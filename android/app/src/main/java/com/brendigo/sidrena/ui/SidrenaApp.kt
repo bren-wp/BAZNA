@@ -174,6 +174,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     "products" -> ProductCatalogScreen(
                         data = snapshot,
                         busy = state.isLoading,
+                        error = state.error,
                         onDetails = {
                             selectedItem = it
                             detailReturnPage = "products"
