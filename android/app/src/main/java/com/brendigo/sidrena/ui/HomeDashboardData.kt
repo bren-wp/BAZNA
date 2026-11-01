@@ -40,6 +40,17 @@ internal fun homeMetrics(
     )
 }
 
+/** A connected site can have CSV files pending publication; do not show green for those. */
+internal fun homeCatalogPending(data: CatalogSnapshot, selectedOutlet: String = ""): Boolean {
+    val outlet = if (selectedOutlet.isBlank()) null else {
+        data.index.outlets.firstOrNull { it.code == selectedOutlet }
+    }
+    if (selectedOutlet.isNotBlank() && outlet == null) return true
+    val productReady = if (outlet == null) data.index.productsCsvReady else outlet.productsCsvReady
+    val serviceReady = if (outlet == null) data.index.servicesCsvReady else outlet.servicesCsvReady
+    return productReady == false || serviceReady == false
+}
+
 /**
  * Three latest PUBLIC docs, not imaginary activity data. Archive dates are preferred
  * where newer, and current CSV feeds can also appear as actual publications.
