@@ -32,6 +32,7 @@ data class PriceItem(
     val sku: String,
     val availability: String,
     val unit: String,
+    val imageUrl: String = "",
 )
 
 data class ArchiveEntry(
