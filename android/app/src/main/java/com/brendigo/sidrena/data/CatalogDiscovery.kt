@@ -26,6 +26,18 @@ object CatalogDiscovery {
             return site.approved(csv).toASCIIString()
         }
 
+        // Optional v1 field introduced by the WordPress plugin. Missing means
+        // unknown (older plugin), and must never be interpreted as not ready.
+        fun ready(feeds: JSONObject, kind: String): Boolean? {
+            val source = feeds.optJSONObject(kind)
+                ?: throw IllegalArgumentException("Nedostaje izvor za $kind.")
+            return when (val raw = source.opt("available_csv")) {
+                null, JSONObject.NULL -> null
+                is Boolean -> raw
+                else -> throw IllegalArgumentException("Status CSV cjenika nije valjan.")
+            }
+        }
+
         val seen = HashSet<String>()
         val outlets = mutableListOf<Outlet>()
         val rawOutlets = when (val field = json.opt("outlets")) {
@@ -49,7 +61,16 @@ object CatalogDiscovery {
             }
             val feed = row.optJSONObject("feeds")
                 ?: throw IllegalArgumentException("Poslovnica nema izvore cjenika.")
-            outlets.add(Outlet(name, code, csvFrom(feed, "proizvodi"), csvFrom(feed, "usluge")))
+            outlets.add(
+                Outlet(
+                    name = name,
+                    code = code,
+                    productCsv = csvFrom(feed, "proizvodi"),
+                    serviceCsv = csvFrom(feed, "usluge"),
+                    productsCsvReady = ready(feed, "proizvodi"),
+                    servicesCsvReady = ready(feed, "usluge"),
+                ),
+            )
         }
 
         fun publicPage(key: String): String? {
@@ -74,6 +95,8 @@ object CatalogDiscovery {
             outlets = outlets,
             pluginVersion = json.optString("plugin_version").ifBlank { null },
             legal = legal,
+            productsCsvReady = ready(sources, "proizvodi"),
+            servicesCsvReady = ready(sources, "usluge"),
         )
     }
 }
