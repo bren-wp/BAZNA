@@ -73,10 +73,10 @@ class HomeReferenceLayoutTest {
         assertEquals("0", homeMetrics(dirty)[2].count)
     }
 
-    @Test fun recentListIsLimitedToTwoRealPublications() {
+    @Test fun recentListMatchesThreeRealPublicationsInReference() {
         val actual = homeRecentPublications(sample())
-        assertEquals(2, actual.size)
-        assertEquals(listOf("CSV", "CSV"), actual.map { it.format })
+        assertEquals(3, actual.size)
+        assertEquals(listOf("CSV", "CSV", "XML"), actual.map { it.format })
         assertTrue(actual.all { it.url.startsWith("https://primjer.hr/") })
         assertTrue(actual.all { it.date?.contains("2026") == true })
     }
@@ -87,10 +87,10 @@ class HomeReferenceLayoutTest {
             productsCsv = "", servicesCsv = "",
         ))
         val items = homeRecentPublications(source)
-        assertEquals(2, items.size)
+        assertEquals(3, items.size)
         assertEquals("XML", items.first().format)
         assertEquals("Cjenik usluga", items.first().title)
-        assertEquals("Cjenik proizvoda", items.last().title)
+        assertEquals("Cjenik proizvoda", items[1].title)
     }
 
     @Test fun invalidPublicUrlsCannotBecomeClickableRecentRows() {
