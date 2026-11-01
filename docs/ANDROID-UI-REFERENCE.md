@@ -330,3 +330,30 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 **Testovi:** `SidrenaConnectionLayoutTest.kt` pokriva kompaktne/izdužene raspone i odbijanje multiline i predugih vrijednosti. Vizualno 1:1 još nije dokazano bez screenshot usporedbe emulatora s originalnim PNG-om; statički demo indikatori telefona iz dizajnerskog mockupa namjerno nisu replicirani u pravoj Android aplikaciji.
 
+
+## Završni vizualni audit — zaslon 03 Početna
+
+**Primarna referenca** je ranije potvrđeni treći telefon s glavnog SIDRENA marketing/brending boarda (`sidrena_ref_screen03_crop.png`); `screens_concept/03_pocetna.png` prikazuje **drugu, pojednostavljenu kompoziciju** i koristi se samo kao sekundarna provjera palete/teksta. Vizualni elementi iz ta dva različita izgleda **ne smiju se miješati**. Svi podaci u stvarnoj Android aplikaciji su iz javno povezanog WordPress kataloga, a ne iz primjerâ na referenci.
+
+| Dio | Primarna referenca i izvedba |
+|---|---|
+| Gornje zaglavlje | `SIDRENA` s narančastim izvornim S logotipom i ikoncom pretrage; 62 dp |
+| Lokalna ikona | `res/drawable/ic_sidrena_mark.xml` sada s točnom geometrijom i gradijentom izvornog `logos/sidrena-symbol.svg` |
+| Povezana stranica | zasebna kartica s zelenom ikonom stanja, domenom i **stvarnim** datumom posljednje objave; pristup osvježavanju/promjeni weba |
+| Statistike | **2×2** kartice, 132 dp svaka; lokalni piktogram gore, naziv i realna brojčana vrijednost dolje; proizvodi, usluge, cjenici i arhiva |
+| Poslovnice | samostalna kartica 78 dp, stvarni broj javnih poslovnica; otvara zaseban zaslon Poslovnice |
+| Nedavne objave | naslov `Nedavno ažurirano`, tri posljednja provjerena objavljena dokumenta unutar jedne kartice, 62 dp po retku |
+| Donja navigacija | Početna / Cjenici / Arhiva / Postavke, aktivna narančasta, diskretna gornja linija 0,6 dp |
+| Boje | `#07182D` pozadina, `#10263D` kartice, `#28455F` obrub; `#FF852C` primarni naglasak |
+| Informacije koje nisu na referenci | upozorenja ili pogreške prikazuju se samo kad doista postoje; pravni profil dostupan preko postojećeg prikaza |
+
+### Funkcionalne i sigurnosne odluke
+
+- `HomeDashboardData.kt` definira `homeMetrics()`, `homeRecentPublications()` i `homeSiteLabel()`. Broj proizvoda/usluga dolazi iz **stvarnih učitanih CSV redaka**. Broj **Cjenici** broji samo valjane aktualne CSV feedove odabrane poslovnice, a **Arhiva** samo valjane, jedinstvene javne CSV/XML dokumente. **Nikada** se ne prikazuju primjeri 1.248 / 320 / 18 / 156 iz dizajna kao stvarni brojčani podaci.
+- `homeRecentPublications()` spaja aktualne objavljene CSV dokumente i valjane arhivske CSV/XML datoteke, uklanja duplikate po URL-u, sortira po stvarno objavljenim datumima i prikazuje **najviše tri**. Dokumenti se otvaraju stvarnom sigurnom HTTPS poveznicom iste domene, kroz postojeći `openPublic()`.
+- Povezana stranica prikazuje stvarni host, a ne izmišljeni naziv trgovine. Oznaka `Povezano` ne predstavlja lažnu provjeru da je web trenutačno online; tijekom učitavanja prikazuje se postojeće stanje `Osvježavanje`.
+- Tražilica, promjena web stranice, osvježavanje, poslovnice i pravne informacije ostaju dostupni bez gubitka postojećih funkcija i ponašanja ostalih zaslona.
+- `HomePresentationTest.kt` i `HomeReferenceLayoutTest.kt` pokrivaju stvarne datume i dokumente, brojanje odabrane poslovnice, sigurne URL-ove i izlaz bez lažnih demo brojki.
+
+**Vizualna potvrda i dalje nedostaje:** Android emulator screenshot na rezolucijama 360×640 i 393×852 dp uz odgovarajući DPI; zatim usklađena screenshot-overlay usporedba s glavnom marketing referencom i dodatne korekcije po pikselima, uključujući sustavske trake i tipografiju. Gradle build i JUnit testovi provjeravaju funkcionalnu ispravnost, ne objektivni pixel-diff.
+
