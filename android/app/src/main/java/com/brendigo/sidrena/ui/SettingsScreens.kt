@@ -15,13 +15,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Public
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,93 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.brendigo.sidrena.BuildConfig
-import com.brendigo.sidrena.data.CatalogSnapshot
-
-@Composable
-fun SettingsPage(
-    data: CatalogSnapshot,
-    busy: Boolean,
-    onEditSite: () -> Unit,
-    onRefresh: () -> Unit,
-    onDisconnect: () -> Unit,
-    onAbout: () -> Unit,
-    onHelp: () -> Unit,
-) {
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        PageHeading("Postavke", "Povezana stranica i postavke aplikacije.")
-        Panel {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AppIcon(Icons.Outlined.Public, SoftBlue)
-                    Spacer(Modifier.width(12.dp))
-                    Column {
-                        Text("Povezana stranica", fontWeight = FontWeight.Bold)
-                        MetaText(data.site)
-                        Pill("Povezano")
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    AccentButton("Provjeri povezivanje", onRefresh, Modifier.weight(1f), !busy)
-                    OutlineAction("Promijeni", onEditSite, Modifier.weight(1f))
-                }
-                TextButton(onClick = onDisconnect) { Text("Odspoji stranicu", color = TextMuted) }
-            }
-        }
-        Panel {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AppIcon(Icons.Outlined.Settings, SoftBlue)
-                    Spacer(Modifier.width(10.dp))
-                    Text("Prikaz", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                }
-                Separator()
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Tema aplikacije")
-                        MetaText("Tamna tema")
-                    }
-                }
-                Separator()
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Jezik")
-                        MetaText("Hrvatski")
-                    }
-                }
-            }
-        }
-        Panel {
-            Column {
-                Text("Podrška", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                RowLink(Icons.Outlined.HelpOutline, "Pomoć i vodiči",
-                    "Odgovori na česta pitanja", onHelp)
-                Separator()
-                RowLink(Icons.Outlined.Info, "O aplikaciji",
-                    "SIDRENA " + BuildConfig.VERSION_NAME, onAbout)
-            }
-        }
-        Panel {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Usklađenost s WordPressom", fontWeight = FontWeight.Bold)
-                MetaText("WordPress dodatak: " + (data.index.pluginVersion ?: "Nepoznata verzija"))
-                data.index.legal?.let { policy ->
-                    MetaText("Pravni profil: " + policy.rulesRevision)
-                    MetaText("Referentni datumi: " + policy.legacyReferenceDate + " / " +
-                        policy.generalReferenceDate)
-                    policy.consumerLawRevision?.let { MetaText("Zaštita potrošača: " + it) }
-                    policy.unitPriceRuleRevision?.let { MetaText("Cijene po jedinici mjere: " + it) }
-                    policy.unitPriceRuleEffectiveFrom?.let { MetaText("Pravilnik o cijeni po jedinici mjere od: " + it) }
-                    policy.priceReductionLookbackDays?.let { MetaText("Sniženja: najniža cijena u " + it + " dana prije sniženja.") }
-                    if (policy.discountBaselineIsAnchorPrice == false) MetaText("Sidrena cijena nije osnova za izračun popusta.")
-                } ?: MetaText("Noviji pravni profil nije dostupan.")
-            }
-        }
-        Spacer(Modifier.height(14.dp))
-    }
-}
 
 @Composable
 fun AboutPage(
@@ -131,7 +41,7 @@ fun AboutPage(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         TextButton(onClick = onBack) {
-            androidx.compose.material3.Icon(Icons.Outlined.ArrowBack, contentDescription = null, tint = SoftBlue)
+            Icon(Icons.Outlined.ArrowBack, contentDescription = null, tint = SoftBlue)
             Spacer(Modifier.width(8.dp))
             Text("Postavke", color = SoftBlue)
         }
