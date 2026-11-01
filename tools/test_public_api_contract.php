@@ -27,6 +27,10 @@ function rest_url( $route ) {
 function rest_ensure_response( $data ) {
 	return $data;
 }
+function add_query_arg( $key, $value, $url ) {
+	$separator = false === strpos( $url, '?' ) ? '?' : '&';
+	return $url . $separator . rawurlencode( $key ) . '=' . rawurlencode( $value );
+}
 class WP_REST_Server {
 	const READABLE = 'GET';
 }
