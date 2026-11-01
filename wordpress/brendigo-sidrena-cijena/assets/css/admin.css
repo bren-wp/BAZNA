@@ -3814,3 +3814,147 @@ body.sidrena-cijena-screen #wpbody-content > .notice .notice-dismiss:focus::befo
     height: 100%;
     object-fit: contain;
 }
+
+/* Shared SIDRENA visual tokens: Android (Compose) + WordPress admin.
+ * Scoped to SIDRENA pages; never restyle WordPress or WooCommerce globally.
+ * Existing layout/responsiveness is retained while cards and actions match
+ * Android's #07182D / #10263D / #28455F / #FF852C palette.
+ */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin {
+	--br-bg: #07182d;
+	--br-line: #28455f;
+	--br-line-strong: #385a73;
+	--br-text: #fff;
+	--br-muted: #a9bad1;
+	--br-gold: #ff852c;
+	--br-green: #52d9a3;
+	--br-blue: #80b9ff;
+	--br-violet: #9091ff;
+	--sidrena-teal: #52d9a3;
+	--sidrena-teal-dark: #52d9a3;
+	--sidrena-blue: #80b9ff;
+	--sidrena-blue-dark: #80b9ff;
+	--sidrena-wash: rgba(255, 133, 44, .08);
+	--sidrena-gradient-btn: linear-gradient(135deg, #ffaa55, #ff852c);
+	--sidrena-gradient-btn-hover: linear-gradient(135deg, #ffb566, #ff9346);
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-shell {
+	background: #07182d;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-sidebar {
+	background: linear-gradient(180deg, #10263d, #07182d);
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-nav__item.is-active {
+	border-color: rgba(255, 133, 44, .38);
+	color: #ffaa55;
+	background: rgba(255, 133, 44, .12);
+	box-shadow: inset 3px 0 0 #ff852c;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-brand__mark--sidrena {
+	border-color: rgba(255, 133, 44, .36);
+	background: linear-gradient(145deg, #19304a, #07182d);
+	box-shadow: 0 0 0 4px rgba(255, 133, 44, .06);
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-urlbox {
+	background: #10263d;
+	border-color: #28455f;
+	border-radius: 14px;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-urlbox code {
+	color: #d8e4f0;
+	overflow-wrap: anywhere;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-settings .button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary {
+	border-radius: 12px;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge {
+	display: grid;
+	gap: 12px;
+	margin: 14px 0 20px;
+	padding: clamp(14px, 2.5vw, 20px);
+	border: 1px solid #28455f;
+	border-radius: 16px;
+	background: #10263d;
+	color: #fff;
+}
+.sidrena-android-bridge__head {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 10px;
+	align-items: center;
+}
+.sidrena-android-bridge__head h3 {
+	margin: 0;
+	color: #fff;
+	font-size: 18px;
+	line-height: 1.4;
+}
+.sidrena-android-bridge p {
+	margin: 0;
+	color: #a9bad1;
+	line-height: 1.6;
+}
+.sidrena-android-bridge__status {
+	display: inline-flex;
+	align-items: center;
+	min-height: 30px;
+	padding: 4px 12px;
+	border: 1px solid #516477;
+	border-radius: 99px;
+	font-size: 12px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.sidrena-android-bridge .is-ready {
+	color: #52d9a3;
+	border-color: rgba(82, 217, 163, .30);
+}
+.sidrena-android-bridge .is-pending {
+	color: #ffaa55;
+	border-color: rgba(255, 133, 44, .36);
+}
+.sidrena-android-bridge__url {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 12px;
+	border: 1px solid #28455f;
+	border-radius: 11px;
+	background: #19304a;
+}
+.sidrena-android-bridge__url code {
+	flex: 1 1 250px;
+	min-width: 0;
+	padding: 0;
+	background: transparent;
+	color: #fff;
+	overflow-wrap: anywhere;
+}
+.sidrena-android-bridge__checks {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 18px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.sidrena-android-bridge__checks li {
+	margin: 0;
+	padding: 2px 0 2px 14px;
+	border-left: 3px solid currentColor;
+	font-size: 13px;
+}
+.sidrena-android-bridge .sidrena-android-bridge__warning {
+	color: #ffcfaa;
+}
+@media (max-width: 782px) {
+	.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge {
+		padding: 14px;
+	}
+	.sidrena-android-bridge__url .button {
+		width: 100%;
+	}
+}
