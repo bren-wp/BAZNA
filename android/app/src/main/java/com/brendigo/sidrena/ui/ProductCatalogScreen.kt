@@ -69,6 +69,26 @@ import com.brendigo.sidrena.data.CatalogSnapshot
 import com.brendigo.sidrena.data.PriceItem
 
 /**
+ * Filters are based on actual public CSV fields. Do not simulate
+ * `Akcija`, `Novo` or categories absent from the v1 REST contract.
+ */
+internal fun filterProductCatalog(
+    products: List<PriceItem>,
+    query: String,
+    filter: Int,
+): List<PriceItem> {
+    require(filter in 0..2)
+    val queried = CatalogSearch.items(products, query, if (filter == 1) 1 else 0)
+    return if (filter == 2) {
+        queried.filter { item ->
+            item.availability.trim().lowercase() in setOf(
+                "dostupno", "na zalihi", "instock", "in stock",
+            )
+        }
+    } else queried
+}
+
+/**
  * 04/12: SIDRENA products.
  * The public API has no images, sale flags, "new" flags, or category data.
  * Keep the reference layout but use truthful anchor-price filters and local
@@ -87,7 +107,7 @@ fun ProductCatalogScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableIntStateOf(0) }
     val visible = remember(data.products, query, filter) {
-        CatalogSearch.items(data.products, query, filter)
+        filterProductCatalog(data.products, query, filter)
     }
 
     Column(Modifier.fillMaxSize().background(Background)) {
@@ -150,7 +170,7 @@ fun ProductCatalogScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf("Svi", "Sidrena", "Bez sidrene").forEachIndexed { index, label ->
+            listOf("Svi", "Sa sidrenom cijenom", "Dostupni").forEachIndexed { index, label ->
                 CatalogFilterChip(
                     label = label,
                     selected = filter == index,
@@ -206,7 +226,7 @@ fun ProductCatalogScreen(
                 contentPadding = PaddingValues(bottom = 20.dp),
             ) {
                 items(visible) { product ->
-                    ProductReferenceRow(product, onClick = { onDetails(product) })
+                    ProductReferenceRow(product, site = data.site, onClick = { onDetails(product) })
                 }
             }
         }
@@ -288,7 +308,7 @@ internal fun CatalogFilterChip(label: String, selected: Boolean, onClick: () -> 
 }
 
 @Composable
-private fun ProductReferenceRow(item: PriceItem, onClick: () -> Unit) {
+private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Unit) {
     val currentPrice = formatPrice(item.currentPrice)
     val referencePrice = formatPrice(item.referencePrice)
     Card(
@@ -307,19 +327,12 @@ private fun ProductReferenceRow(item: PriceItem, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // A neutral local pictogram, not a fake remote product photo.
-            Box(
-                modifier = Modifier.size(width = 64.dp, height = 72.dp)
-                    .background(Color(0xFFF0EEE8), RoundedCornerShape(9.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    Icons.Outlined.Inventory2,
-                    contentDescription = null,
-                    tint = Color(0xFF996F4D),
-                    modifier = Modifier.size(35.dp),
-                )
-            }
+            // Only a real, approved WordPress product photo may be rendered.
+            ProductThumbnail(
+                site = site,
+                imageUrl = item.imageUrl,
+                modifier = Modifier.size(width = 64.dp, height = 72.dp),
+            )
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
