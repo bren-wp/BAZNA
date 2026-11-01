@@ -184,3 +184,33 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 **Obavezna provjera prije 1:1 potvrde:** Kotlin build, testovi, Android Lint, audit, APK/AAB; emulator 393×852 i 360×640 dp, skaliranje teksta 100% i 150%, pretraga dugog naziva, prazna lista, spora i neuspjela mreža, odabir različitih poslovnica, screenshot overlay s referencom. Bez izmjerene usporedbe ne tvrditi da je zaslon pixel-perfect 1:1.
 
+
+## Zaslon 10 — Pretraživanje (isti PR #202)
+
+Nativni `ui/SearchScreen.kt` zamjenjuje zastarjeli `ArchiveAndSearch.kt`. Koristi iste zajedničke UI komponente kao Proizvodi, Usluge i Cjenici: tamnoplava SIDRENA podloga, vlastiti toolbar, pretraga, narančasti aktivni filtar, kartice stavki i donja navigacija.
+
+| Element | Mjera i ponašanje |
+|---|---|
+| Zaglavlje | 61 dp, bijeli naslov 22 sp Bold, povratak i izbornik po 48 dp |
+| Tražilica | 52 dp, `#19304A`, radius 12 dp, tipkovnica `ImeAction.Search` |
+| Filtri | 43 dp, razmak 8 dp: Sve / Proizvodi / Usluge; Arhiva je zaseban navigacijski prečac |
+| Rezultati | najmanje 91 dp, kartica `#10263D`, radius 14 dp, obrub `#28455F` |
+| Ikona | 59 dp, narančasti proizvod ili plava usluga; bez izmišljene fotografije |
+| Cijena | 16 sp ExtraBold `#FF852C`; sidrena 11 sp, samo ako je objavljena |
+| Layout | `LazyColumn`, `imePadding`, skraćivanje dugih naziva, prazna stanja |
+| Navigacija | detalj proizvoda/usluge i povratak na prethodni zaslon, sa sačuvanim upitom i filtrom |
+
+### Integracija i izvor podataka
+
+- `searchCatalogEntries(products, services, query, kind)` filtrira **oba stvarna javna CSV kataloga**, bez dvojnog preuzimanja, server-side pretraživanja ili dodatnih vanjskih biblioteka. Zadržava objavljeni redoslijed unutar svakog izvora.
+- Filtar `Sve` pretražuje proizvode i usluge; zasebni filtri biraju vrstu prema stvarnoj listi izvora, a ne nepouzdanim tekstualnim kategorijama.
+- Postojeći `CatalogSearch.items()` omogućuje više pojmova te pretragu naziva, SKU-a, ID-a, dostupnosti i vrste bez pretvaranja sidrene cijene u popust.
+- U rezultatima se prikazuju isključivo stvarne trenutačne i sidrene cijene; prazna cijena jasno je označena. Nema demo podatka u produkciji.
+- `SidrenaApp.kt` upravlja `rememberSaveable` upitom, vrstom filtra i prethodnom stranicom. Nakon otvaranja detalja i povratka pretraga ostaje očuvana. Android sustavna i gornja tipka za povratak vode na isti prethodni zaslon.
+- `SearchPage` prikazuje stvarno učitavanje i API grešku; kontekstni izbornik omogućuje osvježavanje i odlazak u Arhivu.
+- `SearchScreenPresentationTest.kt` sadrži šest JVM testova za kombiniranu pretragu, vrstu, hrvatske znakove, više pojmova, prazne rezultate i cijene.
+
+### Provjera prihvatljivosti
+
+Provjeriti `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, audit i APK/AAB artefakte. Ručno provjeriti zaslone 393×852 dp i 360×640 dp, tipkovnicu, male uređaje, 150% veličinu fonta, mnoštvo rezultata, pretragu s hrvatskim znakovima, povratak iz detalja i `Arhiva` prečac. **Pixel-perfect 1:1 nije potvrđen** bez usporedbe screenshota emulatora i izvornog brending prikaza te korekcije izmjerenih odstupanja.
+
