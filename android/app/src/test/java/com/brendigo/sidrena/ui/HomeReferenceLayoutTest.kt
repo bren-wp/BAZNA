@@ -114,6 +114,40 @@ class HomeReferenceLayoutTest {
         assertEquals("trgovina.example.hr", homeSiteLabel("https://trgovina.example.hr/"))
     }
 
+    @Test fun aPendingWordPressFeedIsNotShownAsFullyPublished() {
+        val source = sample()
+        val pending = source.copy(
+            index = source.index.copy(productsCsvReady = true, servicesCsvReady = false),
+        )
+        assertTrue(homeCatalogPending(pending))
+        assertFalse(homeCatalogPending(pending.copy(
+            index = pending.index.copy(servicesCsvReady = true),
+        )))
+    }
+
+    @Test fun legacyPluginWithNoReadinessRemainsCompatible() {
+        assertFalse(homeCatalogPending(sample()))
+    }
+
+    @Test fun outletReadinessCannotBorrowWebshopStatus() {
+        val source = sample()
+        val pending = source.copy(
+            index = source.index.copy(
+                productsCsvReady = true,
+                servicesCsvReady = true,
+                outlets = listOf(Outlet(
+                    "Rijeka", "rijeka", "https://primjer.hr/ri-p.csv",
+                    "https://primjer.hr/ri-s.csv",
+                    productsCsvReady = false,
+                    servicesCsvReady = true,
+                )),
+            ),
+        )
+        assertFalse(homeCatalogPending(pending))
+        assertTrue(homeCatalogPending(pending, "rijeka"))
+        assertTrue(homeCatalogPending(pending, "deleted-outlet"))
+    }
+
     @Test fun dateSortingUsesActualPublishedIsoAndCroatianDates() {
         val date = homeDateKey("31. 10. 2026.")
         assertEquals(date, homeDateKey("2026-10-31"))
