@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -514,4 +513,10 @@ internal fun SidrenaSettingsPreview() {
             onHelp = {},
         )
     }
+}
+
+@Preview(name = "11 SIDRENA Postavke kompaktno", widthDp = 360, heightDp = 640, showBackground = true)
+@Composable
+internal fun SidrenaSettingsCompactPreview() {
+    SidrenaSettingsPreview()
 }
