@@ -104,3 +104,26 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 **QA:** `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, audit izvornog koda; JUnit testovi za opise cijena, datume, nedostupne podatke i vraćanje odabira. Nakon builda slijedi ručni prikaz na emulatoru 393×852 i 360×640 dp, 100% i 150% povećanje fonta te screenshot overlay prema originalnoj slici. Sama kompilacija ne potvrđuje pixel-perfect 1:1 rezultat.
 
+
+## Zaslon 07 — Cjenici (PR #202)
+
+**Vizualna referenca:** sedmi telefon korisnikove SIDRENA ploče. Posebno zaglavlje s povratkom i izbornikom, tražilica, filtri `Svi / Proizvodi / Usluge / Ostalo`, kompaktni redovi dokumenata s formatom i radnjom otvaranja. Zadržane su tamnoplava i narančasta paleta, bijeli naslovi i suptilni obrubi.
+
+| Element | Vizualni cilj |
+|---|---|
+| Zaglavlje | 61 dp, naslov 22 sp, povratak i izbornik 48 dp |
+| Tražilica | 52 dp, `#19304A`, radius 12 dp |
+| Filtar | 43 dp, razmak 8 dp; narančast samo odabrani |
+| Redak dokumenta | najmanje 80 dp, `#10263D`, radius 14 dp |
+| Ikona dokumenta | 44×44 dp, lokalna: CSV zelena, XML narančasta, WEB plava |
+| Naziv/metadata | naziv 14 sp Bold, format i status 12 sp, datum 11 sp |
+| Akcija | `OpenInNew` (48 dp dodirna površina); otvara URL, ne nameće preuzimanje |
+
+**Stvarni izvori:** `index.productsCsv` / `index.servicesCsv` (ili CSV cjenici odabrane poslovnice), `index.publicPage` kao WEB dokument i stvarni `archive` CSV/XML zapisi. Arhivski zapisi izričito su označeni **Arhiva**; ne prikazuju se lažni PDF-ovi, veličine datoteka, nazivi ili datumi. Deduplikacija ide po provjerenoj URL adresi. Filtar `Ostalo` prikazuje javnu web stranicu cjenika ili neklasificiranu arhivu; ne zaključuje vrstu iz datotečnog imena.
+
+**Sigurnost:** svi linkovi prije prikaza prolaze `SiteUrl.publicLink()` (ista HTTPS domena), a prilikom otvaranja još jednom prolaze zaštitu u `SidrenaApp.openPublic()`. Odabir poslovnice određuje izvore CSV cjenika; nepoznata poslovnica ne uzrokuje tihu zamjenu webshopom.
+
+**Navigacija:** `Početna → Cjenici`, donja stavka `Cjenici`, unutar zaslona `Natrag`, `Arhiva cjenika` i `Osvježi cjenike`. Druga i treća funkcija koriste postojeću logiku, bez posebnih HTTP klijenata.
+
+**Provjera:** `PublicPriceListsScreenTest.kt` (javni dokumenti, pretraga, filtri, poslovnice, duplikati, same-origin zaštita). CI: Kotlin compile, JUnit, Android Lint, sigurnosni audit, APK/AAB. Pixel-perfect potvrda zahtijeva snimku emulatora i overlay s referentnim dizajnom na istim dimenzijama, nakon čega se mjere preostala odstupanja. **Bez snimke još ne postoji potvrda vizualnog rezultata 1:1.**
+
