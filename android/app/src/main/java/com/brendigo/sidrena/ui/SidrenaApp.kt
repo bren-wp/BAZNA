@@ -153,10 +153,16 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     },
                 )
             } else {
-                BrandHeader(onNotifications = {
-                    alert = "Posljednja objava: " +
-                        (snapshot.index.publishedAt ?: "Datum nije dostupan")
-                })
+                // Home screen has its own wordmark/search header from the reference.
+                // Keep the shared header unchanged on all other screens.
+                if (page == "home") {
+                    // HomePage renders the dedicated search header.
+                } else {
+                    BrandHeader(onNotifications = {
+                        alert = "Posljednja objava: " +
+                            (snapshot.index.publishedAt ?: "Datum nije dostupan")
+                    })
+                }
                 when (page) {
                     "home" -> HomePage(
                         data = snapshot,
