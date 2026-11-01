@@ -40,12 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -108,13 +103,15 @@ fun SearchPage(
     data: CatalogSnapshot,
     busy: Boolean,
     error: String?,
+    query: String,
+    kind: Int,
+    onQueryChange: (String) -> Unit,
+    onKindChange: (Int) -> Unit,
     onDetails: (PriceItem) -> Unit,
     onBack: () -> Unit,
     onArchive: () -> Unit,
     onRefresh: () -> Unit,
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var kind by rememberSaveable { mutableIntStateOf(0) }
     val results = remember(data.products, data.services, query, kind) {
         searchCatalogEntries(data.products, data.services, query, kind)
     }
@@ -134,7 +131,7 @@ fun SearchPage(
         Spacer(Modifier.height(7.dp))
         CatalogSearchBar(
             value = query,
-            onQueryChange = { query = it.take(256) },
+            onQueryChange = { onQueryChange(it.take(256)) },
             hint = "Pretraži proizvode i usluge…",
             accessibilityLabel = "Pretraži proizvode i usluge po nazivu, šifri ili oznaci",
         )
@@ -149,7 +146,7 @@ fun SearchPage(
                 CatalogFilterChip(
                     label = title,
                     selected = kind == index,
-                    onClick = { kind = index },
+                    onClick = { onKindChange(index) },
                 )
             }
             CatalogFilterChip(
@@ -431,6 +428,10 @@ internal fun SidrenaSearchPreview() {
             data = example,
             busy = false,
             error = null,
+            query = "",
+            kind = 0,
+            onQueryChange = {},
+            onKindChange = {},
             onDetails = {},
             onBack = {},
             onArchive = {},
