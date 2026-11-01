@@ -1,6 +1,6 @@
 # SIDRENA Android — vizualni standard
 
-Android zasloni koriste jedinstveni SIDRENA dizajn usklađen s dostavljenih deset referentnih prikaza.
+Android zasloni koriste jedinstveni SIDRENA dizajn usklađen s dostavljenih dvanaest referentnih prikaza.
 
 ## Dizajnerski sustav
 
@@ -16,7 +16,7 @@ Android zasloni koriste jedinstveni SIDRENA dizajn usklađen s dostavljenih dese
 
 | Referenca | Android prikaz |
 |---|---|
-| 1. Splash | SIDRENA logo, slogan i animirana traka |
+| 1. Splash | Izvorni narančasti SVG simbol S, slogan i potpis Brendigo bez trake učitavanja |
 | 2. Povezivanje | HTTPS unos i povezivanje s WordPressom |
 | 3. Početna | Povezana stranica, statistike, objave i brze kartice |
 | 4. Proizvodi | Pretraga, filtri sidrenih cijena i popis javnih artikala |
@@ -280,4 +280,29 @@ Android CI mora proći Kotlin kompilaciju, `testDebugUnitTest`, `lintDebug`, `as
 - `ui/AboutScreenPresentationTest.kt`: šest testova verzija, praznih datuma i metapodataka, URL validacije, nemogućih HTTP/external URL-ova te pravnog profila.
 - U CI-ju obvezni Kotlin build, unit tests, Lint, sigurnosni/dead-code audit i APK/AAB validacija.
 - Ručni test: Android Back i gornji povratak, pomoćni dijalozi, e-pošta s/bez instalirane aplikacije, veliki font, kratka visina i duga domena. **Tvrdnja 1:1 pixel-perfect nije dokazana dok emulator screenshot nije poravnan s korisnikovim referentnim prikazom.**
+
+
+## Završni vizualni audit — zaslon 01 Splash
+
+Izvorni preglednik: `SIDRENA-Android-Kompletan-Brending.zip` → `screens_concept/01_splash.png` (1080 × 1920). Datoteka `logos/sidrena-splash-1080x1920.png` ima iste piksele. Autoritativni vektor: `logos/sidrena-splash.svg`. Implementacija je `ui/SidrenaSplashScreen.kt`, s izvornim vektorskim `Path` koordinatama umjesto lokalnog launcher simbola koji nije istovjetan izvornom znaku.
+
+**Odstupanja otklonjena:** prethodni prikaz koristio je mali S u uokvirenoj kartici, kutne dekoracije, plavu pomoćnu boju slogana i indikator učitavanja. Referenca ima velik samostalan narančasti znak S, dvije suptilne kružnice, odgovarajući plavi dijagonalni gradijent, bijeli veliki naziv i odvojeni narančasti potpis. Korisnik nije tražio dodatne slike — implementacija crta vektorski sadržaj lokalno, bez slikovnih ili mrežnih resursa.
+
+| Referentni element | Točna SVG koordinata / vrijednost |
+|---|---|
+| Radni format | 1080 × 1920 jedinica |
+| Pozadinski gradijent | `#07182D` → `#123457`, gornji lijevi u donji desni kut |
+| Desna gornja kružnica | centar (935, 250), radijus 540, `#FF852C` s 5,5% prozirnosti |
+| Donja lijeva kružnica | centar (120, 1650), radijus 450, `#5C8EBB` s 5,5% prozirnosti |
+| Glavni simbol | izvorna `Path` geometrija, translacija (16, 188), skaliranje ×4 |
+| Gradijent simbola | `#FFAA55` → `#FF852C` |
+| Naslov SIDRENA | središnja x=540, baseline y=1160, 119 jedinica, Bold, tracking 10 |
+| Slogan – redak 1 | baseline 1248, font 42, `#A9BAD1` |
+| Slogan – redak 2 | baseline 1310, font 42, `#A9BAD1` |
+| Potpis by Brendigo | baseline 1720, font 36, `#FF852C` |
+| Trajanje | 2200 ms, bez vizualne trake učitavanja; prethodna navigacija ostaje nepromijenjena |
+
+`splashGeometry()` u originalnom 1080×1920 formatu daje točno navedene SVG položaje. Na drugim omjerima zaslona slovo i veličina teksta skaliraju se jednoliko, bez rastezanja; vertikalni oslonci prilagođavaju se visini. `SidrenaSplashGeometryTest.kt` pokriva izvorni format i kompaktne/izdužene ekrane.
+
+**Ostaje za dokazati:** usporedbu snimke aplikacije u emulatoru s autoritativnom referentnom PNG datotekom, na istom viewportu, uz maskiranje eventualnih sistemskih traka i provjeru razlika zbog Android zamjenskog fonta. GitHub Actions Kotlin build, JUnit i Lint ne dokazuju konačan pixel-perfect 1:1, nego samo tehničku valjanost. Nakon stvarne usporedbe slijedi zaslon 02 Povezivanje i naredni redom.
 
