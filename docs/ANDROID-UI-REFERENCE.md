@@ -161,3 +161,26 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 - `ui/ArchiveScreenPresentationTest.kt` — sedam JVM testova datuma, godina, filtriranja, formata, URL sigurnosti, duplikata i prazne arhive.
 - CI: `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, sigurnosni i dead-code audit. Potrebna je i ručna pixel-diff usporedba stvarnog emulatora s korisničkom referencom; prolazak Gradlea nije dokaz preciznosti 1:1.
 
+
+## Zaslon 09 — Poslovnice (isti PR #202)
+
+**Referenca:** deveti telefon SIDRENA branding boarda. Zaslon slijedi kompoziciju: zaglavlje 61 dp, pretraga 52 dp, tamnoplavi informativni blok 168 dp u prostoru karte, lista poslovnica i jasna akcija za pregled pripadajućih cjenika.
+
+| Dio | Pravilo |
+|---|---|
+| Pozadina | `#07182D`, tamne kartice `#10263D`, izdignuta površina `#19304A` |
+| Zaglavlje | 61 dp, bijeli naslov 22 sp, akcije povratak i izbornik po 48 dp |
+| Pretraživanje | 52 dp, radius 12 dp, pretraga stvarnih naziva/šifri poslovnica |
+| Područje karte | 168 dp, statički geometrijski uzorak s oznakom **Karta nije dostupna** |
+| Poslovnice | min. 92 dp, radius 14 dp, obrub 1 dp `#28455F`, ikona 48 dp |
+| Odabir | `Odaberi` učitava cijene poslovnice; aktivna kartica `Cjenici` otvara njezine cjenike |
+| Scroll | `LazyColumn` sa stabilnim kodovima, prilagodba tipkovnici putem `imePadding` |
+
+**Ograničenje javnog API-ja:** `Outlet` sadrži samo `name`, `code`, `productCsv` i `serviceCsv`. Ne sadrži GPS koordinate, adresu, radno vrijeme niti telefonski broj. Stoga zaslon ne crta izmišljene karte s pinovima i ne prikazuje fiktivne adrese ili udaljenosti. Uzorak u panelu je dekorativan, ne geografski prikaz. Kartografsku funkciju moguće je implementirati tek nakon dokumentiranog proširenja javnog WordPress API-ja stvarnim lokacijskim podacima i zasebne validacije.
+
+**Stvarna funkcionalnost:** `publishedLocations()` prikazuje webshop kao zaseban kanal, uz stvarne poslovnice iz `CatalogIndex.outlets`; ukupan broj fizičkih poslovnica ne uključuje webshop. `filterPublishedLocations()` podržava više pojmova, velika/mala slova, hrvatske znakove i pretragu po šifri. `SidrenaViewModel.selectOutlet()` ostaje jedini put za promjenu izvora; spinner i greška vidljivi su na istom zaslonu. Uspješan odabir omogućuje gumb **Cjenici** koji otvara javne cjenike odabrane poslovnice. Prije otvaranja stranice sve URL adrese prolaze postojeću `SiteUrl.publicLink()` zaštitu.
+
+**Integracija:** `ui/LocationsScreen.kt` je nova implementacija, stari `LocationsPage/OutletCard` uklonjeni su iz `ArchiveAndSearch.kt`; `SearchPage` je ostao funkcionalno nepromijenjen. U `SidrenaApp.kt` uklonjeno je dvostruko zaglavlje i povezani su povratak, osvježavanje, odabir poslovnice, otvaranje cjenika. `LocationsScreenPresentationTest.kt` sadrži šest JVM testova.
+
+**Obavezna provjera prije 1:1 potvrde:** Kotlin build, testovi, Android Lint, audit, APK/AAB; emulator 393×852 i 360×640 dp, skaliranje teksta 100% i 150%, pretraga dugog naziva, prazna lista, spora i neuspjela mreža, odabir različitih poslovnica, screenshot overlay s referencom. Bez izmjerene usporedbe ne tvrditi da je zaslon pixel-perfect 1:1.
+
