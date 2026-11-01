@@ -104,6 +104,7 @@ fun HomePage(
             site = data.site,
             publishedAt = data.index.publishedAt,
             busy = busy,
+            publicationPending = homeCatalogPending(data, selectedOutlet),
             onRefresh = onRefresh,
             onEdit = onEdit,
         )
@@ -318,6 +319,7 @@ private fun HomeConnectedCard(
     site: String,
     publishedAt: String?,
     busy: Boolean,
+    publicationPending: Boolean,
     onRefresh: () -> Unit,
     onEdit: () -> Unit,
 ) {
@@ -344,7 +346,7 @@ private fun HomeConnectedCard(
                 }
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    "Povezano",
+                    if (publicationPending) "Cjenici čekaju objavu" else "Povezano",
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.White,
                     fontSize = 18.sp,
@@ -394,7 +396,8 @@ private fun HomeConnectedCard(
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Zadnje ažuriranje: " + (publishedAt?.takeIf { it.isNotBlank() } ?: "Datum nije dostupan"),
+                text = if (publicationPending) "Najprije objavite CSV cjenike u WordPress dodatku." else
+                    "Zadnje ažuriranje: " + (publishedAt?.takeIf { it.isNotBlank() } ?: "Datum nije dostupan"),
                 color = Color(0xFFD8E4F0),
                 fontSize = 12.sp,
                 maxLines = 2,
