@@ -214,3 +214,34 @@ Nativni `ui/SearchScreen.kt` zamjenjuje zastarjeli `ArchiveAndSearch.kt`. Korist
 
 Provjeriti `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, audit i APK/AAB artefakte. Ručno provjeriti zaslone 393×852 dp i 360×640 dp, tipkovnicu, male uređaje, 150% veličinu fonta, mnoštvo rezultata, pretragu s hrvatskim znakovima, povratak iz detalja i `Arhiva` prečac. **Pixel-perfect 1:1 nije potvrđen** bez usporedbe screenshota emulatora i izvornog brending prikaza te korekcije izmjerenih odstupanja.
 
+
+## Zaslon 11 — Postavke (isti PR #202)
+
+**Dizajnerska referenca:** SIDRENA zaslon postavki, s tamnoplavom pozadinom, narančastim akcijama, grupiranim karticama i donjom navigacijom. Implementacija `ui/SettingsScreen.kt`; zadržan `AboutPage` u `ui/SettingsScreens.kt`.
+
+| Dio | Vizualni cilj |
+|---|---|
+| Zaglavlje | 61 dp, bijeli naslov 22 sp Bold, ikona povratka s dodirnom površinom 48 dp |
+| Pozadina | `#07182D`, kartice `#10263D`, izdignute ikonice `#19304A` |
+| Kartice | radius 16 dp, obrub 1 dp `#28455F`, unutarnje margine 14–16 dp |
+| Povezana stranica | URL sa skraćivanjem dugih domena, status `#52D9A3`, datum zadnje objave |
+| Primarna akcija | narančasti gumb Osvježi, 48 dp; promjena URL-a obrisani sekundarni gumb |
+| Sekcije | POSLOVNICA I CJENICI, PRIKAZ, INFORMACIJE I PODRŠKA |
+| Stavke | visina 76 dp, ikona 43 dp, naslov 14 sp, opis 12 sp, desna strelica samo za stvarne akcije |
+| Odspajanje | zasebna akcija 48 dp; postojeći potvrdni dijalog prije brisanja lokalne HTTPS adrese |
+| Raspored | `verticalScroll`, prilagodba kraćim ekranima i povećanom fontu |
+
+### Integracija i sigurnost
+
+- `SettingsSummary` prikazuje samo podatke iz `CatalogSnapshot`: HTTPS adresu, zadnju objavu, naziv stvarne odabrane poslovnice, verziju dodatka i reviziju pravnog profila. Nedostajući metapodaci označeni su kao nedostupni, bez izmišljanja datuma ili verzije.
+- Osvježi, Promijeni URL, Odspoji stranicu, Poslovnica, Pomoć i O aplikaciji povezani su sa stvarnim `SidrenaViewModel` funkcijama i postojećom navigacijom. Dok traje osvježavanje, radnje koje mijenjaju vezu onemogućene su.
+- `Tema aplikacije: Tamna tema` i `Jezik aplikacije: Hrvatski` su **informativne** (aplikacija trenutačno nema sustav promjene teme ili jezika). Ne prikazuju se lažni prekidači ni klikabilni redovi.
+- `Odspoji stranicu` koristi već postojeći potvrdni `AlertDialog`; lokalna postavka se uklanja bez brisanja sadržaja WordPress stranice.
+- Povezana poslovnica prepoznaje se prema točnom javnom `Outlet.code`; nepoznat kod ne smije se prikazati kao webshop.
+- `ui/SettingsScreens.kt` nakon izdvajanja sadrži samo `AboutPage`, bez duplicirane implementacije postavki i nepotrebnih uvoza.
+- `SettingsScreenPresentationTest.kt` provjerava šest scenarija uključujući prazne i nedostupne metapodatke.
+
+### QA i pixel-perfect kriteriji
+
+Android CI mora proći Kotlin kompilaciju, `testDebugUnitTest`, `lintDebug`, `assembleDebug`, `bundleRelease`, source security/dead-code audit i verifikaciju artefakata. Na emulatoru dodatno usporediti screenshot pri 393×852 dp i 360×640 dp, provjeriti 150% font scaling, duge nazive domena, grešku mreže, ponovno povezivanje i odspajanje. **Dok se ne napravi overlay sa stvarnim emulatorom i referencom, 1:1 pixel-perfect nije potvrđen.**
+
