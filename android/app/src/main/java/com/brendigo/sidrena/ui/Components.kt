@@ -175,20 +175,27 @@ fun AppNavigation(active: Int, onSelect: (Int) -> Unit) {
         Triple("Arhiva", Icons.Outlined.Archive, 2),
         Triple("Postavke", Icons.Outlined.Settings, 3),
     )
-    NavigationBar(containerColor = Background, tonalElevation = 0.dp) {
-        tabs.forEach { (label, icon, index) ->
-            NavigationBarItem(
-                selected = active == index,
-                onClick = { onSelect(index) },
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label, maxLines = 1) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Accent, selectedTextColor = Accent,
-                    indicatorColor = Background,
-                    unselectedIconColor = TextMuted, unselectedTextColor = TextMuted,
-                ),
-                alwaysShowLabel = true,
-            )
+    Column {
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 0.6.dp,
+            color = Border,
+        )
+        NavigationBar(containerColor = Background, tonalElevation = 0.dp) {
+            tabs.forEach { (label, icon, index) ->
+                NavigationBarItem(
+                    selected = active == index,
+                    onClick = { onSelect(index) },
+                    icon = { Icon(icon, contentDescription = label) },
+                    label = { Text(label, maxLines = 1) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Accent, selectedTextColor = Accent,
+                        indicatorColor = Background,
+                        unselectedIconColor = TextMuted, unselectedTextColor = TextMuted,
+                    ),
+                    alwaysShowLabel = true,
+                )
+            }
         }
     }
 }
