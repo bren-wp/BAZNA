@@ -245,3 +245,39 @@ Provjeriti `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, a
 
 Android CI mora proći Kotlin kompilaciju, `testDebugUnitTest`, `lintDebug`, `assembleDebug`, `bundleRelease`, source security/dead-code audit i verifikaciju artefakata. Na emulatoru dodatno usporediti screenshot pri 393×852 dp i 360×640 dp, provjeriti 150% font scaling, duge nazive domena, grešku mreže, ponovno povezivanje i odspajanje. **Dok se ne napravi overlay sa stvarnim emulatorom i referencom, 1:1 pixel-perfect nije potvrđen.**
 
+
+## Zaslon 12 — O aplikaciji (isti PR #202)
+
+**Stanje:** posljednji zaslon planiranog 12-zaslonskog Android prolaza; nativni `ui/AboutScreen.kt` s postojećim lokalnim drawable logotipom. Novi slikovni resursi nisu generirani. `SettingsScreens.kt` uklonjen je jer je jedini preostali `AboutPage` izdvojen u novi zaslon.
+
+### Vizualna kompozicija
+
+| Element | Mjera i dizajn |
+|---|---|
+| Pozadina | tamna `#07182D` uz `#10263D` kartice i `#28455F` obrub |
+| Zaglavlje | 61 dp, naslov 22 sp Bold, povratak 48 dp |
+| Brendirani hero | radius 18 dp, lokalni SIDRENA znak 67 dp na navy pločici 83 dp, naziv 27 sp ExtraBold |
+| Slogan | `Cijene pod kontrolom. Poslovanje s povjerenjem.`, 12 sp, centrirano |
+| Verzije | dvije fleksibilne kartice min. 107 dp, radius 15 dp, Android nasuprot WordPress dodatku |
+| Upute | redovi najmanje 76 dp, lokalna ikona 43 dp, tekst 14/12 sp, strelica samo na radnji |
+| Podaci | URL povezane stranice i datum posljednje objave s odgovarajućom oznakom kada nedostaju |
+| Podrška | funkcionalno otvaranje sistemske aplikacije za e-poštu, bez vanjskih SDK-ova |
+| Podnožje | neutralno objašnjenje read-only podataka i `SIDRENA by Brendigo` |
+| Responsive | `verticalScroll`, flexible `Row.weight`, prelomi i skraćivanje dugačkih URL-ova |
+
+### Podaci i funkcije
+
+- `aboutMetadata()` razdvaja **verziju Android aplikacije iz `BuildConfig.VERSION_NAME`** od **verzije WordPress dodatka iz `CatalogIndex.pluginVersion`**. Nijedna se ne smije izmišljati niti jedna zamjenjivati drugu.
+- Datum posljednje objave i revizija pravnog profila prikazuju se samo kada ih javni WordPress API doista objavi; nedostajući profil se ne predstavlja kao pravna potvrda.
+- `aboutPublicPriceListUrl()` prihvaća samo `SiteUrl.publicLink()` (ista javna HTTPS domena); gumb se prikazuje **samo kada postoji stvarna sigurna poveznica**. `SidrenaApp.openPublic()` provjerava URL još jednom pri otvaranju.
+- `Kako povezati stranicu` i `Što su sidrene cijene?` otvaraju stvarne informativne dijaloge; `Kontaktiraj podršku` koristi postojeći `ACTION_SENDTO` za e-poštu; gumb natrag vodi u Postavke.
+- Donja navigacija aktivno označava Postavke i dok je otvoreno O aplikaciji. Duplirano generičko zaglavlje je skriveno.
+- Statična stranica ne zahtijeva dodatne mrežne pozive ili dopuštenja.
+
+### QA
+
+- `ui/AboutScreen.kt`: dva `@Preview` prikaza (393 × 852 i 360 × 640 dp).
+- `ui/AboutScreenPresentationTest.kt`: šest testova verzija, praznih datuma i metapodataka, URL validacije, nemogućih HTTP/external URL-ova te pravnog profila.
+- U CI-ju obvezni Kotlin build, unit tests, Lint, sigurnosni/dead-code audit i APK/AAB validacija.
+- Ručni test: Android Back i gornji povratak, pomoćni dijalozi, e-pošta s/bez instalirane aplikacije, veliki font, kratka visina i duga domena. **Tvrdnja 1:1 pixel-perfect nije dokazana dok emulator screenshot nije poravnan s korisnikovim referentnim prikazom.**
+
