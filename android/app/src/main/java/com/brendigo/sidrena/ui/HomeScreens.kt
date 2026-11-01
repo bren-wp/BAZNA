@@ -213,7 +213,7 @@ fun HomePage(
                     }
                     !data.index.publishedAt.isNullOrBlank() -> HomeRecentRow(
                         title = "Zadnji objavljeni cjenik",
-                        subtitle = data.index.publishedAt,
+                        subtitle = data.index.publishedAt.orEmpty(),
                         icon = Icons.Outlined.Description,
                         iconTint = SoftBlue,
                         onClick = {
