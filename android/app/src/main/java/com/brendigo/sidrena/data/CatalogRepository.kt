@@ -51,12 +51,12 @@ class CatalogRepository {
         val products = safeItems(
             productUrl,
             "proizvode",
-            selected?.productsCsvReady ?: index.productsCsvReady,
+            if (selected == null) index.productsCsvReady else selected.productsCsvReady,
         )
         val services = safeItems(
             serviceUrl,
             "usluge",
-            selected?.servicesCsvReady ?: index.servicesCsvReady,
+            if (selected == null) index.servicesCsvReady else selected.servicesCsvReady,
         )
         val archive = try {
             val discoveryUrl = indexJson.optString("type_archive")
