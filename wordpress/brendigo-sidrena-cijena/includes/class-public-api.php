@@ -38,6 +38,20 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		) );
 	}
 
+	/**
+	 * Read-only feed readiness flag used by mobile and public catalog clients.
+	 * No private metadata or filesystem path is exposed to visitors.
+	 *
+	 * @param string $kind Product or service feed.
+	 * @param string $format CSV or XML.
+	 * @param string $oznaka Optional public outlet code.
+	 * @return bool
+	 */
+	private function feed_available( $kind, $format = 'csv', $oznaka = '' ) {
+		$path = Brendigo_Sidrena_Cijena_Feed_Files::instance()->get_type_public_path( $kind, $format, $oznaka );
+		return is_string( $path ) && '' !== $path && is_file( $path ) && is_readable( $path );
+	}
+
 	public function index() {
 		$export = Brendigo_Sidrena_Cijena_Export::instance();
 		$meta = $export->get_public_meta();
@@ -54,7 +68,7 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			'outlets'      => array(),
 		);
 		foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
-			$out['feeds'][ $kind ] = array();
+			$out['feeds'][ $kind ] = array( 'available_csv' => $this->feed_available( $kind ) );
 			foreach ( array( 'xml', 'csv' ) as $ext ) {
 				$out['feeds'][ $kind ][ $ext ] = esc_url_raw( rest_url( 'brendigo-sidrena/v1/cjenici/' . $kind . '/' . $ext ) );
 			}
@@ -67,6 +81,9 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				}
 				$entry = array( 'name' => isset( $outlet['naziv'] ) ? $outlet['naziv'] : $code, 'code' => $code, 'feeds' => array() );
 				foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
+					$entry['feeds'][ $kind ] = array( 'available_csv' => $this->feed_available( $kind, 'csv', $code ) );
+				}
+				foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
 					foreach ( array( 'xml', 'csv' ) as $ext ) {
 						$entry['feeds'][ $kind ][ $ext ] = esc_url_raw( add_query_arg( 'oznaka', $code, rest_url( 'brendigo-sidrena/v1/cjenici/' . $kind . '/' . $ext ) ) );
 					}
@@ -74,6 +91,11 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				$out['outlets'][] = $entry;
 			}
 		}
+		// Optional, backwards-compatible status: old clients still use feeds[*].csv.
+		$out['publication'] = array(
+			'csv_ready' => $out['feeds']['proizvodi']['available_csv'] && $out['feeds']['usluge']['available_csv'],
+			'generated_at' => $out['published_at'],
+		);
 		return rest_ensure_response( $out );
 	}
 
