@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.OpenInNew
@@ -165,18 +164,13 @@ fun DetailPage(
                 }
             }
 
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    if (!publicPage.isNullOrBlank()) {
-                        AccentButton(
-                            label = "Otvori javni cjenik",
-                            onClick = { onOpen(publicPage) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+            if (!publicPage.isNullOrBlank()) {
+                item {
+                    AccentButton(
+                        label = "Otvori javni cjenik",
+                        onClick = { onOpen(publicPage) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
         }
@@ -331,7 +325,9 @@ private fun DetailPricePanel(view: DetailPresentation) {
                 view.availability?.let { availability ->
                     Text(
                         text = availability,
-                        color = Success,
+                        color = if (
+                            availability.equals("Dostupno", ignoreCase = true)
+                        ) Success else TextMuted,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp,
                         maxLines = 2,
@@ -418,6 +414,35 @@ internal fun detailPresentation(item: PriceItem): DetailPresentation {
         referenceDate = item.referenceDate.takeIf { hasReference && it.isNotBlank() },
         sku = item.sku.takeIf { it.isNotBlank() },
         availability = item.availability.takeIf { it.isNotBlank() },
+    )
+}
+
+/** Save only public CSV fields in the Android saved-instance-state Bundle. */
+internal fun saveDetailItem(item: PriceItem): ArrayList<String> = arrayListOf(
+    item.id,
+    item.name,
+    item.kind,
+    item.currentPrice,
+    item.referencePrice,
+    item.referenceDate,
+    item.sku,
+    item.availability,
+    item.unit,
+)
+
+/** Restores a selected detail after activity recreation; no network changes. */
+internal fun restoreDetailItem(fields: List<String>): PriceItem? {
+    if (fields.size != 9) return null
+    return PriceItem(
+        id = fields[0],
+        name = fields[1],
+        kind = fields[2],
+        currentPrice = fields[3],
+        referencePrice = fields[4],
+        referenceDate = fields[5],
+        sku = fields[6],
+        availability = fields[7],
+        unit = fields[8],
     )
 }
 
