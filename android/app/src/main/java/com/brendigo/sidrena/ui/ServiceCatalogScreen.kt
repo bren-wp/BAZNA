@@ -169,10 +169,7 @@ fun ServiceCatalogScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(bottom = 20.dp),
             ) {
-                items(
-                    items = visible,
-                    key = { it.id + "|" + it.name },
-                ) { service ->
+                items(visible) { service ->
                     ServiceReferenceCard(item = service, onClick = { onDetails(service) })
                 }
             }
