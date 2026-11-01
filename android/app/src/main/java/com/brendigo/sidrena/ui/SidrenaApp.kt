@@ -154,7 +154,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             } else {
                 // Home screen has its own wordmark/search header from the reference.
                 // Keep the shared header unchanged on all other screens.
-                if (page != "home" && page != "products" && page != "services" && page != "detail" && page != "cjenici") {
+                if (page !in setOf("home", "products", "services", "detail", "cjenici", "archive")) {
                     BrandHeader(onNotifications = {
                         alert = "Posljednja objava: " +
                             (snapshot.index.publishedAt ?: "Datum nije dostupan")
@@ -206,7 +206,15 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onArchive = { navigate("archive") },
                         onRefresh = model::refresh,
                     )
-                    "archive" -> ArchivePage(data = snapshot, onOpen = ::openPublic)
+                    "archive" -> ArchivePage(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onOpen = ::openPublic,
+                        onBack = { navigate("home") },
+                        onPriceLists = { navigate("cjenici") },
+                        onRefresh = model::refresh,
+                    )
                     "locations" -> LocationsPage(
                         data = snapshot,
                         selectedOutlet = state.outlet,
