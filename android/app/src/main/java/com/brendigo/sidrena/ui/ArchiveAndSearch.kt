@@ -17,8 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Archive
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Search
@@ -42,90 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.brendigo.sidrena.data.ArchiveEntry
 import com.brendigo.sidrena.data.CatalogSearch
 import com.brendigo.sidrena.data.CatalogSnapshot
 import com.brendigo.sidrena.data.PriceItem
 import androidx.compose.ui.unit.dp
-
-@Composable
-fun ArchivePage(data: CatalogSnapshot, onOpen: (String) -> Unit) {
-    var format by rememberSaveable { mutableStateOf("sve") }
-    var search by rememberSaveable { mutableStateOf("") }
-    val archive = CatalogSearch.archives(data.archive, search, format)
-    LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item {
-            PageHeading("Arhiva objava",
-                "Pregledajte prethodno objavljene cjenike i otvorite arhivirane datoteke.")
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("csv", "xml", "sve").forEach { option ->
-                    FilterChip(
-                        selected = format == option,
-                        onClick = { format = option },
-                        label = { Text(option.uppercase().let { if (option == "sve") "Sve" else it }) },
-                        modifier = Modifier.weight(1f),
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Accent, selectedLabelColor = Background),
-                    )
-                }
-            }
-            OutlinedTextField(
-                value = search, onValueChange = { search = it },
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = { Icon(Icons.Outlined.Search, null) },
-                label = { Text("Pretraži arhivu") },
-                singleLine = true,
-            )
-            Spacer(Modifier.height(10.dp))
-            if (archive.isNotEmpty()) {
-                Panel {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AppIcon(Icons.Outlined.Description, SoftBlue)
-                            Spacer(Modifier.width(12.dp))
-                            Column {
-                                Text("Zadnji arhivirani cjenik", fontWeight = FontWeight.Bold)
-                                MetaText(archive.first().date)
-                            }
-                        }
-                        ArchiveSummary(archive.first())
-                        OutlineAction("Otvori", { onOpen(archive.first().url) }, Modifier.fillMaxWidth())
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-            }
-            MetaText("Prikazano " + archive.size + " arhivskih datoteka")
-        }
-        if (archive.isEmpty()) item { Panel { MetaText("Za odabrani prikaz nema arhivskih datoteka.") } }
-        items(archive.drop(if (archive.isNotEmpty()) 1 else 0)) { entry ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                border = BorderStroke(1.dp, Border),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Row(Modifier.padding(13.dp), verticalAlignment = Alignment.CenterVertically) {
-                    AppIcon(Icons.Outlined.Description, if (entry.format == "xml") Violet else SoftBlue)
-                    Spacer(Modifier.width(10.dp))
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                        Text(entry.date, fontWeight = FontWeight.Bold)
-                        ArchiveSummary(entry)
-                    }
-                    TextButton(onClick = { onOpen(entry.url) }) { Text("Otvori", color = Accent) }
-                }
-            }
-        }
-        item { Spacer(Modifier.height(14.dp)) }
-    }
-}
-
-@Composable
-private fun ArchiveSummary(entry: ArchiveEntry) {
-    MetaText(
-        (if (entry.kind.equals("usluge", true)) "Usluge" else "Proizvodi") +
-            " · " + entry.outlet + " · " + entry.format.uppercase()
-    )
-}
 
 @Composable
 fun LocationsPage(
