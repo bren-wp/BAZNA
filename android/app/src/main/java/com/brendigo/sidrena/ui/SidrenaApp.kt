@@ -198,6 +198,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     )
                     "cjenici" -> PublicPriceListsScreen(
                         data = snapshot,
+                        selectedOutlet = state.outlet,
                         busy = state.isLoading,
                         error = state.error,
                         onBack = { navigate("home") },
