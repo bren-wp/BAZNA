@@ -155,7 +155,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             } else {
                 // Home screen has its own wordmark/search header from the reference.
                 // Keep the shared header unchanged on all other screens.
-                if (page != "home") {
+                if (page != "home" && page != "products") {
                     BrandHeader(onNotifications = {
                         alert = "Posljednja objava: " +
                             (snapshot.index.publishedAt ?: "Datum nije dostupan")
@@ -171,16 +171,28 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onEdit = model::editSite,
                         onOpen = ::openPublic,
                     )
-                    "products", "services" -> CatalogPage(
+                    "products" -> ProductCatalogScreen(
                         data = snapshot,
-                        isService = page == "services",
+                        busy = state.isLoading,
                         onDetails = {
                             selectedItem = it
-                            detailReturnPage = page
+                            detailReturnPage = "products"
+                            navigate("detail")
+                        },
+                        onBack = { navigate("home") },
+                        onShowServices = { navigate("services") },
+                        onRefresh = model::refresh,
+                    )
+                    "services" -> CatalogPage(
+                        data = snapshot,
+                        isService = true,
+                        onDetails = {
+                            selectedItem = it
+                            detailReturnPage = "services"
                             navigate("detail")
                         },
                         onSearch = { navigate("search") },
-                        onSwitchKind = { navigate(if (page == "products") "services" else "products") },
+                        onSwitchKind = { navigate("products") },
                     )
                     "archive" -> ArchivePage(data = snapshot, onOpen = ::openPublic)
                     "locations" -> LocationsPage(
