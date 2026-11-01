@@ -255,7 +255,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			return array( 'id', 'vrsta', 'naziv', 'url', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum' );
 		}
 
-		return array( 'id', 'vrsta', 'naziv', 'sku', 'marka', 'url', 'jedinica_mjere', 'cijena_jedinice_mjere', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum', 'barkod', 'dostupnost' );
+		return array( 'id', 'vrsta', 'naziv', 'sku', 'marka', 'url', 'slika_url', 'jedinica_mjere', 'cijena_jedinice_mjere', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum', 'barkod', 'dostupnost' );
 	}
 
 	/**
