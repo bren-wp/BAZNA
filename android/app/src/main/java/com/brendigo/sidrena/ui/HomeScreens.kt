@@ -38,7 +38,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -525,8 +524,8 @@ internal fun homeRecentArchive(entries: List<ArchiveEntry>): List<ArchiveEntry> 
 
 /** Handles ISO strings and Croatian dd. MM. yyyy. dates without locale-dependent parsing. */
 internal fun homeDateKey(raw: String): Long {
-    val iso = Regex("""(\\d{4})-(\\d{2})-(\\d{2})""").find(raw)
-    val hr = Regex("""(\\d{1,2})\\.\\s*(\\d{1,2})\\.\\s*(\\d{4})""").find(raw)
+    val iso = Regex("""(\d{4})-(\d{2})-(\d{2})""").find(raw)
+    val hr = Regex("""(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})""").find(raw)
     return runCatching {
         when {
             iso != null -> LocalDate.of(
