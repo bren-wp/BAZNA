@@ -5,6 +5,7 @@ on:
       - 'wordpress/brendigo-sidrena-cijena/**'
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
+      - 'tools/test_public_api_contract.php'
       - '.github/workflows/official-plugin-ci.yml'
   push:
     branches: [main]
@@ -12,6 +13,7 @@ on:
       - 'wordpress/brendigo-sidrena-cijena/**'
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
+      - 'tools/test_public_api_contract.php'
 permissions:
   contents: read
 jobs:
@@ -34,6 +36,8 @@ jobs:
           tail -n 3 /tmp/sidrena-lint.log
       - name: Test shared legal contract
         run: php tools/test_legal_contract.php
+      - name: Test public Android/WordPress feed discovery compatibility
+        run: php tools/test_public_api_contract.php
       - name: Package reproducibly and verify SHA-256
         shell: bash
         run: |
