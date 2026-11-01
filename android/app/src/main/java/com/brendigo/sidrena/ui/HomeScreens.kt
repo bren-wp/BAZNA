@@ -129,14 +129,16 @@ fun HomePage(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             HomeMetricCard(
                 title = "Cjenici",
-                value = if (publishedPage != null) "Javni" else "—",
+                value = if (
+                    publishedPage != null ||
+                    data.index.productsCsv.isNotBlank() ||
+                    data.index.servicesCsv.isNotBlank() ||
+                    data.archive.isNotEmpty()
+                ) "Javni" else "—",
                 icon = Icons.Outlined.Description,
                 tint = SoftBlue,
                 modifier = Modifier.weight(1f),
-                onClick = {
-                    if (publishedPage != null) onOpen(publishedPage)
-                    else onNavigate("archive")
-                },
+                onClick = { onNavigate("cjenici") },
             )
             HomeMetricCard(
                 title = "Arhiva",
