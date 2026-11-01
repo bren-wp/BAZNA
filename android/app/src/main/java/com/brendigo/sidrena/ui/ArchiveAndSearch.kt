@@ -18,10 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Store
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -30,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,78 +37,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.brendigo.sidrena.data.CatalogSearch
 import com.brendigo.sidrena.data.CatalogSnapshot
 import com.brendigo.sidrena.data.PriceItem
-import androidx.compose.ui.unit.dp
-
-@Composable
-fun LocationsPage(
-    data: CatalogSnapshot,
-    selectedOutlet: String,
-    busy: Boolean,
-    onSelect: (String) -> Unit,
-) {
-    val outlets = data.index.outlets
-    LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(11.dp)) {
-        item {
-            PageHeading("Poslovnice i kanali", "Pregledajte objavljene cjenike prema poslovnici ili webshopu.")
-            Panel {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AppIcon(Icons.Outlined.LocationOn)
-                    Spacer(Modifier.width(12.dp))
-                    Column {
-                        Text((outlets.size + 1).toString(),
-                            style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                        MetaText("Webshop i povezane poslovnice")
-                    }
-                }
-            }
-            Spacer(Modifier.height(3.dp))
-        }
-        item {
-            OutletCard("Webshop", "Glavni javni cjenik", selectedOutlet.isEmpty(), busy) {
-                onSelect("")
-            }
-        }
-        items(outlets) { outlet ->
-            OutletCard(outlet.name, "Šifra: " + outlet.code,
-                selectedOutlet == outlet.code, busy) { onSelect(outlet.code) }
-        }
-        item {
-            Panel {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Poslovnice i javni cjenici", fontWeight = FontWeight.Bold)
-                    MetaText("Prikazuju se poslovnice objavljene na povezanoj WordPress stranici.")
-                }
-            }
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-private fun OutletCard(
-    name: String, detail: String, active: Boolean, busy: Boolean, onClick: () -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(enabled = !busy, onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        border = BorderStroke(1.dp, if (active) Accent else Border),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            AppIcon(if (name == "Webshop") Icons.Outlined.Store else Icons.Outlined.LocationOn)
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(name, fontWeight = FontWeight.Bold)
-                MetaText(detail)
-                if (active) Pill("Odabrano")
-            }
-            TextButton(enabled = !busy, onClick = onClick) { Text("Pregledaj", color = Accent) }
-        }
-    }
-}
 
 @Composable
 fun SearchPage(
