@@ -6,6 +6,7 @@ on:
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
+      - 'tools/test_public_feed_columns.php'
       - '.github/workflows/official-plugin-ci.yml'
   push:
     branches: [main]
@@ -14,6 +15,7 @@ on:
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
+      - 'tools/test_public_feed_columns.php'
 permissions:
   contents: read
 jobs:
@@ -38,6 +40,8 @@ jobs:
         run: php tools/test_legal_contract.php
       - name: Test public Android/WordPress feed discovery compatibility
         run: php tools/test_public_api_contract.php
+      - name: Test optional product imagery and CSV field compatibility
+        run: php tools/test_public_feed_columns.php
       - name: Package reproducibly and verify SHA-256
         shell: bash
         run: |
