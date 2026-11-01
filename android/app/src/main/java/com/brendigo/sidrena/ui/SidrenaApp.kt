@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.brendigo.sidrena.SidrenaViewModel
 import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.PriceItem
 import com.brendigo.sidrena.data.SiteUrl
 
 @Composable
@@ -37,14 +36,14 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     val snapshot = state.snapshot
     val context = LocalContext.current
     var page by rememberSaveable { mutableStateOf("home") }
-    var selectedItem by remember { mutableStateOf<PriceItem?>(null) }
+    var selectedItemFields by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var detailReturnPage by rememberSaveable { mutableStateOf("products") }
     var alert by remember { mutableStateOf<String?>(null) }
     var askDisconnect by remember { mutableStateOf(false) }
 
     fun navigate(destination: String) {
         page = destination
-        if (destination != "detail") selectedItem = null
+        if (destination != "detail") selectedItemFields = emptyList()
     }
 
     fun openPublic(url: String) {
@@ -155,7 +154,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             } else {
                 // Home screen has its own wordmark/search header from the reference.
                 // Keep the shared header unchanged on all other screens.
-                if (page != "home" && page != "products" && page != "services") {
+                if (page != "home" && page != "products" && page != "services" && page != "detail") {
                     BrandHeader(onNotifications = {
                         alert = "Posljednja objava: " +
                             (snapshot.index.publishedAt ?: "Datum nije dostupan")
@@ -176,7 +175,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         busy = state.isLoading,
                         error = state.error,
                         onDetails = {
-                            selectedItem = it
+                            selectedItemFields = saveDetailItem(it)
                             detailReturnPage = "products"
                             navigate("detail")
                         },
@@ -189,7 +188,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         busy = state.isLoading,
                         error = state.error,
                         onDetails = {
-                            selectedItem = it
+                            selectedItemFields = saveDetailItem(it)
                             detailReturnPage = "services"
                             navigate("detail")
                         },
@@ -208,12 +207,12 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         busy = state.isLoading,
                     )
                     "search" -> SearchPage(data = snapshot, onDetails = {
-                        selectedItem = it
+                        selectedItemFields = saveDetailItem(it)
                         detailReturnPage = "search"
                         navigate("detail")
                     }, onBack = { navigate("products") }, onArchive = { navigate("archive") })
                     "detail" -> DetailPage(
-                        item = selectedItem,
+                        item = restoreDetailItem(selectedItemFields),
                         data = snapshot,
                         onBack = { navigate(detailReturnPage) },
                         onOpen = ::openPublic,
