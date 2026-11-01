@@ -80,3 +80,27 @@ Implementirano u `ui/ServiceCatalogScreen.kt`, integrirano kroz `SidrenaApp.kt`,
 
 **Vizualna potvrda:** preciznost 1:1 potrebno je objektivno provjeriti usporedbom screenshotova emulatora i izvornog boarda na istim dimenzijama te dodatnom provjerom za različite DPI gustoće. Ova promjena sama po sebi ne predstavlja potvrđen screenshot pixel-diff.
 
+
+## Zaslon 06 — Detalj artikla (Compose)
+
+**Vizualna referenca:** šesti telefon izvornog SIDRENA boarda. Redoslijed: zaglavlje s povratkom, veliki hero prostor za artikl, naziv i jedinica, istaknuta narančasta trenutačna cijena, bijela sidrena cijena i datum, informacije o artiklu te javni cjenik.
+
+Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.kt`, testovi `ui/ItemDetailPresentationTest.kt`.
+
+| Dio | Mjere i ponašanje |
+|---|---|
+| Zaglavlje | 57 dp, naslov 21 sp, povratak 48 dp; dodatni izbornik samo kad postoji javni cjenik |
+| Hero | 213 dp, navy gradient, radius 17 dp, narančasti lokalni simbol (nema izmišljenih fotografija) |
+| Naziv | 23 sp ExtraBold, razmak 4 dp prema jedinici |
+| Trenutačna cijena | 29 sp ExtraBold, #FF852C, samo ako je dostupna |
+| Sidrena cijena | 18 sp SemiBold, bijela; datum prikazati samo ako postoji sidrena cijena |
+| Sekundarni tekst | 12–13 sp, #A9BAD1 |
+| Detalji | tamnoplava kartica #10263D, border #28455F, radius 15 dp |
+| Raspored | vertikalni LazyColumn, radi na kompaktnim zaslonima i pri promjeni veličine fonta |
+
+**Važno za ispravnost podataka:** `CatalogSnapshot` i `PriceItem` trenutno **ne sadrže** fotografiju proizvoda, kategoriju, opis niti datum kraja razdoblja primjene. Nijedan od tih podataka ne smije se izmišljati ili ispisivati kao da je iz javnog API-ja. Umjesto fotografije koristi se lokalni piktogram s natpisom „Fotografija nije objavljena”. Podatak o dostupnosti ispisuje se točno kako je objavljen: zelena se koristi samo za izričitu vrijednost `Dostupno`, a ne za npr. `Nedostupno`.
+
+**Interakcije:** povratak na stvarni prethodni popis, otvaranje javnog HTTPS cjenika kroz postojeći `SiteUrl.publicLink()` sloj, pohrana devet javnih tekstualnih polja odabrane stavke u `rememberSaveable` kako rotacija ne bi izgubila detalj.
+
+**QA:** `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, audit izvornog koda; JUnit testovi za opise cijena, datume, nedostupne podatke i vraćanje odabira. Nakon builda slijedi ručni prikaz na emulatoru 393×852 i 360×640 dp, 100% i 150% povećanje fonta te screenshot overlay prema originalnoj slici. Sama kompilacija ne potvrđuje pixel-perfect 1:1 rezultat.
+
