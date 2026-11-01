@@ -38,10 +38,16 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     var page by rememberSaveable { mutableStateOf("home") }
     var selectedItemFields by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var detailReturnPage by rememberSaveable { mutableStateOf("products") }
+    var searchReturnPage by rememberSaveable { mutableStateOf("home") }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var searchKind by rememberSaveable { mutableStateOf(0) }
     var alert by remember { mutableStateOf<String?>(null) }
     var askDisconnect by remember { mutableStateOf(false) }
 
     fun navigate(destination: String) {
+        if (destination == "search" && page != "search" && page != "detail") {
+            searchReturnPage = page
+        }
         page = destination
         if (destination != "detail") selectedItemFields = emptyList()
     }
@@ -75,7 +81,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
         navigate(when (page) {
             "detail" -> detailReturnPage
             "about" -> "settings"
-            "search" -> "products"
+            "search" -> searchReturnPage
             else -> "home"
         })
     }
@@ -115,6 +121,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                 AppNavigation(
                     active = when (page) {
                         "home", "locations" -> 0
+                        "search" -> if (searchReturnPage == "home") 0 else 1
                         "archive" -> 2
                         "settings", "about" -> 3
                         else -> 1
@@ -154,7 +161,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             } else {
                 // Home screen has its own wordmark/search header from the reference.
                 // Keep the shared header unchanged on all other screens.
-                if (page !in setOf("home", "products", "services", "detail", "cjenici", "archive", "locations")) {
+                if (page !in setOf("home", "products", "services", "detail", "cjenici", "archive", "locations", "search")) {
                     BrandHeader(onNotifications = {
                         alert = "Posljednja objava: " +
                             (snapshot.index.publishedAt ?: "Datum nije dostupan")
@@ -225,11 +232,23 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onPriceLists = { navigate("cjenici") },
                         onRefresh = model::refresh,
                     )
-                    "search" -> SearchPage(data = snapshot, onDetails = {
-                        selectedItemFields = saveDetailItem(it)
-                        detailReturnPage = "search"
-                        navigate("detail")
-                    }, onBack = { navigate("products") }, onArchive = { navigate("archive") })
+                    "search" -> SearchPage(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        query = searchQuery,
+                        kind = searchKind,
+                        onQueryChange = { searchQuery = it.take(256) },
+                        onKindChange = { searchKind = it },
+                        onDetails = {
+                            selectedItemFields = saveDetailItem(it)
+                            detailReturnPage = "search"
+                            navigate("detail")
+                        },
+                        onBack = { navigate(searchReturnPage) },
+                        onArchive = { navigate("archive") },
+                        onRefresh = model::refresh,
+                    )
                     "detail" -> DetailPage(
                         item = restoreDetailItem(selectedItemFields),
                         data = snapshot,
