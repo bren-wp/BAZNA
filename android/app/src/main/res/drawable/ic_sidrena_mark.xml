@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp"
-    android:viewportWidth="108" android:viewportHeight="108">
-    <path
-        android:fillColor="#FF852C"
-        android:pathData="M20,18 C24,11 33,10 44,10 L85,10 C96,10 100,17 100,27 L100,33 L51,33 C42,33 42,39 53,43 L79,54 C96,62 103,71 99,85 C96,96 86,101 72,101 L18,101 L18,84 L71,84 C80,84 82,79 74,75 L37,59 C23,53 17,43 17,32 C17,27 18,22 20,18 Z"/>
-    <path
-        android:fillColor="#07182D"
-        android:pathData="M17,39 L54,39 L79,49 L79,56 L48,46 L17,46 Z"/>
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="148"
+    android:viewportHeight="142">
+    <!-- Exact geometry from original logos/sidrena-symbol.svg. -->
+    <group
+        android:translateX="-61"
+        android:translateY="-58">
+        <path android:pathData="M72,76 Q80,61 102,61 H181 Q193,61 193,76 V89 H107 Q98,89 100,98 Q101,105 118,112 L158,128 Q193,140 193,164 Q193,195 155,195 H69 V172 H151 Q169,172 168,160 Q168,149 152,143 L106,125 Q69,111 69,91 Q69,82 72,76 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="69"
+                    android:startY="61"
+                    android:endX="193"
+                    android:endY="195"
+                    android:startColor="#FFAA55"
+                    android:endColor="#FF852C" />
+            </aapt:attr>
+        </path>
+    </group>
 </vector>
