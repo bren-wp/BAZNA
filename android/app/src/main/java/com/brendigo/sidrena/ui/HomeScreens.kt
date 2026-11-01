@@ -385,7 +385,7 @@ private fun HomeConnectedCard(
                 }
             }
             Text(
-                text = site.removePrefix("https://").removeSuffix("/"),
+                text = homeSiteLabel(site),
                 modifier = Modifier.padding(start = 40.dp, end = 9.dp),
                 color = TextMuted,
                 fontSize = 13.sp,
