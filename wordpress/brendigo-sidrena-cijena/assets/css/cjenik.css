@@ -1,11 +1,11 @@
 :root {
 	color-scheme: dark;
-	--br-bg: #06101e;
+	--br-bg: #07182d;
 	--br-line: rgba(159, 181, 210, 0.16);
-	--br-text: #f7f9fc;
-	--br-muted: #9aaac0;
-	--br-gold: #f4bd52;
-	--br-green: #39d99b;
+	--br-text: #ffffff;
+	--br-muted: #a9bad1;
+	--br-gold: #ff852c;
+	--br-green: #52d9a3;
 	--br-red: #ff7d8f;
 }
 
