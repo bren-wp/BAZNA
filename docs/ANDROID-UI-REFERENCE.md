@@ -357,3 +357,34 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 **Vizualna potvrda i dalje nedostaje:** Android emulator screenshot na rezolucijama 360×640 i 393×852 dp uz odgovarajući DPI; zatim usklađena screenshot-overlay usporedba s glavnom marketing referencom i dodatne korekcije po pikselima, uključujući sustavske trake i tipografiju. Gradle build i JUnit testovi provjeravaju funkcionalnu ispravnost, ne objektivni pixel-diff.
 
+
+## Zaslon 04 — Proizvodi i zajednički WordPress/Android API ugovor
+
+**Primarna vizualna referenca:** četvrti telefon glavne SIDRENA marketinške ploče; `screens_concept/04_proizvodi.png` dodatno opisuje tražilicu, sidrenu cijenu i stanja. U produkciji su sve fotografije, nazivi i cijene stvarni podaci WordPress/WooCommerce trgovine, nikad kopije demo artikala s referentne slike.
+
+### Android UI
+
+- `ui/ProductCatalogScreen.kt` koristi naslov **Proizvodi**, narančasti/brendirani navigacijski naglasak, tražilicu `Pretraži proizvode…`, filtre **Svi / Sa sidrenom cijenom / Dostupni** i `LazyColumn` kartice.
+- Kartice: `#10263D` s `#28455F` obrubom, radius 14 dp, sadržaj min. 92 dp, lokalni okvir slike 64×72 dp, naziv 15 sp Bold, jedinica mjere/SKU, sadašnja cijena 17 sp ExtraBold narančasta `#FF852C` i diskretna sidrena referentna cijena.
+- Filtri koriste samo postojeće javne CSV podatke: `sidrena_cijena` ili `dostupnost=dostupno`. **Akcija**, **Novo** i proizvoljne kategorije nisu lažno generirani dok API te informacije ne objavi.
+- `ui/PublicProductImage.kt` podržava stvarne WordPress/WooCommerce fotografije samo ako `slika_url` postoji i pripada istoj HTTPS domeni kao spojena stranica. Mrežni pristup provjerava DNS protiv privatnih IP adresa, ne slijedi preusmjeravanja, ograničava odgovor na 1,5 MB, tip slike JPEG/PNG/WebP i dekodiranje na maksimalno 16 MP. Koristi postojeći OkHttp, ograničenu memorijsku predmemoriju i lokalnu fallback ikonu. Bez novih SDK-ova ili izmišljenih fotografija.
+
+### WordPress dodatak
+
+- U `includes/class-public-api.php` unutar postojećeg javnog `brendigo-sidrena/v1/cjenici` odgovora (bez promjene `api_version: 1`) svaki `feeds.proizvodi` / `feeds.usluge` i poslovnica sada imaju opcionalni `available_csv: bool`; dodatno `publication.csv_ready` prikazuje je li javni webshop objavio oba CSV feeda. Provjerava se postojanje **stvarne objavljene datoteke** `is_file` i `is_readable` bez izlaganja putanje na poslužitelju.
+- Ove vrijednosti su samo informacija o spremnosti; API ostaje javan i read-only. Nema administratorske autentikacije, korisničkih podataka, lozinki ili privatnih kataloga u odgovoru.
+- Android `CatalogDiscovery.kt` čita opcionalne booleane i odbija vrijednosti pogrešnog tipa. Ako polje nedostaje (stariji dodatak), nastavlja staro ponašanje učitavanja CSV-a; ako je `false`, prikazuje korisnu poruku umjesto nepotrebnog pokušaja nedostupnog endpointa.
+- Zasebne poslovnice imaju zasebne readiness oznake, i njihov status nikada nije zamijenjen statusom webshopa. Nakon objave korisnik može osvježiti Android podatke.
+- WooCommerce javni feed proizvoda `includes/class-feed-rows.php` i `includes/class-feed-files.php` sada sadrži **neobavezan** stupac `slika_url` iz izvorne objavljene fotografije artikla. Usluge i stare CSV datoteke ostaju kompatibilne; sidrena cijena, datum, dostupnost, SKU i jedinica mjere ostaju nepromijenjeni.
+- `includes/admin/tab-javni-xml.php` sada prikazuje panel **SIDRENA Android · Povezivanje**, kopiranje javne HTTPS adrese, status pojedinačnih objavljenih CSV datoteka i upute za Android osvježavanje. UI je usklađen s Android paletom u `assets/css/admin.css`, `cjenik.css` i `archive.css`.
+- Kod promjena kataloga **obavezna je objava/regeneracija CSV cjenika** u WordPress administraciji; javni REST endpoint namjerno ne regenerira katalog tijekom anonimnog zahtjeva, kako se ne bi dopuštala zlouporaba.
+
+### Regresijski testovi i QA
+
+- Android `PublicCatalogCompatibilityTest.kt`: čitanje novih oznaka, starije instalacije, odbijanje pogrešnih tipova, opcionalne fotografije, filtri, zaštita vanjskog HTTP/HTTPS izvora.
+- `HomeReferenceLayoutTest.kt`: ne označava potpuno objavljene cjenike kada proizvodi/usluge ili odabrana poslovnica nisu spremni.
+- WordPress `tools/test_public_api_contract.php`: end-to-end struktura odgovora `index()` uz izolirani PHP stub, uključujući spremnost feedova, URL-ove, poslovnice i izostanak lokalnih filesystem putanja u JSON odgovoru.
+- `tools/test_public_feed_columns.php`: aktualne i sidrene cijene, datumi, valjan CSV BOM, opcionalna fotografija samo za proizvode.
+- GitHub Actions: **Android** kompilacija, testovi, lint, APK/AAB; **WordPress** PHP lint, dva testna ugovora, reproducibilno ZIP pakiranje, audit cijelog repozitorija.
+- Vizualni test 1:1 još zahtijeva stvarni emulator (barem 360×640 i 393×852), screenshot overlay i pregled WordPress administracije u pregledniku. Funkcionalni test s produkcijskom WordPress stranicom zahtijeva stvarno objavljeni dodatak i cjenike; lokalni stubovi ne potvrđuju hosting/DNS/WAF/HTTP konfiguraciju.
+
