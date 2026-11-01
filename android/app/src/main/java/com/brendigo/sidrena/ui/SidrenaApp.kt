@@ -161,7 +161,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             } else {
                 // Home screen has its own wordmark/search header from the reference.
                 // Keep the shared header unchanged on all other screens.
-                if (page !in setOf("home", "products", "services", "detail", "cjenici", "archive", "locations", "search", "settings")) {
+                if (page !in setOf("home", "products", "services", "detail", "cjenici", "archive", "locations", "search", "settings", "about")) {
                     BrandHeader(onNotifications = {
                         alert = "Posljednja objava: " +
                             (snapshot.index.publishedAt ?: "Datum nije dostupan")
@@ -269,10 +269,12 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onHelp = { navigate("about") },
                     )
                     "about" -> AboutPage(
+                        data = snapshot,
                         onBack = { navigate("settings") },
                         onConnectHelp = { alert = "Unesite HTTPS adresu svoje WordPress stranice s aktivnim dodatkom SIDRENA. Nakon povezivanja odaberite poslovnicu i pregledajte objavljene cjenike." },
                         onAnchorHelp = { alert = "Sidrena cijena je dokumentirana referentna vrijednost uz pripadajući datum. Uvijek provjerite podatke na izvornoj WordPress stranici." },
                         onSupport = ::supportEmail,
+                        onOpenPublic = ::openPublic,
                     )
                     else -> HomePage(snapshot, state.isLoading, state.error,
                         ::navigate, model::refresh, model::editSite, ::openPublic)
