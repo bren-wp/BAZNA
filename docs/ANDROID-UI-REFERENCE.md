@@ -306,3 +306,27 @@ Izvorni preglednik: `SIDRENA-Android-Kompletan-Brending.zip` → `screens_concep
 
 **Ostaje za dokazati:** usporedbu snimke aplikacije u emulatoru s autoritativnom referentnom PNG datotekom, na istom viewportu, uz maskiranje eventualnih sistemskih traka i provjeru razlika zbog Android zamjenskog fonta. GitHub Actions Kotlin build, JUnit i Lint ne dokazuju konačan pixel-perfect 1:1, nego samo tehničku valjanost. Nakon stvarne usporedbe slijedi zaslon 02 Povezivanje i naredni redom.
 
+
+## Završni vizualni audit — zaslon 02 Povezivanje
+
+Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostavljenog brending paketa. Nije potrebno generirati dodatne slike.
+
+**Odstupanja ispravljena:** prethodni ekran imao je veliki kružni simbol poveznice, drugačiji naslov, centrirani uvod, običan `OutlinedTextField` s lijevom ikonom i drugačije tekstove gumba i sigurnosne kartice. Na referenci tih elemenata nema. Novi `ui/SidrenaConnectionScreen.kt` koristi naslov **Poveži WordPress stranicu**, lijevo poravnati uvod, tamnu adresnu karticu, širok narančasti gumb **Poveži stranicu**, istaknuti naslov **Sigurna veza** i mali potpis SIDRENA u podnožju.
+
+| Element | Izvorna geometrija / provedba |
+|---|---|
+| Glavna boja | `#07182D`; u podlozi inputa `#10263D`; informativni panel `#19304A` |
+| Naslov | povratak narančast `#FF852C`, bijeli `Poveži WordPress stranicu`, lijevi alignment |
+| Podnaslov | `Svi javni cjenici na jednom mjestu` |
+| Opis | `Poveži svoju web-stranicu za pristup objavljenim proizvodima, uslugama i arhivi.` |
+| Input | oznaka `HTTPS adresa web-stranice`, bold korisnički URL, bez lijeve ikone |
+| Placeholder | `https://primjer-trgovina.hr` prikazuje se **samo kao primjer**, nikada nije stvarni unos |
+| Primarna akcija | narančasta, min. 52 dp, `Poveži stranicu`; validacija u `SiteUrl.parse()` |
+| Informacija | `Sigurna veza`, zeleni `#52D9A3` i tekst o javno dostupnom WordPress sadržaju |
+| Podnožje | `SIDRENA • by Brendigo`, bez demo/koncept oznaka |
+| Responsivnost | razmaci za 360×640 i 393×852 dp, vertikalni scroll i `imePadding` |
+
+**Funkcionalnost ostaje stvarna:** `BasicTextField` prihvaća samo jednu liniju do 2048 znakova, tipkovnica za URL i potvrda pozivaju `SidrenaViewModel.connect()`; `SiteUrl.parse()` odbija nesigurne/nevaljane URL-ove. Prazna adresa stvara stvarnu validacijsku poruku umjesto povezivanja na primjer iz dizajna. Gumb i tipkovnica prikazuju stanje učitavanja i mrežnu pogrešku. Povratak ostaje aktivan prema dosadašnjoj logici.
+
+**Testovi:** `SidrenaConnectionLayoutTest.kt` pokriva kompaktne/izdužene raspone i odbijanje multiline i predugih vrijednosti. Vizualno 1:1 još nije dokazano bez screenshot usporedbe emulatora s originalnim PNG-om; statički demo indikatori telefona iz dizajnerskog mockupa namjerno nisu replicirani u pravoj Android aplikaciji.
+
