@@ -15,7 +15,7 @@ body {
 	margin: 0;
 	background:
 		radial-gradient(circle at 82% 4%, rgba(115, 87, 255, 0.16), transparent 28%),
-		radial-gradient(circle at 12% 92%, rgba(244, 189, 82, 0.08), transparent 30%),
+		radial-gradient(circle at 12% 92%, rgba(255, 133, 44, 0.08), transparent 30%),
 		var(--br-bg);
 	color: var(--br-text);
 	font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -46,7 +46,7 @@ main {
 	width: 330px;
 	height: 330px;
 	border-radius: 50%;
-	background: radial-gradient(circle, rgba(244, 189, 82, 0.16), transparent 66%);
+	background: radial-gradient(circle, rgba(255, 133, 44, 0.16), transparent 66%);
 	pointer-events: none;
 }
 
@@ -101,7 +101,7 @@ h1 {
 }
 
 .cjenik-btn {
-	background: linear-gradient(135deg, #f6cb69, #e2a239);
+	background: linear-gradient(135deg, #ffaa55, #ff852c);
 	color: #111924;
 	box-shadow: 0 10px 24px rgba(226, 162, 57, 0.16);
 }
@@ -130,13 +130,13 @@ h1 {
 	padding: 0 14px;
 	border: 1px solid var(--br-line);
 	border-radius: 11px;
-	background: #071525;
+	background: #19304a;
 	color: var(--br-text);
 	font: inherit;
 	outline: none;
 }
 .cjenik-search input::placeholder { color: #71849d; }
-.cjenik-search input:focus { border-color: rgba(244, 189, 82, 0.7); box-shadow: 0 0 0 3px rgba(244, 189, 82, 0.1); }
+.cjenik-search input:focus { border-color: rgba(255, 133, 44, 0.7); box-shadow: 0 0 0 3px rgba(255, 133, 44, 0.1); }
 
 .cjenik-pager {
 	display: flex;
@@ -146,9 +146,9 @@ h1 {
 	margin: 16px 0 0;
 }
 .cjenik-pager[hidden] { display: none !important; }
-.cjenik-page { min-width: 40px; min-height: 38px; padding: 0 12px; border-color: var(--br-line); background: #0d1b2d; color: #dfe6ef; }
-.cjenik-page:hover { border-color: rgba(244, 189, 82, 0.45); background: #13243a; }
-.cjenik-page.is-current { border-color: rgba(244, 189, 82, 0.55); background: rgba(244, 189, 82, 0.14); color: #ffe29d; }
+.cjenik-page { min-width: 40px; min-height: 38px; padding: 0 12px; border-color: var(--br-line); background: #10263d; color: #dfe6ef; }
+.cjenik-page:hover { border-color: rgba(255, 133, 44, 0.45); background: #13243a; }
+.cjenik-page.is-current { border-color: rgba(255, 133, 44, 0.55); background: rgba(255, 133, 44, 0.14); color: #ffaa55; }
 .cjenik-page-gap { color: var(--br-muted); }
 
 .cjenik-table tr[hidden], .cjenik-upit tr[hidden] { display: none !important; }
@@ -176,7 +176,7 @@ h1 {
 }
 
 .cjenik-table th, .cjenik-upit th {
-	background: #0d1b2d;
+	background: #10263d;
 	color: #aebdd0;
 	font-size: 0.72rem;
 	font-weight: 800;
