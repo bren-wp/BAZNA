@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -35,6 +34,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -78,6 +78,7 @@ import com.brendigo.sidrena.data.PriceItem
 fun ProductCatalogScreen(
     data: CatalogSnapshot,
     busy: Boolean,
+    error: String?,
     onDetails: (PriceItem) -> Unit,
     onBack: () -> Unit,
     onShowServices: () -> Unit,
@@ -160,6 +161,22 @@ fun ProductCatalogScreen(
         }
 
         Spacer(Modifier.height(14.dp))
+        if (busy) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth().height(3.dp),
+                color = Accent,
+                trackColor = SurfaceRaised,
+            )
+            Spacer(Modifier.height(8.dp))
+        }
+        if (!error.isNullOrBlank()) {
+            Text(
+                text = error,
+                color = Color(0xFFFFC997),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+        }
         if (visible.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(top = 26.dp),
@@ -381,6 +398,7 @@ internal fun SidrenaProductsPreview() {
         ProductCatalogScreen(
             data = demo,
             busy = false,
+            error = null,
             onDetails = {},
             onBack = {},
             onShowServices = {},
