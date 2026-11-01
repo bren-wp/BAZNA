@@ -153,10 +153,14 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     },
                 )
             } else {
-                BrandHeader(onNotifications = {
-                    alert = "Posljednja objava: " +
-                        (snapshot.index.publishedAt ?: "Datum nije dostupan")
-                })
+                // Home screen has its own wordmark/search header from the reference.
+                // Keep the shared header unchanged on all other screens.
+                if (page != "home" && page != "products" && page != "services") {
+                    BrandHeader(onNotifications = {
+                        alert = "Posljednja objava: " +
+                            (snapshot.index.publishedAt ?: "Datum nije dostupan")
+                    })
+                }
                 when (page) {
                     "home" -> HomePage(
                         data = snapshot,
@@ -167,16 +171,31 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onEdit = model::editSite,
                         onOpen = ::openPublic,
                     )
-                    "products", "services" -> CatalogPage(
+                    "products" -> ProductCatalogScreen(
                         data = snapshot,
-                        isService = page == "services",
+                        busy = state.isLoading,
+                        error = state.error,
                         onDetails = {
                             selectedItem = it
-                            detailReturnPage = page
+                            detailReturnPage = "products"
                             navigate("detail")
                         },
-                        onSearch = { navigate("search") },
-                        onSwitchKind = { navigate(if (page == "products") "services" else "products") },
+                        onBack = { navigate("home") },
+                        onShowServices = { navigate("services") },
+                        onRefresh = model::refresh,
+                    )
+                    "services" -> ServiceCatalogScreen(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onDetails = {
+                            selectedItem = it
+                            detailReturnPage = "services"
+                            navigate("detail")
+                        },
+                        onBack = { navigate("home") },
+                        onShowProducts = { navigate("products") },
+                        onRefresh = model::refresh,
                     )
                     "archive" -> ArchivePage(data = snapshot, onOpen = ::openPublic)
                     "locations" -> LocationsPage(

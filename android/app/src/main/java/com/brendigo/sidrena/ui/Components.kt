@@ -19,7 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.NotificationsNone
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
@@ -170,7 +170,7 @@ fun Pill(label: String, good: Boolean = true) {
 @Composable
 fun AppNavigation(active: Int, onSelect: (Int) -> Unit) {
     val tabs = listOf(
-        Triple("Početna", Icons.Outlined.Home, 0),
+        Triple("Početna", Icons.Filled.Home, 0),
         Triple("Cjenici", Icons.Outlined.Description, 1),
         Triple("Arhiva", Icons.Outlined.Archive, 2),
         Triple("Postavke", Icons.Outlined.Settings, 3),
@@ -184,7 +184,7 @@ fun AppNavigation(active: Int, onSelect: (Int) -> Unit) {
                 label = { Text(label, maxLines = 1) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Accent, selectedTextColor = Accent,
-                    indicatorColor = SurfaceRaised,
+                    indicatorColor = Background,
                     unselectedIconColor = TextMuted, unselectedTextColor = TextMuted,
                 ),
                 alwaysShowLabel = true,

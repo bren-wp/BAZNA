@@ -16,17 +16,67 @@ Android zasloni koriste jedinstveni SIDRENA dizajn usklađen s dostavljenih dese
 
 | Referenca | Android prikaz |
 |---|---|
-| 1. Povezivanje | HTTPS unos i povezivanje s WordPressom |
-| 2. Početna | Povezana stranica, statistike, objava i brze kartice |
-| 3. Proizvodi | Pretraga, dostupnost, trenutačna i sidrena cijena |
-| 4. Usluge | Popis usluga, pretraga, cijene |
-| 5. Detalj stavke | Naziv, SKU, cijene, datum i dostupnost |
-| 6. Arhiva | CSV/XML filter i objavljene datoteke |
-| 7. Poslovnice | Odabir webshopa i javnih poslovnica |
-| 8. Pretraživanje | Proizvodi i usluge s pretragom |
-| 9. Postavke | HTTPS stranica, osvježavanje i prikaz |
-| 10. O aplikaciji | Verzija, upute i podrška |
+| 1. Splash | SIDRENA logo, slogan i animirana traka |
+| 2. Povezivanje | HTTPS unos i povezivanje s WordPressom |
+| 3. Početna | Povezana stranica, statistike, objave i brze kartice |
+| 4. Proizvodi | Pretraga, filtri sidrenih cijena i popis javnih artikala |
+| 5. Usluge | Popis usluga, pretraga, cijene |
+| 6. Detalj stavke | Naziv, SKU, cijene, datum i dostupnost |
+| 7. Cjenici | Javni cjenici |
+| 8. Arhiva | CSV/XML filter i objavljene datoteke |
+| 9. Poslovnice | Odabir webshopa i javnih poslovnica |
+| 10. Pretraživanje | Proizvodi i usluge s pretragom |
+| 11. Postavke | HTTPS stranica, osvježavanje i prikaz |
+| 12. O aplikaciji | Verzija, upute i podrška |
+
 
 Podnožje s četiri glavne kartice: **Početna, Cjenici, Arhiva, Postavke**. Trenutačno aktivna kartica naglašena je narančastom.
 
 Interakcije ovise o stvarnoj dostupnosti server-side funkcionalnosti. Vizualne reference prikazuju i uređivanje, obavijesti, slike proizvoda i povijest promjena; javni WordPress REST API trenutno ne daje sve potrebne autorizirane podatke za te mogućnosti, pa se one ne smiju lažno simulirati. Dizajnerski cilj je što bliže podudaranje, uz stvarne izvore podataka i funkcionalne radnje.
+
+## Zaslon 04 — Proizvodi (PR #201)
+
+Referentni četvrti telefon: zaglavlje s povratkom i izbornikom, polje pretrage, jedan red kratkih filtera, tamne kartice s lijevom svijetlom pločicom, nazivom i jedinicom te narančastom aktualnom cijenom i sivom referentnom cijenom. Implementacija: `ui/ProductCatalogScreen.kt`.
+
+| Element | Cilj |
+|---|---|
+| Zaglavlje | 61 dp; naslov Proizvodi 22 sp, povratak i izbornik min. 48 dp |
+| Tražilica | 52 dp, `#19304A`, zaobljenje 12 dp |
+| Filtri | 43 dp, razmak 8 dp, narančasti aktivni čip |
+| Proizvod | min. 92 dp, `#10263D`, radius 14 dp |
+| Ikona proizvoda | 64×72 dp, lokalna neutralna ilustracija bez vanjske usluge |
+| Naziv | 15 sp bold, najviše dva retka |
+| Cijena | 17 sp bold, `#FF852C`; referenca 11 sp `#A9BAD1` |
+| Podaci | Stvarni `CatalogSnapshot.products`, `CatalogSearch.items()`, `PriceDisplay.euro()` |
+
+**API ograničenja:** Javne WordPress rute ne pružaju slike proizvoda, kategorije, oznake `Novo` niti promocije. Zato prikaz koristi neutralan lokalni piktogram, a filteri su **Svi**, **Sidrena** i **Bez sidrene**; gumb **Usluge** otvara postojeći zaslon usluga. Ne smije se označiti sidrena cijena kao popust ili stvoriti lažni podatak.
+
+**QA:** Android CI (assembleDebug, bundleRelease, testDebugUnitTest, lintDebug, sigurnosni audit), test otvaranja detalja, povratka, učitavanja, tipkovnice i rubnih podataka (prazna lista, dugačka imena, bez cijene). Vizualna tvrdnja pixel-perfect 1:1 zahtijeva screenshot s emulatora i overlay usporedbu na istoj rezoluciji kao referenca, uz zasebnu provjeru pristupačnosti.
+
+
+## Zaslon 05 — Usluge (PR #201)
+
+**Glavna referenca:** peti telefon na korisnički potvrđenom marketing/branding prikazu SIDRENA. Rezervna referenca `05_usluge.png` iz paketa brendinga prikazuje jednostavniji popis i služi samo za usporedbu boja, proporcija i elemenata. Oznake `DEMO` i `KONCEPT` nisu dio stvarnog sučelja.
+
+Implementirano u `ui/ServiceCatalogScreen.kt`, integrirano kroz `SidrenaApp.kt`, s testovima u `ui/ServiceCatalogPresentationTest.kt`.
+
+| Element | Smjernica |
+|---|---|
+| Zaglavlje | 61 dp, bijeli naslov Usluge 22 sp, povratak i izbornik 48 dp |
+| Pretraga | 52 dp, tamnoplavo izdignuto polje, zaobljenje 12 dp |
+| Filteri | 43 dp, razmak 8 dp, aktivni filtar narančast, ostali tamnoplavi |
+| Redak usluge | min. visina 101 dp, kartica `#10263D`, 1 dp border `#28455F`, radius 14 dp |
+| Piktogram | 76 × 82 dp, lokalni `Build` simbol u `#FF852C` |
+| Naziv | 15 sp bold, dva retka, uredno skraćivanje |
+| Aktualna cijena | 17 sp, narančasta, format na hrvatskom |
+| Referentna cijena | 12 sp u `#A9BAD1`, samo ako je javno objavljena |
+| Scroll | LazyColumn i pomični filteri, prilagodba tipkovnici |
+
+**Povezani podaci:** prikaz koristi `CatalogSnapshot.services`, `CatalogSearch.items()` i `PriceDisplay.euro()` (pravi cjenici WordPressa). Nema lažnih primjera u produkcijskom prikazu, a pregledni testni podaci nalaze se isključivo u `@Preview`.
+
+**API ograničenja:** WordPress javni CSV nema fotografije, kategorije ni podatke o popularnosti usluga. Umjesto lažnih foto-thumbnaila koristi se lokalni simbol; filteri **Svi / Sidrena / Bez sidrene** rade na stvarnim referentnim cijenama, a **Proizvodi** je funkcionalni navigacijski prečac. Cijene se ne označavaju kao „od X €” bez server-side podatka da je to početna/minimalna cijena.
+
+**Funkcionalni testovi:** pretraga hrvatskih znakova i SKU-a, kombiniranje filtara, prazna lista, neočekivano prazna cijena, ulazak u detalje i povratak na usluge, promjena na proizvode, osvježavanje, prikaz mrežne greške, test velikog fonta i različitih širina. Gradle CI provjerava Android build, unit testove, lint te APK/AAB.
+
+**Vizualna potvrda:** preciznost 1:1 potrebno je objektivno provjeriti usporedbom screenshotova emulatora i izvornog boarda na istim dimenzijama te dodatnom provjerom za različite DPI gustoće. Ova promjena sama po sebi ne predstavlja potvrđen screenshot pixel-diff.
+
