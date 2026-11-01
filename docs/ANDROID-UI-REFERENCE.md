@@ -127,3 +127,37 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 **Provjera:** `PublicPriceListsScreenTest.kt` (javni dokumenti, pretraga, filtri, poslovnice, duplikati, same-origin zaštita). CI: Kotlin compile, JUnit, Android Lint, sigurnosni audit, APK/AAB. Pixel-perfect potvrda zahtijeva snimku emulatora i overlay s referentnim dizajnom na istim dimenzijama, nakon čega se mjere preostala odstupanja. **Bez snimke još ne postoji potvrda vizualnog rezultata 1:1.**
 
+
+## Zaslon 08 — Arhiva (isti PR #202)
+
+**Glavna referenca:** osmi telefon izvornog SIDRENA brendinga. Raspored u Kotlin/Jetpack Composeu: zaglavlje s povratkom i kontekstnim izbornikom, pretraživanje, čipovi godina, status filtra te lista arhivskih dokumenata sa zasebnim zelenim CSV i narančastim XML ikonama.
+
+| Element | Mjera / pravilo |
+|---|---|
+| Zaglavlje | 61 dp, naslov 22 sp Bold, povratak i izbornik 48 dp |
+| Tražilica | 52 dp, `#19304A`, zaobljenje 12 dp; koristi postojeću komponentu |
+| Godine | 43 dp čip, razmak 8 dp, odabrani `#FF852C`; godine su samo one stvarno objavljene |
+| Popis | kartice najmanje 79 dp, `#10263D`, radius 14 dp, obrub `#28455F` |
+| Ikona dokumenta | 43 × 43 dp, CSV zeleno `#52D9A3`, XML narančasto `#FF852C` |
+| Sadržaj | naslov 14 sp, format 12 sp, datum 11 sp; bez izmišljenih veličina datoteka |
+| Akcija | `OpenInNew` 48 dp za otvaranje dokumenta, bez prisilnog preuzimanja |
+| Scroll | godine horizontalno, stavke `LazyColumn`; prilagodba kraćim zaslonima |
+
+### Stvarna povezanost sa WordPressom
+
+- `CatalogSnapshot.archive` već je filtriran za odabranu poslovnicu na backend/sync sloju; ekran ne dodaje fiktivne datoteke ili druge poslovnice.
+- Prikazuje isključivo stvarne, objavljene **CSV/XML** poveznice s iste HTTPS domene (`SiteUrl.publicLink()`) i uklanja duplikate URL-ova.
+- Godine nastaju iz provjerljivih datuma u ISO ili hrvatskom zapisu; nepoznati datumi ostaju u filtru **Sve**, bez izmišljene godine ili mjeseca.
+- Naziv `Cjenik proizvoda/usluga — mjesec godina` izvodi se iz stvarno objavljenih `kind` i `date`. Nepoznati tip se prikazuje neutralno kao `Cjenik`.
+- Pretraga radi s više riječi i kombinira se s godinom i CSV/XML filtrom iz izbornika. Moguće je otvoriti aktualne cjenike i osvježiti podatke.
+- Otvaranje se provodi postojećim `SidrenaApp.openPublic()` (ponovna same-origin HTTPS provjera). Bez prisilnog preuzimanja CSV/XML.
+- Arhiva se ne prikazuje kao kompletna ako je server-sko čitanje neuspješno: prikazuje se postojeće upozorenje `Arhiva trenutačno nije dostupna`.
+
+### Integracija i provjera
+
+- `ui/ArchiveScreen.kt` — novi nativni zaslon, Preview 393 × 852 dp.
+- `ui/ArchiveAndSearch.kt` — uklonjen samo zastarjeli `ArchivePage`, Poslovnice i Pretraga ostaju sačuvani.
+- `ui/SidrenaApp.kt` — povezana donja navigacija, povratak na početnu, izbornik aktualnih cjenika i osvježavanje, bez dvostrukog zaglavlja.
+- `ui/ArchiveScreenPresentationTest.kt` — sedam JVM testova datuma, godina, filtriranja, formata, URL sigurnosti, duplikata i prazne arhive.
+- CI: `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, sigurnosni i dead-code audit. Potrebna je i ručna pixel-diff usporedba stvarnog emulatora s korisničkom referencom; prolazak Gradlea nije dokaz preciznosti 1:1.
+
