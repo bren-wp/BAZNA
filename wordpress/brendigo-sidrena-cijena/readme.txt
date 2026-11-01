@@ -12,6 +12,13 @@ Manage reference prices and dates, publish a public HTML pricelist, and generate
 
 == Changelog ==
 
+= 1.5.4 =
+* Added public read-only CSV feed availability flags in the existing SIDRENA REST API, including separate business outlet statuses, to prevent misleading Android loading states.
+* Added optional WooCommerce product thumbnails to the public product CSV/XML feed without changing the required price, date or service columns.
+* Added a WordPress dashboard connection panel for the SIDRENA Android application, with copyable HTTPS address and actual published-feed readiness.
+* Aligned SIDRENA admin and public price-list colors with the Android brand; no new third-party dependencies.
+* Kept API version 1 and compatibility with older Android clients. Changes are prepared in a PR and require deployment to become available.
+
 = 1.5.3 =
 * Separate the 30-day sale baseline from documented historical reference prices in the public legal metadata.
 * Document the effective date of NN 105/2026 and pending 2026 rulebook consultation without changing existing public CSV/XML schemas or saved prices.
