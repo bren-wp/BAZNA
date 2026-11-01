@@ -68,6 +68,7 @@ import com.brendigo.sidrena.data.SiteUrl
 @Composable
 fun PublicPriceListsScreen(
     data: CatalogSnapshot,
+    selectedOutlet: String,
     busy: Boolean,
     error: String?,
     onBack: () -> Unit,
@@ -77,7 +78,9 @@ fun PublicPriceListsScreen(
 ) {
     var search by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableIntStateOf(0) }
-    val documents = remember(data) { publicPriceListDocuments(data) }
+    val documents = remember(data, selectedOutlet) {
+        publicPriceListDocuments(data, selectedOutlet)
+    }
     val visible = remember(documents, search, filter) {
         filterPublicPriceLists(documents, search, filter)
     }
@@ -335,10 +338,16 @@ internal data class PublicPriceListDocument(
  * CSV endpoints, the public website, and previously published CSV/XML files.
  * Every URL must pass the same-origin HTTPS guard before reaching the UI.
  */
-internal fun publicPriceListDocuments(data: CatalogSnapshot): List<PublicPriceListDocument> {
+internal fun publicPriceListDocuments(
+    data: CatalogSnapshot,
+    selectedOutlet: String = "",
+): List<PublicPriceListDocument> {
     val site = runCatching { SiteUrl.parse(data.site) }.getOrNull()
         ?: return emptyList()
     val results = mutableListOf<PublicPriceListDocument>()
+    val outlet = data.index.outlets.firstOrNull { it.code == selectedOutlet }
+    // Unknown outlet code must not silently display webshop prices as if selected.
+    if (selectedOutlet.isNotBlank() && outlet == null) return emptyList()
     fun add(
         title: String,
         rawUrl: String?,
@@ -362,7 +371,7 @@ internal fun publicPriceListDocuments(data: CatalogSnapshot): List<PublicPriceLi
 
     add(
         title = "Cjenik proizvoda",
-        rawUrl = data.index.productsCsv,
+        rawUrl = outlet?.productCsv ?: data.index.productsCsv,
         format = "CSV",
         group = 1,
         date = data.index.publishedAt,
@@ -370,7 +379,7 @@ internal fun publicPriceListDocuments(data: CatalogSnapshot): List<PublicPriceLi
     )
     add(
         title = "Cjenik usluga",
-        rawUrl = data.index.servicesCsv,
+        rawUrl = outlet?.serviceCsv ?: data.index.servicesCsv,
         format = "CSV",
         group = 2,
         date = data.index.publishedAt,
@@ -459,6 +468,7 @@ internal fun SidrenaPriceListsPreview() {
     SidrenaTheme {
         PublicPriceListsScreen(
             data = sample,
+            selectedOutlet = "",
             busy = false,
             error = null,
             onBack = {},
