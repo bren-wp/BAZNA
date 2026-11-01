@@ -176,6 +176,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onRefresh = model::refresh,
                         onEdit = model::editSite,
                         onOpen = ::openPublic,
+                        selectedOutlet = state.outlet,
                     )
                     "products" -> ProductCatalogScreen(
                         data = snapshot,
@@ -276,8 +277,16 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onSupport = ::supportEmail,
                         onOpenPublic = ::openPublic,
                     )
-                    else -> HomePage(snapshot, state.isLoading, state.error,
-                        ::navigate, model::refresh, model::editSite, ::openPublic)
+                    else -> HomePage(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onNavigate = ::navigate,
+                        onRefresh = model::refresh,
+                        onEdit = model::editSite,
+                        onOpen = ::openPublic,
+                        selectedOutlet = state.outlet,
+                    )
                 }
             }
         }
