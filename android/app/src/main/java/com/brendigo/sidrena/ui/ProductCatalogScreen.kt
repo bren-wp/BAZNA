@@ -143,7 +143,7 @@ fun ProductCatalogScreen(
         }
 
         Spacer(Modifier.height(7.dp))
-        ProductSearchBar(query, onQueryChange = { query = it.take(256) })
+        CatalogSearchBar(query, onQueryChange = { query = it.take(256) }, hint = "Pretraži proizvode…", accessibilityLabel = "Pretraži proizvode")
         Spacer(Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -151,13 +151,13 @@ fun ProductCatalogScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             listOf("Svi", "Sidrena", "Bez sidrene").forEachIndexed { index, label ->
-                ProductFilterChip(
+                CatalogFilterChip(
                     label = label,
                     selected = filter == index,
                     onClick = { filter = index },
                 )
             }
-            ProductFilterChip("Usluge ▾", selected = false, onClick = onShowServices)
+            CatalogFilterChip("Usluge ▾", selected = false, onClick = onShowServices)
         }
 
         Spacer(Modifier.height(14.dp))
@@ -214,13 +214,13 @@ fun ProductCatalogScreen(
 }
 
 @Composable
-private fun ProductSearchBar(value: String, onQueryChange: (String) -> Unit) {
+internal fun CatalogSearchBar(value: String, onQueryChange: (String) -> Unit, hint: String, accessibilityLabel: String) {
     val focusManager = LocalFocusManager.current
     Row(
         modifier = Modifier.fillMaxWidth()
             .height(52.dp)
             .background(SurfaceRaised, RoundedCornerShape(12.dp))
-            .semantics { contentDescription = "Pretraži proizvode" }
+            .semantics { contentDescription = accessibilityLabel }
             .padding(start = 13.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -243,7 +243,7 @@ private fun ProductSearchBar(value: String, onQueryChange: (String) -> Unit) {
             decorationBox = { content ->
                 Box(contentAlignment = Alignment.CenterStart) {
                     if (value.isBlank()) {
-                        Text("Pretraži proizvode…", color = TextMuted, fontSize = 15.sp)
+                        Text(hint, color = TextMuted, fontSize = 15.sp)
                     }
                     content()
                 }
@@ -265,7 +265,7 @@ private fun ProductSearchBar(value: String, onQueryChange: (String) -> Unit) {
 }
 
 @Composable
-private fun ProductFilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
+internal fun CatalogFilterChip(label: String, selected: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(9.dp),
