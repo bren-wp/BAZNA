@@ -5,6 +5,8 @@ data class Outlet(
     val code: String,
     val productCsv: String,
     val serviceCsv: String,
+    val productsCsvReady: Boolean? = null,
+    val servicesCsvReady: Boolean? = null,
 )
 
 data class CatalogIndex(
@@ -16,6 +18,8 @@ data class CatalogIndex(
     val outlets: List<Outlet>,
     val pluginVersion: String? = null,
     val legal: LegalContract? = null,
+    val productsCsvReady: Boolean? = null,
+    val servicesCsvReady: Boolean? = null,
 )
 
 data class PriceItem(
