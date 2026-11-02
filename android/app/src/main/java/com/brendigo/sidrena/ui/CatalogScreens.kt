@@ -2,6 +2,7 @@ package com.brendigo.sidrena.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material3.Card
@@ -34,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -99,6 +103,13 @@ fun DetailPage(
             }
         } else {
             item {
+                DetailReferenceHero(
+                    site = data.site,
+                    imageUrl = item?.imageUrl.orEmpty(),
+                    service = view.isService,
+                )
+            }
+            item {
                 DetailReferenceCard(background = SurfaceRaised) {
                     Text(
                         view.title.uppercase(java.util.Locale.forLanguageTag("hr-HR")),
@@ -111,8 +122,8 @@ fun DetailPage(
                         detailHeadline(view.title, view.unit),
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
-                        lineHeight = 26.sp,
+                        fontSize = 23.sp,
+                        lineHeight = 28.sp,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -123,7 +134,7 @@ fun DetailPage(
                     if (skuAndAvailability.isNotBlank()) {
                         Text(
                             skuAndAvailability,
-                            color = Success,
+                            color = if (isPublishedAvailable(view.availability)) Success else TextMuted,
                             fontSize = 13.sp,
                             maxLines = 2,
                         )
@@ -133,7 +144,7 @@ fun DetailPage(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(13.dp),
+                    shape = RoundedCornerShape(15.dp),
                     border = BorderStroke(1.dp, Border),
                     colors = CardDefaults.cardColors(containerColor = Surface),
                 ) {
@@ -165,8 +176,16 @@ fun DetailPage(
                             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 11.dp),
                             color = if (view.referencePrice != null) Color.White else TextMuted,
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 14.sp,
+                            fontSize = if (view.referencePrice != null) 18.sp else 14.sp,
                         )
+                        view.referenceDate?.let { published ->
+                            Text(
+                                "Datum sidrene cijene: " + published,
+                                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 11.dp),
+                                color = TextMuted,
+                                fontSize = 12.sp,
+                            )
+                        }
                     }
                 }
             }
@@ -231,6 +250,57 @@ fun DetailPage(
     }
 }
 
+/**
+ * Screen 06: the 213dp reference hero uses original navy/orange visuals.
+ * A real product photo is shown only when published on the connected HTTPS
+ * site; services and items without photos use a local vector pictogram.
+ */
+@Composable
+private fun DetailReferenceHero(site: String, imageUrl: String, service: Boolean) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .height(213.dp)
+            .background(
+                Brush.linearGradient(
+                    listOf(Color(0xFF193A5A), Color(0xFF07182D)),
+                ),
+                RoundedCornerShape(17.dp),
+            )
+            .border(BorderStroke(1.dp, Border), RoundedCornerShape(17.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (!service && approvedProductImageUrl(site, imageUrl) != null) {
+            ProductThumbnail(
+                site = site,
+                imageUrl = imageUrl,
+                modifier = Modifier.size(width = 180.dp, height = 188.dp),
+            )
+        } else {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(9.dp),
+            ) {
+                Icon(
+                    imageVector = if (service) Icons.Outlined.Build else Icons.Outlined.Inventory2,
+                    contentDescription = null,
+                    tint = Accent,
+                    modifier = Modifier.size(64.dp),
+                )
+                Text(
+                    text = if (service) "Javno objavljena usluga" else "Fotografija nije objavljena",
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                )
+            }
+        }
+    }
+}
+
+/** Availability text is rendered as published, not inferred by substring. */
+internal fun isPublishedAvailable(value: String?): Boolean =
+    value?.trim()?.lowercase(java.util.Locale.ROOT) in
+        setOf("dostupno", "na zalihi", "in stock", "instock")
+
 @Composable
 private fun DetailReferenceToolbar(
     title: String,
@@ -242,12 +312,12 @@ private fun DetailReferenceToolbar(
         modifier = Modifier.fillMaxWidth().height(57.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.size(33.dp)) {
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
             Icon(
                 Icons.Outlined.ArrowBack,
                 contentDescription = "Natrag na popis",
-                tint = Accent,
-                modifier = Modifier.size(19.dp),
+                tint = Color.White,
+                modifier = Modifier.size(24.dp),
             )
         }
         Spacer(Modifier.width(6.dp))
@@ -261,7 +331,7 @@ private fun DetailReferenceToolbar(
         )
         if (onOpenPublic != null) {
             Box {
-                IconButton(onClick = { expanded = true }, modifier = Modifier.size(44.dp)) {
+                IconButton(onClick = { expanded = true }, modifier = Modifier.size(48.dp)) {
                     Icon(Icons.Outlined.MoreVert, contentDescription = "Javni cjenik", tint = TextMuted)
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -286,7 +356,7 @@ private fun DetailReferenceCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(13.dp),
+        shape = RoundedCornerShape(15.dp),
         border = BorderStroke(1.dp, Border),
         colors = CardDefaults.cardColors(containerColor = background),
     ) {
@@ -325,6 +395,8 @@ private fun DetailAttribute(label: String, value: String) {
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.weight(1f),
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
