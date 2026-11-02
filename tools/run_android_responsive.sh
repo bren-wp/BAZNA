@@ -47,7 +47,37 @@ for entry in "${cases[@]}"; do
         | tee "$output/instrumentation.txt"
     grep -q 'OK (1 test)' "$output/instrumentation.txt"
 
-    adb pull /sdcard/Android/data/com.brendigo.sidrena/files/responsive/. "$output/" >/dev/null
+    # ADB can fail while recursively pulling this Android scoped-storage
+    # directory (the first PNG may copy successfully before adb exits 1).
+    # The instrumented test itself has already passed. Download the 12 known
+    # screen files independently, with bounded retries for transient I/O,
+    # rather than masking any missing or corrupt screenshot.
+    screens=(
+        "01-splash" "02-connect" "03-home" "04-products"
+        "05-services" "06-detail" "07-documents" "08-archive"
+        "09-outlets" "10-search" "11-settings" "12-about"
+    )
+    remote="/sdcard/Android/data/com.brendigo.sidrena/files/responsive"
+    rm -f "$output"/*.png
+    for screen in "${screens[@]}"; do
+        downloaded=0
+        for attempt in 1 2 3; do
+            if adb pull "$remote/${screen}.png" "$output/${screen}.png" >/dev/null \
+                && test -s "$output/${screen}.png"; then
+                downloaded=1
+                break
+            fi
+            rm -f "$output/${screen}.png"
+            echo "Retry ${attempt}/3: ${label}/${screen}.png (adb pull)" >&2
+            adb wait-for-device || true
+            sleep "$attempt"
+        done
+        if (( downloaded == 0 )); then
+            echo "ERROR: failed to retrieve ${label}/${screen}.png after 3 tries" >&2
+            adb shell ls -l "$remote" >&2 || true
+            exit 1
+        fi
+    done
     COUNT="$(find "$output" -maxdepth 1 -type f -name '*.png' | wc -l)"
     test "$COUNT" -eq 12
 
