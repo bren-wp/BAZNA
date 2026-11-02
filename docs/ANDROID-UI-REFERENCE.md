@@ -441,3 +441,29 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 - `.github/workflows/android-ci.yml` pokreće `tools/run_android_responsive.sh`: devet stvarnih konfiguracija emulatora od 240 dp do 1280 dp, uključujući 393×852, tablet, landscape i povećani font. Instrumentacijski test `ResponsiveScreensTest.kt` prikazuje svih 12 Compose zaslona i snima ukupno **108 PNG datoteka** u GitHub Actions artefakt `SIDRENA-Android-responsive-screenshots`.
 - To su testovi stvarnog renderiranja i veličine snimke, **ne** dokaz nepostojanja svakog overlapa niti 1:1 odstupanja prema izvornom dizajnu. Pixel-perfect odobrenje zahtijeva usporedbu svakog PNG-a s izvornom referencom pri istom DPI-ju, font scaleu, status/navigacijskim trakama i slijed provjere klikova.
 - WordPress plugin ima CSS prilagodbe za 320/375/600/782 px: povezivanje Androida, URL, statusi objave, popis poslovnica i pomoć uz cijenu ostaju dostupni na uskim zaslonima. Za prihvat je potreban još stvarni pregled na WordPress mobilnoj administraciji i webshopu (uključujući 200% zum i tipkovnicu), ne samo PHP i CSS statičke provjere.
+
+## Ekran 07/12 — Javni cjenici i provjera responzivnosti (2. 11. 2026.)
+
+**Referenca:** originalni `screens_concept/07_cjenici.png`, 1080 × 1920, bez izmišljenih sustavskih oznaka, stvarnih PDF dokumenata ili DEMO značke u produkciji. Implementacija ostaje u postojećem PR-u #202.
+
+### Android raspored i ponašanje
+
+- Naslov `Javni cjenici` s narančastom strelicom, potpis `Objavljeni dokumenti` te vertikalno složene tamnoplave kartice s velikom narančastom oznakom stvarnog formata CSV/XML/WEB. Raspored uključuje preciznije razmake i kartice visine najmanje 76 dp.
+- Dodir na karticu ili ikonu otvara **provjerenu HTTPS poveznicu iste WordPress domene**. Nije dodan lažni PDF jer WordPress API takve dokumente ne jamči. Datumi dolaze isključivo iz stvarnih metapodataka objave.
+- Pretraživanje, filtri, osvježavanje i arhiva funkcionalni su u izborniku; dodatni stalni redovi nisu prisutni na osnovnoj referenci. `available_csv=false` skriva neobjavljen dokument, a `null` čuva kompatibilnost sa starijim pluginom. Odabrana poslovnica nikada ne preuzima status webshopa.
+- `AppNavigation` na zaslonima užim od 360 dp daje četiri dostupačna ikonografska odredišta s govornim opisima; 360 dp i više zadržava izvorne oznake. Na tabletima/panoramskim zaslonima sadržaj je centriran u maksimalno 840 dp, obrazac povezivanja u 560 dp.
+
+### Automatizirani Android testovi
+
+- JUnit: `AdaptiveSizingTest.kt` mjeri 13 karakterističnih širina **240 / 280 / 320 / 360 / 393 / 411 / 480 / 600 / 720 / 840 / 1024 / 1280 / 1920 dp**, uključujući granične uvjete za navigaciju.
+- Stvarni emulator: `ResponsiveScreensInstrumentedTest.kt` i `tools/run_android_responsive.sh` pokušavaju prikazati **svih 12 Compose zaslona** pri devet konfiguracija: **240×480, 320×568, 360×780, 393×852, 411×891, 600×960, 840×1120, 1280×800, 320×640 s fontom 1.4×** (160 dpi, Android API 35). Uz provjeru granica dodirnih elemenata prikuplja se 108 snimki ako test prođe.
+- GitHub Actions objavljuje rezultat i screenshot artefakt `SIDRENA-Android-responsive-screenshots`. Samo uspješan izvršeni workflow dokazuje da je pojedina konfiguracija stvarno testirana. Dodatna vizualna screenshot razlika u odnosu na 1080×1920 referencu i stvarni uređaji i dalje su nužni za potvrđeno 1:1.
+
+### WordPress responzivnost
+
+- Public plugin `cjenik.css`: mobilne tablične ćelije prelaze u tamnoplave kartice do 720 px, dugi nazivi/URL-ovi se prelamaju bez vodoravnog pomaka cijele stranice; cijene i sidreni datumi ostaju vidljivi.
+- Admin `admin.css`: široki uređivač s 15 stupaca ima **vlastiti vodoravni scroll**, dok navigacija, kartice, WooCommerce filtri, statusi poslovnica i gumbi ostaju unutar mobilnog zaslona. Zastarjeli gumbi za masovno kopiranje trenutačnih cijena/datumâ uklonjeni su zbog prethodno utvrđene pravne opasnosti.
+- Browser test `tools/test_responsive_browser.mjs` pokreće stvarni Chrome na **13 širina 240–1920 px** za javni PHP renderirani cjenik i reprezentativni WordPress admin: **26 snimki + JSON mjerenja** u artefaktu `SIDRENA-WordPress-responsive-Chrome`. Tablični scroll dopušten je unutar tablice, ne preko cijelog dokumenta.
+- WordPress je klijentov javni **read-only** izvor; Android ne preuzima administratorske lozinke i ne mijenja katalog. Niti automatizirana responsivnost niti zeleni CI sami po sebi ne predstavljaju pravni certifikat.
+
+**Ograničenje:** "sve moguće" kombinacije rezolucija, DPI-ja, omjera stranica, pristupačnosti, verzija Androida i tema nisu konačan skup. Matrica iznad pokriva definiran skup graničnih i tipičnih profila, a ne sve uređaje. Za produkcijsko označavanje 1:1 preporučuje se screenshot-diff referenci po svakoj klasi uređaja te barem jedan stvarni fizički telefon i tablet.
