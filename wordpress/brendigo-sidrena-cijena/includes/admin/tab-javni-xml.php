@@ -116,6 +116,39 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 				<?php echo $sidrena_android_services_ready ? esc_html__( 'objavljeno', 'brendigo-sidrena-cijena' ) : esc_html__( 'nije objavljeno', 'brendigo-sidrena-cijena' ); ?>
 			</li>
 		</ul>
+		<?php if ( $sidrena_settings->is_multi_poslovnica() ) : ?>
+			<?php
+			$sidrena_android_outlets = Brendigo_Sidrena_Cijena_Poslovnice::instance()->all();
+			$sidrena_android_outlets_shown = array_slice( $sidrena_android_outlets, 0, 12 );
+			?>
+			<div class="sidrena-android-bridge__outlets">
+				<h4><?php echo esc_html__( 'Povezivanje poslovnica', 'brendigo-sidrena-cijena' ); ?></h4>
+				<p><?php echo esc_html__( 'Android učitava zasebne CSV cjenike svake odabrane poslovnice. Status webshopa ne zamjenjuje status poslovnice.', 'brendigo-sidrena-cijena' ); ?></p>
+				<ul class="sidrena-android-bridge__outlet-list">
+					<?php foreach ( $sidrena_android_outlets_shown as $sidrena_android_outlet ) : ?>
+						<?php
+						$sidrena_android_code = isset( $sidrena_android_outlet['oznaka'] ) ? (string) $sidrena_android_outlet['oznaka'] : '';
+						if ( '' === $sidrena_android_code ) {
+							continue;
+						}
+						$sidrena_android_name = isset( $sidrena_android_outlet['naziv'] ) && '' !== $sidrena_android_outlet['naziv'] ? $sidrena_android_outlet['naziv'] : $sidrena_android_code;
+						$sidrena_android_outlet_products = $sidrena_feeds->get_type_public_path( 'proizvodi', 'csv', $sidrena_android_code );
+						$sidrena_android_outlet_services = $sidrena_feeds->get_type_public_path( 'usluge', 'csv', $sidrena_android_code );
+						$sidrena_android_outlet_products_ok = is_string( $sidrena_android_outlet_products ) && '' !== $sidrena_android_outlet_products && is_file( $sidrena_android_outlet_products ) && is_readable( $sidrena_android_outlet_products );
+						$sidrena_android_outlet_services_ok = is_string( $sidrena_android_outlet_services ) && '' !== $sidrena_android_outlet_services && is_file( $sidrena_android_outlet_services ) && is_readable( $sidrena_android_outlet_services );
+						?>
+						<li>
+							<strong><?php echo esc_html( $sidrena_android_name ); ?></strong>
+							<span class="<?php echo $sidrena_android_outlet_products_ok ? 'is-ready' : 'is-pending'; ?>"><?php echo esc_html__( 'Proizvodi', 'brendigo-sidrena-cijena' ); ?>: <?php echo $sidrena_android_outlet_products_ok ? esc_html__( 'objavljeno', 'brendigo-sidrena-cijena' ) : esc_html__( 'nije objavljeno', 'brendigo-sidrena-cijena' ); ?></span>
+							<span class="<?php echo $sidrena_android_outlet_services_ok ? 'is-ready' : 'is-pending'; ?>"><?php echo esc_html__( 'Usluge', 'brendigo-sidrena-cijena' ); ?>: <?php echo $sidrena_android_outlet_services_ok ? esc_html__( 'objavljeno', 'brendigo-sidrena-cijena' ) : esc_html__( 'nije objavljeno', 'brendigo-sidrena-cijena' ); ?></span>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+				<?php if ( count( $sidrena_android_outlets ) > count( $sidrena_android_outlets_shown ) ) : ?>
+					<p><?php echo esc_html__( 'Prikazano je prvih 12 poslovnica. Stanje ostalih dostupno je u javnom REST API-ju.', 'brendigo-sidrena-cijena' ); ?></p>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 		<?php if ( ! $sidrena_android_ready ) : ?>
 			<p class="sidrena-android-bridge__warning"><?php echo esc_html__( 'Najprije generirajte javni cjenik. Nakon objave u Android aplikaciji odaberite Osvježi. Izostanak proizvoda ili usluga u CSV datoteci dopušten je ako je datoteka ispravno objavljena.', 'brendigo-sidrena-cijena' ); ?></p>
 		<?php endif; ?>
