@@ -100,7 +100,11 @@ fun ConnectionPage(
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize().background(Background),
     ) {
-        val spacing = connectionSpacing(maxHeight.value)
+        // Snapshot viewport constraints here. Nested Column/Box scopes cannot
+        // implicitly resolve BoxWithConstraintsScope.maxWidth/maxHeight.
+        val viewportWidthDp = maxWidth.value
+        val viewportHeightDp = maxHeight.value
+        val spacing = connectionSpacing(viewportHeightDp)
         Column(
             modifier = Modifier.fillMaxSize()
                 .imePadding()
@@ -126,9 +130,9 @@ fun ConnectionPage(
                 Text(
                     "Poveži WordPress stranicu",
                     color = Color.White,
-                    fontSize = if (maxWidth.value >= 360f) 27.sp else 21.sp,
+                    fontSize = if (viewportWidthDp >= 360f) 27.sp else 21.sp,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = if (maxWidth.value >= 360f) 30.sp else 25.sp,
+                    lineHeight = if (viewportWidthDp >= 360f) 30.sp else 25.sp,
                     maxLines = 2,
                     modifier = Modifier.padding(start = 48.dp),
                 )
@@ -137,7 +141,7 @@ fun ConnectionPage(
             Spacer(Modifier.height(spacing.intro))
             // Screen 02 reference: raised blue connectivity medallion, not a
             // downloaded image or an externally loaded icon asset.
-            val linkSize = if (maxHeight.value >= 760f) 118.dp else 104.dp
+            val linkSize = if (viewportHeightDp >= 760f) 118.dp else 104.dp
             Box(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
                     .size(linkSize)
@@ -155,7 +159,7 @@ fun ConnectionPage(
                     Icons.Outlined.Link,
                     contentDescription = null,
                     tint = SoftBlue,
-                    modifier = Modifier.size(if (maxHeight.value >= 760f) 52.dp else 46.dp),
+                    modifier = Modifier.size(if (viewportHeightDp >= 760f) 52.dp else 46.dp),
                 )
             }
             Spacer(Modifier.height(16.dp))
