@@ -8,6 +8,15 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ItemDetailPresentationTest {
+    @Test fun availabilityBadgeCannotMarkUnavailableProductAsGreen() {
+        assertTrue(isPublishedAvailable("Dostupno"))
+        assertTrue(isPublishedAvailable("na zalihi"))
+        assertFalse(isPublishedAvailable("Nedostupno"))
+        assertFalse(isPublishedAvailable("Nije dostupno"))
+        assertFalse(isPublishedAvailable("prednarudžba"))
+        assertFalse(isPublishedAvailable(null))
+    }
+
     private fun item(
         current: String = "5,99",
         reference: String = "8,49",
