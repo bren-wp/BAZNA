@@ -80,4 +80,23 @@ sidrena_markup_expect( false !== strpos( $html, '&lt;script&gt;' ), 'Escaped nam
 sidrena_markup_expect( false !== strpos( $html, 'data-label="Sidrena cijena"' ), 'Translated price cell label retained' );
 sidrena_markup_expect( false !== strpos( $html, 'href="https://primjer.hr/servis"' ), 'Existing public service link retained' );
 
+if ( isset( $argv ) && in_array( '--fixture', $argv, true ) ) {
+    // Export the actual public HTML builder output for headless browser QA.
+    // This is a test-only document; never exposed on the production site.
+    $css_file = realpath( __DIR__ . '/../wordpress/brendigo-sidrena-cijena/assets/css/cjenik.css' );
+    if ( ! $css_file ) {
+        fwrite( STDERR, "Missing public price-list CSS fixture\n" );
+        exit( 1 );
+    }
+    $css_url = 'file://' . $css_file;
+    echo '<!doctype html><html lang="hr"><head><meta charset="utf-8">';
+    echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
+    echo '<link rel="stylesheet" href="' . esc_attr( $css_url ) . '">';
+    echo '</head><body><main><section class="cjenik-hero"><p class="cjenik-kicker">SIDRENA</p>';
+    echo '<h1>Javni cjenici</h1><p>Objavljeni proizvodi i usluge</p></section>';
+    echo $html;
+    echo '</main></body></html>';
+    exit( 0 );
+}
+
 fwrite( STDOUT, "PASS: SIDRENA public service/product HTML, dates and safe mobile card fields\n" );
