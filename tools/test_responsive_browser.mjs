@@ -134,6 +134,17 @@ try {
                     wrapperClientWidth: wrap ? wrap.clientWidth : 0,
                     toolDisplay: type === "admin" ?
                         getComputedStyle(document.querySelector(".brendigo-woo-catalog-tools")).display : null,
+                    navDisplay: type === "admin" ?
+                        getComputedStyle(document.querySelector(".brendigo-admin-nav")).display : null,
+                    navItemMinHeight: type === "admin" ?
+                        parseFloat(getComputedStyle(document.querySelector(".brendigo-admin-nav__item")).minHeight) : null,
+                    saveButtonMinHeight: type === "admin" ?
+                        parseFloat(getComputedStyle(document.querySelector(".brendigo-woo-catalog-footer .button")).minHeight) : null,
+                    navItemOutside: type === "admin" && width <= 480 ?
+                        [...document.querySelectorAll(".brendigo-admin-nav__item")].some(el => {
+                            const r = el.getBoundingClientRect();
+                            return r.left < -2 || r.right > width + 2;
+                        }) : false,
                     priceCellWhiteSpace: type === "public" ? (() => {
                         const cell = document.querySelector(".cjenik-table tbody tr td:nth-child(n + 3)");
                         return cell ? getComputedStyle(cell).whiteSpace : null;
@@ -158,8 +169,16 @@ try {
                     result.priceCellWhiteSpace !== "normal") {
                     errors.push("mobile catalog prices/URLs cannot wrap: " + result.priceCellWhiteSpace);
                 }
-            } else if (width <= 782 && result.toolDisplay !== "grid") {
-                errors.push("admin form does not stack on small screens");
+            } else if (width <= 782) {
+                if (result.toolDisplay !== "grid") {
+                    errors.push("admin form does not stack on small screens");
+                }
+                if (result.navItemMinHeight < 44 || result.saveButtonMinHeight < 44) {
+                    errors.push("mobile nav/save tap targets must be at least 44px high");
+                }
+                if (width <= 480 && (result.navDisplay !== "grid" || result.navItemOutside)) {
+                    errors.push("phone sidebar nav must be a visible two-column grid");
+                }
             }
 
             const shot = await cdp("Page.captureScreenshot", {
