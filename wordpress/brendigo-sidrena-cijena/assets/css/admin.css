@@ -4192,3 +4192,17 @@ body.sidrena-cijena-screen #wpbody-content {
         scroll-snap-align: none;
     }
 }
+
+
+/* Android/WordPress brand parity: orange primary CTA needs navy lettering.
+ * White on the #FF852C gradient lacks readable text contrast. The following
+ * overrides remain inside the official SIDRENA admin, never global wp-admin. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin button.button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input[type="submit"].button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary:hover,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary:focus-visible,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary:active {
+    color: #07182d !important;
+    text-shadow: none !important;
+}
