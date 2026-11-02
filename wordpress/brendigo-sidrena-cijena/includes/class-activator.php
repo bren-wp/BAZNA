@@ -42,6 +42,12 @@ class Brendigo_Sidrena_Cijena_Activator {
 	 * @return array{done:bool,processed:int,written:int,page:int,next_page:int,next_offset:int,next_child:int,total:int,seen:int}
 	 */
 	public static function process_batch( $page = 0, $stamp_today = false, $offset = 0, $child = 0 ) {
+		// Stop legacy scheduled snapshot work: current prices are not historical evidence.
+		self::clear_pending_state();
+		return array( 'done' => true, 'processed' => 0, 'written' => 0,
+			'page' => 0, 'next_page' => 0, 'next_offset' => 0,
+			'next_child' => 0, 'total' => 0, 'seen' => 0,
+			'blocked' => true );
 		ignore_user_abort( true );
 
 		$page   = absint( $page );
@@ -265,6 +271,13 @@ class Brendigo_Sidrena_Cijena_Activator {
 
 		$stats_before = self::catalog_stats();
 
+		if ( ! $dry_run ) {
+			// Read-only audit is allowed, but bulk historic values cannot be guessed.
+			return array( 'written' => 0, 'processed' => 0, 'updated' => 0,
+				'inserted' => 0, 'missing_before' => (int) $stats_before['missing'],
+				'dry_run' => false, 'fast' => $fast, 'blocked' => true );
+		}
+
 		if ( $fast ) {
 			$ids    = '' !== $stamp_date ? self::missing_product_ids() : array();
 			$result = self::fast_fill( $dry_run );
@@ -323,6 +336,9 @@ class Brendigo_Sidrena_Cijena_Activator {
 	 * @return array{done:bool,processed:int,written:int,page:int}
 	 */
 	public static function fill_page( $page, $batch_size = 250, $dry_run = false, $stamp_date = '' ) {
+		if ( ! $dry_run ) {
+			return array( 'done' => true, 'processed' => 0, 'written' => 0, 'page' => $page, 'blocked' => true );
+		}
 		$page       = max( 1, absint( $page ) );
 		$batch_size = max( 1, absint( $batch_size ) );
 
@@ -397,6 +413,9 @@ class Brendigo_Sidrena_Cijena_Activator {
 	 * @return array{written:int,updated:int,inserted:int}
 	 */
 	public static function fast_fill( $dry_run = false ) {
+		if ( ! $dry_run ) {
+			return array( 'written' => 0, 'updated' => 0, 'inserted' => 0, 'blocked' => true );
+		}
 		global $wpdb;
 
 		$ids = self::missing_product_ids();
