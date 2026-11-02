@@ -388,3 +388,31 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 - GitHub Actions: **Android** kompilacija, testovi, lint, APK/AAB; **WordPress** PHP lint, dva testna ugovora, reproducibilno ZIP pakiranje, audit cijelog repozitorija.
 - Vizualni test 1:1 još zahtijeva stvarni emulator (barem 360×640 i 393×852), screenshot overlay i pregled WordPress administracije u pregledniku. Funkcionalni test s produkcijskom WordPress stranicom zahtijeva stvarno objavljeni dodatak i cjenike; lokalni stubovi ne potvrđuju hosting/DNS/WAF/HTTP konfiguraciju.
 
+
+
+## Zaslon 05/12 — Usluge i WordPress prikaz cjenika
+
+**Referenca:** dostavljena visoka slika \`SIDRENA-05-reference.png\` (Usluge, tamnoplava pozadina, narančasta strelica, široka tražilica i četiri kompaktne kartice). Prikaz je izrađen kao stvarni Compose UI, bez generiranja slike u chatu. Primjeri cijena/naziva na dizajnerskoj slici koriste se samo za razvojni preview i nikad se ne ubrizgavaju u produkcijski katalog.
+
+### Android
+
+- Kompozicija \`ServiceCatalogScreen.kt\` koristi \`#07182D\` pozadinu, naslov 23 sp, visinu zaglavlja 61 dp, tražilicu visine 52 dp, gornji odmak 21 dp od liste i kartice \`#10263D\` visine barem 76 dp, radijusa 12 dp i obruba \`#28455F\`. Narančasta je \`#FF852C\`; siva \`#A9BAD1\`.
+- Strelica i izbornik su funkcionalni. Izbornik sadrži filtre **Sve usluge / Sa sidrenom cijenom / Bez sidrene cijene**, **Osvježi usluge** i **Prikaži proizvode**. Filtri namjerno nisu stalno u dodatnom redu: tako glavni zaslon prati konkretnu dostavljenu referencu.
+- Pretraga izravno filtrira stvarne javno objavljene usluge preko \`CatalogSearch.items\`. \`LazyColumn\` prikazuje stvarna imena i podatke; odabir kartice otvara detalj stavke.
+- Jedna objavljena cijena **nije automatski „cijena od”**: prikazuje se **Cijena** i izvorna vrijednost. Sidrena cijena prikazuje se samo kad postoji, uz **objavljeni datum**. Nema lažnih promocija, nasumičnih cijena, slika ili izvora.
+- Ako WordPress v1 prijavi \`available_csv=false\`, korisnik dobiva jasnu poruku da cjenik usluga nije objavljen. Kada API nema to novo polje (starija verzija), aplikacija ostaje kompatibilna i pokušava standardno CSV učitavanje.
+- Stanje objave odabrane poslovnice provjerava se **isključivo na njezinu feedu**. Nema tihog prelaska na webshop kad poslovnica nije pronađena.
+
+### WordPress
+
+- U \`SIDRENA → Javni cjenik → SIDRENA Android · Povezivanje\` prikazani su objavljeni CSV proizvoda/usluga za glavni cjenik i zasebno prvih 12 poslovnica. Sve se poslovnice mogu provjeriti kroz postojeći javni \`GET /wp-json/brendigo-sidrena/v1/cjenici\`. Oznaka statusa računa se isključivo iz objavljenih čitljivih datoteka; **prazna, ali ispravno objavljena CSV datoteka** smatra se objavljenom.
+- \`class-feed-files.php\` u javni HTML dodaje stabilne, HTML-escapeane \`data-kind\` (\`usluga\`/\`proizvod\`) i \`data-field\` atribute uz postojeće lokalizirane oznake. Javne mobilne kartice u \`assets/css/cjenik.css\` preuzimaju Android paletu, prikazuju stvarnu trenutačnu cijenu narančasto i sidrenu cijenu tamnije, bez skrivanja datuma ili izvornog sadržaja.
+- Ništa se ne mijenja u WooCommerce cijeni, datumima, korisničkim računima, administratorskim lozinkama ili privatnom API-ju. Android je **read-only**, koristi HTTPS i podatke javne objave.
+
+### Provjere prije spajanja
+
+- Android: \`ServiceCatalogPresentationTest.kt\` uključuje pretraživanje, filtar, točnu trenutnu cijenu, nedostajuću sidrenu cijenu, sidreni datum i zaseban status poslovnice. CI mora proći compile, lint, unit tests te APK/AAB.
+- WordPress: \`tools/test_public_catalog_markup.php\` poziva stvarni PHP builder s izoliranim WordPress stubovima; provjerava \`data-kind\`, \`data-field\`, escapeanje naziva, izvornu cijenu, sidrenu cijenu i datum. Uz to se izvode ostali REST/CSV testovi i reproducibilno pakiranje.
+- Za stvarnu **pixel-po-pixel potvrdu** još treba usporediti emulator screenshot i referencu na jednakom DP/DPI okruženju, Android 360/393/411 dp širine te WordPress 360/768/desktop prikaz. Nije moguće tvrditi potvrđen 1:1 bez te usporedbe.
+- Za stvarnu provjeru povezivanja: na testnom WordPressu objaviti cjenik, preko preglednika otvoriti \`/wp-json/brendigo-sidrena/v1/cjenici\`, provjeriti \`feeds.usluge.available_csv=true\`, otvoriti \`feeds.usluge.csv\`, provjeriti 302 odredište iste HTTPS domene, povezati Android, odabrati poslovnicu, osvježiti i otvoriti uslugu. Hosting/CDN/WAF mogu uzrokovati greške koje lokalni testovi ne oponašaju.
+
