@@ -870,35 +870,8 @@
 		$("#sidrena-wc-price-filter").on("change", applyFilters);
 		$form.on("change", ".js-sidrena-wc-price", applyFilters);
 
-		$(".js-sidrena-wc-fill-date").on("click", function () {
-			var date = $.trim($("#sidrena-wc-bulk-date").val() || "");
-			if (!date) {
-				return;
-			}
-			visibleRows().find(".js-sidrena-wc-date").each(function () {
-				if (!$.trim($(this).val() || "")) {
-					$(this).val(date).trigger("change");
-				}
-			});
-		});
-
-		$(".js-sidrena-wc-fill-price").on("click", function () {
-			var message = i18n.fillCurrentConfirm || "Fill empty reference-price fields with the current price? Use this only if that price applied on the reference date.";
-			if (!window.confirm(message)) {
-				return;
-			}
-			visibleRows().each(function () {
-				var $row = $(this);
-				var $field = $row.find(".js-sidrena-wc-price");
-				if ($.trim($field.val() || "")) {
-					return;
-				}
-				var price = $.trim($row.find(".brendigo-woo-current").data("current") || "");
-				if (price) {
-					$field.val(price).trigger("change");
-				}
-			});
-		});
+		// Historical reference prices and dates must be entered individually
+		// with evidence, never copied from the current WooCommerce price.
 
 		$resetButton.on("click", function () {
 			if (!dirtyCount) {
