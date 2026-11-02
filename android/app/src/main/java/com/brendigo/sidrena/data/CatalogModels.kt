@@ -20,6 +20,7 @@ data class CatalogIndex(
     val legal: LegalContract? = null,
     val productsCsvReady: Boolean? = null,
     val servicesCsvReady: Boolean? = null,
+    val pendingPublication: Boolean? = null,
 )
 
 data class PriceItem(
