@@ -558,7 +558,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 	}
 
 	/**
-	 * After activation, point at the two fill buttons. Shown on every admin screen until dismissed or a fill finishes.
+	 * After activation, prompt an administrator to verify historical prices manually.
 	 */
 	private function render_fill_prompt_notice() {
 		if ( 'yes' !== get_option( Brendigo_Sidrena_Cijena_Activator::FILL_PROMPT_OPTION ) ) {
@@ -572,7 +572,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 		);
 
 		echo '<div class="notice notice-info"><p>';
-		echo esc_html__( 'Sidrena cijena ne upisuje cijene pri aktivaciji. Prazna polja možete popuniti na kartici Postavke: iz redovne cijene (datum ostaje zadani) ili s današnjim datumom.', 'brendigo-sidrena-cijena' );
+		echo esc_html__( 'Automatsko popunjavanje sidrenih/baznih cijena iz današnjih cijena isključeno je. Za svaku stavku upišite dokazanu povijesnu cijenu i njezin referentni datum.', 'brendigo-sidrena-cijena' );
 		echo ' <a href="' . esc_url( $settings_url ) . '">' . esc_html__( 'Otvori postavke', 'brendigo-sidrena-cijena' ) . '</a>';
 		echo ' · <a href="' . esc_url( $dismiss_url ) . '">' . esc_html__( 'Sakrij', 'brendigo-sidrena-cijena' ) . '</a>';
 		echo '</p></div>';
@@ -596,7 +596,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 		}
 
 		echo '<div class="notice notice-info"><p>';
-		echo esc_html__( 'Sidrena cijena: u tijeku je spremanje redovnih cijena proizvoda i varijacija. Već unesene sidrene cijene neće se prepisati.', 'brendigo-sidrena-cijena' );
+		echo esc_html__( 'Zatečena automatska obrada povijesnih cijena zaustavljena je. Postojeće cijene nisu izmijenjene; verificirajte datum i iznos svake stavke.', 'brendigo-sidrena-cijena' );
 		echo '</p></div>';
 	}
 
@@ -632,7 +632,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 		}
 
 		echo '<div class="notice notice-info"><p>';
-		echo esc_html__( 'Sidrena cijena: u tijeku je spremanje redovnih cijena proizvoda i varijacija. Već unesene sidrene cijene neće se prepisati.', 'brendigo-sidrena-cijena' );
+		echo esc_html__( 'Zatečena automatska obrada povijesnih cijena zaustavljena je. Postojeće cijene nisu izmijenjene; verificirajte datum i iznos svake stavke.', 'brendigo-sidrena-cijena' );
 		echo '</p></div>';
 	}
 
