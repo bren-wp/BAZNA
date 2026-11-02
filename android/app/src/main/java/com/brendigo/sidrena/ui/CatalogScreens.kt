@@ -237,8 +237,8 @@ private fun DetailToolbar(
 }
 
 /**
- * A neutral native placeholder. A product photograph cannot be loaded from
- * PriceItem: the public JSON/CSV contract has no image field.
+ * Prefer a genuine, same-origin WordPress product thumbnail when available.
+ * Otherwise render the native placeholder without invented imagery.
  */
 @Composable
 private fun DetailHero(isService: Boolean, site: String, imageUrl: String) {
