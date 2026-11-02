@@ -29,17 +29,11 @@ class Brendigo_Sidrena_Cijena_Activator {
 
 
 	/**
-	 * Process one short slice of products, then reschedule if needed.
+	 * Deprecated cron entry point. Kept only so existing scheduled events can
+	 * run safely after plugin updates: remove legacy cursors and never infer
+	 * historical prices from current prices or today's date.
 	 *
-	 * A page is 40 parents, but each HTTP request stops after WORK_BUDGET
-	 * product objects so a proxy timeout cannot drop the rest of the catalog.
-	 * Offset and child resume inside the same page.
-	 *
-	 * @param int  $page        Optional explicit page. 0 reads the stored cursor.
-	 * @param bool $stamp_today Also write today's date when the date field is empty.
-	 * @param int  $offset      Parent index inside the current page.
-	 * @param int  $child       Variation index inside the current parent.
-	 * @return array{done:bool,processed:int,written:int,page:int,next_page:int,next_offset:int,next_child:int,total:int,seen:int}
+	 * @return array<string,int|bool> Blocked status for legacy consumers.
 	 */
 	public static function process_batch( $page = 0, $stamp_today = false, $offset = 0, $child = 0 ) {
 		// Stop legacy scheduled snapshot work: current prices are not historical evidence.
