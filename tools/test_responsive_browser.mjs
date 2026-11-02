@@ -134,6 +134,8 @@ try {
                     wrapperClientWidth: wrap ? wrap.clientWidth : 0,
                     toolDisplay: type === "admin" ?
                         getComputedStyle(document.querySelector(".brendigo-woo-catalog-tools")).display : null,
+                    primaryButtonColor: type === "admin" ?
+                        getComputedStyle(document.querySelector(".brendigo-woo-catalog-footer .button-primary")).color : null,
                     navDisplay: type === "admin" ?
                         getComputedStyle(document.querySelector(".brendigo-admin-nav")).display : null,
                     navItemMinHeight: type === "admin" ?
@@ -169,6 +171,8 @@ try {
                     result.priceCellWhiteSpace !== "normal") {
                     errors.push("mobile catalog prices/URLs cannot wrap: " + result.priceCellWhiteSpace);
                 }
+            } else if (fixture.label === "admin" && result.primaryButtonColor !== "rgb(7, 24, 45)") {
+                errors.push("orange primary action text must be dark navy, got " + result.primaryButtonColor);
             } else if (width <= 782) {
                 if (result.toolDisplay !== "grid") {
                     errors.push("admin form does not stack on small screens");
