@@ -30,7 +30,7 @@ class CatalogRepository {
         val serviceUrl = selected?.serviceCsv ?: index.servicesCsv
 
         val warnings = mutableListOf<String>()
-        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte SIDRENA na 1.5.2.")
+        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte dodatak SIDRENA.")
         fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
             if (ready == false) {
                 warnings.add("Cjenik za " + label + " još nije objavljen u WordPress dodatku. Objavite ga u administraciji SIDRENA.")
