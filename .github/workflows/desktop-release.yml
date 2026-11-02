@@ -124,7 +124,9 @@ jobs:
           set -euo pipefail
           wp_sha=$(sha256sum "release/brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip" | cut -d' ' -f1)
           cat > notes.md <<EOF
-          # SIDRENA $RELEASE_VERSION\n\n          Android $ANDROID_VERSION · Windows $WINDOWS_VERSION · WordPress $WORDPRESS_VERSION
+          # SIDRENA $RELEASE_VERSION
+
+          Android $ANDROID_VERSION · Windows $WINDOWS_VERSION · WordPress $WORDPRESS_VERSION
 
           ## Android
           Nativni Android prikaz s dvanaest povezanih zaslona, hrvatskim jezikom, pretraživanjem, poslovnicama, javnim proizvodima, uslugama i arhivom. Dostupni su instalacijski **debug APK** i **nepotpisani AAB**. Potpisivanje za Google Play nije uključeno.
