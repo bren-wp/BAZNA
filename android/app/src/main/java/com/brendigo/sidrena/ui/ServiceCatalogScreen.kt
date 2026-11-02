@@ -93,12 +93,14 @@ fun ServiceCatalogScreen(
             onShowProducts = onShowProducts,
             onRefresh = onRefresh,
         )
-        Spacer(Modifier.height(11.dp))
+        // Reference 1080 px canvas: toolbar immediately followed by a 40 dp search field.
         CatalogSearchBar(
             value = query,
             onQueryChange = { query = it.take(256) },
             hint = "Pretraži usluge…",
             accessibilityLabel = "Pretraži javno objavljene usluge",
+            heightDp = 40,
+            radiusDp = 9,
         )
         Spacer(Modifier.height(21.dp))
 
