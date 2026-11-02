@@ -11,6 +11,25 @@ class SiteUrlTest {
             site.endpoint("wp-json/brendigo-sidrena/v1/cjenici").toASCIIString())
     }
 
+    @Test fun supportsSameOriginPlainPermalinkRestApiWithoutCredentials() {
+        val root = SiteUrl.parse("https://primjer.hr")
+        assertEquals(
+            "https://primjer.hr/?rest_route=%2Fbrendigo-sidrena%2Fv1%2Fcjenici",
+            root.queryRestEndpoint("brendigo-sidrena/v1/cjenici").toASCIIString(),
+        )
+        val subdir = SiteUrl.parse("https://primjer.hr/trgovina")
+        assertEquals(
+            "https://primjer.hr/trgovina/?rest_route=%2Fbrendigo-sidrena%2Fv1%2Fcjenici",
+            subdir.queryRestEndpoint("brendigo-sidrena/v1/cjenici").toASCIIString(),
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            root.queryRestEndpoint("https://other.example/v1")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            root.queryRestEndpoint("../wp-admin")
+        }
+    }
+
     @Test fun rejectsPlainHttpAndLocalHosts() {
         for (url in listOf("http://primjer.hr", "https://localhost", "https://127.0.0.1",
             "https://admin:lozinka@primjer.hr", "https://primjer.hr/a/../wp")) {
