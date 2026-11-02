@@ -93,6 +93,13 @@ class ItemDetailPresentationTest {
         assertNull(empty.saleLabel)
     }
 
+    @Test fun referenceIdentityCardUsesPublishedNameAndUnitOnce() {
+        assertEquals("Maslinovo ulje 1 L", detailHeadline("Maslinovo ulje", "1 L"))
+        assertEquals("Maslinovo ulje 1 L", detailHeadline("Maslinovo ulje 1 L", "1 L"))
+        assertEquals("Usluga čišćenja", detailHeadline("Usluga čišćenja", ""))
+        assertEquals("Sapun", detailHeadline("Sapun", null))
+    }
+
     @Test fun missingReferenceDateIsUnknownNotAutomaticallyAssigned() {
         val state = detailPresentation(item(reference = "4,50", referenceDate = ""))
         assertTrue(state.referencePrice?.contains("4,50") == true)
