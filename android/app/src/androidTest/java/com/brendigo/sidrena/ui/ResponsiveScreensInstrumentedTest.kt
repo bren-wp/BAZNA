@@ -106,7 +106,7 @@ class ResponsiveScreensInstrumentedTest {
                         if (currentScreen.intValue >= 2) {
                             AppNavigation(
                                 active = when (currentScreen.intValue) {
-                                    0, 1, 2, 8 -> 0
+                                    1, 2, 8 -> 0
                                     7 -> 2
                                     10, 11 -> 3
                                     else -> 1
