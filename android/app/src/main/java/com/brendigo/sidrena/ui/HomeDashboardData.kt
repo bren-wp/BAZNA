@@ -46,6 +46,7 @@ internal fun homeCatalogPending(data: CatalogSnapshot, selectedOutlet: String = 
         data.index.outlets.firstOrNull { it.code == selectedOutlet }
     }
     if (selectedOutlet.isNotBlank() && outlet == null) return true
+    if (data.index.pendingPublication == true) return true
     val productReady = if (outlet == null) data.index.productsCsvReady else outlet.productsCsvReady
     val serviceReady = if (outlet == null) data.index.servicesCsvReady else outlet.servicesCsvReady
     return productReady == false || serviceReady == false
