@@ -18,6 +18,10 @@ function sidrena_contract_assert( $condition, $label ) {
 function add_action( $hook, $callback ) {
 	return true;
 }
+function register_rest_route( $namespace, $route, $args ) {
+	global $sidrena_registered_routes;
+	$sidrena_registered_routes[ $namespace . $route ] = $args;
+}
 function esc_url_raw( $url ) {
 	return $url;
 }
@@ -98,8 +102,20 @@ file_put_contents( $services, "naziv;maloprodajna_cijena\n" );
 file_put_contents( $outlet_products, "naziv;maloprodajna_cijena\n" );
 
 $api = Brendigo_Sidrena_Cijena_Public_API::instance();
+$api->register();
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/cjenici'] ), 'Discovery route registered on plugin init' );
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/arhiva'] ), 'Archive route registered on plugin init' );
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/cjenici/(?P<kind>proizvodi|usluge)/(?P<format>xml|csv)'] ), 'CSV/XML feed route registered' );
+foreach ( $sidrena_registered_routes as $registered ) {
+	sidrena_contract_assert( WP_REST_Server::READABLE === $registered['methods'], 'Public endpoints must be read-only' );
+	sidrena_contract_assert( '__return_true' === $registered['permission_callback'], 'Public endpoints have no admin authentication' );
+}
 $json = $api->index();
 sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
+sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
+sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
+sidrena_contract_assert( true === $json['connection']['csv_publication_required'], 'CSV readiness is not fabricated on first install' );
+sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-sidrena/v1/cjenici' === $json['connection']['rest_endpoint'], 'Canonical REST connection endpoint present' );
 sidrena_contract_assert( true === $json['feeds']['proizvodi']['available_csv'], 'Product feed ready' );
 sidrena_contract_assert( true === $json['feeds']['usluge']['available_csv'], 'Service feed ready' );
 sidrena_contract_assert( true === $json['publication']['csv_ready'], 'Both main feeds published' );
