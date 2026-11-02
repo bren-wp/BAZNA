@@ -396,7 +396,7 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 ### Android
 
-- Kompozicija \`ServiceCatalogScreen.kt\` koristi \`#07182D\` pozadinu, naslov 23 sp, visinu zaglavlja 61 dp, tražilicu visine 52 dp, gornji odmak 21 dp od liste i kartice \`#10263D\` visine barem 76 dp, radijusa 12 dp i obruba \`#28455F\`. Narančasta je \`#FF852C\`; siva \`#A9BAD1\`.
+- Kompozicija \`ServiceCatalogScreen.kt\` koristi \`#07182D\` pozadinu, naslov 23 sp, visinu zaglavlja 61 dp, tražilicu visine 40 dp (radijus 9 dp) odmah ispod zaglavlja, odmak 21 dp do prve kartice od liste i kartice \`#10263D\` visine barem 76 dp, radijusa 12 dp i obruba \`#28455F\`. Narančasta je \`#FF852C\`; siva \`#A9BAD1\`.
 - Strelica i izbornik su funkcionalni. Izbornik sadrži filtre **Sve usluge / Sa sidrenom cijenom / Bez sidrene cijene**, **Osvježi usluge** i **Prikaži proizvode**. Filtri namjerno nisu stalno u dodatnom redu: tako glavni zaslon prati konkretnu dostavljenu referencu.
 - Pretraga izravno filtrira stvarne javno objavljene usluge preko \`CatalogSearch.items\`. \`LazyColumn\` prikazuje stvarna imena i podatke; odabir kartice otvara detalj stavke.
 - Jedna objavljena cijena **nije automatski „cijena od”**: prikazuje se **Cijena** i izvorna vrijednost. Sidrena cijena prikazuje se samo kad postoji, uz **objavljeni datum**. Nema lažnih promocija, nasumičnih cijena, slika ili izvora.
