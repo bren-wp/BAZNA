@@ -7,6 +7,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -97,9 +98,12 @@ fun SidrenaSplashScreen(
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LaunchedEffect(onFinished) {
+    // Preserve one 2200 ms splash interval across parent recompositions.
+    // Use the latest navigation callback without restarting the countdown.
+    val latestOnFinished = rememberUpdatedState(onFinished)
+    LaunchedEffect(Unit) {
         delay(SPLASH_DURATION_MS)
-        onFinished()
+        latestOnFinished.value()
     }
     SidrenaSplashArtwork(modifier)
 }
