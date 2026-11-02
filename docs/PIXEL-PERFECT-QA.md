@@ -58,7 +58,7 @@ aplikacije.
 ```bash
 python3 -m pip install Pillow
 python3 tools/compare_ui_reference.py \
-  reference/01-splash.png \
+  reference-393/01-splash.png \
   artifacts/android-responsive/reference-393/01-splash.png \
   --diff-dir artifacts/ui-diff
 ```
