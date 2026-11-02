@@ -111,7 +111,7 @@ class ResponsiveScreensTest {
             }
         }
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val output = File(context.getExternalFilesDir(null), "ui-screenshots")
+        val output = File(context.getExternalFilesDir(null), "responsive")
         assertTrue(output.exists() || output.mkdirs())
 
         names.forEachIndexed { index, name ->
