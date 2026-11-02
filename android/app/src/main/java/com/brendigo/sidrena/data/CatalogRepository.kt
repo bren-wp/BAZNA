@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import okhttp3.Dns
@@ -22,7 +23,9 @@ import java.nio.charset.StandardCharsets
 class CatalogRepository {
     suspend fun load(inputSite: String, selectedOutlet: String = ""): CatalogSnapshot = withContext(Dispatchers.IO) {
         val site = SiteUrl.parse(inputSite)
-        val indexJson = JSONObject(read(site, site.endpoint("wp-json/brendigo-sidrena/v1/cjenici"), 256 * 1024))
+        // Official WordPress REST supports both pretty and plain permalinks.
+        // Do not retry on 401/403, TLS errors or an unavailable network.
+        val indexJson = readDiscovery(site)
         val index = CatalogDiscovery.parse(indexJson, site)
         val selected = index.outlets.firstOrNull { it.code == selectedOutlet }
         require(selectedOutlet.isEmpty() || selected != null) { "Odabrana poslovnica više ne postoji." }
@@ -85,6 +88,35 @@ class CatalogRepository {
         }
 
         CatalogSnapshot(site.display, index, products, services, archive, warnings)
+    }
+
+    private fun readDiscovery(site: SiteUrl): JSONObject {
+        val pretty = site.endpoint("wp-json/brendigo-sidrena/v1/cjenici")
+        val payload = try {
+            read(site, pretty, 256 * 1024)
+        } catch (exception: IOException) {
+            if (exception.message !in setOf("HTTP 404", "HTTP 405")) throw exception
+            return JSONObject(
+                read(
+                    site,
+                    site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
+                    256 * 1024,
+                ),
+            )
+        }
+        return try {
+            JSONObject(payload)
+        } catch (exception: JSONException) {
+            // An HTML front page on a misconfigured /wp-json/ route is common
+            // with plain permalinks. A same-origin query route can still work.
+            JSONObject(
+                read(
+                    site,
+                    site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
+                    256 * 1024,
+                ),
+            )
+        }
     }
 
     private val client: OkHttpClient = OkHttpClient.Builder()
