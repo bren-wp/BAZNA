@@ -431,3 +431,13 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 
 **Kontrole prije produkcije:** usporedba s izvornim PNG-om u emulatoru (isti DPI/inseti/font), vizualni pregled WordPress mobilnog i desktop kataloga, stvarna objava i preuzimanje JSON/CSV/XML na trgovčevoj domeni, test različitih poslovnica, WP-Cron/poslužiteljski cron do 08:00, pravna provjera dokaza za cijene iz 2025./2026., iznimaka i jediničnih cijena te konačnih pravilnika nakon 13. 11. Ovaj razvojni prolaz i uspješan CI ne znače automatsko zakonsko certificiranje ili izmjereno pixel-perfect 1:1.
 
+
+
+## Reprodukcija obnovljenog kataloga i responzivni Android QA (PR #202)
+
+- Odabrana poslovnica sprema se uz HTTPS stranicu tek nakon uspješnog učitavanja. Nakon gašenja procesa aplikacija ponovno učitava isti katalog; ako je poslovnica u međuvremenu uklonjena, prikazuje se glavni webshop katalog, a odabir se briše. Odspajanje briše i stranicu i poslovnicu.
+- `DetailSelection.kt` pri obnovi detalja provjerava **domenu, poslovnicu, vrstu, ID i po potrebi SKU** te podatke ponovno pronalazi u svježe učitanom javnom CSV-u. Prethodno spremljena cijena nikada nije autoritativna nakon obnove.
+- `DetailSelectionTest.kt` pokriva različite poslovnice, domene, tip proizvoda/usluge, promjenu cijene, uklonjene stavke i SKU. Povećani font i uski zasloni ne smiju trajno odrezati statističke kartice.
+- `.github/workflows/android-ci.yml` pokreće `tools/run_android_responsive.sh`: devet stvarnih konfiguracija emulatora od 240 dp do 1280 dp, uključujući 393×852, tablet, landscape i povećani font. Instrumentacijski test `ResponsiveScreensTest.kt` prikazuje svih 12 Compose zaslona i snima ukupno **108 PNG datoteka** u GitHub Actions artefakt `SIDRENA-Android-responsive-screenshots`.
+- To su testovi stvarnog renderiranja i veličine snimke, **ne** dokaz nepostojanja svakog overlapa niti 1:1 odstupanja prema izvornom dizajnu. Pixel-perfect odobrenje zahtijeva usporedbu svakog PNG-a s izvornom referencom pri istom DPI-ju, font scaleu, status/navigacijskim trakama i slijed provjere klikova.
+- WordPress plugin ima CSS prilagodbe za 320/375/600/782 px: povezivanje Androida, URL, statusi objave, popis poslovnica i pomoć uz cijenu ostaju dostupni na uskim zaslonima. Za prihvat je potreban još stvarni pregled na WordPress mobilnoj administraciji i webshopu (uključujući 200% zum i tipkovnicu), ne samo PHP i CSS statičke provjere.
