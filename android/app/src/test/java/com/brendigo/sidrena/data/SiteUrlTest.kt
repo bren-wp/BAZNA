@@ -1,6 +1,10 @@
 package com.brendigo.sidrena.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
+import org.json.JSONException
+import java.io.IOException
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -35,6 +39,16 @@ class SiteUrlTest {
             "https://admin:lozinka@primjer.hr", "https://primjer.hr/a/../wp")) {
             assertThrows(IllegalArgumentException::class.java) { SiteUrl.parse(url) }
         }
+    }
+
+    @Test fun fallbackNeverBypassesAuthorizationOrNetworkSecurity() {
+        assertTrue(shouldFallbackToPlainRest(IOException("HTTP 404")))
+        assertTrue(shouldFallbackToPlainRest(IOException("HTTP 405")))
+        assertTrue(shouldFallbackToPlainRest(JSONException("Server returned HTML")))
+        assertFalse(shouldFallbackToPlainRest(IOException("HTTP 401")))
+        assertFalse(shouldFallbackToPlainRest(IOException("HTTP 403")))
+        assertFalse(shouldFallbackToPlainRest(IOException("TLS handshake failed")))
+        assertFalse(shouldFallbackToPlainRest(IllegalArgumentException("Private DNS blocked")))
     }
 
     @Test fun disallowsCrossDomainFeeds() {
