@@ -1,6 +1,7 @@
 package com.brendigo.sidrena.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -26,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -36,7 +39,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -100,11 +105,11 @@ fun ConnectionPage(
             modifier = Modifier.fillMaxSize()
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 24.dp),
         ) {
             Spacer(Modifier.height(spacing.top))
             Box(
-                modifier = Modifier.fillMaxWidth().height(58.dp),
+                modifier = Modifier.fillMaxWidth().height(64.dp),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 IconButton(
@@ -121,15 +126,39 @@ fun ConnectionPage(
                 Text(
                     "Poveži WordPress stranicu",
                     color = Color.White,
-                    fontSize = 21.sp,
+                    fontSize = if (maxWidth.value >= 360f) 27.sp else 21.sp,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 25.sp,
+                    lineHeight = if (maxWidth.value >= 360f) 30.sp else 25.sp,
                     maxLines = 2,
                     modifier = Modifier.padding(start = 48.dp),
                 )
             }
 
             Spacer(Modifier.height(spacing.intro))
+            // Screen 02 reference: raised blue connectivity medallion, not a
+            // downloaded image or an externally loaded icon asset.
+            val linkSize = if (maxHeight.value >= 760f) 118.dp else 104.dp
+            Box(
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+                    .size(linkSize)
+                    .shadow(9.dp, CircleShape)
+                    .background(
+                        Brush.linearGradient(
+                            listOf(Color(0xFF204B7C), Color(0xFF122B4D)),
+                        ),
+                        CircleShape,
+                    )
+                    .border(BorderStroke(1.dp, Color(0xFF41678B)), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Outlined.Link,
+                    contentDescription = null,
+                    tint = SoftBlue,
+                    modifier = Modifier.size(if (maxHeight.value >= 760f) 52.dp else 46.dp),
+                )
+            }
+            Spacer(Modifier.height(16.dp))
             Text(
                 text = "Svi javni cjenici na jednom mjestu",
                 color = Color.White,
@@ -148,15 +177,15 @@ fun ConnectionPage(
 
             Spacer(Modifier.height(spacing.field))
             Card(
-                modifier = Modifier.fillMaxWidth().heightIn(min = 84.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceRaised),
                 border = BorderStroke(1.dp, Border),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(14.dp),
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(9.dp),
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
                         text = "HTTPS adresa web-stranice",
@@ -169,7 +198,7 @@ fun ConnectionPage(
                             acceptedSiteInput(value)?.let(onInput)
                         },
                         modifier = Modifier.fillMaxWidth()
-                            .heightIn(min = 30.dp)
+                            .heightIn(min = 25.dp)
                             .semantics {
                                 contentDescription = "HTTPS adresa WordPress stranice"
                             },
@@ -221,8 +250,8 @@ fun ConnectionPage(
                     onConnect(input.trim())
                 },
                 enabled = !busy,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Accent,
                     contentColor = Background,
@@ -266,9 +295,9 @@ fun ConnectionPage(
             Spacer(Modifier.height(spacing.notice))
             Card(
                 modifier = Modifier.fillMaxWidth().heightIn(min = 104.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceRaised),
+                colors = CardDefaults.cardColors(containerColor = Surface),
                 border = BorderStroke(1.dp, Border),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(14.dp),
             ) {
                 Column(
                     modifier = Modifier.padding(13.dp),
