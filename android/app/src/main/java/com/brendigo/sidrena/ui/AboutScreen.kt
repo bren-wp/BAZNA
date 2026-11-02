@@ -212,6 +212,29 @@ fun AboutPage(
             }
         }
 
+        if (data.index.legal?.basePriceRegulationStatus == "draft_consultation") {
+            AboutSectionTitle("ZAKONSKI STATUS NA 2. 11. 2026.")
+            AboutGroup {
+                AboutReadOnlyRow(
+                    icon = Icons.Outlined.Info,
+                    title = "Bazna cijena",
+                    value = "Pravilnik je još u savjetovanju do 13. 11. 2026.",
+                )
+                AboutDivider()
+                AboutReadOnlyRow(
+                    icon = Icons.Outlined.Security,
+                    title = "Provjera povijesnih cijena",
+                    value = "Trgovac mora potvrditi cijene i datume izvornom evidencijom.",
+                )
+                AboutDivider()
+                AboutReadOnlyRow(
+                    icon = Icons.Outlined.Description,
+                    title = "Pravna usklađenost",
+                    value = "Nije automatski potvrđena ovim javnim profilom.",
+                )
+            }
+        }
+
         AboutSectionTitle("PODRŠKA")
         AboutGroup {
             AboutActionRow(
