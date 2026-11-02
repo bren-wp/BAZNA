@@ -4020,3 +4020,48 @@ body.sidrena-cijena-screen #wpbody-content {
 		padding: 14px;
 	}
 }
+
+
+/* Only the first 12 outlets are shown in the Android connectivity panel;
+ * all published outlets remain available through the public REST endpoint. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__outlets {
+	display: grid;
+	gap: 8px;
+	padding: 12px;
+	border: 1px solid #28455f;
+	border-radius: 12px;
+	background: #19304a;
+}
+.sidrena-android-bridge__outlets h4 {
+	margin: 0;
+	color: #fff;
+	font-size: 14px;
+}
+.sidrena-android-bridge__outlet-list {
+	display: grid;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.sidrena-android-bridge__outlet-list > li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 14px;
+	margin: 0;
+	padding: 8px 0;
+	border-bottom: 1px solid #28455f;
+}
+.sidrena-android-bridge__outlet-list > li:last-child {
+	border-bottom: 0;
+}
+.sidrena-android-bridge__outlet-list strong {
+	flex: 1 1 160px;
+	color: #fff;
+	font-size: 13px;
+}
+.sidrena-android-bridge__outlet-list span {
+	font-size: 12px;
+	white-space: nowrap;
+}
