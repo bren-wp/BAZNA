@@ -10,10 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.brendigo.sidrena.data.ArchiveEntry
@@ -117,7 +114,11 @@ class ResponsiveScreensTest {
         names.forEachIndexed { index, name ->
             compose.runOnIdle { screen = index }
             compose.waitForIdle()
-            val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
+            // Full-display capture includes Android system insets. The shared
+            // emulator audit checks the PNG against the exact wm size.
+            val bitmap = InstrumentationRegistry.getInstrumentation()
+                .uiAutomation.takeScreenshot()
+                ?: error("Emulator screenshot unavailable for $name")
             assertTrue("Empty render for $name", bitmap.width > 0 && bitmap.height > 0)
             File(output, "$name.png").outputStream().use {
                 assertTrue("PNG encode failed for $name", bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
