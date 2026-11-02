@@ -53,53 +53,6 @@ class Brendigo_Sidrena_Cijena_Activator {
 	}
 
 	/**
-	 * Parent IDs for one snapshot page, ordered by ID.
-	 *
-	 * @param int $page 1-based page.
-	 * @return array<int,int>
-	 */
-	private static function snapshot_ids( $page ) {
-		$ids = wc_get_products( self::snapshot_query_args( $page, self::BATCH_SIZE ) );
-
-		return is_array( $ids ) ? array_map( 'absint', $ids ) : array();
-	}
-
-	/**
-	 * How many parent products the snapshot walks.
-	 *
-	 * @return int
-	 */
-	private static function snapshot_total() {
-		$query = wc_get_products( self::snapshot_query_args( 1, 1, true ) );
-		if ( is_object( $query ) && isset( $query->total ) ) {
-			return (int) $query->total;
-		}
-
-		return 0;
-	}
-
-	/**
-	 * Shared product query for the admin/cron snapshot.
-	 *
-	 * @param int  $page     1-based page.
-	 * @param int  $limit    Page size.
-	 * @param bool $paginate Return a result object with a total.
-	 * @return array<string,mixed>
-	 */
-	private static function snapshot_query_args( $page, $limit, $paginate = false ) {
-		return array(
-			'status'   => array( 'publish', 'private', 'draft', 'pending' ),
-			'type'     => array( 'simple', 'variable', 'external', 'subscription', 'variable-subscription' ),
-			'limit'    => $limit,
-			'page'     => max( 1, absint( $page ) ),
-			'paginate' => (bool) $paginate,
-			'return'   => 'ids',
-			'orderby'  => 'ID',
-			'order'    => 'ASC',
-		);
-	}
-
-	/**
 	 * Whether a snapshot is still running.
 	 *
 	 * @return bool
