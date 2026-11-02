@@ -152,7 +152,7 @@ class Brendigo_Sidrena_Cijena_Admin_Save {
 		if ( Brendigo_Sidrena_Cijena_Plugin::woocommerce_active() ) {
 			$payload['brand_taxonomy'] = isset( $_POST['sidrena_cijena_brand_taxonomy'] ) ? sanitize_text_field( wp_unslash( $_POST['sidrena_cijena_brand_taxonomy'] ) ) : '';
 			$payload['auto_display'] = isset( $_POST['sidrena_cijena_auto_display'] ) ? 'yes' : 'no';
-			$payload['auto_fill']    = isset( $_POST['sidrena_cijena_auto_fill'] ) ? 'yes' : 'no';
+			$payload['auto_fill']    = 'no'; // Historical values must be verified, never inferred.
 		}
 
 		$settings->save( $payload );
@@ -385,6 +385,13 @@ class Brendigo_Sidrena_Cijena_Admin_Save {
 		if ( ! Brendigo_Sidrena_Cijena_Plugin::current_user_can_manage() ) {
 			wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
 		}
+		// Legacy AJAX URLs must not bypass the legal protection when the
+		// removed UI controls are invoked directly or by an old cached script.
+		wp_send_json_error(
+			array( 'message' => __( 'Masovno zaključivanje povijesnih cijena onemogućeno je. Unesite provjerenu cijenu i datum za svaku stavku.', 'brendigo-sidrena-cijena' ) ),
+			409
+		);
+		return;
 
 		while ( ob_get_level() > 0 ) {
 			ob_end_clean();
