@@ -114,6 +114,20 @@ class HomeReferenceLayoutTest {
         assertEquals("trgovina.example.hr", homeSiteLabel("https://trgovina.example.hr/"))
     }
 
+    @Test fun publishedCsvCanStillBeStaleAfterNewWordPressPriceEdits() {
+        val data = sample().copy(
+            index = sample().index.copy(
+                productsCsvReady = true,
+                servicesCsvReady = true,
+                pendingPublication = true,
+            ),
+        )
+        assertTrue(homeCatalogPending(data))
+        assertFalse(homeCatalogPending(data.copy(
+            index = data.index.copy(pendingPublication = false),
+        )))
+    }
+
     @Test fun aPendingWordPressFeedIsNotShownAsFullyPublished() {
         val source = sample()
         val pending = source.copy(
