@@ -91,24 +91,18 @@ class CatalogRepository {
     }
 
     private fun readDiscovery(site: SiteUrl): JSONObject {
-        val pretty = site.endpoint("wp-json/brendigo-sidrena/v1/cjenici")
-        val payload = try {
-            read(site, pretty, 256 * 1024)
-        } catch (exception: IOException) {
-            if (exception.message !in setOf("HTTP 404", "HTTP 405")) throw exception
-            return JSONObject(
+        // WordPress supports /wp-json/ and /?rest_route=/...; do not silently
+        // retry authorization errors, DNS failures, TLS errors or timeouts.
+        return try {
+            JSONObject(
                 read(
                     site,
-                    site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
+                    site.endpoint("wp-json/brendigo-sidrena/v1/cjenici"),
                     256 * 1024,
                 ),
             )
-        }
-        return try {
-            JSONObject(payload)
-        } catch (exception: JSONException) {
-            // An HTML front page on a misconfigured /wp-json/ route is common
-            // with plain permalinks. A same-origin query route can still work.
+        } catch (exception: Exception) {
+            if (!shouldFallbackToPlainRest(exception)) throw exception
             JSONObject(
                 read(
                     site,
@@ -175,3 +169,8 @@ class CatalogRepository {
         throw IOException("Previše preusmjeravanja.")
     }
 }
+
+/** Only routing mismatches warrant an alternative WordPress endpoint. */
+internal fun shouldFallbackToPlainRest(exception: Exception): Boolean =
+    exception is JSONException ||
+        (exception is IOException && exception.message in setOf("HTTP 404", "HTTP 405"))
