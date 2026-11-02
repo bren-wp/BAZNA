@@ -55,6 +55,43 @@ class PublicPriceListsScreenTest {
         assertTrue(publicPriceListDocuments(sample(), selectedOutlet = "missing").isEmpty())
     }
 
+    @Test fun unpublishedWordPressFeedNeverAppearsAsDownloadableDocument() {
+        val index = sample().index.copy(
+            productsCsvReady = false,
+            servicesCsvReady = true,
+        )
+        val docs = publicPriceListDocuments(sample().copy(index = index))
+        assertFalse(docs.any { it.title == "Cjenik proizvoda" && !it.archived })
+        assertTrue(docs.any { it.title == "Cjenik usluga" && !it.archived })
+        assertTrue(docs.any { it.archived })
+    }
+
+    @Test fun independentOutletStatusesCannotBorrowWebshopReadiness() {
+        val source = sample()
+        val outlet = source.index.outlets.first()
+        val index = source.index.copy(
+            productsCsvReady = false,
+            servicesCsvReady = true,
+            outlets = listOf(
+                outlet.copy(productsCsvReady = true, servicesCsvReady = false),
+            ),
+        )
+        val docs = publicPriceListDocuments(source.copy(index = index), "rijeka")
+        assertTrue(docs.any { it.title == "Cjenik proizvoda" && !it.archived })
+        assertFalse(docs.any { it.title == "Cjenik usluga" && !it.archived })
+    }
+
+    @Test fun legacyOutletWithoutReadinessFlagsDoesNotBorrowFalseWebshopStatus() {
+        val source = sample()
+        val index = source.index.copy(
+            productsCsvReady = false,
+            servicesCsvReady = false,
+        )
+        val docs = publicPriceListDocuments(source.copy(index = index), "rijeka")
+        assertTrue(docs.any { it.title == "Cjenik proizvoda" && !it.archived })
+        assertTrue(docs.any { it.title == "Cjenik usluga" && !it.archived })
+    }
+
     @Test fun filtersUseRealKindAndCaseInsensitiveTerms() {
         val list = publicPriceListDocuments(sample())
         assertEquals(2, filterPublicPriceLists(list, "", 1).size)
