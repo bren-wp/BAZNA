@@ -14,6 +14,12 @@ on:
 permissions:
   contents: read
 
+# Keep only the latest PR revision under test; 9 emulator profiles take
+# substantial runner time and stale commits must not block current QA.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   android:
     name: Android Kotlin compile, tests, lint, APK and AAB
