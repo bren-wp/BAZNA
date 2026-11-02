@@ -133,7 +133,11 @@ try {
                     wrapperScrollWidth: wrap ? wrap.scrollWidth : 0,
                     wrapperClientWidth: wrap ? wrap.clientWidth : 0,
                     toolDisplay: type === "admin" ?
-                        getComputedStyle(document.querySelector(".brendigo-woo-catalog-tools")).display : null
+                        getComputedStyle(document.querySelector(".brendigo-woo-catalog-tools")).display : null,
+                    priceCellWhiteSpace: type === "public" ? (() => {
+                        const cell = document.querySelector(".cjenik-table tbody tr td:nth-child(n + 3)");
+                        return cell ? getComputedStyle(cell).whiteSpace : null;
+                    })() : null
                 };
             })()`;
             const evaluation = await cdp("Runtime.evaluate", {
@@ -149,6 +153,10 @@ try {
                 const expect = width <= 720 ? "block" : "table-row";
                 if (result.tableDisplay !== expect) {
                     errors.push("table mode expected " + expect + " got " + result.tableDisplay);
+                }
+                if (width <= 720 && result.priceCellWhiteSpace !== null &&
+                    result.priceCellWhiteSpace !== "normal") {
+                    errors.push("mobile catalog prices/URLs cannot wrap: " + result.priceCellWhiteSpace);
                 }
             } else if (width <= 782 && result.toolDisplay !== "grid") {
                 errors.push("admin form does not stack on small screens");
