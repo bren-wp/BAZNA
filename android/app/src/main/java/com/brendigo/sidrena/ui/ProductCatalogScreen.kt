@@ -90,9 +90,9 @@ internal fun filterProductCatalog(
 
 /**
  * 04/12: SIDRENA products.
- * The public API has no images, sale flags, "new" flags, or category data.
- * Keep the reference layout but use truthful anchor-price filters and local
- * product icons rather than fabricated metadata or external image requests.
+ * The WordPress v1 public CSV optionally exposes real product thumbnails.
+ * There are no guaranteed sale badges, new-product flags or category fields.
+ * Preserve the reference layout without inventing photos or product metadata.
  */
 @Composable
 fun ProductCatalogScreen(
