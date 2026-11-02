@@ -9,6 +9,8 @@ on:
       - 'tools/test_public_feed_columns.php'
       - 'tools/test_public_catalog_markup.php'
       - 'tools/test_legal_price_safety.php'
+      - 'tools/test_responsive_browser.mjs'
+      - 'tools/fixtures/**'
       - '.github/workflows/official-plugin-ci.yml'
   push:
     branches: [main]
@@ -20,6 +22,8 @@ on:
       - 'tools/test_public_feed_columns.php'
       - 'tools/test_public_catalog_markup.php'
       - 'tools/test_legal_price_safety.php'
+      - 'tools/test_responsive_browser.mjs'
+      - 'tools/fixtures/**'
 permissions:
   contents: read
 jobs:
@@ -50,6 +54,28 @@ jobs:
         run: php tools/test_public_catalog_markup.php
       - name: Test legally verified reference dates and no historical price inference
         run: php tools/test_legal_price_safety.php
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Render real public PHP cjenik and audit WordPress responsive layout in Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v google-chrome
+          mkdir -p artifacts/browser-responsive
+          php tools/test_public_catalog_markup.php --fixture > artifacts/browser-responsive/public.html
+          node tools/test_responsive_browser.mjs \
+            artifacts/browser-responsive/public.html \
+            tools/fixtures/admin-responsive.html \
+            artifacts/browser-responsive
+      - name: Upload browser viewport evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SIDRENA-WordPress-responsive-Chrome
+          path: artifacts/browser-responsive/
+          retention-days: 7
+          if-no-files-found: warn
       - name: Package reproducibly and verify SHA-256
         shell: bash
         run: |
