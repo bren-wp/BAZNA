@@ -41,6 +41,8 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     val context = LocalContext.current
     var page by rememberSaveable { mutableStateOf("home") }
     var selectedItemFields by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var selectedItemOutlet by rememberSaveable { mutableStateOf("") }
+    var selectedItemSite by rememberSaveable { mutableStateOf("") }
     var detailReturnPage by rememberSaveable { mutableStateOf("products") }
     var searchReturnPage by rememberSaveable { mutableStateOf("home") }
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -53,7 +55,11 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             searchReturnPage = page
         }
         page = destination
-        if (destination != "detail") selectedItemFields = emptyList()
+        if (destination != "detail") {
+            selectedItemFields = emptyList()
+            selectedItemOutlet = ""
+            selectedItemSite = ""
+        }
     }
 
     fun openPublic(url: String) {
@@ -197,6 +203,8 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         error = state.error,
                         onDetails = {
                             selectedItemFields = saveDetailItem(it)
+                            selectedItemOutlet = state.outlet
+                            selectedItemSite = snapshot.site
                             detailReturnPage = "products"
                             navigate("detail")
                         },
@@ -211,6 +219,8 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         selectedOutlet = state.outlet,
                         onDetails = {
                             selectedItemFields = saveDetailItem(it)
+                            selectedItemOutlet = state.outlet
+                            selectedItemSite = snapshot.site
                             detailReturnPage = "services"
                             navigate("detail")
                         },
@@ -257,6 +267,8 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onKindChange = { searchKind = it },
                         onDetails = {
                             selectedItemFields = saveDetailItem(it)
+                            selectedItemOutlet = state.outlet
+                            selectedItemSite = snapshot.site
                             detailReturnPage = "search"
                             navigate("detail")
                         },
@@ -265,7 +277,13 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onRefresh = model::refresh,
                     )
                     "detail" -> DetailPage(
-                        item = restoreDetailItem(selectedItemFields),
+                        item = resolveCurrentDetailItem(
+                            saved = restoreDetailItem(selectedItemFields),
+                            snapshot = snapshot,
+                            savedOutlet = selectedItemOutlet,
+                            currentOutlet = state.outlet,
+                            savedSite = selectedItemSite,
+                        ),
                         data = snapshot,
                         onBack = { navigate(detailReturnPage) },
                         onOpen = ::openPublic,
