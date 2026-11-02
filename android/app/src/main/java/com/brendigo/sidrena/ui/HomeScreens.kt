@@ -336,13 +336,18 @@ private fun HomeConnectedCard(
         Column(Modifier.fillMaxWidth().padding(start = 14.dp, top = 10.dp, end = 8.dp, bottom = 13.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(30.dp).background(HomeConnectedTint, CircleShape),
+                    Modifier.size(30.dp).background(
+                        if (publicationPending) Accent.copy(alpha = 0.16f)
+                        else HomeConnectedTint,
+                        CircleShape,
+                    ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Check,
+                        imageVector = if (publicationPending) Icons.Outlined.Info
+                        else Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Background,
+                        tint = if (publicationPending) Accent else Background,
                         modifier = Modifier.size(20.dp),
                     )
                 }
