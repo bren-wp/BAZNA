@@ -91,6 +91,10 @@ object CsvParser {
                 availability = value("dostupnost"),
                 unit = value("jedinica_mjere"),
                 imageUrl = value("slika_url"),
+                unitPrice = value("cijena_jedinice_mjere"),
+                saleLabel = value("naziv_posebnog_oblika"),
+                barcode = value("barkod"),
+                brand = value("marka"),
             )
         }
     }
