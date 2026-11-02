@@ -706,7 +706,9 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			return;
 		}
 
-		$this->snapshot_if_empty( $product, self::today_date() );
+		// Historical reference prices require independently verified evidence.
+		// The legacy auto-fill option must never write a present-day price as history.
+		return;
 	}
 
 	/**
@@ -741,19 +743,9 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 	 * @return bool True when a value was written.
 	 */
 	public function snapshot_if_empty( $product, $date = '' ) {
-		if ( ! $this->can_snapshot( $product ) ) {
-			return false;
-		}
-
-		$id = $product->get_id();
-		$this->set_price( $id, $product->get_regular_price() );
-
-		$date = is_string( $date ) ? trim( $date ) : '';
-		if ( '' !== $date && '' === $this->get_date( $id ) ) {
-			$this->set_date( $id, $date );
-		}
-
-		return true;
+		// Never derive a legally fixed historical price from today's regular price.
+		// Preserve all existing manually verified historical records unchanged.
+		return false;
 	}
 
 	/**
@@ -797,7 +789,9 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			return $this->normalize_date( $custom );
 		}
 
-		return $this->normalize_date( (string) Brendigo_Sidrena_Cijena_Settings::instance()->get( 'default_date' ) );
+		// A missing per-product date is unknown; shop defaults are not evidence
+		// that this exact product had the given price on the reference day.
+		return '';
 	}
 
 	/**
