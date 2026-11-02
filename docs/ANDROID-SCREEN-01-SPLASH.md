@@ -11,6 +11,19 @@ Referenca: korisnički odobreni SIDRENA branding board i `SIDRENA-Android-Brandi
 - Ne pokreće se lažni mrežni zahtjev, ne modificira WordPress konfiguracija i ne uvodi se nova vanjska ovisnost.
 - Previews: 393 × 852 dp i 360 × 640 dp (kompaktni raspored).
 
+
+## Izvori i neslaganje među referencama
+
+Starija široka SIDRENA marketinška ploča prikazuje Splash s uokvirenim
+logotipom i narančastim indikatorom učitavanja. Zaseban izvor
+`SIDRENA-Android-Branding/logos/sidrena-splash.svg` i pripadajući
+`01_splash.png` (1080 × 1920) opisuju samostalan S, kružne geometrijske
+oblike i bez indikatora. Trenutačna implementacija slijedi zaseban
+1080 × 1920 izvor, **ne** stari kolaž telefona. Miješanje elemenata iz ta
+dva prikaza ne može dati egzaktan pixel-perfect rezultat. Obje su reference
+zabilježene; prihvatni test mora koristiti točno onaj izvor na koji se
+implementacija poziva.
+
 ## Ručna vizualna provjera
 
 1. Čisti start, ponovno otvaranje, rotacija tijekom animacije i roditeljska rekompozicija bez resetiranja trajanja.
