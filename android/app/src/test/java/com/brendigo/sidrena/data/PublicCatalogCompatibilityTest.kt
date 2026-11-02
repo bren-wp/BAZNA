@@ -18,7 +18,8 @@ class PublicCatalogCompatibilityTest {
         {
           "api_version": 1,
           "plugin_version": "1.5.3",
-          "publication": {"csv_ready": true, "generated_at": "2026-10-31"},
+          "publication": {"csv_ready": true, "generated_at": "2026-10-31",
+            "pending_changes": true, "compliance_certified": false},
           "feeds": {
             "proizvodi": {
               "csv": "https://primjer.hr/wp-json/brendigo-sidrena/v1/cjenici/proizvodi/csv",
@@ -106,6 +107,41 @@ class PublicCatalogCompatibilityTest {
         assertEquals(listOf("1"), filterProductCatalog(products, "", 1).map { it.id })
         assertEquals(listOf("1", "3"), filterProductCatalog(products, "", 2).map { it.id })
         assertTrue(filterProductCatalog(products, "nepostojeći", 0).isEmpty())
+    }
+
+    @Test fun detectsPublishedButStaleWordPressCatalogWithoutCertifyingCompliance() {
+        val index = CatalogDiscovery.parse(discovery(), site)
+        assertEquals(true, index.pendingPublication)
+        assertEquals(true, index.productsCsvReady)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun refusesFakeComplianceCertificationFromPublicApi() {
+        val payload = discovery()
+        payload.getJSONObject("publication").put("compliance_certified", true)
+        CatalogDiscovery.parse(payload, site)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun refusesStringInsteadOfBooleanForPendingChanges() {
+        val payload = discovery()
+        payload.getJSONObject("publication").put("pending_changes", "yes")
+        CatalogDiscovery.parse(payload, site)
+    }
+
+    @Test fun retainsUnitPriceSaleLabelAndReferenceDateAsSeparateFields() {
+        val csv = """
+            id;vrsta;naziv;maloprodajna_cijena;cijena_jedinice_mjere;naziv_posebnog_oblika;sidrena_cijena;sidrena_datum;barkod;marka
+            11;proizvod;Sapun;2,45;4,90;akcija;3,20;02.05.2025.;3851234567891;Domaće
+        """.trimIndent()
+        val row = CsvParser.items(csv).single()
+        assertEquals("2,45", row.currentPrice)
+        assertEquals("4,90", row.unitPrice)
+        assertEquals("akcija", row.saleLabel)
+        assertEquals("3,20", row.referencePrice)
+        assertEquals("02.05.2025.", row.referenceDate)
+        assertEquals("3851234567891", row.barcode)
+        assertEquals("Domaće", row.brand)
     }
 
     @Test fun imageIsOnlyApprovedOnTheSameHttpsWordPressOrigin() {
