@@ -31,9 +31,7 @@ network=read("desktop/Sidrena.Core/OfficialPluginDiscovery.cs")
 manifest=read("android/app/src/main/AndroidManifest.xml")
 release=read(".github/workflows/desktop-release.yml")
 
-import re
-
-version_match = re.search(r"^ \\* Version: (\\d+\\.\\d+\\.\\d+)\\s*$", main, re.MULTILINE)
+version_match = re.search(r"^ [*] Version: ([0-9]+[.][0-9]+[.][0-9]+)[ ]*$", main, re.MULTILINE)
 plugin_version = version_match.group(1) if version_match else None
 if not plugin_version or "Stable tag: " + plugin_version not in readme:
     errors.append("Mismatch in official WordPress version")
