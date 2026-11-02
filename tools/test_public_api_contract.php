@@ -26,6 +26,10 @@ function esc_url_raw( $url ) {
 	return $url;
 }
 function rest_url( $route ) {
+	global $sidrena_plain_permalinks;
+	if ( ! empty( $sidrena_plain_permalinks ) ) {
+		return 'https://primjer.hr/?rest_route=/' . $route;
+	}
 	return 'https://primjer.hr/wp-json/' . $route;
 }
 function rest_ensure_response( $data ) {
@@ -126,6 +130,25 @@ sidrena_contract_assert( true === $json['outlets'][0]['feeds']['proizvodi']['ava
 sidrena_contract_assert( false === $json['outlets'][0]['feeds']['usluge']['available_csv'], 'Outlet service missing, not falsely ready' );
 sidrena_contract_assert( false === strpos( json_encode( $json ), $dir ), 'No local filesystem paths in public JSON' );
 sidrena_contract_assert( 1 === $json['legal']['schema'], 'Existing legal contract retained' );
+
+// A real WordPress installation with plain permalinks returns query-style
+// rest_url() values. Verify the plugin publishes the SAME contract and keeps
+// outlet query parameters without requiring admin authentication.
+$sidrena_plain_permalinks = true;
+$plain = $api->index();
+sidrena_contract_assert(
+	'https://primjer.hr/?rest_route=/brendigo-sidrena/v1/cjenici' === $plain['connection']['rest_endpoint'],
+	'Plain permalink connection URL is discoverable'
+);
+sidrena_contract_assert(
+	'https://primjer.hr/?rest_route=/brendigo-sidrena/v1/cjenici/proizvodi/csv' === $plain['feeds']['proizvodi']['csv'],
+	'Plain permalink product CSV endpoint'
+);
+sidrena_contract_assert(
+	false !== strpos( $plain['outlets'][0]['feeds']['proizvodi']['csv'], '&oznaka=ri-01' ),
+	'Plain permalink outlet parameters preserved'
+);
+$sidrena_plain_permalinks = false;
 
 unlink( $services );
 $after = $api->index();
