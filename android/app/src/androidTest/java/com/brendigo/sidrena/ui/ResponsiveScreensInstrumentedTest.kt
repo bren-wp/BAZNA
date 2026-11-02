@@ -236,7 +236,7 @@ class ResponsiveScreensInstrumentedTest {
             FileOutputStream(File(directory, name + ".png")).use { output ->
                 capture!!.compress(Bitmap.CompressFormat.PNG, 100, output)
             }
-            capture.recycle()
+            capture?.recycle()
         }
     }
 }
