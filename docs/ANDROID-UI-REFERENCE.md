@@ -470,3 +470,19 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 - WordPress je klijentov javni **read-only** izvor; Android ne preuzima administratorske lozinke i ne mijenja katalog. Niti automatizirana responsivnost niti zeleni CI sami po sebi ne predstavljaju pravni certifikat.
 
 **Ograničenje:** "sve moguće" kombinacije rezolucija, DPI-ja, omjera stranica, pristupačnosti, verzija Androida i tema nisu konačan skup. Matrica iznad pokriva definiran skup graničnih i tipičnih profila, a ne sve uređaje. Za produkcijsko označavanje 1:1 preporučuje se screenshot-diff referenci po svakoj klasi uređaja te barem jedan stvarni fizički telefon i tablet.
+
+
+### UI QA — Zaslon 05 / Android 0.3.7
+
+- Navigacija i izbornik: 48 dp dodirna površina, usklađeni sa zaslonom 04.
+- Tražilica: 52 dp, radius 12 dp i isti kontrast kao popis proizvoda.
+- Filtri: vidljivi vodoravno pomični čipovi **Sve / Sa sidrenom / Bez sidrene** i funkcionalni prečac **Proizvodi**. Izbornik i dalje podržava ista tri filtra te osvježavanje.
+- Kartica usluge: min. 101 dp, radius 14 dp; pločica s lokalnim gradijentom i sjenom 4 dp, 76 × 82 dp, odnosno 52 × 62 dp kada je kartica uža od 300 dp.
+- Cijene, referentni datumi i dostupnost preuzimaju se iz WordPressa. Kartice su pristupačne tipke koje otvaraju pravi detalj stavke, a ne marketinške imitacije.
+- Android CI mora proći 12 zaslona na svih 9 emulator konfiguracija, uključujući povećani font. Egzaktna 1:1 identičnost još zahtijeva usporedbu snimki identične fizičke rezolucije s korisnikovim izvornim referencama.
+
+### WordPress QA — admin 1.5.7
+
+- Unutar vlastitog horizontalnog scroll kontejnera uređivačka polja i tipke tablice imaju min. visinu 44 px na širini do 782 px.
+- Chrome preglednik na 13 širina zasebno provjerava veličine mobilnih kontrola, vidljivost navigacije, primarni kontrast i odsutnost prelijevanja. Pogreška jedne skupine provjera više ne smije preskočiti ostale.
+- Bez promjene CSV/XML, REST v1, cijena ili povijesnih zapisa.

@@ -142,6 +142,10 @@ try {
                         parseFloat(getComputedStyle(document.querySelector(".brendigo-admin-nav__item")).minHeight) : null,
                     saveButtonMinHeight: type === "admin" ?
                         parseFloat(getComputedStyle(document.querySelector(".brendigo-woo-catalog-footer .button")).minHeight) : null,
+                    catalogRowInputMinHeight: type === "admin" ?
+                        parseFloat(getComputedStyle(document.querySelector(".sidrena-cijena-catalog tbody input")).minHeight) : null,
+                    catalogRowButtonMinHeight: type === "admin" ?
+                        parseFloat(getComputedStyle(document.querySelector(".sidrena-cijena-catalog tbody button")).minHeight) : null,
                     navItemOutside: type === "admin" && width <= 480 ?
                         [...document.querySelectorAll(".brendigo-admin-nav__item")].some(el => {
                             const r = el.getBoundingClientRect();
@@ -171,17 +175,25 @@ try {
                     result.priceCellWhiteSpace !== "normal") {
                     errors.push("mobile catalog prices/URLs cannot wrap: " + result.priceCellWhiteSpace);
                 }
-            } else if (fixture.label === "admin" && result.primaryButtonColor !== "rgb(7, 24, 45)") {
-                errors.push("orange primary action text must be dark navy, got " + result.primaryButtonColor);
-            } else if (width <= 782) {
-                if (result.toolDisplay !== "grid") {
-                    errors.push("admin form does not stack on small screens");
+            } else {
+                // Run all admin assertions independently: a contrast failure
+                // must not accidentally skip the mobile layout checks.
+                if (result.primaryButtonColor !== "rgb(7, 24, 45)") {
+                    errors.push("orange primary action text must be dark navy, got " + result.primaryButtonColor);
                 }
-                if (result.navItemMinHeight < 44 || result.saveButtonMinHeight < 44) {
-                    errors.push("mobile nav/save tap targets must be at least 44px high");
-                }
-                if (width <= 480 && (result.navDisplay !== "grid" || result.navItemOutside)) {
-                    errors.push("phone sidebar nav must be a visible two-column grid");
+                if (width <= 782) {
+                    if (result.toolDisplay !== "grid") {
+                        errors.push("admin form does not stack on small screens");
+                    }
+                    if (result.navItemMinHeight < 44 || result.saveButtonMinHeight < 44) {
+                        errors.push("mobile nav/save tap targets must be at least 44px high");
+                    }
+                    if (result.catalogRowInputMinHeight < 44 || result.catalogRowButtonMinHeight < 44) {
+                        errors.push("editable catalog input/action must be at least 44px high");
+                    }
+                    if (width <= 480 && (result.navDisplay !== "grid" || result.navItemOutside)) {
+                        errors.push("phone sidebar nav must be a visible two-column grid");
+                    }
                 }
             }
 

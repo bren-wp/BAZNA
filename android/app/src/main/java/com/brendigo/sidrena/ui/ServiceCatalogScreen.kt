@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,7 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Inventory2
@@ -43,8 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -93,16 +99,35 @@ fun ServiceCatalogScreen(
             onShowProducts = onShowProducts,
             onRefresh = onRefresh,
         )
-        // Reference 1080 px canvas: toolbar immediately followed by a 40 dp search field.
+        // Match the shared 52 dp search field used on screen 04.
         CatalogSearchBar(
             value = query,
             onQueryChange = { query = it.take(256) },
             hint = "Pretraži usluge…",
             accessibilityLabel = "Pretraži javno objavljene usluge",
-            heightDp = 40,
-            radiusDp = 9,
+            heightDp = 52,
+            radiusDp = 12,
         )
-        Spacer(Modifier.height(21.dp))
+        Spacer(Modifier.height(12.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            listOf("Sve", "Sa sidrenom", "Bez sidrene").forEachIndexed { index, label ->
+                CatalogFilterChip(
+                    label = label,
+                    selected = anchorFilter == index,
+                    onClick = { anchorFilter = index },
+                )
+            }
+            CatalogFilterChip(
+                label = "Proizvodi ▾",
+                selected = false,
+                onClick = onShowProducts,
+            )
+        }
+        Spacer(Modifier.height(14.dp))
 
         if (busy) {
             LinearProgressIndicator(
@@ -138,7 +163,7 @@ fun ServiceCatalogScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(7.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(top = 1.dp, bottom = 18.dp),
             ) {
                 items(visible) { service ->
@@ -167,12 +192,12 @@ private fun ServiceToolbar(
         modifier = Modifier.fillMaxWidth().height(61.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.size(42.dp)) {
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
             Icon(
-                imageVector = Icons.Outlined.ArrowBackIosNew,
+                imageVector = Icons.Outlined.ArrowBack,
                 contentDescription = "Natrag na početnu",
-                tint = Accent,
-                modifier = Modifier.size(19.dp),
+                tint = Color.White,
+                modifier = Modifier.size(25.dp),
             )
         }
         Spacer(Modifier.width(7.dp))
@@ -180,12 +205,12 @@ private fun ServiceToolbar(
             "Usluge",
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 23.sp,
+            fontSize = 22.sp,
             modifier = Modifier.weight(1f),
         )
 
         Box {
-            IconButton(onClick = { expanded = true }, modifier = Modifier.size(46.dp)) {
+            IconButton(onClick = { expanded = true }, modifier = Modifier.size(48.dp)) {
                 Icon(
                     imageVector = Icons.Outlined.MoreVert,
                     contentDescription = "Opcije usluga i filtriranje",
@@ -256,70 +281,84 @@ private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
 
     Card(
         modifier = Modifier.fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .semantics {
                 contentDescription = item.name + ", trenutačna cijena " + current +
                     (anchor?.let { ", " + it } ?: "")
             },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
         border = BorderStroke(1.dp, Border),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .heightIn(min = 76.dp)
-                .padding(horizontal = 10.dp, vertical = 9.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(11.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(35.dp)
-                    .background(SurfaceRaised, RoundedCornerShape(9.dp)),
-                contentAlignment = Alignment.Center,
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            // The reference uses a 76 × 82 dp service emblem. Use the
+            // compact variant only when its text column would be clipped.
+            val compact = maxWidth < 300.dp
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .heightIn(min = 101.dp)
+                    .padding(horizontal = 10.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(11.dp),
             ) {
-                Icon(
-                    Icons.Outlined.Build,
-                    contentDescription = null,
-                    tint = Accent,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
+                Box(
+                    modifier = Modifier
+                        .size(
+                            width = if (compact) 52.dp else 76.dp,
+                            height = if (compact) 62.dp else 82.dp,
+                        )
+                        .shadow(4.dp, RoundedCornerShape(12.dp))
+                        .background(
+                            Brush.linearGradient(
+                                listOf(Color(0xFF214364), Color(0xFF142B46)),
+                            ),
+                            RoundedCornerShape(12.dp),
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Outlined.Build,
+                        contentDescription = null,
+                        tint = Accent,
+                        modifier = Modifier.size(if (compact) 26.dp else 34.dp),
+                    )
+                }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                Text(
-                    item.name.ifBlank { "Usluga bez naziva" },
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    "Cijena",
-                    color = TextMuted,
-                    fontSize = 12.sp,
-                )
-                Text(
-                    current,
-                    color = if (item.currentPrice.isBlank()) TextMuted else Accent,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (anchor != null) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
                     Text(
-                        anchor,
+                        item.name.ifBlank { "Usluga bez naziva" },
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        lineHeight = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        "Cijena",
                         color = TextMuted,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        current,
+                        color = if (item.currentPrice.isBlank()) TextMuted else Accent,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
+                    if (anchor != null) {
+                        Text(
+                            anchor,
+                            color = TextMuted,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
         }
