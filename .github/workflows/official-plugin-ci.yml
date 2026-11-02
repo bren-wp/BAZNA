@@ -7,6 +7,7 @@ on:
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
+      - 'tools/test_public_catalog_markup.php'
       - '.github/workflows/official-plugin-ci.yml'
   push:
     branches: [main]
@@ -16,6 +17,7 @@ on:
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
+      - 'tools/test_public_catalog_markup.php'
 permissions:
   contents: read
 jobs:
@@ -42,6 +44,8 @@ jobs:
         run: php tools/test_public_api_contract.php
       - name: Test optional product imagery and CSV field compatibility
         run: php tools/test_public_feed_columns.php
+      - name: Test public mobile service cards and HTML escaping
+        run: php tools/test_public_catalog_markup.php
       - name: Package reproducibly and verify SHA-256
         shell: bash
         run: |
