@@ -4,13 +4,19 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.6
+Stable tag: 1.5.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Manage reference prices and dates, publish a public HTML pricelist, and generate XML/CSV archives for WooCommerce or standalone catalogs.
 
 == Changelog ==
+
+= 1.5.7 =
+* Improve mobile and tablet editing ergonomics in the wide catalog without changing catalog data or columns.
+* Use minimum 44px controls inside the horizontally scrollable price table.
+* Expand browser regression checks for editable rows and ensure all mobile failures are reported independently.
+* Preserve REST v1, historical anchor prices and existing CSV/XML formats.
 
 = 1.5.6 =
 * Fix narrow WordPress administrator navigation so all SIDRENA tabs are visible in two columns without unwanted horizontal clipping.
