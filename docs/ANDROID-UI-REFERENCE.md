@@ -452,6 +452,7 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 - Dodir na karticu ili ikonu otvara **provjerenu HTTPS poveznicu iste WordPress domene**. Nije dodan lažni PDF jer WordPress API takve dokumente ne jamči. Datumi dolaze isključivo iz stvarnih metapodataka objave.
 - Pretraživanje, filtri, osvježavanje i arhiva funkcionalni su u izborniku; dodatni stalni redovi nisu prisutni na osnovnoj referenci. `available_csv=false` skriva neobjavljen dokument, a `null` čuva kompatibilnost sa starijim pluginom. Odabrana poslovnica nikada ne preuzima status webshopa.
 - `AppNavigation` na zaslonima užim od 360 dp daje četiri dostupačna ikonografska odredišta s govornim opisima; 360 dp i više zadržava izvorne oznake. Na tabletima/panoramskim zaslonima sadržaj je centriran u maksimalno 840 dp, obrazac povezivanja u 560 dp.
+- **Proizvodi 04/12:** na karticama užim od 310 dp proizvodna fotografija, puni naslov i jedinica mjere ostaju u gornjem retku, a aktualna i sidrena cijena prelaze ispod. Na klasičnim 360–411 dp uređajima originalna vodoravna referentna kartica ostaje nepromijenjena; referentne cijene se ne izmišljaju.
 
 ### Automatizirani Android testovi
 
