@@ -419,9 +419,9 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 ## Referentni audit — zaslon 06/12 Detalj artikla i usluge (2. 11. 2026.)
 
-Nativni zaslon `ui/CatalogScreens.kt` dodatno je povezan s javnim WordPress CSV poljima. Primarna referenca je šesti telefon SIDRENA brendinga. Aplikacija ne izmišlja slike, stare cijene niti promotivne oznake: prikazuje samo informacije koje postoje u izvornom javnom katalogu.
+Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima. Za detalj se koristi **izvorni konceptni PNG 06_detalj_proizvoda.png (1080×1920)**: zaglavlje, kartica identiteta s naslovom, SKU-om i dostupnošću, kartica trenutačne i sidrene cijene te treća kartica datuma i izvora. U stvarnoj aplikaciji ne ispisuju se demo oznaka, lažni status-bar elementi, promotivni podaci ni izmišljene fotografije.
 
-- Stvarno odobrena WooCommerce fotografija s iste HTTPS domene može se pojaviti u velikom hero bloku; ako je nema, koristi se postojeći lokalni narančasti piktogram. Veza se ne šalje vanjskom dobavljaču slika.
+- Uklonjen je prethodni veliki generički hero/piktogram koji se ne pojavljuje na konceptnom PNG-u. Autentične fotografije proizvoda i dalje su podržane u zaslonu popisa Proizvodi (04), ali detalj (06) prvenstveno odgovara podatkovnim karticama i ne dodaje sliku koja nije na referenci.
 - `PriceItem` i `CsvParser` osim stvarne trenutne i sidrene cijene sada čuvaju `cijena_jedinice_mjere`, `naziv_posebnog_oblika`, `sidrena_datum`, `barkod` i `marka`. Nijedno polje nije generirano iz dizajnerske slike.
 - Detalj prikazuje izvornu jediničnu cijenu, naziv posebnog oblika prodaje, marku i barkod kada postoje. **Bazna cijena nije poistovjećena sa sidrenom**, a najniža cijena tijekom 30 dana prije sniženja mora imati neovisni i potpuni dokaz.
 - Ako sidrena cijena postoji, ali datum **nije javno objavljen**, zaslon eksplicitno upozorava na neprovjeren povijesni datum. Ako cijene uopće nema, ona se ne računa iz današnje cijene.
