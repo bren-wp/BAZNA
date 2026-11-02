@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -429,13 +430,13 @@ private fun HomeMetricCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = modifier.height(132.dp).clickable(onClick = onClick),
+        modifier = modifier.heightIn(min = 132.dp).clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Surface),
         border = BorderStroke(1.dp, Border),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(14.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 132.dp).padding(14.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Icon(
@@ -450,7 +451,7 @@ private fun HomeMetricCard(
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
