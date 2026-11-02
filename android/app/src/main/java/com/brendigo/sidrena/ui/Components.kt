@@ -3,6 +3,8 @@ package com.brendigo.sidrena.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +38,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -175,20 +180,65 @@ fun AppNavigation(active: Int, onSelect: (Int) -> Unit) {
         Triple("Arhiva", Icons.Outlined.Archive, 2),
         Triple("Postavke", Icons.Outlined.Settings, 3),
     )
-    NavigationBar(containerColor = Background, tonalElevation = 0.dp) {
-        tabs.forEach { (label, icon, index) ->
-            NavigationBarItem(
-                selected = active == index,
-                onClick = { onSelect(index) },
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label, maxLines = 1) },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Accent, selectedTextColor = Accent,
-                    indicatorColor = Background,
-                    unselectedIconColor = TextMuted, unselectedTextColor = TextMuted,
-                ),
-                alwaysShowLabel = true,
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        val compact = AdaptiveSizing.iconOnlyNavigation(maxWidth.value.toInt())
+        Column(Modifier.width(minOf(maxWidth, AdaptiveSizing.MAX_CONTENT_WIDTH_DP.dp))) {
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 0.6.dp,
+                color = Border,
             )
+            if (compact) {
+                // Material 3 tab labels cannot fit four items on 240–320dp phones.
+                // Each icon retains a full-width tap target and spoken label.
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(64.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    tabs.forEach { (label, icon, index) ->
+                        IconButton(
+                            onClick = { onSelect(index) },
+                            modifier = Modifier.weight(1f)
+                                .semantics { selected = (active == index) },
+                        ) {
+                            Icon(
+                                icon,
+                                contentDescription = label,
+                                tint = if (active == index) Accent else TextMuted,
+                                modifier = Modifier.size(25.dp),
+                            )
+                        }
+                    }
+                }
+            } else {
+                NavigationBar(containerColor = Background, tonalElevation = 0.dp) {
+                    tabs.forEach { (label, icon, index) ->
+                        NavigationBarItem(
+                            selected = active == index,
+                            onClick = { onSelect(index) },
+                            icon = { Icon(icon, contentDescription = label) },
+                            label = {
+                                Text(
+                                    label,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Accent,
+                                selectedTextColor = Accent,
+                                indicatorColor = Background,
+                                unselectedIconColor = TextMuted,
+                                unselectedTextColor = TextMuted,
+                            ),
+                            alwaysShowLabel = true,
+                        )
+                    }
+                }
+            }
         }
     }
 }

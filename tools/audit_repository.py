@@ -47,7 +47,12 @@ source_digest = sha256(''.join(
 ).encode()).hexdigest()
 main_php = (plugin / 'brendigo-sidrena-cijena.php').read_text(encoding='utf-8')
 readme = (plugin / 'readme.txt').read_text(encoding='utf-8')
-plugin_version = '1.5.3'
+plugin_version = next((
+    line.split(': ', 1)[1].strip() for line in main_php.splitlines()
+    if line.startswith(' * Version: ')
+), '')
+if not re.fullmatch(r'\d+\.\d+\.\d+', plugin_version):
+    issues.append('Missing or malformed WordPress version header')
 if f' * Version: {plugin_version}\n' not in main_php or f'Stable tag: {plugin_version}\n' not in readme:
     issues.append('Plugin header and stable tag mismatch')
 if f"BRENDIGO_SIDRENA_CIJENA_VERSION', '{plugin_version}'" not in main_php:

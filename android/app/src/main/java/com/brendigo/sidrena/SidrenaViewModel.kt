@@ -30,7 +30,10 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         val saved = preferences.getString("site", "").orEmpty()
-        if (saved.isNotBlank()) connect(saved)
+        if (saved.isNotBlank()) {
+            val savedOutlet = preferences.getString("outlet", "").orEmpty()
+            load(saved, savedOutlet, newSite = true, restoringSession = true)
+        }
     }
 
     fun setSiteInput(value: String) {
@@ -51,7 +54,7 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
 
     fun disconnect() {
         requestId++
-        preferences.edit().remove("site").apply()
+        preferences.edit().remove("site").remove("outlet").apply()
         state = SidrenaState()
     }
 
@@ -74,17 +77,37 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
         load(site, state.outlet, false)
     }
 
-    private fun load(site: String, outlet: String, newSite: Boolean) {
+    private fun load(
+        site: String,
+        outlet: String,
+        newSite: Boolean,
+        restoringSession: Boolean = false,
+    ) {
         val id = ++requestId
         state = state.copy(siteInput = site, isLoading = true, error = null,
             isEditingSite = if (newSite) true else state.isEditingSite)
         viewModelScope.launch {
             try {
-                val loaded = repository.load(site, outlet)
+                // Reconnect using the saved outlet, not the default webshop.
+                // A deleted outlet is the only case where a fallback is safe.
+                val loaded = try {
+                    repository.load(site, outlet)
+                } catch (missing: IllegalArgumentException) {
+                    if (!restoringSession || outlet.isBlank() ||
+                        missing.message != "Odabrana poslovnica više ne postoji."
+                    ) throw missing
+                    repository.load(site, "")
+                }
                 if (id != requestId) return@launch
-                preferences.edit().putString("site", loaded.site).apply()
+                val effectiveOutlet = if (outlet.isNotBlank() &&
+                    loaded.index.outlets.none { it.code == outlet }
+                ) "" else outlet
+                preferences.edit()
+                    .putString("site", loaded.site)
+                    .putString("outlet", effectiveOutlet)
+                    .apply()
                 state = state.copy(siteInput = loaded.site, snapshot = loaded,
-                    outlet = outlet, isEditingSite = false, isLoading = false, error = null)
+                    outlet = effectiveOutlet, isEditingSite = false, isLoading = false, error = null)
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (_: Exception) {

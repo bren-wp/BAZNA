@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -69,10 +70,30 @@ import com.brendigo.sidrena.data.CatalogSnapshot
 import com.brendigo.sidrena.data.PriceItem
 
 /**
+ * Filters are based on actual public CSV fields. Do not simulate
+ * `Akcija`, `Novo` or categories absent from the v1 REST contract.
+ */
+internal fun filterProductCatalog(
+    products: List<PriceItem>,
+    query: String,
+    filter: Int,
+): List<PriceItem> {
+    require(filter in 0..2)
+    val queried = CatalogSearch.items(products, query, if (filter == 1) 1 else 0)
+    return if (filter == 2) {
+        queried.filter { item ->
+            item.availability.trim().lowercase() in setOf(
+                "dostupno", "na zalihi", "instock", "in stock",
+            )
+        }
+    } else queried
+}
+
+/**
  * 04/12: SIDRENA products.
- * The public API has no images, sale flags, "new" flags, or category data.
- * Keep the reference layout but use truthful anchor-price filters and local
- * product icons rather than fabricated metadata or external image requests.
+ * The WordPress v1 public CSV optionally exposes real product thumbnails.
+ * There are no guaranteed sale badges, new-product flags or category fields.
+ * Preserve the reference layout without inventing photos or product metadata.
  */
 @Composable
 fun ProductCatalogScreen(
@@ -87,7 +108,7 @@ fun ProductCatalogScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableIntStateOf(0) }
     val visible = remember(data.products, query, filter) {
-        CatalogSearch.items(data.products, query, filter)
+        filterProductCatalog(data.products, query, filter)
     }
 
     Column(Modifier.fillMaxSize().background(Background)) {
@@ -150,7 +171,7 @@ fun ProductCatalogScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf("Svi", "Sidrena", "Bez sidrene").forEachIndexed { index, label ->
+            listOf("Svi", "Sa sidrenom cijenom", "Dostupni").forEachIndexed { index, label ->
                 CatalogFilterChip(
                     label = label,
                     selected = filter == index,
@@ -206,7 +227,7 @@ fun ProductCatalogScreen(
                 contentPadding = PaddingValues(bottom = 20.dp),
             ) {
                 items(visible) { product ->
-                    ProductReferenceRow(product, onClick = { onDetails(product) })
+                    ProductReferenceRow(product, site = data.site, onClick = { onDetails(product) })
                 }
             }
         }
@@ -214,12 +235,19 @@ fun ProductCatalogScreen(
 }
 
 @Composable
-internal fun CatalogSearchBar(value: String, onQueryChange: (String) -> Unit, hint: String, accessibilityLabel: String) {
+internal fun CatalogSearchBar(
+    value: String,
+    onQueryChange: (String) -> Unit,
+    hint: String,
+    accessibilityLabel: String,
+    heightDp: Int = 52,
+    radiusDp: Int = 12,
+) {
     val focusManager = LocalFocusManager.current
     Row(
         modifier = Modifier.fillMaxWidth()
-            .height(52.dp)
-            .background(SurfaceRaised, RoundedCornerShape(12.dp))
+            .height(heightDp.dp)
+            .background(SurfaceRaised, RoundedCornerShape(radiusDp.dp))
             .semantics { contentDescription = accessibilityLabel }
             .padding(start = 13.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -288,9 +316,12 @@ internal fun CatalogFilterChip(label: String, selected: Boolean, onClick: () -> 
 }
 
 @Composable
-private fun ProductReferenceRow(item: PriceItem, onClick: () -> Unit) {
+private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Unit) {
     val currentPrice = formatPrice(item.currentPrice)
     val referencePrice = formatPrice(item.referencePrice)
+    val unitText = item.unit.ifBlank {
+        item.sku.takeIf { it.isNotBlank() }?.let { "SKU: " + it }.orEmpty()
+    }
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
             .semantics {
@@ -301,69 +332,116 @@ private fun ProductReferenceRow(item: PriceItem, onClick: () -> Unit) {
         border = BorderStroke(1.dp, Border.copy(alpha = 0.6f)),
         colors = CardDefaults.cardColors(containerColor = Surface),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp)
-                .padding(horizontal = 10.dp, vertical = 9.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            // A neutral local pictogram, not a fake remote product photo.
-            Box(
-                modifier = Modifier.size(width = 64.dp, height = 72.dp)
-                    .background(Color(0xFFF0EEE8), RoundedCornerShape(9.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    Icons.Outlined.Inventory2,
-                    contentDescription = null,
-                    tint = Color(0xFF996F4D),
-                    modifier = Modifier.size(35.dp),
-                )
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Text(
-                    item.name.ifBlank { "Bez naziva" },
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                val unitText = item.unit.ifBlank {
-                    item.sku.takeIf { it.isNotBlank() }?.let { "SKU: " + it }.orEmpty()
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            // Below 360dp device width, reserving a fixed photo and two-price
+            // column would leave virtually no width for the product title.
+            // Keep the reference's horizontal card unchanged for normal phones.
+            if (maxWidth < 310.dp) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        ProductThumbnail(
+                            site = site,
+                            imageUrl = item.imageUrl,
+                            modifier = Modifier.size(width = 50.dp, height = 56.dp),
+                        )
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                item.name.ifBlank { "Bez naziva" },
+                                color = Color.White, fontSize = 15.sp,
+                                lineHeight = 18.sp, fontWeight = FontWeight.Bold,
+                                maxLines = 2, overflow = TextOverflow.Ellipsis,
+                            )
+                            if (unitText.isNotBlank()) {
+                                Text(
+                                    unitText, color = TextMuted, fontSize = 12.sp,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            currentPrice,
+                            color = if (item.currentPrice.isBlank()) TextMuted else Accent,
+                            fontSize = 16.sp, fontWeight = FontWeight.ExtraBold,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            if (item.referencePrice.isBlank()) "Bez sidrene"
+                            else "Ref: " + referencePrice,
+                            color = TextMuted, fontSize = 11.sp,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
-                if (unitText.isNotBlank()) {
-                    Text(
-                        unitText,
-                        color = Color(0xFFE1EAF3),
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp)
+                        .padding(horizontal = 10.dp, vertical = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    ProductThumbnail(
+                        site = site,
+                        imageUrl = item.imageUrl,
+                        modifier = Modifier.size(width = 64.dp, height = 72.dp),
                     )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            item.name.ifBlank { "Bez naziva" },
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        if (unitText.isNotBlank()) {
+                            Text(
+                                unitText,
+                                color = Color(0xFFE1EAF3),
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            currentPrice,
+                            color = if (item.currentPrice.isBlank()) TextMuted else Accent,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            maxLines = 1,
+                        )
+                        Text(
+                            if (item.referencePrice.isBlank()) "Bez sidrene cijene"
+                            else "Ref. cijena: " + referencePrice,
+                            color = TextMuted,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                        )
+                    }
                 }
-            }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    currentPrice,
-                    color = if (item.currentPrice.isBlank()) TextMuted else Accent,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                )
-                Text(
-                    if (item.referencePrice.isBlank()) "Bez sidrene cijene"
-                    else "Ref. cijena: " + referencePrice,
-                    color = TextMuted,
-                    fontSize = 11.sp,
-                    maxLines = 1,
-                )
             }
         }
     }

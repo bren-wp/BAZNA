@@ -5,6 +5,7 @@ on:
     paths:
       - 'android/**'
       - 'tools/audit_android.py'
+      - 'tools/run_android_responsive.sh'
       - '.github/workflows/android-ci.yml'
   push:
     branches: [main]
@@ -12,6 +13,12 @@ on:
 
 permissions:
   contents: read
+
+# Keep only the latest PR revision under test; 9 emulator profiles take
+# substantial runner time and stale commits must not block current QA.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   android:
@@ -59,3 +66,51 @@ jobs:
           path: artifacts/android/
           if-no-files-found: error
           retention-days: 30
+
+  responsive-emulator:
+    name: Android 12 screens × 9 real emulator configurations
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Enable Android emulator KVM acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install Android SDK 36 for app compilation
+        shell: bash
+        run: |
+          set -euo pipefail
+          manager=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)
+          yes | "$manager" --licenses >/dev/null || true
+          "$manager" --install "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Build real device instrumentation APK
+        working-directory: android
+        run: gradle --no-daemon :app:assembleDebug :app:assembleDebugAndroidTest
+      - name: Exercise all twelve Compose screens and capture per-size screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          emulator-boot-timeout: 600
+          disable-animations: true
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: bash tools/run_android_responsive.sh
+      - name: Publish actual screen captures and instrumentation output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SIDRENA-Android-responsive-screenshots
+          path: artifacts/android-responsive/
+          if-no-files-found: warn
+          retention-days: 7

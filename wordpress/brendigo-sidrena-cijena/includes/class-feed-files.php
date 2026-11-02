@@ -255,7 +255,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			return array( 'id', 'vrsta', 'naziv', 'url', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum' );
 		}
 
-		return array( 'id', 'vrsta', 'naziv', 'sku', 'marka', 'url', 'jedinica_mjere', 'cijena_jedinice_mjere', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum', 'barkod', 'dostupnost' );
+		return array( 'id', 'vrsta', 'naziv', 'sku', 'marka', 'url', 'slika_url', 'jedinica_mjere', 'cijena_jedinice_mjere', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum', 'barkod', 'dostupnost' );
 	}
 
 	/**
@@ -864,9 +864,9 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			$hidden = $row_index >= self::CJENIK_PAGE_SIZE ? ' hidden' : '';
 			++$row_index;
 
-			$html .= '<tr data-search="' . esc_attr( $search ) . '"' . $hidden . '>';
+			$html .= '<tr data-kind="' . esc_attr( $vrsta ) . '" data-search="' . esc_attr( $search ) . '"' . $hidden . '>';
 			foreach ( $columns as $key => $column ) {
-				$html .= '<td data-label="' . esc_attr( $column['label'] ) . '">' . $cells[ $key ] . '</td>';
+				$html .= '<td data-field="' . esc_attr( $key ) . '" data-label="' . esc_attr( $column['label'] ) . '">' . $cells[ $key ] . '</td>';
 			}
 			$html .= '</tr>';
 		}

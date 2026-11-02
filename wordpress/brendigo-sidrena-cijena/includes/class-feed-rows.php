@@ -307,6 +307,11 @@ class Brendigo_Sidrena_Cijena_Feed_Rows {
 		if ( $public ) {
 			$row['id']                     = (string) $product->get_id();
 			$row['url']                    = (string) get_permalink( $product->get_id() );
+			// Optional public thumbnail for SIDRENA Android catalog cards.
+			// Images are never required to publish a valid cjenik.
+			$image_id = method_exists( $product, 'get_image_id' ) ? (int) $product->get_image_id() : 0;
+			$image_url = $image_id > 0 ? wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' ) : false;
+			$row['slika_url'] = is_string( $image_url ) ? esc_url_raw( $image_url ) : '';
 			$row['barkod']                 = $this->product_barcode( $product );
 			$row['marka']                  = Brendigo_Sidrena_Cijena_Settings::instance()->product_marka( $product );
 			$row['dostupnost']             = $this->product_dostupnost( $product );

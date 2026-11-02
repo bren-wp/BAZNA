@@ -636,7 +636,8 @@ class Brendigo_Sidrena_Cijena_Catalog {
 			return $custom;
 		}
 
-		return $this->normalize_date( (string) Brendigo_Sidrena_Cijena_Settings::instance()->get( 'default_date' ) );
+		// Do not present the general date as verified for every manual row.
+		return '';
 	}
 
 	/**

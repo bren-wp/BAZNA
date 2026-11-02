@@ -3,7 +3,6 @@ package com.brendigo.sidrena.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,11 +19,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Sync
@@ -59,14 +58,13 @@ import com.brendigo.sidrena.data.CatalogSnapshot
 import com.brendigo.sidrena.data.PriceItem
 
 /**
- * Screen 05/12 — SIDRENA public service catalog.
+ * Screen 05/12: Usluge — the reference's title, wide search box and compact
+ * vertically stacked navy service cards. The screenshot is a *layout* guide;
+ * names, prices, and publication status always come from the WordPress CSV.
  *
- * Reference layout: back arrow, title and overflow menu, search bar,
- * horizontal chips, vertically stacked picture-sized service rows.
- *
- * Public CSV does not carry thumbnails, popularity, or category fields:
- * a local tool icon substitutes images; filtering is restricted to published
- * anchor-price data, never an inferred "popular" or "category" value.
+ * The reference's "od" label is not applied to a single exact published price:
+ * that would falsely imply a variable starting price. The real anchor and
+ * historical reference date are shown only when present in the public feed.
  */
 @Composable
 fun ServiceCatalogScreen(
@@ -77,100 +75,77 @@ fun ServiceCatalogScreen(
     onBack: () -> Unit,
     onShowProducts: () -> Unit,
     onRefresh: () -> Unit,
+    selectedOutlet: String = "",
 ) {
     var query by rememberSaveable { mutableStateOf("") }
-    var filter by rememberSaveable { mutableIntStateOf(0) }
-    val visible = remember(data.services, query, filter) {
-        visiblePublicServices(data.services, query, filter)
+    var anchorFilter by rememberSaveable { mutableIntStateOf(0) }
+    val visible = remember(data.services, query, anchorFilter) {
+        visiblePublicServices(data.services, query, anchorFilter)
     }
+    val publication = servicePublicationState(data, selectedOutlet)
 
     Column(modifier = Modifier.fillMaxSize().background(Background).imePadding()) {
         ServiceToolbar(
             busy = busy,
+            anchorFilter = anchorFilter,
+            onFilter = { anchorFilter = it },
             onBack = onBack,
             onShowProducts = onShowProducts,
             onRefresh = onRefresh,
         )
-        Spacer(Modifier.height(7.dp))
+        // Reference 1080 px canvas: toolbar immediately followed by a 40 dp search field.
         CatalogSearchBar(
             value = query,
             onQueryChange = { query = it.take(256) },
             hint = "Pretraži usluge…",
             accessibilityLabel = "Pretraži javno objavljene usluge",
+            heightDp = 40,
+            radiusDp = 9,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(21.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            listOf("Svi", "Sidrena", "Bez sidrene").forEachIndexed { index, title ->
-                CatalogFilterChip(
-                    label = title,
-                    selected = filter == index,
-                    onClick = { filter = index },
-                )
-            }
-            CatalogFilterChip(
-                label = "Proizvodi ▾",
-                selected = false,
-                onClick = onShowProducts,
-            )
-        }
-
-        Spacer(Modifier.height(14.dp))
         if (busy) {
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth().height(3.dp),
                 color = Accent,
                 trackColor = SurfaceRaised,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(10.dp))
         }
+
         if (!error.isNullOrBlank()) {
             Text(
-                text = error,
+                error,
+                modifier = Modifier.padding(bottom = 10.dp),
                 color = Color(0xFFFFC997),
                 fontSize = 13.sp,
-                modifier = Modifier.padding(bottom = 12.dp),
             )
         }
 
-        if (visible.isEmpty()) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 26.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(9.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Build,
-                    contentDescription = null,
-                    tint = TextMuted,
-                    modifier = Modifier.size(36.dp),
-                )
-                Text(
-                    text = if (data.services.isEmpty()) "Nema javno objavljenih usluga."
-                    else "Nema usluga za odabrane filtre.",
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                if (query.isNotBlank() || filter != 0) {
-                    Text(
-                        "Promijenite pretragu ili odaberite Svi.",
-                        color = TextMuted,
-                        fontSize = 13.sp,
-                    )
-                }
-            }
+        if (publication == false && data.services.isEmpty()) {
+            ServiceEmptyState(
+                title = "CSV cjenik usluga još nije objavljen.",
+                description = "Objavite cjenik u WordPress dodatku SIDRENA, a zatim osvježite podatke.",
+            )
+        } else if (visible.isEmpty()) {
+            ServiceEmptyState(
+                title = if (data.services.isEmpty()) "Nema javno objavljenih usluga."
+                    else "Nema usluga za odabranu pretragu.",
+                description = if (query.isNotBlank() || anchorFilter != 0)
+                    "Promijenite pretragu ili u izborniku odaberite Sve usluge."
+                else "Provjerite javnu objavu usluga na povezanoj WordPress stranici.",
+            )
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp),
+                contentPadding = PaddingValues(top = 1.dp, bottom = 18.dp),
             ) {
                 items(visible) { service ->
-                    ServiceReferenceCard(item = service, onClick = { onDetails(service) })
+                    ServiceReferenceCard(
+                        item = service,
+                        onClick = { onDetails(service) },
+                    )
                 }
             }
         }
@@ -180,44 +155,60 @@ fun ServiceCatalogScreen(
 @Composable
 private fun ServiceToolbar(
     busy: Boolean,
+    anchorFilter: Int,
+    onFilter: (Int) -> Unit,
     onBack: () -> Unit,
     onShowProducts: () -> Unit,
     onRefresh: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier.fillMaxWidth().height(61.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+        IconButton(onClick = onBack, modifier = Modifier.size(42.dp)) {
             Icon(
-                imageVector = Icons.Outlined.ArrowBack,
+                imageVector = Icons.Outlined.ArrowBackIosNew,
                 contentDescription = "Natrag na početnu",
-                tint = Color.White,
-                modifier = Modifier.size(25.dp),
+                tint = Accent,
+                modifier = Modifier.size(19.dp),
             )
         }
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(7.dp))
         Text(
-            text = "Usluge",
+            "Usluge",
             color = Color.White,
-            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
+            fontSize = 23.sp,
             modifier = Modifier.weight(1f),
         )
+
         Box {
-            IconButton(onClick = { expanded = true }, modifier = Modifier.size(48.dp)) {
+            IconButton(onClick = { expanded = true }, modifier = Modifier.size(46.dp)) {
                 Icon(
                     imageVector = Icons.Outlined.MoreVert,
-                    contentDescription = "Opcije usluga",
-                    tint = Color.White,
-                    modifier = Modifier.size(25.dp),
+                    contentDescription = "Opcije usluga i filtriranje",
+                    tint = TextMuted,
+                    modifier = Modifier.size(24.dp),
                 )
             }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                listOf("Sve usluge", "Sa sidrenom cijenom", "Bez sidrene cijene")
+                    .forEachIndexed { index, label ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            leadingIcon = {
+                                if (anchorFilter == index) {
+                                    Icon(Icons.Outlined.Check, contentDescription = null)
+                                }
+                            },
+                            onClick = {
+                                onFilter(index)
+                                expanded = false
+                            },
+                        )
+                    }
                 DropdownMenuItem(
                     text = { Text("Osvježi usluge") },
                     leadingIcon = { Icon(Icons.Outlined.Sync, contentDescription = null) },
@@ -241,73 +232,89 @@ private fun ServiceToolbar(
 }
 
 @Composable
+private fun ServiceEmptyState(title: String, description: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = 28.dp, start = 7.dp, end = 7.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(9.dp),
+    ) {
+        Icon(
+            Icons.Outlined.Build,
+            contentDescription = null,
+            tint = TextMuted,
+            modifier = Modifier.size(33.dp),
+        )
+        Text(title, color = Color.White, fontWeight = FontWeight.SemiBold)
+        Text(description, color = TextMuted, fontSize = 13.sp)
+    }
+}
+
+@Composable
 private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
-    val price = serviceCurrentPrice(item.currentPrice)
-    val anchor = serviceReferenceCaption(item.referencePrice)
+    val current = serviceCurrentPrice(item.currentPrice)
+    val anchor = serviceReferenceWithDate(item.referencePrice, item.referenceDate)
+
     Card(
         modifier = Modifier.fillMaxWidth()
             .clickable(onClick = onClick)
             .semantics {
-                contentDescription = item.name + ", cijena " + price +
+                contentDescription = item.name + ", trenutačna cijena " + current +
                     (anchor?.let { ", " + it } ?: "")
             },
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, Border.copy(alpha = 0.65f)),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
+        border = BorderStroke(1.dp, Border),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-                .heightIn(min = 101.dp)
+                .heightIn(min = 76.dp)
                 .padding(horizontal = 10.dp, vertical = 9.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(11.dp),
         ) {
             Box(
                 modifier = Modifier
-                    .size(width = 76.dp, height = 82.dp)
-                    .background(SurfaceRaised, RoundedCornerShape(11.dp)),
+                    .size(35.dp)
+                    .background(SurfaceRaised, RoundedCornerShape(9.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Build,
+                    Icons.Outlined.Build,
                     contentDescription = null,
                     tint = Accent,
-                    modifier = Modifier.size(34.dp),
+                    modifier = Modifier.size(22.dp),
                 )
             }
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Text(
-                    text = item.name.ifBlank { "Usluga bez naziva" },
+                    item.name.ifBlank { "Usluga bez naziva" },
                     color = Color.White,
                     fontSize = 15.sp,
+                    lineHeight = 18.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    lineHeight = 18.sp,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = price,
+                    "Cijena",
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    current,
                     color = if (item.currentPrice.isBlank()) TextMuted else Accent,
-                    fontSize = 17.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (anchor != null) {
                     Text(
-                        text = anchor,
-                        color = TextMuted,
-                        fontSize = 12.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                } else {
-                    Text(
-                        text = "Sidrena cijena nije objavljena",
+                        anchor,
                         color = TextMuted,
                         fontSize = 11.sp,
                         maxLines = 1,
@@ -319,24 +326,40 @@ private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
     }
 }
 
-/** Sorting stays in server order; only public fields decide filtering. */
+/** Preserve the WordPress publisher's order; use only public v1 fields. */
 internal fun visiblePublicServices(
     items: List<PriceItem>,
     query: String,
     anchorFilter: Int,
 ): List<PriceItem> = CatalogSearch.items(items, query, anchorFilter)
 
-/** A CSV price is an actual published price, never automatically a "from" price. */
+/** A published exact service price is not a variable "starting from" price. */
 internal fun serviceCurrentPrice(raw: String): String =
     if (raw.isBlank()) "Cijena nije objavljena" else formatPrice(raw)
 
 internal fun serviceReferenceCaption(raw: String): String? =
     if (raw.isBlank()) null else "Ref. cijena: " + formatPrice(raw)
 
+/** Date is kept alongside an anchored price whenever one was published. */
+internal fun serviceReferenceWithDate(price: String, date: String): String? =
+    serviceReferenceCaption(price)?.let {
+        if (date.isBlank()) it else "$it · $date"
+    }
+
+/**
+ * null = older WordPress plugin does not expose the optional readiness field.
+ * Outlet CSV readiness must never borrow the webshop's flag.
+ */
+internal fun servicePublicationState(data: CatalogSnapshot, outletCode: String = ""): Boolean? {
+    if (outletCode.isEmpty()) return data.index.servicesCsvReady
+    val outlet = data.index.outlets.firstOrNull { it.code == outletCode } ?: return false
+    return outlet.servicesCsvReady
+}
+
 @Preview(name = "05 SIDRENA Usluge 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaServicePreview() {
-    val preview = CatalogSnapshot(
+    val demo = CatalogSnapshot(
         site = "https://primjer.hr",
         index = CatalogIndex(
             publishedAt = "2026-10-10",
@@ -348,19 +371,17 @@ internal fun SidrenaServicePreview() {
         ),
         products = emptyList(),
         services = listOf(
-            PriceItem("1", "Servis klima-uređaja", "usluga", "45,00", "60,00", "2026-10-01", "", "", ""),
-            PriceItem("2", "Montaža rasvjete", "usluga", "30,00", "45,00", "2026-10-01", "", "", ""),
-            PriceItem("3", "Čišćenje prostora", "usluga", "20,00", "35,00", "2026-10-01", "", "", ""),
-            PriceItem("4", "Izrada web stranice", "usluga", "250,00", "350,00", "2026-10-01", "", "", ""),
-            PriceItem("5", "Knjigovodstvene usluge", "usluga", "100,00", "150,00", "2026-10-01", "", "", ""),
-            PriceItem("6", "Dizajn logotipa", "usluga", "80,00", "120,00", "2026-10-01", "", "", ""),
+            PriceItem("1", "Montaža namještaja", "usluga", "30,00", "", "", "", "", ""),
+            PriceItem("2", "Servis klima-uređaja", "usluga", "45,00", "", "", "", "", ""),
+            PriceItem("3", "Čišćenje prostora", "usluga", "20,00", "", "", "", "", ""),
+            PriceItem("4", "Dostava i montaža", "usluga", "15,00", "", "", "", "", ""),
         ),
         archive = emptyList(),
         warnings = emptyList(),
     )
     SidrenaTheme {
         ServiceCatalogScreen(
-            data = preview,
+            data = demo,
             busy = false,
             error = null,
             onDetails = {},

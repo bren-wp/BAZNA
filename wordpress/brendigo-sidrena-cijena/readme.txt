@@ -4,13 +4,20 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Manage reference prices and dates, publish a public HTML pricelist, and generate XML/CSV archives for WooCommerce or standalone catalogs.
 
 == Changelog ==
+
+= 1.5.4 =
+* Added public read-only CSV feed availability flags in the existing SIDRENA REST API, including separate business outlet statuses, to prevent misleading Android loading states.
+* Added optional WooCommerce product thumbnails to the public product CSV/XML feed without changing the required price, date or service columns.
+* Added a WordPress dashboard connection panel for the SIDRENA Android application, with copyable HTTPS address and actual published-feed readiness.
+* Aligned SIDRENA admin and public price-list colors with the Android brand; no new third-party dependencies.
+* Kept API version 1 and compatibility with older Android clients. Changes are prepared in a PR and require deployment to become available.
 
 = 1.5.3 =
 * Separate the 30-day sale baseline from documented historical reference prices in the public legal metadata.

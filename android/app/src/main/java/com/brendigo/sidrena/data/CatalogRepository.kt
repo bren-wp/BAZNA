@@ -30,8 +30,15 @@ class CatalogRepository {
         val serviceUrl = selected?.serviceCsv ?: index.servicesCsv
 
         val warnings = mutableListOf<String>()
-        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte SIDRENA na 1.5.2.")
-        fun safeItems(url: String, label: String): List<PriceItem> {
+        if (index.pendingPublication == true) {
+            warnings.add("WordPress ima neobjavljene izmjene. Prikazane CSV cijene mogu biti zastarjele dok se cjenik ponovno ne objavi.")
+        }
+        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte dodatak SIDRENA.")
+        fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
+            if (ready == false) {
+                warnings.add("Cjenik za " + label + " još nije objavljen u WordPress dodatku. Objavite ga u administraciji SIDRENA.")
+                return emptyList()
+            }
             if (url.isBlank()) {
                 warnings.add("Nema objavljenog CSV cjenika: " + label + ".")
                 return emptyList()
@@ -44,8 +51,16 @@ class CatalogRepository {
             }
         }
 
-        val products = safeItems(productUrl, "proizvode")
-        val services = safeItems(serviceUrl, "usluge")
+        val products = safeItems(
+            productUrl,
+            "proizvode",
+            if (selected == null) index.productsCsvReady else selected.productsCsvReady,
+        )
+        val services = safeItems(
+            serviceUrl,
+            "usluge",
+            if (selected == null) index.servicesCsvReady else selected.servicesCsvReady,
+        )
         val archive = try {
             val discoveryUrl = indexJson.optString("type_archive")
             val remote = if (discoveryUrl.isBlank())
@@ -97,7 +112,7 @@ class CatalogRepository {
                 .url(url.toASCIIString())
                 .get()
                 .header("Accept", "application/json, text/csv, */*")
-                .header("User-Agent", "SIDRENA-Android/0.3.2")
+                .header("User-Agent", "SIDRENA-Android")
                 .build()
             client.newCall(request).execute().use { response ->
                 val code = response.code

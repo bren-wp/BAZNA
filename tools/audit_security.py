@@ -31,9 +31,10 @@ network=read("desktop/Sidrena.Core/OfficialPluginDiscovery.cs")
 manifest=read("android/app/src/main/AndroidManifest.xml")
 release=read(".github/workflows/desktop-release.yml")
 
-for version in ("1.5.3",):
-    if "Version: "+version not in main or "Stable tag: "+version not in readme:
-        errors.append("Mismatch in official WordPress version")
+version_match = re.search(r"^ [*] Version: ([0-9]+[.][0-9]+[.][0-9]+)[ ]*$", main, re.MULTILINE)
+plugin_version = version_match.group(1) if version_match else None
+if not plugin_version or "Stable tag: " + plugin_version not in readme:
+    errors.append("Mismatch in official WordPress version")
 for token in ("2026-11-17","2025-05-02","2026-09-10"):
     if any(token not in source for source in (legal,android,win)):
         errors.append("Cross-platform legal date drift: "+token)

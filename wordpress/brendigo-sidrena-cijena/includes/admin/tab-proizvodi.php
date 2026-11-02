@@ -68,12 +68,7 @@ defined( 'ABSPATH' ) || exit;
 						<option value="complete"><?php echo esc_html__( 'Sa sidrenom cijenom', 'brendigo-sidrena-cijena' ); ?></option>
 					</select>
 				</label>
-				<label>
-					<span><?php echo esc_html__( 'Datum za prazna polja', 'brendigo-sidrena-cijena' ); ?></span>
-					<input type="text" id="sidrena-wc-bulk-date" value="<?php echo esc_attr( Brendigo_Sidrena_Cijena_Settings::instance()->get( 'default_date' ) ); ?>" inputmode="numeric" />
-				</label>
-				<button type="button" class="button button-secondary js-sidrena-wc-fill-date"><?php echo esc_html__( 'Popuni prazne datume', 'brendigo-sidrena-cijena' ); ?></button>
-				<button type="button" class="button button-secondary js-sidrena-wc-fill-price"><?php echo esc_html__( 'Preuzmi važeću cijenu u prazna polja', 'brendigo-sidrena-cijena' ); ?></button>
+				<p class="brendigo-woo-catalog-tools__note"><?php echo esc_html__( 'Sidrenu cijenu i povijesni datum unosite samo uz provjeru izvorne evidencije. Današnja cijena nije dokaz povijesne cijene.', 'brendigo-sidrena-cijena' ); ?></p>
 			</div>
 			<div class="brendigo-woo-catalog-summary">
 				<p class="description brendigo-woo-change-status" id="sidrena-wc-change-status" aria-live="polite"><?php echo esc_html__( 'Nema nespremljenih promjena.', 'brendigo-sidrena-cijena' ); ?></p>
@@ -110,7 +105,7 @@ defined( 'ABSPATH' ) || exit;
 								<td><code><?php echo esc_html( '' !== $sidrena_wc_row['sku'] ? $sidrena_wc_row['sku'] : '—' ); ?></code></td>
 								<td class="brendigo-woo-current" data-current="<?php echo esc_attr( '' !== $sidrena_wc_row['current'] ? $sidrena_wc_row['current'] : $sidrena_wc_row['regular'] ); ?>"><?php echo '' !== $sidrena_wc_row['display'] ? wp_kses_post( $sidrena_wc_row['display'] ) : '—'; ?></td>
 								<td><input type="text" class="wc_input_price js-sidrena-wc-price" inputmode="decimal" name="sidrena_wc[<?php echo esc_attr( (string) $sidrena_wc_row['id'] ); ?>][price]" value="<?php echo esc_attr( $sidrena_wc_row['sidrena'] ); ?>" /></td>
-								<td><input type="text" class="js-sidrena-wc-date" inputmode="numeric" name="sidrena_wc[<?php echo esc_attr( (string) $sidrena_wc_row['id'] ); ?>][date]" value="<?php echo esc_attr( $sidrena_wc_row['date'] ); ?>" placeholder="<?php echo esc_attr( Brendigo_Sidrena_Cijena_Settings::instance()->get( 'default_date' ) ); ?>" /></td>
+								<td><input type="text" class="js-sidrena-wc-date" inputmode="numeric" name="sidrena_wc[<?php echo esc_attr( (string) $sidrena_wc_row['id'] ); ?>][date]" value="<?php echo esc_attr( $sidrena_wc_row['date'] ); ?>" placeholder="DD.MM.GGGG." /></td>
 								<td><input type="text" name="sidrena_wc[<?php echo esc_attr( (string) $sidrena_wc_row['id'] ); ?>][barcode]" value="<?php echo esc_attr( $sidrena_wc_row['barcode'] ); ?>" /></td>
 								<td><select name="sidrena_wc[<?php echo esc_attr( (string) $sidrena_wc_row['id'] ); ?>][visibility]"><option value="auto"<?php selected( $sidrena_wc_row['visibility'], 'auto' ); ?>><?php echo esc_html__( 'Automatski', 'brendigo-sidrena-cijena' ); ?></option><option value="include"<?php selected( $sidrena_wc_row['visibility'], 'include' ); ?>><?php echo esc_html__( 'Uključi', 'brendigo-sidrena-cijena' ); ?></option><option value="exclude"<?php selected( $sidrena_wc_row['visibility'], 'exclude' ); ?>><?php echo esc_html__( 'Isključi', 'brendigo-sidrena-cijena' ); ?></option></select></td>
 							</tr>

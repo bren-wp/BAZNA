@@ -12,9 +12,9 @@
 
 | Platforma | Namjena | Izdanje |
 |---|---|---|
-| **Android** | Pregled javnih proizvoda, usluga, sidrenih cijena, poslovnica i arhive iz povezanog WordPressa | **0.3.3** |
+| **Android** | Pregled javnih proizvoda, usluga, sidrenih cijena, poslovnica i arhive iz povezanog WordPressa | **0.3.4 (PR #202)** |
 | **Windows** | Lokalno upravljanje katalozima, poviješću cijena, lokacijama, CSV/XML datotekama i sigurnosnim kopijama | **0.10.6** |
-| **WordPress** | Službeni dodatak za javne cjenike, sidrene cijene i arhivu | **1.5.3**, nadopunjen pravni profil |
+| **WordPress** | Službeni dodatak za javne cjenike, sidrene cijene i arhivu | **1.5.4 (PR #202)**, nadopunjen pravni profil |
 
 ### SIDRENA Android
 
@@ -22,13 +22,19 @@ Povežite WordPress stranicu, pregledajte proizvode i usluge, filtrirajte sidren
 
 ![SIDRENA vizualni identitet](desktop/branding/sidrena-banner.svg)
 
+### Android i WordPress — zajednički javni katalog (PR #202)
+
+U pripremi su **Android 0.3.4** i **WordPress 1.5.4**. U WordPressu otvorite **SIDRENA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **SIDRENA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
+
+Android ostaje samo za čitanje: prihvaća REST v1, učitava stvarne proizvode/usluge i poslovnice, poštuje status objave, te prikazuje stvarne WooCommerce slike samo s iste javne HTTPS domene. Bez objavljenih CSV cjenika prikazuje jasnu obavijest i omogućuje naknadno osvježavanje; stari dodaci bez statusnih polja i dalje su kompatibilni. Niti jedna promjena nije objavljena u produkciji prije spajanja i izdavanja.
+
 ### SIDRENA Desktop za Windows
 
 Nativno Windows sučelje za lokalno vođenje aktualnih i povijesnih cijena, kataloga, usluga, poslovnica i izvoza. Podržani su prijenosni **Portable.exe** i standardni **Setup.exe** instalacijski paket. Aplikacija ima provjere cjelovitosti pri radu sa sigurnosnim kopijama i evidenciju promjena cijena.
 
 ### SIDRENA za WordPress
 
-Službeni dodatak **Brendigo Sidrena Cijena 1.5.3** osigurava objavljivanje javnih cjenika i arhiviranje podataka. Njegova se verzija i izvorni paket **ne mijenjaju** pri ažuriranju Android ili Windows aplikacije.
+Službeni dodatak **Brendigo Sidrena Cijena 1.5.4 (u pripremi u PR-u #202)** osigurava javne cjenike i arhiviranje. Promjene dodatka izdaju se zasebno od Android i Windows aplikacije.
 
 ## Preuzimanja
 
@@ -46,6 +52,6 @@ Android APK namijenjen je instalaciji i provjeri. Android AAB treba odgovarajuć
 
 ## Pravna revizija — listopad 2026.
 
-WordPress **1.5.3**, Android **0.3.3** i Windows **0.10.6** koriste zajednički javni profil propisa NN 101/2026 i izmjena NN 110/2026. Datum proširene primjene je **17. studenoga 2026.** Nacrt novih pravilnika još nije konačni propis. Povijesne sidrene cijene ne izračunavaju se automatski iz sadašnje cijene.
+WordPress **1.5.4 (PR #202)**, Android **0.3.4 (PR #202)** i Windows **0.10.6** koriste zajednički javni profil propisa NN 101/2026 i izmjena NN 110/2026. Datum proširene primjene je **17. studenoga 2026.** Nacrt novih pravilnika još nije konačni propis. Povijesne sidrene cijene ne izračunavaju se automatski iz sadašnje cijene.
 
 [Pravna revizija 29. 10. 2026.](docs/LEGAL-REVIEW-2026-10-29.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)

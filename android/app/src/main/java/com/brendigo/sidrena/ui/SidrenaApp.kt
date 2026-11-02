@@ -7,9 +7,12 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.AlertDialog
@@ -22,13 +25,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.brendigo.sidrena.SidrenaViewModel
 import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.PriceItem
 import com.brendigo.sidrena.data.SiteUrl
 
 @Composable
@@ -37,14 +40,26 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     val snapshot = state.snapshot
     val context = LocalContext.current
     var page by rememberSaveable { mutableStateOf("home") }
-    var selectedItem by remember { mutableStateOf<PriceItem?>(null) }
+    var selectedItemFields by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var selectedItemOutlet by rememberSaveable { mutableStateOf("") }
+    var selectedItemSite by rememberSaveable { mutableStateOf("") }
     var detailReturnPage by rememberSaveable { mutableStateOf("products") }
+    var searchReturnPage by rememberSaveable { mutableStateOf("home") }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var searchKind by rememberSaveable { mutableStateOf(0) }
     var alert by remember { mutableStateOf<String?>(null) }
     var askDisconnect by remember { mutableStateOf(false) }
 
     fun navigate(destination: String) {
+        if (destination == "search" && page != "search" && page != "detail") {
+            searchReturnPage = page
+        }
         page = destination
-        if (destination != "detail") selectedItem = null
+        if (destination != "detail") {
+            selectedItemFields = emptyList()
+            selectedItemOutlet = ""
+            selectedItemSite = ""
+        }
     }
 
     fun openPublic(url: String) {
@@ -76,7 +91,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
         navigate(when (page) {
             "detail" -> detailReturnPage
             "about" -> "settings"
-            "search" -> "products"
+            "search" -> searchReturnPage
             else -> "home"
         })
     }
@@ -116,6 +131,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                 AppNavigation(
                     active = when (page) {
                         "home", "locations" -> 0
+                        "search" -> if (searchReturnPage == "home") 0 else 1
                         "archive" -> 2
                         "settings", "about" -> 3
                         else -> 1
@@ -123,7 +139,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     onSelect = { index ->
                         navigate(when (index) {
                             0 -> "home"
-                            1 -> "products"
+                            1 -> "cjenici"
                             2 -> "archive"
                             else -> "settings"
                         })
@@ -132,10 +148,19 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             }
         },
     ) { insets ->
-        Column(
-            Modifier.fillMaxSize().padding(insets)
-                .padding(horizontal = if (state.isEditingSite || snapshot == null) 0.dp else 16.dp)
+        // Preserve the original phone layout, but stop stretching a single
+        // column and its price cards edge-to-edge on tablets/landscape screens.
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize().padding(insets),
+            contentAlignment = Alignment.TopCenter,
         ) {
+            val connecting = state.isEditingSite || snapshot == null
+            val maxDp = if (connecting) AdaptiveSizing.MAX_CONNECTION_WIDTH_DP
+                else AdaptiveSizing.MAX_CONTENT_WIDTH_DP
+            Column(
+                Modifier.width(minOf(maxWidth, maxDp.dp)).fillMaxHeight()
+                    .padding(horizontal = if (connecting) 0.dp else 16.dp)
+            ) {
             if (state.isEditingSite || snapshot == null) {
                 ConnectionPage(
                     input = state.siteInput,
@@ -155,7 +180,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             } else {
                 // Home screen has its own wordmark/search header from the reference.
                 // Keep the shared header unchanged on all other screens.
-                if (page != "home" && page != "products" && page != "services") {
+                if (page !in setOf("home", "products", "services", "detail", "cjenici", "archive", "locations", "search", "settings", "about")) {
                     BrandHeader(onNotifications = {
                         alert = "Posljednja objava: " +
                             (snapshot.index.publishedAt ?: "Datum nije dostupan")
@@ -170,13 +195,16 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onRefresh = model::refresh,
                         onEdit = model::editSite,
                         onOpen = ::openPublic,
+                        selectedOutlet = state.outlet,
                     )
                     "products" -> ProductCatalogScreen(
                         data = snapshot,
                         busy = state.isLoading,
                         error = state.error,
                         onDetails = {
-                            selectedItem = it
+                            selectedItemFields = saveDetailItem(it)
+                            selectedItemOutlet = state.outlet
+                            selectedItemSite = snapshot.site
                             detailReturnPage = "products"
                             navigate("detail")
                         },
@@ -188,8 +216,11 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         data = snapshot,
                         busy = state.isLoading,
                         error = state.error,
+                        selectedOutlet = state.outlet,
                         onDetails = {
-                            selectedItem = it
+                            selectedItemFields = saveDetailItem(it)
+                            selectedItemOutlet = state.outlet
+                            selectedItemSite = snapshot.site
                             detailReturnPage = "services"
                             navigate("detail")
                         },
@@ -197,44 +228,99 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onShowProducts = { navigate("products") },
                         onRefresh = model::refresh,
                     )
-                    "archive" -> ArchivePage(data = snapshot, onOpen = ::openPublic)
+                    "cjenici" -> PublicPriceListsScreen(
+                        data = snapshot,
+                        selectedOutlet = state.outlet,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onBack = { navigate("home") },
+                        onOpen = ::openPublic,
+                        onArchive = { navigate("archive") },
+                        onRefresh = model::refresh,
+                    )
+                    "archive" -> ArchivePage(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onOpen = ::openPublic,
+                        onBack = { navigate("home") },
+                        onPriceLists = { navigate("cjenici") },
+                        onRefresh = model::refresh,
+                    )
                     "locations" -> LocationsPage(
                         data = snapshot,
                         selectedOutlet = state.outlet,
-                        onSelect = { code ->
-                            model.selectOutlet(code)
-                            navigate("home")
-                        },
                         busy = state.isLoading,
+                        error = state.error,
+                        onBack = { navigate("home") },
+                        onSelect = model::selectOutlet,
+                        onPriceLists = { navigate("cjenici") },
+                        onRefresh = model::refresh,
                     )
-                    "search" -> SearchPage(data = snapshot, onDetails = {
-                        selectedItem = it
-                        detailReturnPage = "search"
-                        navigate("detail")
-                    }, onBack = { navigate("products") }, onArchive = { navigate("archive") })
+                    "search" -> SearchPage(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        query = searchQuery,
+                        kind = searchKind,
+                        onQueryChange = { searchQuery = it.take(256) },
+                        onKindChange = { searchKind = it },
+                        onDetails = {
+                            selectedItemFields = saveDetailItem(it)
+                            selectedItemOutlet = state.outlet
+                            selectedItemSite = snapshot.site
+                            detailReturnPage = "search"
+                            navigate("detail")
+                        },
+                        onBack = { navigate(searchReturnPage) },
+                        onArchive = { navigate("archive") },
+                        onRefresh = model::refresh,
+                    )
                     "detail" -> DetailPage(
-                        item = selectedItem,
+                        item = resolveCurrentDetailItem(
+                            saved = restoreDetailItem(selectedItemFields),
+                            snapshot = snapshot,
+                            savedOutlet = selectedItemOutlet,
+                            currentOutlet = state.outlet,
+                            savedSite = selectedItemSite,
+                        ),
                         data = snapshot,
                         onBack = { navigate(detailReturnPage) },
                         onOpen = ::openPublic,
                     )
                     "settings" -> SettingsPage(
-                        data = snapshot, busy = state.isLoading,
+                        data = snapshot,
+                        selectedOutlet = state.outlet,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onBack = { navigate("home") },
                         onEditSite = model::editSite,
                         onRefresh = model::refresh,
                         onDisconnect = { askDisconnect = true },
+                        onOutlets = { navigate("locations") },
                         onAbout = { navigate("about") },
                         onHelp = { navigate("about") },
                     )
                     "about" -> AboutPage(
+                        data = snapshot,
                         onBack = { navigate("settings") },
                         onConnectHelp = { alert = "Unesite HTTPS adresu svoje WordPress stranice s aktivnim dodatkom SIDRENA. Nakon povezivanja odaberite poslovnicu i pregledajte objavljene cjenike." },
                         onAnchorHelp = { alert = "Sidrena cijena je dokumentirana referentna vrijednost uz pripadajući datum. Uvijek provjerite podatke na izvornoj WordPress stranici." },
                         onSupport = ::supportEmail,
+                        onOpenPublic = ::openPublic,
                     )
-                    else -> HomePage(snapshot, state.isLoading, state.error,
-                        ::navigate, model::refresh, model::editSite, ::openPublic)
+                    else -> HomePage(
+                        data = snapshot,
+                        busy = state.isLoading,
+                        error = state.error,
+                        onNavigate = ::navigate,
+                        onRefresh = model::refresh,
+                        onEdit = model::editSite,
+                        onOpen = ::openPublic,
+                        selectedOutlet = state.outlet,
+                    )
                 }
+            }
             }
         }
     }

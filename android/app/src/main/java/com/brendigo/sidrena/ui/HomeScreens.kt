@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -85,11 +86,12 @@ fun HomePage(
     onRefresh: () -> Unit,
     onEdit: () -> Unit,
     onOpen: (String) -> Unit,
+    selectedOutlet: String = "",
 ) {
     var legalExpanded by rememberSaveable { mutableStateOf(false) }
-    val recent = remember(data.archive) { homeRecentArchive(data.archive) }
+    val recent = remember(data, selectedOutlet) { homeRecentPublications(data, selectedOutlet) }
+    val metrics = remember(data, selectedOutlet) { homeMetrics(data, selectedOutlet) }
     val countFormat = remember { NumberFormat.getIntegerInstance(Locale.forLanguageTag("hr-HR")) }
-    val publishedPage = data.index.publicPage
     val count: (Int) -> String = { countFormat.format(it) }
 
     Column(
@@ -103,6 +105,8 @@ fun HomePage(
             site = data.site,
             publishedAt = data.index.publishedAt,
             busy = busy,
+            publicationPending = homeCatalogPending(data, selectedOutlet),
+            changesPending = data.index.pendingPublication == true,
             onRefresh = onRefresh,
             onEdit = onEdit,
         )
@@ -110,7 +114,7 @@ fun HomePage(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             HomeMetricCard(
                 title = "Proizvodi",
-                value = count(data.products.size),
+                value = metrics[0].count,
                 icon = Icons.Outlined.LocalOffer,
                 tint = Accent,
                 modifier = Modifier.weight(1f),
@@ -118,7 +122,7 @@ fun HomePage(
             )
             HomeMetricCard(
                 title = "Usluge",
-                value = count(data.services.size),
+                value = metrics[1].count,
                 icon = Icons.Outlined.Settings,
                 tint = SoftBlue,
                 modifier = Modifier.weight(1f),
@@ -129,18 +133,15 @@ fun HomePage(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             HomeMetricCard(
                 title = "Cjenici",
-                value = if (publishedPage != null) "Javni" else "—",
+                value = metrics[2].count,
                 icon = Icons.Outlined.Description,
                 tint = SoftBlue,
                 modifier = Modifier.weight(1f),
-                onClick = {
-                    if (publishedPage != null) onOpen(publishedPage)
-                    else onNavigate("archive")
-                },
+                onClick = { onNavigate("cjenici") },
             )
             HomeMetricCard(
                 title = "Arhiva",
-                value = count(data.archive.size),
+                value = metrics[3].count,
                 icon = Icons.Outlined.Archive,
                 tint = HomeArchiveTint,
                 modifier = Modifier.weight(1f),
@@ -185,7 +186,7 @@ fun HomePage(
 
         Spacer(Modifier.height(4.dp))
         Text(
-            text = "Nedavne objave",
+            text = "Nedavno ažurirano",
             color = Color.White,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
@@ -202,25 +203,16 @@ fun HomePage(
                 when {
                     recent.isNotEmpty() -> recent.forEach { entry ->
                         HomeRecentRow(
-                            title = homeArchiveLabel(entry),
-                            subtitle = listOf(entry.date.takeIf(String::isNotBlank), entry.format.uppercase())
-                                .filterNotNull().joinToString(" · "),
-                            icon = if (entry.kind.contains("uslug", ignoreCase = true))
-                                Icons.Outlined.Settings else Icons.Outlined.Description,
+                            title = entry.title,
+                            subtitle = listOfNotNull(
+                                entry.format,
+                                entry.date?.takeIf(String::isNotBlank),
+                            ).joinToString(" · "),
+                            icon = Icons.Outlined.Description,
                             iconTint = if (entry.format.equals("xml", true)) Accent else SoftBlue,
                             onClick = { onOpen(entry.url) },
                         )
                     }
-                    !data.index.publishedAt.isNullOrBlank() -> HomeRecentRow(
-                        title = "Zadnji objavljeni cjenik",
-                        subtitle = data.index.publishedAt.orEmpty(),
-                        icon = Icons.Outlined.Description,
-                        iconTint = SoftBlue,
-                        onClick = {
-                            if (publishedPage != null) onOpen(publishedPage)
-                            else onNavigate("archive")
-                        },
-                    )
                     else -> Text(
                         "Nema objavljenih datoteka na povezanoj stranici.",
                         modifier = Modifier.padding(16.dp),
@@ -329,6 +321,8 @@ private fun HomeConnectedCard(
     site: String,
     publishedAt: String?,
     busy: Boolean,
+    publicationPending: Boolean,
+    changesPending: Boolean,
     onRefresh: () -> Unit,
     onEdit: () -> Unit,
 ) {
@@ -343,19 +337,25 @@ private fun HomeConnectedCard(
         Column(Modifier.fillMaxWidth().padding(start = 14.dp, top = 10.dp, end = 8.dp, bottom = 13.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(30.dp).background(HomeConnectedTint, CircleShape),
+                    Modifier.size(30.dp).background(
+                        if (publicationPending) Accent.copy(alpha = 0.16f)
+                        else HomeConnectedTint,
+                        CircleShape,
+                    ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Check,
+                        imageVector = if (publicationPending) Icons.Outlined.Info
+                        else Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Background,
+                        tint = if (publicationPending) Accent else Background,
                         modifier = Modifier.size(20.dp),
                     )
                 }
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    "Povezano",
+                    if (changesPending) "Promjene čekaju objavu"
+                    else if (publicationPending) "Cjenici čekaju objavu" else "Povezano",
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.White,
                     fontSize = 18.sp,
@@ -396,7 +396,7 @@ private fun HomeConnectedCard(
                 }
             }
             Text(
-                text = site.removePrefix("https://").removeSuffix("/"),
+                text = homeSiteLabel(site),
                 modifier = Modifier.padding(start = 40.dp, end = 9.dp),
                 color = TextMuted,
                 fontSize = 13.sp,
@@ -405,7 +405,12 @@ private fun HomeConnectedCard(
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Zadnje ažuriranje: " + (publishedAt?.takeIf { it.isNotBlank() } ?: "Datum nije dostupan"),
+                text = if (changesPending)
+                    "Objavljeni CSV može biti zastario. Objavite promjene u WordPressu i osvježite."
+                else if (publicationPending)
+                    "Najprije objavite CSV cjenike u WordPress dodatku."
+                else "Zadnje ažuriranje: " +
+                    (publishedAt?.takeIf { it.isNotBlank() } ?: "Datum nije dostupan"),
                 color = Color(0xFFD8E4F0),
                 fontSize = 12.sp,
                 maxLines = 2,
@@ -425,13 +430,13 @@ private fun HomeMetricCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = modifier.height(132.dp).clickable(onClick = onClick),
+        modifier = modifier.heightIn(min = 132.dp).clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Surface),
         border = BorderStroke(1.dp, Border),
         shape = RoundedCornerShape(16.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(14.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 132.dp).padding(14.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Icon(
@@ -446,7 +451,7 @@ private fun HomeMetricCard(
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
@@ -573,6 +578,7 @@ internal fun SidrenaHomePreview() {
             onRefresh = {},
             onEdit = {},
             onOpen = {},
+            selectedOutlet = "",
         )
     }
 }

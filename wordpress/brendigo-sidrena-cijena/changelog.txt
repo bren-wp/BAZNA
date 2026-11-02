@@ -1,3 +1,11 @@
+= 1.5.4 – development candidate (2026-11-02) =
+* WordPress REST v1 now exposes optional available_csv for goods and services, including independent per-outlet readiness. Both missing and published-empty CSV files are represented honestly.
+* Product feeds optionally include the original public WooCommerce attachment URL in slika_url; no private images, image proxies, user data, or additional authentication are introduced.
+* Added an Android connection and publication-status panel to the existing public cjenici settings page.
+* Shared navy, orange, green brand colors across WordPress dashboard and public cjenik/archive pages.
+* Two standalone PHP contract regression tests and CI checks verify public API, file readiness, no filesystem leakage, and backward-compatible CSV columns.
+* No DB migrations, no changes to saved prices, legal-date rules, shortcode semantics, or existing REST URLs. Not a released tag until publication.
+
 = 1.5.0 – 2026-10-09 =
 * Matched the plugin name and readme heading exactly for WordPress.org Plugin Check.
 * Renamed the Serbian Latin locale to sr_RS_latin, with matching compiled PO/MO catalogs.

@@ -3,8 +3,8 @@
  * Public legal metadata shared by WordPress, Android and SIDRENA Desktop.
  *
  * Source: NN 101/2026 (1212 and 1213), amended by NN 110/2026
- * (1309 and 1310). The proposed October 2026 implementing rulebooks
- * remain consultations, not enforceable replacements at this version.
+ * (1309 and 1310). The proposed base-price and public-price-list rulebooks were still in
+ * e-consultation on 2026-11-02 (until 2026-11-13), not enacted law.
  *
  * @package Brendigo_Sidrena_Cijena
  */
@@ -33,7 +33,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
     public static function public_contract() {
         return array(
             'schema' => 1,
-            'reviewed_on' => '2026-10-29',
+            'reviewed_on' => '2026-11-02',
             'jurisdiction' => 'HR',
             'rules_revision' => self::RULES_REVISION,
             'consumer_law_revision' => self::CONSUMER_LAW_REVISION,
@@ -41,6 +41,15 @@ final class Brendigo_Sidrena_Cijena_Legal {
             'unit_price_rule_effective_from' => self::UNIT_PRICE_RULE_EFFECTIVE_FROM,
             'price_reduction_lookback_days' => self::PRICE_REDUCTION_LOOKBACK_DAYS,
             'discount_baseline_is_anchor_price' => false,
+            // Informational only: the new NN 59/2026 price-display provisions
+            // begin 17 Nov; final base-price method is still in consultation.
+            'base_price_regulation_status' => 'draft_consultation',
+            'base_price_rule_effective_from' => self::EFFECTIVE_DATE,
+            'base_price_is_automatically_derived' => false,
+            'historical_price_verification_required' => true,
+            'legal_compliance_certified' => false,
+            'consumer_30_day_low_is_anchor_price' => false,
+            'consumer_30_day_low_is_base_price' => false,
             'draft_rulebooks_consultation_until' => '2026-11-13',
             'effective_from' => self::EFFECTIVE_DATE,
             'reference_dates' => array(
@@ -75,6 +84,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
                 'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1310.html',
                 'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_06_59_728.html',
                 'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_105_1270.html',
+                'https://mingo.gov.hr/vijesti/ministar-susnjar-kroz-dijalog-s-gospodarstvenicima-do-provedivih-pravila-i-vece-zastite-potrosaca/10461',
             ),
         );
     }

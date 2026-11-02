@@ -1,11 +1,11 @@
 :root {
 	color-scheme: dark;
-	--br-bg: #06101e;
+	--br-bg: #07182d;
 	--br-line: rgba(159, 181, 210, 0.16);
-	--br-text: #f7f9fc;
-	--br-muted: #9aaac0;
-	--br-gold: #f4bd52;
-	--br-green: #39d99b;
+	--br-text: #ffffff;
+	--br-muted: #a9bad1;
+	--br-gold: #ff852c;
+	--br-green: #52d9a3;
 	--br-red: #ff7d8f;
 }
 
@@ -15,7 +15,7 @@ body {
 	margin: 0;
 	background:
 		radial-gradient(circle at 82% 4%, rgba(115, 87, 255, 0.16), transparent 28%),
-		radial-gradient(circle at 12% 92%, rgba(244, 189, 82, 0.08), transparent 30%),
+		radial-gradient(circle at 12% 92%, rgba(255, 133, 44, 0.08), transparent 30%),
 		var(--br-bg);
 	color: var(--br-text);
 	font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -46,7 +46,7 @@ main {
 	width: 330px;
 	height: 330px;
 	border-radius: 50%;
-	background: radial-gradient(circle, rgba(244, 189, 82, 0.16), transparent 66%);
+	background: radial-gradient(circle, rgba(255, 133, 44, 0.16), transparent 66%);
 	pointer-events: none;
 }
 
@@ -101,7 +101,7 @@ h1 {
 }
 
 .cjenik-btn {
-	background: linear-gradient(135deg, #f6cb69, #e2a239);
+	background: linear-gradient(135deg, #ffaa55, #ff852c);
 	color: #111924;
 	box-shadow: 0 10px 24px rgba(226, 162, 57, 0.16);
 }
@@ -130,13 +130,13 @@ h1 {
 	padding: 0 14px;
 	border: 1px solid var(--br-line);
 	border-radius: 11px;
-	background: #071525;
+	background: #19304a;
 	color: var(--br-text);
 	font: inherit;
 	outline: none;
 }
 .cjenik-search input::placeholder { color: #71849d; }
-.cjenik-search input:focus { border-color: rgba(244, 189, 82, 0.7); box-shadow: 0 0 0 3px rgba(244, 189, 82, 0.1); }
+.cjenik-search input:focus { border-color: rgba(255, 133, 44, 0.7); box-shadow: 0 0 0 3px rgba(255, 133, 44, 0.1); }
 
 .cjenik-pager {
 	display: flex;
@@ -146,9 +146,9 @@ h1 {
 	margin: 16px 0 0;
 }
 .cjenik-pager[hidden] { display: none !important; }
-.cjenik-page { min-width: 40px; min-height: 38px; padding: 0 12px; border-color: var(--br-line); background: #0d1b2d; color: #dfe6ef; }
-.cjenik-page:hover { border-color: rgba(244, 189, 82, 0.45); background: #13243a; }
-.cjenik-page.is-current { border-color: rgba(244, 189, 82, 0.55); background: rgba(244, 189, 82, 0.14); color: #ffe29d; }
+.cjenik-page { min-width: 40px; min-height: 38px; padding: 0 12px; border-color: var(--br-line); background: #10263d; color: #dfe6ef; }
+.cjenik-page:hover { border-color: rgba(255, 133, 44, 0.45); background: #13243a; }
+.cjenik-page.is-current { border-color: rgba(255, 133, 44, 0.55); background: rgba(255, 133, 44, 0.14); color: #ffaa55; }
 .cjenik-page-gap { color: var(--br-muted); }
 
 .cjenik-table tr[hidden], .cjenik-upit tr[hidden] { display: none !important; }
@@ -176,7 +176,7 @@ h1 {
 }
 
 .cjenik-table th, .cjenik-upit th {
-	background: #0d1b2d;
+	background: #10263d;
 	color: #aebdd0;
 	font-size: 0.72rem;
 	font-weight: 800;
@@ -232,3 +232,86 @@ a:hover { color: #b7d5ff; }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+
+
+/* SIDRENA mobile catalog: same 07/18/2d background, 10/26/3d cards,
+ * 28/45/5f borders, and ff/85/2c price accent as Android screens 04–05.
+ * data-field is a stable public schema key; visible labels stay translated.
+ */
+.cjenik-table td[data-field="maloprodajna_cijena"] {
+	color: #ff852c;
+	font-weight: 800;
+	font-variant-numeric: tabular-nums;
+}
+.cjenik-table td[data-field="sidrena_cijena"] {
+	color: #a9bad1;
+	font-variant-numeric: tabular-nums;
+}
+@media (max-width: 720px) {
+	.cjenik-table-wrap {
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+		overflow: visible;
+	}
+	.cjenik-table tbody tr {
+		margin: 0 0 8px;
+		padding: 12px 14px;
+		border: 1px solid #28455f;
+		border-radius: 12px;
+		background: #10263d;
+	}
+	.cjenik-table tbody tr[data-kind="usluga"] {
+		border-color: #36526a;
+	}
+	.cjenik-table tr[data-kind="usluga"] td[data-field="naziv"] {
+		color: #fff;
+		font-size: 15px;
+		font-weight: 750;
+	}
+	.cjenik-table tr[data-kind="usluga"] td[data-field="maloprodajna_cijena"] {
+		font-size: 16px;
+		line-height: 1.45;
+	}
+	.cjenik-table td[data-field="sidrena_cijena"] {
+		color: #a9bad1;
+		font-size: 12px;
+	}
+	.cjenik-table tbody tr td::before {
+		color: #a9bad1;
+	}
+}
+
+/* Public price list: prevent long product names, SKUs and URLs from
+ * producing page-level horizontal scrolling on compact phones. */
+.cjenik-table-wrap,
+.sidrena-cjenik,
+.cjenik-toolbar,
+.cjenik-search {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+}
+.cjenik-table td,
+.cjenik-upit td,
+.cjenik-hero,
+.cjenik-empty-filter {
+    overflow-wrap: anywhere;
+}
+@media (max-width: 720px) {
+    .cjenik-table-wrap {
+        width: 100%;
+    }
+    .cjenik-table tbody tr,
+    .cjenik-upit tbody tr {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+    .cjenik-table td,
+    .cjenik-upit td {
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+}
