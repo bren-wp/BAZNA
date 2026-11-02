@@ -316,42 +316,42 @@ private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
                     )
                 }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                Text(
-                    item.name.ifBlank { "Usluga bez naziva" },
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    "Cijena",
-                    color = TextMuted,
-                    fontSize = 12.sp,
-                )
-                Text(
-                    current,
-                    color = if (item.currentPrice.isBlank()) TextMuted else Accent,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (anchor != null) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
                     Text(
-                        anchor,
+                        item.name.ifBlank { "Usluga bez naziva" },
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        lineHeight = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        "Cijena",
                         color = TextMuted,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        current,
+                        color = if (item.currentPrice.isBlank()) TextMuted else Accent,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
+                    if (anchor != null) {
+                        Text(
+                            anchor,
+                            color = TextMuted,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
-            }
             }
         }
     }
