@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="hr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Mirrors SIDRENA wp-admin shell and catalogue classes, using the actual plugin CSS. -->
+  <link rel="stylesheet" href="../../wordpress/brendigo-sidrena-cijena/assets/css/admin.css">
+  <title>SIDRENA responsive WordPress admin test</title>
+</head>
+<body class="sidrena-cijena-screen">
+<div id="wpcontent"><div id="wpbody-content">
+  <div class="wrap sidrena-cijena-settings brendigo-sidrena-admin">
+    <div class="brendigo-admin-shell">
+      <aside class="brendigo-admin-sidebar">
+        <a class="brendigo-admin-brand" href="#"><span>SIDRENA</span> Brendigo</a>
+        <nav class="brendigo-admin-nav">
+          <a class="brendigo-admin-nav__item is-active" href="#">Pregled</a>
+          <a class="brendigo-admin-nav__item" href="#">Proizvodi</a>
+          <a class="brendigo-admin-nav__item" href="#">Poslovnice</a>
+          <a class="brendigo-admin-nav__item" href="#">Javni cjenici</a>
+          <a class="brendigo-admin-nav__item" href="#">Postavke</a>
+          <a class="brendigo-admin-nav__item" href="#">Upute</a>
+        </nav>
+      </aside>
+      <main class="brendigo-admin-main">
+        <header class="brendigo-admin-topbar">
+          <div><p class="brendigo-admin-eyebrow">Upravljanje sidrenim cijenama</p>
+          <h1>Proizvodi i usluge</h1><p>Pregled objavljenih cijena s povijesnim podacima.</p></div>
+          <div class="brendigo-admin-topbar__meta">
+            <span class="brendigo-admin-chip">v1.5.4</span>
+            <span class="brendigo-admin-chip brendigo-admin-chip--success">WooCommerce povezano</span>
+            <a class="button brendigo-admin-docs" href="#">Upute korak po korak</a>
+          </div>
+        </header>
+        <div class="sidrena-cijena-panels">
+          <section class="sidrena-cijena-card brendigo-woo-catalog">
+            <div class="sidrena-cijena-card__head">
+              <div><h2>WooCommerce proizvodi</h2><p>Javni cjenik, sidrena i aktualna cijena.</p></div>
+            </div>
+            <div class="brendigo-woo-catalog-tools">
+              <label><span>Pretraži na ovoj stranici</span>
+                <input type="search" placeholder="Naziv ili SKU" /></label>
+              <label><span>Prikaz</span><select><option>Svi proizvodi</option></select></label>
+              <p class="brendigo-woo-catalog-tools__note">Povijesnu cijenu unesite samo uz provjeru.</p>
+            </div>
+            <div class="sidrena-cijena-catalog-wrap brendigo-woo-catalog-wrap">
+              <table class="sidrena-cijena-catalog" id="sidrena-cijena-catalog">
+                <thead><tr>
+                  <th>Naziv</th><th>Vrsta</th><th>SKU</th><th>Marka</th>
+                  <th>Redovna</th><th>Akcijska</th><th>Sidrena</th>
+                  <th>Datum</th><th>Barkod</th><th>Jedinica</th>
+                  <th>Cijena po jedinici</th><th>Dostupnost</th>
+                  <th>Poslovnica</th><th>URL</th><th>Radnje</th>
+                </tr></thead>
+                <tbody><tr>
+                  <td><input class="js-naziv" value="Maslinovo ulje 1 L"></td>
+                  <td>proizvod</td><td>MU-001</td><td>Brendigo</td>
+                  <td>5,99 €</td><td>4,99 €</td><td>8,49 €</td>
+                  <td>10.09.2026.</td><td>3851234567891</td><td>1 L</td>
+                  <td>5,99 €</td><td>Dostupno</td><td>Rijeka</td>
+                  <td>https://primjer.hr/proizvod/ulje</td><td><button>Uredi</button></td>
+                </tr></tbody>
+              </table>
+            </div>
+            <div class="brendigo-woo-catalog-footer">
+              <button class="button button-primary">Spremi sidrene cijene</button>
+            </div>
+          </section>
+          <section class="sidrena-cijena-card">
+            <h2>SIDRENA Android povezivanje</h2>
+            <div class="sidrena-android-bridge__outlets">
+              <h4>Poslovnice</h4>
+              <ul class="sidrena-android-bridge__outlet-list">
+                <li><strong>Rijeka</strong><span>Proizvodi: objavljeno</span><span>Usluge: nije objavljeno</span></li>
+                <li><strong>Dugi naziv druge poslovnice za testiranje lomljenja teksta</strong>
+                  <span>Proizvodi: nije objavljeno</span><span>Usluge: objavljeno</span></li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+</div></div>
+</body>
+</html>
