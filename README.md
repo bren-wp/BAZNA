@@ -22,6 +22,14 @@ Povežite WordPress stranicu, pregledajte proizvode i usluge, filtrirajte sidren
 
 ![SIDRENA vizualni identitet](desktop/branding/sidrena-banner.svg)
 
+### Android ↔ WordPress povezivanje (SIDRENA 1.5.9)
+
+Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android aplikaciju upišite adresu WordPress instalacije (npr. `https://primjer.hr/` ili `https://primjer.hr/trgovina/`). Za prikaz javnih cjenika nije potrebna WordPress prijava. Android podržava WordPress REST i u načinu lijepih poveznica (`/wp-json/`) i u načinu običnih poveznica (`?rest_route=`); prihvaća samo javne HTTPS adrese iste domene.
+
+**Napomena:** podaci se prikazuju tek nakon što WordPress objavi javni CSV; prva aktivacija može zahtijevati dovršetak WP-Cron objave. Provjerite SIDRENA administracijski status objave i posjetite javni REST endpoint bez prijave. Podaci o sidrenoj cijeni nisu automatski procijenjeni i ovo nije potvrda zakonske sukladnosti cijena.
+
+[Upute za instalaciju, povezivanje, sigurnosne provjere i pravni audit](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md)
+
 ### Android i WordPress — zajednički javni katalog
 
 Android 1.5.9 i WordPress 1.5.9 uključuju korekcije mobilnog sučelja i pripremu novog izdanja. U WordPressu otvorite **SIDRENA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **SIDRENA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
