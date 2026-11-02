@@ -25,6 +25,15 @@ sidrena_expect( '' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'unknown' 
 sidrena_expect( '2025-05-02' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'legacy_fmcg' ), 'Verified legacy date' );
 sidrena_expect( '2026-09-10' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'general_goods_services' ), 'Verified new date' );
 sidrena_expect( 'NN-59-2026' === $contract['consumer_law_revision'], 'Consumer law revision' );
+sidrena_expect( '2026-11-02' === $contract['reviewed_on'], 'Checked against law on 2 Nov 2026' );
+sidrena_expect( 'draft_consultation' === $contract['base_price_regulation_status'], 'Draft base-price regulation is not enacted' );
+sidrena_expect( '2026-11-17' === $contract['base_price_rule_effective_from'], 'New legal date is not earlier than 17 Nov' );
+sidrena_expect( false === $contract['base_price_is_automatically_derived'], 'Base price is not reconstructed from anchor or current price' );
+sidrena_expect( false === $contract['consumer_30_day_low_is_anchor_price'], '30-day sale baseline is separate from anchor' );
+sidrena_expect( false === $contract['consumer_30_day_low_is_base_price'], '30-day sale baseline is separate from base price' );
+sidrena_expect( true === $contract['historical_price_verification_required'], 'Historical price requires actual evidence' );
+sidrena_expect( false === $contract['legal_compliance_certified'], 'Public profile must not certify site compliance' );
+
 sidrena_expect( 'NN-105-2026' === $contract['unit_price_rule_revision'], 'Unit price regulation' );
 sidrena_expect( in_array( 'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_105_1270.html', $contract['source_urls'], true ), 'Published unit-price rule source' );
 sidrena_expect( ! empty( $contract['source_urls'] ), 'Legal sources' );
