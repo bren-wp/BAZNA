@@ -46,7 +46,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -305,7 +307,13 @@ private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
                             width = if (compact) 52.dp else 76.dp,
                             height = if (compact) 62.dp else 82.dp,
                         )
-                        .background(SurfaceRaised, RoundedCornerShape(12.dp)),
+                        .shadow(4.dp, RoundedCornerShape(12.dp))
+                        .background(
+                            Brush.linearGradient(
+                                listOf(Color(0xFF214364), Color(0xFF142B46)),
+                            ),
+                            RoundedCornerShape(12.dp),
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
