@@ -23,6 +23,9 @@ function esc_url( $value ) {
 function esc_html__( $message, $text_domain ) {
 	return $message;
 }
+function __( $message, $text_domain ) {
+	return $message;
+}
 function esc_attr__( $message, $text_domain ) {
 	return $message;
 }
