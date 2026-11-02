@@ -803,7 +803,6 @@ class Brendigo_Sidrena_Cijena_Admin {
 						'unsavedChanges' => __( 'Imate nespremljene promjene.', 'brendigo-sidrena-cijena' ),
 						'unsavedLabel'   => __( 'Nespremljene promjene', 'brendigo-sidrena-cijena' ),
 						'saving'         => __( 'Spremanje…', 'brendigo-sidrena-cijena' ),
-						'fillCurrentConfirm' => __( 'Popuniti prazna polja sidrene cijene važećom cijenom prikazanih proizvoda? Koristite samo ako je ta cijena vrijedila na referentni datum koji unosite.', 'brendigo-sidrena-cijena' ),
 						'wooNoChanges'      => __( 'Nema nespremljenih promjena.', 'brendigo-sidrena-cijena' ),
 						'wooLeaveWarning'   => __( 'Imate nespremljene promjene sidrenih cijena. Ako napustite stranicu, promjene će se izgubiti.', 'brendigo-sidrena-cijena' ),
 						'wooResetConfirm'   => __( 'Poništiti sve nespremljene promjene na ovoj stranici?', 'brendigo-sidrena-cijena' ),
