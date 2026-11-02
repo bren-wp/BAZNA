@@ -134,6 +134,10 @@ try {
                     wrapperClientWidth: wrap ? wrap.clientWidth : 0,
                     toolDisplay: type === "admin" ?
                         getComputedStyle(document.querySelector(".brendigo-woo-catalog-tools")).display : null,
+                    cardHeadFlexWrap: type === "admin" ?
+                        getComputedStyle(document.querySelector(".sidrena-cijena-card__head")).flexWrap : null,
+                    cardTitleOverflowWrap: type === "admin" ?
+                        getComputedStyle(document.querySelector(".sidrena-cijena-card__head h2")).overflowWrap : null,
                     primaryButtonColor: type === "admin" ?
                         getComputedStyle(document.querySelector(".brendigo-woo-catalog-footer .button-primary")).color : null,
                     navDisplay: type === "admin" ?
@@ -184,6 +188,9 @@ try {
                 if (width <= 782) {
                     if (result.toolDisplay !== "grid") {
                         errors.push("admin form does not stack on small screens");
+                    }
+                    if (result.cardHeadFlexWrap !== "wrap" || result.cardTitleOverflowWrap !== "anywhere") {
+                        errors.push("admin catalog heading must wrap safely on small screens");
                     }
                     if (result.navItemMinHeight < 44 || result.saveButtonMinHeight < 44) {
                         errors.push("mobile nav/save tap targets must be at least 44px high");
