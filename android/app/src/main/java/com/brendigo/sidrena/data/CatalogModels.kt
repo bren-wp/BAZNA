@@ -33,6 +33,10 @@ data class PriceItem(
     val availability: String,
     val unit: String,
     val imageUrl: String = "",
+    val unitPrice: String = "",
+    val saleLabel: String = "",
+    val barcode: String = "",
+    val brand: String = "",
 )
 
 data class ArchiveEntry(
