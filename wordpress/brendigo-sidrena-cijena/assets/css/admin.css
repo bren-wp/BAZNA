@@ -4228,3 +4228,35 @@ body.sidrena-cijena-screen #wpbody-content {
         white-space: nowrap;
     }
 }
+
+
+/* SIDRENA 1.5.8: prevent long names and action buttons from overlapping
+ * the edit-card heading on phone/tablet admin screens. Preserve desktop
+ * information hierarchy, WordPress menu and catalog table data. */
+@media (max-width: 782px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card__head {
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+        max-width: 100%;
+        min-width: 0;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card__head > * {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card__head h2 {
+        overflow-wrap: anywhere;
+        white-space: normal;
+        margin-block: 0 6px;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card__head .button {
+        min-height: 44px;
+        white-space: normal;
+        text-align: center;
+    }
+}
