@@ -4,13 +4,18 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.7
+Stable tag: 1.5.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Manage reference prices and dates, publish a public HTML pricelist, and generate XML/CSV archives for WooCommerce or standalone catalogs.
 
 == Changelog ==
+
+= 1.5.8 =
+* Improve responsive editor headings and action buttons on mobile and tablet WordPress admin screens.
+* Extend Chrome UI regression checks for wrapped catalog headings without modifying existing product or price data.
+* Keep public REST v1, archive, CSV/XML and legal reference prices compatible with prior versions.
 
 = 1.5.7 =
 * Improve mobile and tablet editing ergonomics in the wide catalog without changing catalog data or columns.

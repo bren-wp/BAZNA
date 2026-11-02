@@ -107,6 +107,16 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 **QA:** `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, audit izvornog koda; JUnit testovi za opise cijena, datume, nedostupne podatke i vraćanje odabira. Nakon builda slijedi ručni prikaz na emulatoru 393×852 i 360×640 dp, 100% i 150% povećanje fonta te screenshot overlay prema originalnoj slici. Sama kompilacija ne potvrđuje pixel-perfect 1:1 rezultat.
 
 
+
+### UI prolaz 1.5.8 — detalji proizvoda i usluga
+
+- Redoslijed: zaglavlje (57 dp), hero prikaz (213 dp) s navy gradijentom i kutovima 17 dp, naslov stavke, trenutačna i sidrena cijena, objavljeni referentni datum, dodatni podaci i pouzdan javni HTTPS izvor.
+- Navigacijska tipka i izbornik javnog cjenika imaju dodirnu površinu od 48 dp. Naziv stavke je 23 sp, trenutačna cijena 29 sp, referentna 18 sp kada postoji.
+- Hero prikazuje stvarnu fotografiju isključivo ako je URL sigurno objavljen na istoj HTTPS domeni. U ostalim slučajevima koristi lokalni vektorski piktogram, bez izmišljene slike.
+- Status "Nedostupno" ne može dobiti zeleno značenje: zeleno se koristi samo za eksplicitne pozitivne statuse "Dostupno", "Na zalihi", "in stock"/"instock".
+- Dugački atributi prelamaju se ili skraćuju na najviše tri retka bez ispadanja iz kartice; iznosi i datumi dolaze isključivo iz javnog WordPress CSV-a.
+- Usporedba pixel-by-pixel 1:1 s originalom zahtijeva pravi screenshot emulatora na istoj rezoluciji; uspješan CI nije sam po sebi vizualna certifikacija.
+
 ## Zaslon 07 — Cjenici (PR #202)
 
 **Vizualna referenca:** sedmi telefon korisnikove SIDRENA ploče. Posebno zaglavlje s povratkom i izbornikom, tražilica, filtri `Svi / Proizvodi / Usluge / Ostalo`, kompaktni redovi dokumenata s formatom i radnjom otvaranja. Zadržane su tamnoplava i narančasta paleta, bijeli naslovi i suptilni obrubi.
