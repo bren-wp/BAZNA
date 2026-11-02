@@ -188,3 +188,33 @@ p.price .sidrena-cijena .woocommerce-Price-amount.amount,
 .sidrena-price-chart__line{fill:none;stroke:#218b8d;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
 .sidrena-price-chart__note{font-size:.875em;opacity:.85}
 .sidrena-price-chart table{width:100%;border-collapse:collapse}.sidrena-price-chart th,.sidrena-price-chart td{padding:.35em;border-bottom:1px solid #9996;text-align:left}
+
+/* On a small storefront viewport a floating help bubble can exceed the right
+ * edge of a WooCommerce card. Open it in normal flow for touch and keyboard
+ * users instead; it remains hidden unless the price label is activated. */
+@media (max-width: 600px) {
+    .sidrena-cijena--has-tooltip {
+        width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .sidrena-cijena--has-tooltip .sidrena-cijena__tooltip {
+        position: static;
+        display: none;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 10px;
+        transform: none;
+        overflow-wrap: anywhere;
+    }
+
+    .sidrena-cijena--has-tooltip .sidrena-cijena__tooltip::after {
+        display: none;
+    }
+
+    .sidrena-cijena--has-tooltip:is(:hover, :focus, :focus-within) .sidrena-cijena__tooltip {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+    }
+}
