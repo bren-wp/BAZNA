@@ -836,12 +836,6 @@
 
 		$form.on("input change", ".brendigo-woo-row :input", updateChangeStatus);
 
-		function visibleRows() {
-			return $rows.filter(function () {
-				return !$(this).is("[hidden]");
-			});
-		}
-
 		function applyFilters() {
 			var query = $.trim($("#sidrena-wc-filter").val() || "").toLowerCase();
 			var priceFilter = String($("#sidrena-wc-price-filter").val() || "all");
