@@ -4158,3 +4158,51 @@ body.sidrena-cijena-screen #wpbody-content {
         padding: 12px;
     }
 }
+
+
+/* Pixel QA — responsive admin navigation and ergonomic controls.
+ * An earlier 782px rule switches the nav to horizontal flex scrolling, so the
+ * 480px grid-template-columns declaration never took effect. On very narrow
+ * phones restore the intended two-column navigation without clipped labels.
+ * Scope all rules to the SIDRENA admin shell, not global WordPress controls. */
+@media (max-width: 782px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-nav__item,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-footer .button,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools input,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools select {
+        box-sizing: border-box;
+        min-height: 44px;
+    }
+}
+@media (max-width: 480px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        overflow-x: visible;
+        scroll-snap-type: none;
+        padding: 0;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-nav__item {
+        min-width: 0;
+        width: auto;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        padding: 8px 10px;
+        scroll-snap-align: none;
+    }
+}
+
+
+/* Android/WordPress brand parity: orange primary CTA needs navy lettering.
+ * White on the #FF852C gradient lacks readable text contrast. The following
+ * overrides remain inside the official SIDRENA admin, never global wp-admin. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin button.button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input[type="submit"].button-primary,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary:hover,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary:focus-visible,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .button-primary:active {
+    color: #07182d !important;
+    text-shadow: none !important;
+}

@@ -13,6 +13,7 @@ Dizajn je implementiran u nativnom Kotlin/Jetpack Composeu. Raspored je responzi
 - `ui/Components.kt`: aktivna stavka navigacije bez dodatne Material pill pozadine i puneće ikone.
 - `ui/HomeScreens.kt`: dva posebna UI statusa (konekcija, ponovna sinkronizacija); padajući izbornik za osvježavanje i promjenu WordPress stranice.
 - `HomePresentationTest.kt`: datumi ISO i HR, sortiranje arhive, uklanjanje duplikata, naziv vrste cjenika.
+- UI prolaz nakon 0.3.5: zeleno stanje povezivanja pojavljuje se samo kada nema neobjavljenih promjena; menu hit target 48 dp; interaktivne kartice i arhivski retci izričito su označeni kao tipke za TalkBack.
 
 ## Očekivana mjerenja u dp
 

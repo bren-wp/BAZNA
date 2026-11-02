@@ -14,6 +14,7 @@ Glavna referenca je **drugi telefon** na korisnički potvrđenom SIDRENA brandin
 - Stvarni status učitavanja, poruke greške i povratak iz prethodno povezanog stanja.
 - Svjesno nisu uključene referentne oznake `DEMO` / `KONCEPT`, testni podaci ili simulirane mrežne operacije.
 - Prilagodba za kompaktne uređaje i pomični sadržaj kada se prikaže tipkovnica; sadržaj se ne preklapa s navigacijskim trakama.
+- UI prolaz nakon 0.3.5: ponovno dodan kružni simbol veze od 118 / 104 dp, s lokalnim vektorskim znakom i blagom sjenom (bez preuzimanja slika); URL polje min. 64 dp, kutovi 14 dp, primarna akcija 56 dp i rubne margine 24 dp. Zadana visina sadržaja ne skriva opciju povezivanja na malim telefonima jer sadržaj ostaje pomičan.
 
 ## Dizajnerske vrijednosti
 

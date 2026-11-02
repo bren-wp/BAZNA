@@ -51,7 +51,9 @@ Referentni četvrti telefon: zaglavlje s povratkom i izbornikom, polje pretrage,
 
 **API ograničenja:** Javne WordPress rute ne pružaju slike proizvoda, kategorije, oznake `Novo` niti promocije. Zato prikaz koristi neutralan lokalni piktogram, a filteri su **Svi**, **Sidrena** i **Bez sidrene**; gumb **Usluge** otvara postojeći zaslon usluga. Ne smije se označiti sidrena cijena kao popust ili stvoriti lažni podatak.
 
-**QA:** Android CI (assembleDebug, bundleRelease, testDebugUnitTest, lintDebug, sigurnosni audit), test otvaranja detalja, povratka, učitavanja, tipkovnice i rubnih podataka (prazna lista, dugačka imena, bez cijene). Vizualna tvrdnja pixel-perfect 1:1 zahtijeva screenshot s emulatora i overlay usporedbu na istoj rezoluciji kao referenca, uz zasebnu provjeru pristupačnosti.
+**QA:** Android CI (assembleDebug, bundleRelease, testDebugUnitTest, lintDebug, sigurnosni audit), test otvaranja detalja, povratka, učitavanja, tipkovnice i rubnih podataka (prazna lista, dugačka imena, bez cijene).
+
+**UI revizija 0.3.6:** Redak proizvoda ostaje horizontalan na uobičajenim telefonima; stupac s trenutačnom i sidrenom cijenom sudjeluje u `Row.weight` raspodjeli umjesto da svojom neograničenom širinom gura naziv ili ikonu izvan kartice. Oba prikaza cijene imaju kontrolirani `TextOverflow.Ellipsis`, a otvaranje detalja ima semantiku gumba za TalkBack. Iznosi i URL-ovi ostaju neizmijenjeni. Vizualna tvrdnja pixel-perfect 1:1 zahtijeva screenshot s emulatora i overlay usporedbu na istoj rezoluciji kao referenca, uz zasebnu provjeru pristupačnosti.
 
 
 ## Zaslon 05 — Usluge (PR #201)
