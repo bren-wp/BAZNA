@@ -86,6 +86,17 @@ object CatalogDiscovery {
         val archiveApi = json.optString("type_archive")
         if (archiveApi.isNotBlank()) site.approved(archiveApi)
 
+        val publication = json.optJSONObject("publication")
+        val pending = when (val flag = publication?.opt("pending_changes")) {
+            null, JSONObject.NULL -> null
+            is Boolean -> flag
+            else -> throw IllegalArgumentException("Nevaljan status neobjavljenih promjena.")
+        }
+        val certified = publication?.opt("compliance_certified")
+        require(certified == null || certified == JSONObject.NULL ||
+            (certified is Boolean && !certified)
+        ) { "Status pravne usklađenosti nije pouzdan." }
+
         return CatalogIndex(
             publishedAt = json.optString("published_at").ifBlank { null },
             publicPage = publicPage("cjenik"),
@@ -97,6 +108,7 @@ object CatalogDiscovery {
             legal = legal,
             productsCsvReady = ready(sources, "proizvodi"),
             servicesCsvReady = ready(sources, "usluge"),
+            pendingPublication = pending,
         )
     }
 }
