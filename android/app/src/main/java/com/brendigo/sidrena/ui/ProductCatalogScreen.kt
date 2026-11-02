@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -318,6 +319,9 @@ internal fun CatalogFilterChip(label: String, selected: Boolean, onClick: () -> 
 private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Unit) {
     val currentPrice = formatPrice(item.currentPrice)
     val referencePrice = formatPrice(item.referencePrice)
+    val unitText = item.unit.ifBlank {
+        item.sku.takeIf { it.isNotBlank() }?.let { "SKU: " + it }.orEmpty()
+    }
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
             .semantics {
@@ -328,62 +332,116 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
         border = BorderStroke(1.dp, Border.copy(alpha = 0.6f)),
         colors = CardDefaults.cardColors(containerColor = Surface),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp)
-                .padding(horizontal = 10.dp, vertical = 9.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            // Only a real, approved WordPress product photo may be rendered.
-            ProductThumbnail(
-                site = site,
-                imageUrl = item.imageUrl,
-                modifier = Modifier.size(width = 64.dp, height = 72.dp),
-            )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Text(
-                    item.name.ifBlank { "Bez naziva" },
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                val unitText = item.unit.ifBlank {
-                    item.sku.takeIf { it.isNotBlank() }?.let { "SKU: " + it }.orEmpty()
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            // Below 360dp device width, reserving a fixed photo and two-price
+            // column would leave virtually no width for the product title.
+            // Keep the reference's horizontal card unchanged for normal phones.
+            if (maxWidth < 310.dp) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        ProductThumbnail(
+                            site = site,
+                            imageUrl = item.imageUrl,
+                            modifier = Modifier.size(width = 50.dp, height = 56.dp),
+                        )
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                item.name.ifBlank { "Bez naziva" },
+                                color = Color.White, fontSize = 15.sp,
+                                lineHeight = 18.sp, fontWeight = FontWeight.Bold,
+                                maxLines = 2, overflow = TextOverflow.Ellipsis,
+                            )
+                            if (unitText.isNotBlank()) {
+                                Text(
+                                    unitText, color = TextMuted, fontSize = 12.sp,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            currentPrice,
+                            color = if (item.currentPrice.isBlank()) TextMuted else Accent,
+                            fontSize = 16.sp, fontWeight = FontWeight.ExtraBold,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            if (item.referencePrice.isBlank()) "Bez sidrene"
+                            else "Ref: " + referencePrice,
+                            color = TextMuted, fontSize = 11.sp,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
-                if (unitText.isNotBlank()) {
-                    Text(
-                        unitText,
-                        color = Color(0xFFE1EAF3),
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp)
+                        .padding(horizontal = 10.dp, vertical = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    ProductThumbnail(
+                        site = site,
+                        imageUrl = item.imageUrl,
+                        modifier = Modifier.size(width = 64.dp, height = 72.dp),
                     )
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            item.name.ifBlank { "Bez naziva" },
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            lineHeight = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        if (unitText.isNotBlank()) {
+                            Text(
+                                unitText,
+                                color = Color(0xFFE1EAF3),
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            currentPrice,
+                            color = if (item.currentPrice.isBlank()) TextMuted else Accent,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            maxLines = 1,
+                        )
+                        Text(
+                            if (item.referencePrice.isBlank()) "Bez sidrene cijene"
+                            else "Ref. cijena: " + referencePrice,
+                            color = TextMuted,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                        )
+                    }
                 }
-            }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    currentPrice,
-                    color = if (item.currentPrice.isBlank()) TextMuted else Accent,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                )
-                Text(
-                    if (item.referencePrice.isBlank()) "Bez sidrene cijene"
-                    else "Ref. cijena: " + referencePrice,
-                    color = TextMuted,
-                    fontSize = 11.sp,
-                    maxLines = 1,
-                )
             }
         }
     }
