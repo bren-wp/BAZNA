@@ -60,10 +60,43 @@ class ItemDetailPresentationTest {
     @Test fun savesAndRestoresSelectedItemAcrossRotation() {
         val original = item(referenceDate = "10. 9. 2026.")
         val fields = saveDetailItem(original)
-        assertEquals(9, fields.size)
+        assertEquals(14, fields.size)
         assertEquals(original, restoreDetailItem(fields))
         assertNull(restoreDetailItem(emptyList()))
         assertNull(restoreDetailItem(listOf("broken")))
+    }
+
+    @Test fun legacySavedDetailsRemainRestorableWithoutNewApiFields() {
+        val older = saveDetailItem(item()).take(9)
+        val oldItem = restoreDetailItem(older)
+        assertEquals("", oldItem?.unitPrice)
+        assertEquals("", oldItem?.saleLabel)
+        assertEquals("", oldItem?.imageUrl)
+    }
+
+    @Test fun legalUnitPriceAndSaleLabelAreDisplayedOnlyWhenPublished() {
+        val priced = item().copy(
+            unitPrice = "3,99",
+            saleLabel = "akcija",
+            brand = "Brendigo",
+            barcode = "3851234567891",
+            imageUrl = "https://primjer.hr/img.webp",
+        )
+        val display = detailPresentation(priced)
+        assertTrue(display.unitPrice?.startsWith("3,99") == true)
+        assertEquals("akcija", display.saleLabel)
+        assertEquals("Brendigo", display.brand)
+        assertEquals("3851234567891", display.barcode)
+        assertEquals(priced, restoreDetailItem(saveDetailItem(priced)))
+        val empty = detailPresentation(priced.copy(unitPrice = "", saleLabel = ""))
+        assertNull(empty.unitPrice)
+        assertNull(empty.saleLabel)
+    }
+
+    @Test fun missingReferenceDateIsUnknownNotAutomaticallyAssigned() {
+        val state = detailPresentation(item(reference = "4,50", referenceDate = ""))
+        assertTrue(state.referencePrice?.contains("4,50") == true)
+        assertNull(state.referenceDate)
     }
 
     @Test fun absentUnpublishedDetailsAreNotInvented() {
