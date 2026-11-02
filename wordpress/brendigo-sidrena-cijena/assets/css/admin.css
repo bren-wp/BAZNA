@@ -4065,3 +4065,34 @@ body.sidrena-cijena-screen #wpbody-content {
 	font-size: 12px;
 	white-space: nowrap;
 }
+
+/* SIDRENA Android connection panel: narrow phones and large browser zoom.
+ * Preserve real values; only wrap content, never hide CSV/outlet statuses. */
+@media (max-width: 600px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__url,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__outlets {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__status,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__outlet-list span {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__url code,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__outlet-list strong {
+        min-width: 0;
+        flex-basis: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__url .button {
+        width: 100%;
+        min-height: 44px;
+        white-space: normal;
+    }
+}
