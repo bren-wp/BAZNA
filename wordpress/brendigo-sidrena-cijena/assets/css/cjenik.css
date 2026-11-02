@@ -314,4 +314,11 @@ a:hover { color: #b7d5ff; }
         overflow-wrap: anywhere;
         word-break: normal;
     }
+    /* Override the more specific desktop nowrap rules for price/URL cells.
+     * Long SKUs and public URLs must wrap inside the mobile card, not push
+     * the complete document beyond the device viewport. */
+    .cjenik-table td:nth-child(n + 3),
+    .cjenik-upit td:last-child {
+        white-space: normal;
+    }
 }
