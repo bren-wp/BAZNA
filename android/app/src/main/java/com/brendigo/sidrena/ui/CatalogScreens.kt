@@ -60,8 +60,8 @@ fun formatPrice(raw: String): String {
 /**
  * 06/12: item details based on the sixth SIDRENA branded screen.
  *
- * WordPress public CSV contains no image URL, description, category or
- * reference validity date range. Those values must never be invented.
+ * The public WordPress CSV can contain an optional product image, actual unit
+ * price, special sale label and historical reference date. Missing values stay unknown.
  */
 @Composable
 fun DetailPage(
@@ -110,7 +110,7 @@ fun DetailPage(
             }
         } else {
             item {
-                DetailHero(isService = view.isService)
+                DetailHero(isService = view.isService, site = data.site, imageUrl = item?.imageUrl.orEmpty())
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -153,6 +153,8 @@ fun DetailPage(
                         view.sku?.let { DetailAttribute("Šifra", it) }
                         view.availability?.let { DetailAttribute("Dostupnost", it) }
                         view.unit?.let { DetailAttribute("Jedinica mjere", it) }
+                        view.brand?.let { DetailAttribute("Marka", it) }
+                        view.barcode?.let { DetailAttribute("Barkod", it) }
                         if (view.sku == null && view.availability == null && view.unit == null) {
                             Text(
                                 "Dodatni podaci nisu objavljeni.",
@@ -239,7 +241,15 @@ private fun DetailToolbar(
  * PriceItem: the public JSON/CSV contract has no image field.
  */
 @Composable
-private fun DetailHero(isService: Boolean) {
+private fun DetailHero(isService: Boolean, site: String, imageUrl: String) {
+    if (!isService && approvedProductImageUrl(site, imageUrl) != null) {
+        ProductThumbnail(
+            site = site,
+            imageUrl = imageUrl,
+            modifier = Modifier.fillMaxWidth().height(213.dp),
+        )
+        return
+    }
     Box(
         modifier = Modifier.fillMaxWidth()
             .height(213.dp)
@@ -334,6 +344,14 @@ private fun DetailPricePanel(view: DetailPresentation) {
                     )
                 }
             }
+            view.saleLabel?.let { sale ->
+                Text("Poseban oblik prodaje: " + sale,
+                    color = SoftBlue, fontSize = 12.sp)
+            }
+            view.unitPrice?.let { unitPrice ->
+                Text("Cijena za jedinicu mjere: " + unitPrice,
+                    color = TextMuted, fontSize = 12.sp)
+            }
             if (view.referencePrice != null) {
                 Spacer(Modifier.height(3.dp))
                 Separator()
@@ -345,12 +363,20 @@ private fun DetailPricePanel(view: DetailPresentation) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
-                view.referenceDate?.let { date ->
+                if (view.referenceDate != null) {
                     Text(
-                        text = "Datum sidrene cijene: " + date,
+                        text = "Datum sidrene cijene: " + view.referenceDate,
                         color = TextMuted,
                         fontSize = 13.sp,
                         lineHeight = 18.sp,
+                    )
+                } else {
+                    Text(
+                        text = "Referentni datum nije objavljen. " +
+                            "Povijesnu cijenu i datum mora potvrditi trgovac.",
+                        color = Color(0xFFFFC997),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp,
                     )
                 }
             } else {
@@ -397,6 +423,10 @@ internal data class DetailPresentation(
     val referenceDate: String?,
     val sku: String?,
     val availability: String?,
+    val unitPrice: String?,
+    val saleLabel: String?,
+    val barcode: String?,
+    val brand: String?,
 )
 
 /** A pure mapping suitable for JVM tests without the Android runtime. */
@@ -414,6 +444,10 @@ internal fun detailPresentation(item: PriceItem): DetailPresentation {
         referenceDate = item.referenceDate.takeIf { hasReference && it.isNotBlank() },
         sku = item.sku.takeIf { it.isNotBlank() },
         availability = item.availability.takeIf { it.isNotBlank() },
+        unitPrice = item.unitPrice.takeIf { it.isNotBlank() }?.let(::formatPrice),
+        saleLabel = item.saleLabel.takeIf { it.isNotBlank() },
+        barcode = item.barcode.takeIf { it.isNotBlank() },
+        brand = item.brand.takeIf { it.isNotBlank() },
     )
 }
 
@@ -428,11 +462,16 @@ internal fun saveDetailItem(item: PriceItem): ArrayList<String> = arrayListOf(
     item.sku,
     item.availability,
     item.unit,
+    item.imageUrl,
+    item.unitPrice,
+    item.saleLabel,
+    item.barcode,
+    item.brand,
 )
 
 /** Restores a selected detail after activity recreation; no network changes. */
 internal fun restoreDetailItem(fields: List<String>): PriceItem? {
-    if (fields.size != 9) return null
+    if (fields.size != 9 && fields.size != 10 && fields.size != 14) return null
     return PriceItem(
         id = fields[0],
         name = fields[1],
@@ -443,6 +482,11 @@ internal fun restoreDetailItem(fields: List<String>): PriceItem? {
         sku = fields[6],
         availability = fields[7],
         unit = fields[8],
+        imageUrl = fields.getOrElse(9) { "" },
+        unitPrice = fields.getOrElse(10) { "" },
+        saleLabel = fields.getOrElse(11) { "" },
+        barcode = fields.getOrElse(12) { "" },
+        brand = fields.getOrElse(13) { "" },
     )
 }
 
