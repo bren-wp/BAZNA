@@ -3958,3 +3958,65 @@ body.sidrena-cijena-screen #wpbody-content > .notice .notice-dismiss:focus::befo
 		width: 100%;
 	}
 }
+
+/* Screen 04 shared catalog presentation: WordPress editor mirrors the navy
+ * surfaces, 12–16 px corner radii and orange actions of the Android product
+ * catalog without changing WooCommerce storefront or global admin controls. */
+body.sidrena-cijena-screen,
+body.sidrena-cijena-screen #wpcontent,
+body.sidrena-cijena-screen #wpbody-content {
+	background: #07182d;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog-wrap,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-mapfield,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-setting-row {
+	border-color: #28455f;
+	border-radius: 14px;
+	background-color: #10263d;
+	color: #fff;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog {
+	background: #10263d;
+	color: #fff;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog thead th {
+	border-bottom-color: #28455f;
+	background: #19304a;
+	color: #a9bad1;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog tbody td {
+	border-bottom-color: #28455f;
+	background: transparent;
+	color: #fff;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog tbody tr:hover td {
+	background: rgba(255, 133, 44, .05);
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input[type="search"],
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input[type="text"],
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input[type="url"],
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin select,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin textarea {
+	border-color: #28455f !important;
+	border-radius: 11px !important;
+	background: #19304a !important;
+	color: #fff !important;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input:focus-visible,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin select:focus-visible,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin button:focus-visible,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin a:focus-visible {
+	outline: 2px solid #ff852c;
+	outline-offset: 2px;
+}
+@media (max-width: 782px) {
+	.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog-wrap {
+		overflow-x: auto;
+		max-width: 100%;
+	}
+	.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card {
+		border-radius: 12px;
+		padding: 14px;
+	}
+}
