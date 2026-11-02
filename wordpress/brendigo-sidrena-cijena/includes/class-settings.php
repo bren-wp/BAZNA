@@ -275,7 +275,9 @@ class Brendigo_Sidrena_Cijena_Settings {
 	 * @return bool
 	 */
 	public function is_auto_fill_enabled() {
-		return 'yes' === $this->get( 'auto_fill' );
+		// A saved legacy preference cannot establish a verified historical price.
+		// This safeguard also applies to sites upgrading from older plugin versions.
+		return false;
 	}
 
 	/**
