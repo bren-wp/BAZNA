@@ -58,6 +58,14 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		$out = array(
 			'api_version'  => 1,
 			'plugin_version' => BRENDIGO_SIDRENA_CIJENA_VERSION,
+			// Public-only Android integration. No credentials, session data, or
+			// unpublished WooCommerce metadata are available through this route.
+			'connection' => array(
+				'mode' => 'public_read_only',
+				'authentication_required' => false,
+				'csv_publication_required' => true,
+				'rest_endpoint' => esc_url_raw( rest_url( 'brendigo-sidrena/v1/cjenici' ) ),
+			),
 			'legal' => Brendigo_Sidrena_Cijena_Legal::public_contract(),
 			'published_at' => isset( $meta['generated'] ) ? gmdate( 'c', (int) $meta['generated'] ) : null,
 			'cjenik'       => esc_url_raw( $export->get_cjenik_url() ),

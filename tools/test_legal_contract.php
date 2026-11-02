@@ -25,7 +25,7 @@ sidrena_expect( '' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'unknown' 
 sidrena_expect( '2025-05-02' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'legacy_fmcg' ), 'Verified legacy date' );
 sidrena_expect( '2026-09-10' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'general_goods_services' ), 'Verified new date' );
 sidrena_expect( 'NN-59-2026' === $contract['consumer_law_revision'], 'Consumer law revision' );
-sidrena_expect( '2026-11-02' === $contract['reviewed_on'], 'Checked against law on 2 Nov 2026' );
+sidrena_expect( '2026-11-03' === $contract['reviewed_on'], 'Checked against law on 3 Nov 2026' );
 sidrena_expect( 'draft_consultation' === $contract['base_price_regulation_status'], 'Draft base-price regulation is not enacted' );
 sidrena_expect( '2026-11-17' === $contract['base_price_rule_effective_from'], 'New legal date is not earlier than 17 Nov' );
 sidrena_expect( false === $contract['base_price_is_automatically_derived'], 'Base price is not reconstructed from anchor or current price' );

@@ -29,17 +29,11 @@ class Brendigo_Sidrena_Cijena_Activator {
 
 
 	/**
-	 * Process one short slice of products, then reschedule if needed.
+	 * Deprecated cron entry point. Kept only so existing scheduled events can
+	 * run safely after plugin updates: remove legacy cursors and never infer
+	 * historical prices from current prices or today's date.
 	 *
-	 * A page is 40 parents, but each HTTP request stops after WORK_BUDGET
-	 * product objects so a proxy timeout cannot drop the rest of the catalog.
-	 * Offset and child resume inside the same page.
-	 *
-	 * @param int  $page        Optional explicit page. 0 reads the stored cursor.
-	 * @param bool $stamp_today Also write today's date when the date field is empty.
-	 * @param int  $offset      Parent index inside the current page.
-	 * @param int  $child       Variation index inside the current parent.
-	 * @return array{done:bool,processed:int,written:int,page:int,next_page:int,next_offset:int,next_child:int,total:int,seen:int}
+	 * @return array<string,int|bool> Blocked status for legacy consumers.
 	 */
 	public static function process_batch( $page = 0, $stamp_today = false, $offset = 0, $child = 0 ) {
 		// Stop legacy scheduled snapshot work: current prices are not historical evidence.
@@ -48,166 +42,8 @@ class Brendigo_Sidrena_Cijena_Activator {
 			'page' => 0, 'next_page' => 0, 'next_offset' => 0,
 			'next_child' => 0, 'total' => 0, 'seen' => 0,
 			'blocked' => true );
-		ignore_user_abort( true );
-
-		$page   = absint( $page );
-		$offset = absint( $offset );
-		$child  = absint( $child );
-		if ( $page < 1 ) {
-			$page   = max( 1, absint( get_option( self::PAGE_OPTION, 1 ) ) );
-			$offset = absint( get_option( self::OFFSET_OPTION, 0 ) );
-			$child  = absint( get_option( self::CHILD_OPTION, 0 ) );
-		}
-
-		$ids   = self::snapshot_ids( $page );
-		$total = self::snapshot_total();
-
-		$meta      = Brendigo_Sidrena_Cijena_Product_Meta::instance();
-		$date      = $stamp_today ? Brendigo_Sidrena_Cijena_Product_Meta::today_date() : '';
-		$processed = 0;
-		$written   = 0;
-		$budget    = self::WORK_BUDGET;
-		$advanced  = 0;
-		$next_child = 0;
-		$slice     = array_slice( $ids, $offset );
-
-		foreach ( $slice as $product_id ) {
-			if ( $budget < 1 && $advanced > 0 ) {
-				break;
-			}
-
-			$product = wc_get_product( $product_id );
-			if ( ! $product ) {
-				++$advanced;
-				$child = 0;
-				continue;
-			}
-
-			++$processed;
-			--$budget;
-
-			if ( $product->is_type( 'variable' ) || $product->is_type( 'variable-subscription' ) ) {
-				$children = array_values( $product->get_children() );
-				$start    = $child;
-				$child    = 0;
-				$count    = count( $children );
-
-				for ( $i = $start; $i < $count; $i++ ) {
-					if ( $budget < 1 ) {
-						$next_child = $i;
-						break 2;
-					}
-
-					$variation = wc_get_product( $children[ $i ] );
-					if ( $variation && $meta->snapshot_if_empty( $variation, $date ) ) {
-						++$written;
-					}
-					--$budget;
-				}
-
-				++$advanced;
-				continue;
-			}
-
-			if ( $meta->snapshot_if_empty( $product, $date ) ) {
-				++$written;
-			}
-			$child = 0;
-			++$advanced;
-		}
-
-		$next_offset   = $offset + $advanced;
-		$page_complete = ( $next_child < 1 ) && ( $next_offset >= count( $ids ) );
-		$done          = $page_complete && count( $ids ) < self::BATCH_SIZE;
-		$next_page     = $page;
-		$consumed      = $page_complete ? count( $ids ) : $next_offset;
-
-		if ( $page_complete && ! $done ) {
-			$next_page   = $page + 1;
-			$next_offset = 0;
-		}
-
-		$seen = $done ? $total : ( ( $page - 1 ) * self::BATCH_SIZE ) + $consumed;
-		if ( $total < $seen ) {
-			$total = $seen;
-		}
-
-		if ( $done ) {
-			delete_option( self::PENDING_OPTION );
-			delete_option( self::PAGE_OPTION );
-			delete_option( self::OFFSET_OPTION );
-			delete_option( self::CHILD_OPTION );
-			delete_option( self::FILL_PROMPT_OPTION );
-			if ( class_exists( 'Brendigo_Sidrena_Cijena_Automation' ) ) {
-				Brendigo_Sidrena_Cijena_Automation::instance()->queue_rebuild( 'snapshot-complete' );
-			}
-		} else {
-			update_option( self::PAGE_OPTION, $next_page, false );
-			update_option( self::OFFSET_OPTION, $next_offset, false );
-			update_option( self::CHILD_OPTION, $next_child, false );
-			if ( ! wp_next_scheduled( 'sidrena_cijena_snapshot_batch' ) ) {
-				wp_schedule_single_event( time() + 2, 'sidrena_cijena_snapshot_batch' );
-			}
-		}
-
-		return array(
-			'done'        => $done,
-			'processed'   => $processed,
-			'written'     => $written,
-			'page'        => $page,
-			'next_page'   => $done ? $page : $next_page,
-			'next_offset' => $done ? 0 : $next_offset,
-			'next_child'  => $done ? 0 : $next_child,
-			'total'       => $total,
-			'seen'        => $seen,
-		);
-	}
-
-	/**
-	 * Parent IDs for one snapshot page, ordered by ID.
-	 *
-	 * @param int $page 1-based page.
-	 * @return array<int,int>
-	 */
-	private static function snapshot_ids( $page ) {
-		$ids = wc_get_products( self::snapshot_query_args( $page, self::BATCH_SIZE ) );
-
-		return is_array( $ids ) ? array_map( 'absint', $ids ) : array();
-	}
-
-	/**
-	 * How many parent products the snapshot walks.
-	 *
-	 * @return int
-	 */
-	private static function snapshot_total() {
-		$query = wc_get_products( self::snapshot_query_args( 1, 1, true ) );
-		if ( is_object( $query ) && isset( $query->total ) ) {
-			return (int) $query->total;
-		}
-
-		return 0;
-	}
-
-	/**
-	 * Shared product query for the admin/cron snapshot.
-	 *
-	 * @param int  $page     1-based page.
-	 * @param int  $limit    Page size.
-	 * @param bool $paginate Return a result object with a total.
-	 * @return array<string,mixed>
-	 */
-	private static function snapshot_query_args( $page, $limit, $paginate = false ) {
-		return array(
-			'status'   => array( 'publish', 'private', 'draft', 'pending' ),
-			'type'     => array( 'simple', 'variable', 'external', 'subscription', 'variable-subscription' ),
-			'limit'    => $limit,
-			'page'     => max( 1, absint( $page ) ),
-			'paginate' => (bool) $paginate,
-			'return'   => 'ids',
-			'orderby'  => 'ID',
-			'order'    => 'ASC',
-		);
+		// Historical-price autofill is intentionally prohibited; legacy cron
+		// callbacks remain registered only to clear stale pending work safely.
 	}
 
 	/**

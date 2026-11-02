@@ -44,6 +44,19 @@ class SiteUrl private constructor(val base: URI) {
         return base.resolve(path)
     }
 
+    /**
+     * Canonical WordPress REST fallback for sites using plain permalinks.
+     * Route names are hardcoded/validated and must never be arbitrary URLs.
+     * Never remove same-origin and HTTPS guards to support a fallback.
+     */
+    fun queryRestEndpoint(route: String): URI {
+        require(route.matches(Regex("[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*"))) {
+            "Neispravna WordPress REST putanja."
+        }
+        val parameter = route.split('/').joinToString("%2F", prefix = "%2F")
+        return approved(base.resolve("?rest_route=" + parameter).toASCIIString())
+    }
+
     fun approved(remote: String): URI {
         val url = try { URI(remote) } catch (_: Exception) {
             throw IllegalArgumentException("Poslužitelj je vratio neispravnu adresu.")
