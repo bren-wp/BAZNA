@@ -125,7 +125,7 @@ fun ConnectionPage(
                     fontWeight = FontWeight.Bold,
                     lineHeight = 25.sp,
                     maxLines = 2,
-                    modifier = Modifier.padding(start = 29.dp),
+                    modifier = Modifier.padding(start = 48.dp),
                 )
             }
 
