@@ -91,10 +91,20 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				$out['outlets'][] = $entry;
 			}
 		}
+		// A published CSV may be older than WooCommerce edits still awaiting
+		// the next public rebuild. Expose this distinction without private data.
+		$pending = array();
+		if ( class_exists( 'Brendigo_Sidrena_Cijena_Automation' ) ) {
+			$pending = Brendigo_Sidrena_Cijena_Automation::instance()->get_pending_state();
+		}
+		$pending_changes = is_array( $pending ) && ! empty( $pending['since'] );
 		// Optional, backwards-compatible status: old clients still use feeds[*].csv.
 		$out['publication'] = array(
 			'csv_ready' => $out['feeds']['proizvodi']['available_csv'] && $out['feeds']['usluge']['available_csv'],
 			'generated_at' => $out['published_at'],
+			'pending_changes' => $pending_changes,
+			// This technical status is never certification of legal price accuracy.
+			'compliance_certified' => false,
 		);
 		return rest_ensure_response( $out );
 	}
