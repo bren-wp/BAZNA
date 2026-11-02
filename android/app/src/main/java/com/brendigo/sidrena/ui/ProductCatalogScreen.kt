@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -323,7 +324,7 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
         item.sku.takeIf { it.isNotBlank() }?.let { "SKU: " + it }.orEmpty()
     }
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
+        modifier = Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick)
             .semantics {
                 contentDescription = item.name + ", trenutačna cijena " + currentPrice +
                     if (item.referencePrice.isBlank()) "" else ", sidrena cijena " + referencePrice
@@ -422,7 +423,11 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
                             )
                         }
                     }
+                    // Share the finite row width between the product title
+                    // and the two-price column. Unbounded price text formerly
+                    // forced the title off-screen on 360dp and larger fonts.
                     Column(
+                        modifier = Modifier.weight(0.85f),
                         horizontalAlignment = Alignment.End,
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
@@ -432,6 +437,7 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
                             fontSize = 17.sp,
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             if (item.referencePrice.isBlank()) "Bez sidrene cijene"
@@ -439,6 +445,7 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
                             color = TextMuted,
                             fontSize = 11.sp,
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
