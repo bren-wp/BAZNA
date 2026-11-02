@@ -395,7 +395,9 @@ internal fun publicPriceListDocuments(
     // WordPress v1 publishes URLs even before the associated CSV file exists.
     // A confirmed available_csv=false must never create an actionable card.
     // Null means an older compatible plugin with no publication-status field.
-    if ((outlet?.productsCsvReady ?: data.index.productsCsvReady) != false) {
+    val productReady = if (outlet == null) data.index.productsCsvReady else outlet.productsCsvReady
+    val serviceReady = if (outlet == null) data.index.servicesCsvReady else outlet.servicesCsvReady
+    if (productReady != false) {
         add(
             title = "Cjenik proizvoda",
             rawUrl = outlet?.productCsv ?: data.index.productsCsv,
@@ -405,7 +407,7 @@ internal fun publicPriceListDocuments(
             archived = false,
         )
     }
-    if ((outlet?.servicesCsvReady ?: data.index.servicesCsvReady) != false) {
+    if (serviceReady != false) {
         add(
             title = "Cjenik usluga",
             rawUrl = outlet?.serviceCsv ?: data.index.servicesCsv,
