@@ -65,3 +65,31 @@ Oba klijenta zahtijevaju `api_version: 1`, provjeravaju izvore javnih cjenika i 
 ## Dopuna 29. listopada 2026.
 
 WordPress 1.5.3, Android 0.3.3 i Windows 0.10.6 razdvajaju najnižu cijenu tijekom 30 dana prije sniženja od fiksne sidrene cijene i uključuju datum stupanja NN 105/2026 na snagu 26. 9. 2026. Javna JSON pravna shema ostaje kompatibilna (schema 1). Proširena pravila 2026/11/17 ostaju odvojena od ranijih pravila koja su već na snazi. Prijedlozi pravilnika na savjetovanju do 13. 11. 2026. nisu konačni tekstovi. Detalji u [pravnoj reviziji](LEGAL-REVIEW-2026-10-29.md).
+
+## Dopuna 2. studenoga 2026. — pravna provjera i zaštita povijesnih podataka
+
+**Datum provjere: 2. 11. 2026.** Odluke NN 101/2026 izmijenjene NN 110/2026 proširuju primjenu od **17. 11. 2026.** Povijesne cijene za ranije obuhvaćene kategorije odnose se na **2. 5. 2025.**, a za nove kategorije i usluge na **10. 9. 2026.** NN 105/2026 o maloprodajnoj cijeni, cijeni za jedinicu mjere i cjeniku usluga na snazi je od **26. 9. 2026.**. Dva predložena pravilnika o baznoj cijeni i digitalnim cjenicima u e-savjetovanju su do 13. 11. 2026.; prijedlog nije doneseni propis. Pojam bazne cijene iz Zakona o zaštiti potrošača, promijenjenog NN 59/2026, i zasebna najniža cijena 30 dana prije sniženja ne mogu se automatski zamijeniti sidrenom cijenom.
+
+### WordPress 1.5.4 — provedene zaštite u PR-u #202
+
+- Ukinuto automatsko popunjavanje sidrene cijene iz **današnje** redovne WooCommerce cijene. I ranije spremljena automatska postavka sada je blokirana.
+- Isključene su stare masovne SQL/CLI/cron i AJAX operacije koje pokušavaju popuniti nepoznate povijesne vrijednosti iz aktualnih cijena; postojeće zabilježene vrijednosti nisu prebrisane.
+- Prazan povijesni datum na proizvodu ili samostalnoj usluzi ostaje **prazan**, umjesto da se bez dokaza preslika opći datum. Ručno potvrđeni datumi i iznosi ostaju nepromijenjeni.
+- U administraciji su zastarjele kontrole masovnog popunjavanja zamijenjene uputama za dokazivi unos.
+- Javni REST v1 zadržava kompatibilne URL-ove, a legal profil dodatno sadrži datum pravne provjere, status savjetovanja, zabranu automatskog izvođenja bazne cijene, obvezu povijesne provjere i oznaku da pravna usklađenost NIJE certificirana.
+- Oznaka publication.pending_changes razlikuje postojeće CSV datoteke od naknadnih promjena koje još nisu ponovno objavljene; publication.compliance_certified uvijek je false.
+
+### Android 0.3.4 — provedene zaštite
+
+- Android legalni parser prihvaća stare REST v1 profile i validira nova, opcionalna pravna polja. Ne prihvaća proturječan navod da je cijeli katalog zakonski certificiran.
+- Detalj 06/12 čita **stvarna** objavljena polja: trenutnu cijenu, sidrenu cijenu i datum, jediničnu cijenu, naziv posebnog oblika prodaje, barkod, marku, dostupnost i neobaveznu stvarnu fotografiju. Nedostajući sidreni datum označen je neprovjerenim.
+- Početna i učitavanje kataloga prikazuju obavijest za neobjavljene promjene čak i kada stariji objavljeni CSV i dalje postoji.
+- Android je read-only i ne koristi administratorske lozinke niti mijenja WordPress cijene.
+
+### Nužne provjere prije produkcijske potvrde
+
+Automatski testovi pokrivaju tipove polja, nepoznat datum, blokadu automatskog popunjavanja, kompatibilne REST odgovore i publikacijski status. Prije zakonske potvrde trgovac mora neovisno dokazati stvarnu cijenu na referentni dan, ispravnu kategoriju i iznimke, punih 30 dana prije sniženja, jedinične cijene, opseg i ukupnu cijenu usluga, eventualne maksimalne dopuštene cijene, održavanje javne arhive i pouzdanu objavu u propisano vrijeme. Potrebno je provjeriti doneseni tekst pravilnika nakon savjetovanja i stvarno ponašanje WordPress hostinga; WP-Cron ne jamči 08:00. Pixel-perfect potvrda zahtijeva emulator i screenshot usporedbu.
+
+**Normativni izvori:** NN 75/2025, NN 101/2026 (1212 i 1213), NN 110/2026 (1309 i 1310), NN 59/2026, NN 105/2026. Poveznice su navedene u uvodu ovog dokumenta. Status e-savjetovanja: https://mingo.gov.hr/vijesti/ministar-susnjar-kroz-dijalog-s-gospodarstvenicima-do-provedivih-pravila-i-vece-zastite-potrosaca/10461
+
+Ova dopuna nije potvrda pravne usklađenosti bilo kojeg konkretnog trgovca.
