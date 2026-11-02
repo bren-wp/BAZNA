@@ -91,7 +91,13 @@ class ResponsiveScreensInstrumentedTest {
         val currentScreen = mutableIntStateOf(0)
         compose.setContent {
             SidrenaTheme {
-                Scaffold(
+                // Capture the splash full-bleed as in MainActivity. A
+                // Scaffold with systemBarsPadding shifted the 1080x1920
+                // reference artwork and invalidated pixel comparisons.
+                if (currentScreen.intValue == 0) {
+                    SidrenaSplashArtwork(Modifier.fillMaxSize())
+                } else {
+                    Scaffold(
                     modifier = Modifier.fillMaxSize()
                         .background(Background).systemBarsPadding(),
                     containerColor = Background,
@@ -123,7 +129,6 @@ class ResponsiveScreensInstrumentedTest {
                                 .padding(horizontal = if (connecting) 0.dp else 16.dp),
                         ) {
                             when (currentScreen.intValue) {
-                                0 -> SidrenaSplashScreen(onFinished = {})
                                 1 -> ConnectionPage(
                                     input = "https://primjer.hr", busy = false,
                                     error = null, canCancel = false,
@@ -186,6 +191,7 @@ class ResponsiveScreensInstrumentedTest {
                             }
                         }
                     }
+                }
                 }
             }
         }
