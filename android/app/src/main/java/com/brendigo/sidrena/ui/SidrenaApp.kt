@@ -195,6 +195,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         data = snapshot,
                         busy = state.isLoading,
                         error = state.error,
+                        selectedOutlet = state.outlet,
                         onDetails = {
                             selectedItemFields = saveDetailItem(it)
                             detailReturnPage = "services"
