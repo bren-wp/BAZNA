@@ -92,6 +92,30 @@ if "wordpress_plugin_version='1.5.2'" in desktop_ci:
 if f"WORDPRESS_VERSION: '{plugin_version}'" not in release_ci:
     issues.append("WordPress version must match the current source")
 
+# WordPress/Android wire contract is security-critical: no private API fallback
+# and no legacy automatic inference of historical prices.
+api_php = (plugin / 'includes/class-public-api.php').read_text(encoding='utf-8')
+snapshot_php = (plugin / 'includes/class-activator.php').read_text(encoding='utf-8')
+android_site = (android / 'app/src/main/java/com/brendigo/sidrena/data/SiteUrl.kt').read_text(encoding='utf-8')
+android_repo = (android / 'app/src/main/java/com/brendigo/sidrena/data/CatalogRepository.kt').read_text(encoding='utf-8')
+if "'api_version'  => 1" not in api_php or "'mode' => 'public_read_only'" not in api_php:
+    issues.append("Missing public read-only WordPress Android discovery contract")
+if "'permission_callback' => '__return_true'" not in api_php and "'permission_callback' => '__return_true'," not in api_php:
+    issues.append("Missing explicit anonymous read-only public REST registration")
+if "queryRestEndpoint(" not in android_site or "shouldFallbackToPlainRest(" not in android_repo:
+    issues.append("Missing guarded WordPress plain-permalink fallback")
+if "followRedirects(false)" not in android_repo or "PublicNetworkGuard::isPublic" not in android_repo:
+    issues.append("Android public-feed network guard changed unexpectedly")
+legacy_section = snapshot_php.split('public static function process_batch(', 1)
+if len(legacy_section) < 2 or 'blocked\' => true' not in legacy_section[1].split('private static function', 1)[0]:
+    issues.append("Legacy automatic reference-price snapshots must stay blocked")
+if 'ignore_user_abort( true );' in legacy_section[1].split('public static function is_pending(', 1)[0]:
+    issues.append("Legacy unreachable price-copy loop unexpectedly reintroduced")
+if f"RELEASE_VERSION: '{plugin_version}'" not in release_ci or 'tag="$RELEASE_VERSION"' not in release_ci:
+    issues.append("Unified SIDRENA release tag must match current plugin version")
+if '--title "SIDRENA"' not in release_ci:
+    issues.append("GitHub release title must be SIDRENA")
+
 # Surface candidate duplicated class names without modifying any code.
 for extension, roots, pattern in (
     (".cs", [desktop], r"\b(?:class|record|struct)\s+([A-Z]\w+)"),
