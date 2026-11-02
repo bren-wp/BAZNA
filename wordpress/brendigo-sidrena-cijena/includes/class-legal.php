@@ -4,7 +4,7 @@
  *
  * Source: NN 101/2026 (1212 and 1213), amended by NN 110/2026
  * (1309 and 1310). The proposed base-price and public-price-list rulebooks were still in
- * e-consultation on 2026-11-02 (until 2026-11-13), not enacted law.
+ * e-consultation on 2026-11-03 (until 2026-11-13), not enacted law.
  *
  * @package Brendigo_Sidrena_Cijena
  */
@@ -33,7 +33,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
     public static function public_contract() {
         return array(
             'schema' => 1,
-            'reviewed_on' => '2026-11-02',
+            'reviewed_on' => '2026-11-03',
             'jurisdiction' => 'HR',
             'rules_revision' => self::RULES_REVISION,
             'consumer_law_revision' => self::CONSUMER_LAW_REVISION,
