@@ -36,7 +36,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.4' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.5' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -80,7 +80,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.4 --output artifacts/brendigo-sidrena-cijena-1.5.4.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.4.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.4 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.4.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.4.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.4.zip
+          python3 tools/package_plugin.py --version 1.5.5 --output artifacts/brendigo-sidrena-cijena-1.5.5.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.5.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.5 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.5.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.5.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.5.zip
