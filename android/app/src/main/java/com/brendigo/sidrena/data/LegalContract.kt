@@ -17,6 +17,10 @@ data class LegalContract(
     val priceReductionLookbackDays: Int? = null,
     val discountBaselineIsAnchorPrice: Boolean? = null,
     val unitPriceRuleEffectiveFrom: String? = null,
+    val basePriceRegulationStatus: String? = null,
+    val basePriceRuleEffectiveFrom: String? = null,
+    val historicalPriceVerificationRequired: Boolean? = null,
+    val legalComplianceCertified: Boolean? = null,
 ) {
     companion object {
         const val REVISION = "NN-101-2026-NN-110-2026"
@@ -65,11 +69,39 @@ data class LegalContract(
             val unitEffective = if (json.has("unit_price_rule_effective_from")) {
                 iso(json.getString("unit_price_rule_effective_from"))
             } else null
+            fun optionalFalse(field: String): Boolean? {
+                if (!json.has(field) || json.isNull(field)) return null
+                val v = json.get(field)
+                require(v is Boolean && !v) { "Neprovjerena pravna potvrda ili izvedena bazna cijena." }
+                return v
+            }
+            fun optionalTrue(field: String): Boolean? {
+                if (!json.has(field) || json.isNull(field)) return null
+                val v = json.get(field)
+                require(v is Boolean && v) { "Nedostaje obvezna potvrda povijesnog podatka." }
+                return v
+            }
+            val baseStatus = if (json.has("base_price_regulation_status")) {
+                json.getString("base_price_regulation_status").also {
+                    require(it == "draft_consultation") {
+                        "Nepoznat status pravilnika o baznoj cijeni."
+                    }
+                }
+            } else null
+            val baseEffective = if (json.has("base_price_rule_effective_from")) {
+                iso(json.getString("base_price_rule_effective_from"))
+            } else null
+            optionalFalse("base_price_is_automatically_derived")
+            optionalFalse("consumer_30_day_low_is_anchor_price")
+            optionalFalse("consumer_30_day_low_is_base_price")
             return LegalContract(
                 revision, effective, legacy, general, days, deadline,
                 optionalRevision("consumer_law_revision"),
                 optionalRevision("unit_price_rule_revision"),
                 discountDays, anchorBaseline, unitEffective,
+                baseStatus, baseEffective,
+                optionalTrue("historical_price_verification_required"),
+                optionalFalse("legal_compliance_certified"),
             )
         }
 
