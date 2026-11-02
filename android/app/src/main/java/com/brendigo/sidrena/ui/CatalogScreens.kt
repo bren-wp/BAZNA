@@ -1,7 +1,6 @@
 package com.brendigo.sidrena.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.OpenInNew
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -37,11 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,10 +51,10 @@ fun formatPrice(raw: String): String {
 }
 
 /**
- * 06/12: item details based on the sixth SIDRENA branded screen.
- *
- * The public WordPress CSV can contain an optional product image, actual unit
- * price, special sale label and historical reference date. Missing values stay unknown.
+ * SIDRENA 06/12 — Reference screens_concept/06_detalj_proizvoda.png.
+ * Three factual cards: item identity, current/reference prices and historical
+ * reference data. Mockup's system status bar and DEMO badge are not rendered.
+ * Every displayed value comes from the public WordPress CSV, never a demo.
  */
 @Composable
 fun DetailPage(
@@ -72,159 +65,209 @@ fun DetailPage(
 ) {
     val view = item?.let(::detailPresentation)
     val publicPage = data.index.publicPage
+    val safePublicPage = runCatching {
+        com.brendigo.sidrena.data.SiteUrl.parse(data.site).publicLink(publicPage)
+    }.getOrNull()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().background(Background),
-        verticalArrangement = Arrangement.spacedBy(13.dp),
-        contentPadding = PaddingValues(bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(bottom = 25.dp),
     ) {
         item {
-            DetailToolbar(
-                title = if (view?.isService == true) "Detalj usluge" else "Detalj artikla",
-                hasPublicLink = !publicPage.isNullOrBlank(),
+            DetailReferenceToolbar(
+                title = if (view?.isService == true) "Detalji usluge" else "Detalji proizvoda",
                 onBack = onBack,
-                onOpenPublic = { publicPage?.let(onOpen) },
+                onOpenPublic = safePublicPage?.let { url -> { onOpen(url) } },
             )
         }
-
         if (view == null) {
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = Surface),
-                    border = BorderStroke(1.dp, Border),
-                ) {
-                    Column(
-                        Modifier.padding(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(13.dp),
-                    ) {
-                        Text("Stavka nije dostupna.", color = Color.White, fontWeight = FontWeight.Bold)
-                        Text(
-                            "Vratite se na popis i ponovno odaberite artikl.",
-                            color = TextMuted, fontSize = 14.sp,
-                        )
-                        OutlineAction("Povratak na popis", onBack, Modifier.fillMaxWidth())
-                    }
+                DetailReferenceCard {
+                    Text(
+                        "Stavka više nije dostupna u katalogu.",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        "Vratite se na popis i odaberite stvarno objavljenu stavku.",
+                        color = TextMuted,
+                        fontSize = 13.sp,
+                    )
+                    OutlineAction("Povratak", onBack)
                 }
             }
         } else {
             item {
-                DetailHero(isService = view.isService, site = data.site, imageUrl = item?.imageUrl.orEmpty())
-            }
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                DetailReferenceCard(background = SurfaceRaised) {
                     Text(
-                        text = view.title,
-                        color = Color.White,
-                        fontSize = 23.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight.ExtraBold,
+                        view.title.uppercase(java.util.Locale.forLanguageTag("hr-HR")),
+                        color = TextMuted,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                    if (view.unit != null) {
+                    Text(
+                        detailHeadline(view.title, view.unit),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        lineHeight = 26.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    val skuAndAvailability = listOfNotNull(
+                        view.sku?.let { "SKU: " + it },
+                        view.availability,
+                    ).joinToString("  •  ")
+                    if (skuAndAvailability.isNotBlank()) {
                         Text(
-                            text = view.unit,
-                            color = TextMuted,
-                            fontSize = 15.sp,
+                            skuAndAvailability,
+                            color = Success,
+                            fontSize = 13.sp,
+                            maxLines = 2,
                         )
                     }
                 }
-            }
-            item {
-                DetailPricePanel(view = view)
             }
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(13.dp),
                     border = BorderStroke(1.dp, Border),
                     colors = CardDefaults.cardColors(containerColor = Surface),
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(13.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 13.dp),
+                        verticalArrangement = Arrangement.spacedBy(7.dp),
                     ) {
                         Text(
-                            "Podaci o " + (if (view.isService) "usluzi" else "artiklu"),
+                            "Trenutačna cijena",
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            color = TextMuted,
+                            fontSize = 13.sp,
+                        )
+                        Text(
+                            view.currentPrice,
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            color = if (view.hasCurrentPrice) Accent else TextMuted,
+                            fontSize = if (view.hasCurrentPrice) 29.sp else 16.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(Modifier.height(1.dp))
+                        Separator()
+                        Text(
+                            if (view.referencePrice != null)
+                                "Sidrena cijena: " + view.referencePrice
+                            else "Sidrena cijena nije objavljena",
+                            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 11.dp),
+                            color = if (view.referencePrice != null) Color.White else TextMuted,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp,
+                        )
+                    }
+                }
+            }
+            item {
+                DetailReferenceCard {
+                    Text(
+                        "Podaci o sidrenoj cijeni",
+                        color = Color.White,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    DetailAttribute(
+                        "Referentni datum",
+                        view.referenceDate ?: "Datum nije potvrđen",
+                    )
+                    DetailAttribute(
+                        "Izvor",
+                        "Javno objavljen cjenik",
+                    )
+                    if (view.referencePrice != null && view.referenceDate == null) {
+                        Text(
+                            "Povijesni datum nije objavljen. " +
+                                "Trgovac mora potvrditi iznos i datum izvornom evidencijom.",
+                            color = Color(0xFFFFC997),
+                            fontSize = 12.sp,
+                            lineHeight = 17.sp,
+                        )
+                    }
+                }
+            }
+            if (view.unitPrice != null || view.saleLabel != null ||
+                view.brand != null || view.barcode != null
+            ) {
+                item {
+                    DetailReferenceCard {
+                        Text(
+                            "Dodatni objavljeni podaci",
                             color = Color.White,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                         )
-                        view.sku?.let { DetailAttribute("Šifra", it) }
-                        view.availability?.let { DetailAttribute("Dostupnost", it) }
-                        view.unit?.let { DetailAttribute("Jedinica mjere", it) }
+                        view.unitPrice?.let { DetailAttribute("Cijena za jedinicu mjere", it) }
+                        view.saleLabel?.let { DetailAttribute("Poseban oblik prodaje", it) }
                         view.brand?.let { DetailAttribute("Marka", it) }
                         view.barcode?.let { DetailAttribute("Barkod", it) }
-                        if (view.sku == null && view.availability == null && view.unit == null) {
-                            Text(
-                                "Dodatni podaci nisu objavljeni.",
-                                color = TextMuted,
-                                fontSize = 13.sp,
-                            )
-                        }
                     }
                 }
             }
-
-            if (!publicPage.isNullOrBlank()) {
-                item {
-                    AccentButton(
-                        label = "Otvori javni cjenik",
-                        onClick = { onOpen(publicPage) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+            item {
+                Spacer(Modifier.height(23.dp))
+                Text(
+                    "Informacije su prikazane prema povezanom javnom izvoru. " +
+                        "Objava ne potvrđuje zakonsku točnost povijesnih cijena.",
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                    lineHeight = 19.sp,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun DetailToolbar(
+private fun DetailReferenceToolbar(
     title: String,
-    hasPublicLink: Boolean,
     onBack: () -> Unit,
-    onOpenPublic: () -> Unit,
+    onOpenPublic: (() -> Unit)?,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier.fillMaxWidth().height(57.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+        IconButton(onClick = onBack, modifier = Modifier.size(33.dp)) {
             Icon(
                 Icons.Outlined.ArrowBack,
-                contentDescription = "Povratak na popis",
-                tint = Color.White,
-                modifier = Modifier.size(25.dp),
+                contentDescription = "Natrag na popis",
+                tint = Accent,
+                modifier = Modifier.size(19.dp),
             )
         }
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(6.dp))
         Text(
-            text = title,
+            title,
             color = Color.White,
-            fontSize = 21.sp,
             fontWeight = FontWeight.Bold,
+            fontSize = 21.sp,
+            maxLines = 1,
             modifier = Modifier.weight(1f),
         )
-        if (hasPublicLink) {
+        if (onOpenPublic != null) {
             Box {
-                IconButton(onClick = { expanded = true }, modifier = Modifier.size(48.dp)) {
-                    Icon(
-                        Icons.Outlined.MoreVert,
-                        contentDescription = "Opcije artikla",
-                        tint = Color.White,
-                    )
+                IconButton(onClick = { expanded = true }, modifier = Modifier.size(44.dp)) {
+                    Icon(Icons.Outlined.MoreVert, contentDescription = "Javni cjenik", tint = TextMuted)
                 }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                ) {
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(
-                        text = { Text("Javni cjenik") },
-                        leadingIcon = {
-                            Icon(Icons.Outlined.OpenInNew, contentDescription = null)
-                        },
+                        text = { Text("Otvori javni cjenik") },
+                        leadingIcon = { Icon(Icons.Outlined.OpenInNew, contentDescription = null) },
                         onClick = {
                             expanded = false
                             onOpenPublic()
@@ -236,179 +279,52 @@ private fun DetailToolbar(
     }
 }
 
-/**
- * Prefer a genuine, same-origin WordPress product thumbnail when available.
- * Otherwise render the native placeholder without invented imagery.
- */
 @Composable
-private fun DetailHero(isService: Boolean, site: String, imageUrl: String) {
-    if (!isService && approvedProductImageUrl(site, imageUrl) != null) {
-        ProductThumbnail(
-            site = site,
-            imageUrl = imageUrl,
-            modifier = Modifier.fillMaxWidth().height(213.dp),
-        )
-        return
-    }
-    Box(
-        modifier = Modifier.fillMaxWidth()
-            .height(213.dp)
-            .background(
-                brush = Brush.linearGradient(
-                    listOf(Color(0xFF1F4967), Color(0xFF0B2139), Color(0xFF12324D)),
-                ),
-                shape = RoundedCornerShape(17.dp),
-            ),
-        contentAlignment = Alignment.Center,
+private fun DetailReferenceCard(
+    background: Color = Surface,
+    content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(13.dp),
+        border = BorderStroke(1.dp, Border),
+        colors = CardDefaults.cardColors(containerColor = background),
     ) {
-        Canvas(Modifier.fillMaxSize()) {
-            val w = size.width
-            val h = size.height
-            val diagonal = Path().apply {
-                moveTo(w * 0.67f, 0f)
-                lineTo(w, 0f)
-                lineTo(w, h * 0.50f)
-                close()
-            }
-            drawPath(diagonal, Color(0xFF294E69).copy(alpha = 0.54f))
-            drawCircle(
-                color = Accent.copy(alpha = 0.10f),
-                radius = size.minDimension * 0.31f,
-                center = Offset(w * 0.50f, h * 0.46f),
-            )
-            drawCircle(
-                color = Accent.copy(alpha = 0.35f),
-                radius = size.minDimension * 0.23f,
-                center = Offset(w * 0.50f, h * 0.46f),
-                style = Stroke(width = 2.dp.toPx()),
-            )
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = if (isService) Icons.Outlined.Settings
-                else Icons.Outlined.Inventory2,
-                contentDescription = null,
-                tint = Color(0xFFFFA45D),
-                modifier = Modifier.size(65.dp),
-            )
-            Spacer(Modifier.height(14.dp))
-            Text(
-                text = "Fotografija nije objavljena",
-                color = Color(0xFFD4E4F3),
-                fontSize = 12.sp,
-            )
-        }
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            content = content,
+        )
     }
 }
 
-@Composable
-private fun DetailPricePanel(view: DetailPresentation) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Border),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                "Trenutačna cijena",
-                color = TextMuted,
-                fontSize = 13.sp,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(
-                    text = view.currentPrice,
-                    color = if (view.hasCurrentPrice) Accent else TextMuted,
-                    fontSize = if (view.hasCurrentPrice) 29.sp else 17.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false),
-                )
-                view.availability?.let { availability ->
-                    Text(
-                        text = availability,
-                        color = if (
-                            availability.equals("Dostupno", ignoreCase = true)
-                        ) Success else TextMuted,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 12.sp,
-                        maxLines = 2,
-                    )
-                }
-            }
-            view.saleLabel?.let { sale ->
-                Text("Poseban oblik prodaje: " + sale,
-                    color = SoftBlue, fontSize = 12.sp)
-            }
-            view.unitPrice?.let { unitPrice ->
-                Text("Cijena za jedinicu mjere: " + unitPrice,
-                    color = TextMuted, fontSize = 12.sp)
-            }
-            if (view.referencePrice != null) {
-                Spacer(Modifier.height(3.dp))
-                Separator()
-                Spacer(Modifier.height(3.dp))
-                Text("Sidrena cijena", color = TextMuted, fontSize = 13.sp)
-                Text(
-                    text = view.referencePrice,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                if (view.referenceDate != null) {
-                    Text(
-                        text = "Datum sidrene cijene: " + view.referenceDate,
-                        color = TextMuted,
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp,
-                    )
-                } else {
-                    Text(
-                        text = "Referentni datum nije objavljen. " +
-                            "Povijesnu cijenu i datum mora potvrditi trgovac.",
-                        color = Color(0xFFFFC997),
-                        fontSize = 12.sp,
-                        lineHeight = 17.sp,
-                    )
-                }
-            } else {
-                Text(
-                    "Sidrena cijena nije objavljena.",
-                    color = TextMuted,
-                    fontSize = 13.sp,
-                )
-            }
-        }
-    }
+/** Do not append the public unit twice when it is already in the product name. */
+internal fun detailHeadline(name: String, unit: String?): String {
+    val clean = name.trim()
+    val u = unit?.trim().orEmpty()
+    return if (u.isEmpty() || clean.endsWith(u, ignoreCase = true)) clean
+        else clean + " " + u
 }
 
 @Composable
 private fun DetailAttribute(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(11.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = label,
+            label,
             color = TextMuted,
-            fontSize = 13.sp,
-            modifier = Modifier.weight(0.9f),
+            fontSize = 12.sp,
+            modifier = Modifier.weight(1f),
         )
         Text(
-            text = value,
+            value,
             color = Color.White,
-            fontSize = 13.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.weight(1.1f),
+            modifier = Modifier.weight(1f),
         )
     }
 }
