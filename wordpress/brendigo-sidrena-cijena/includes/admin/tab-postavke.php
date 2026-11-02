@@ -36,8 +36,9 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 				<?php $this->render_toggle( 'sidrena_cijena_auto_display', 'sidrena_cijena_auto_display', 'yes' === $sidrena_settings->get( 'auto_display' ), __( 'Automatski prikaz', 'brendigo-sidrena-cijena' ) ); ?>
 			</div>
 			<div class="brendigo-setting-row">
-				<div><strong><?php echo esc_html__( 'Automatsko popunjavanje novih proizvoda', 'brendigo-sidrena-cijena' ); ?></strong><small><?php echo esc_html__( 'Ako su polja prazna, nova stavka može dobiti trenutačnu redovnu cijenu i datum spremanja kao vlastiti referentni datum.', 'brendigo-sidrena-cijena' ); ?></small></div>
-				<?php $this->render_toggle( 'sidrena_cijena_auto_fill', 'sidrena_cijena_auto_fill', 'yes' === $sidrena_settings->get( 'auto_fill' ), __( 'Automatsko popunjavanje', 'brendigo-sidrena-cijena' ) ); ?>
+				<div><strong><?php echo esc_html__( 'Povijesna cijena unosi se uz dokaz', 'brendigo-sidrena-cijena' ); ?></strong>
+				<small><?php echo esc_html__( 'Automatsko preslikavanje današnje redovne cijene u sidrenu ili baznu cijenu isključeno je. Upišite stvarnu povijesnu cijenu i odgovarajući datum za svaku stavku; sačuvajte izvorne dokaze.', 'brendigo-sidrena-cijena' ); ?></small></div>
+				<span class="sidrena-android-bridge__status is-pending"><?php echo esc_html__( 'Povijesni unos: ručna provjera', 'brendigo-sidrena-cijena' ); ?></span>
 			</div>
 			<?php endif; ?>
 
@@ -118,20 +119,15 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 
 <?php if ( $sidrena_woo ) : ?>
 <section class="sidrena-cijena-card brendigo-tools-card">
-	<div class="sidrena-cijena-card__head brendigo-card-title"><span class="dashicons dashicons-admin-tools" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Alati za postojeći katalog', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Masovno popunjavanje koristi se samo kada znate koja referentna cijena i datum pripadaju proizvodima.', 'brendigo-sidrena-cijena' ); ?></p></div></div>
-	<div class="brendigo-tool-actions">
-		<button type="button" class="button button-secondary sidrena-cijena-snapshot-btn" id="sidrena-cijena-run-snapshot"><span class="dashicons dashicons-update" aria-hidden="true"></span><?php
-			printf(
-				/* translators: %s: locked general reference date. */
-				esc_html__( 'Popuni prazne cijene s %s', 'brendigo-sidrena-cijena' ),
-				esc_html( Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_GENERAL )
-			);
-			?></button>
-		<button type="button" class="button button-secondary sidrena-cijena-snapshot-btn" id="sidrena-cijena-run-snapshot-today"><span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span><?php echo esc_html__( 'Nove stavke: koristi današnji datum', 'brendigo-sidrena-cijena' ); ?></button>
+	<div class="sidrena-cijena-card__head brendigo-card-title">
+		<span class="dashicons dashicons-shield" aria-hidden="true"></span>
+		<div><h2><?php echo esc_html__( 'Provjera povijesnih cijena', 'brendigo-sidrena-cijena' ); ?></h2>
+		<p><?php echo esc_html__( 'Masovno kopiranje trenutačnih cijena i automatsko dodavanje datuma onemogućeno je: ne dokazuje cijenu na referentni dan.', 'brendigo-sidrena-cijena' ); ?></p></div>
 	</div>
-	<div class="sidrena-cijena-progress" id="sidrena-snapshot-progress" hidden><div class="sidrena-cijena-progress__track"><div class="sidrena-cijena-progress__bar" id="sidrena-snapshot-bar"></div></div></div>
-	<p class="sidrena-cijena-snapshot-status" aria-live="polite"></p>
-	<div class="brendigo-info-box"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><p><?php echo esc_html__( 'Masovno popunjavanje upisuje samo prazna polja. Već spremljene vrijednosti ostaju nepromijenjene.', 'brendigo-sidrena-cijena' ); ?></p></div>
+	<div class="brendigo-info-box">
+		<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
+		<p><?php echo esc_html__( 'Za svaku stavku utvrdite je li primjenjiv 2. 5. 2025. ili 10. 9. 2026.; koristite sačuvanu evidenciju i ručno unesite odgovarajući iznos i datum. Bazna cijena i najniža cijena u 30 dana ne smiju se automatski izvoditi iz sidrene cijene.', 'brendigo-sidrena-cijena' ); ?></p>
+	</div>
 </section>
 <?php endif; ?>
 
