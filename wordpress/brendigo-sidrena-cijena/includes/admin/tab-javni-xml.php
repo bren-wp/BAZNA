@@ -93,15 +93,30 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 	$sidrena_android_products_ready = is_string( $sidrena_android_products ) && '' !== $sidrena_android_products && is_file( $sidrena_android_products ) && is_readable( $sidrena_android_products );
 	$sidrena_android_services_ready = is_string( $sidrena_android_services ) && '' !== $sidrena_android_services && is_file( $sidrena_android_services ) && is_readable( $sidrena_android_services );
 	$sidrena_android_ready = $sidrena_android_products_ready && $sidrena_android_services_ready;
+	$sidrena_android_pending = false;
+	if ( class_exists( 'Brendigo_Sidrena_Cijena_Automation' ) ) {
+		$sidrena_android_pending_state = Brendigo_Sidrena_Cijena_Automation::instance()->get_pending_state();
+		$sidrena_android_pending = is_array( $sidrena_android_pending_state ) && ! empty( $sidrena_android_pending_state['since'] );
+	}
 	?>
 	<section class="sidrena-android-bridge" aria-labelledby="sidrena-android-bridge-title">
 		<div class="sidrena-android-bridge__head">
 			<h3 id="sidrena-android-bridge-title"><?php echo esc_html__( 'SIDRENA Android · Povezivanje', 'brendigo-sidrena-cijena' ); ?></h3>
-			<span class="sidrena-android-bridge__status <?php echo $sidrena_android_ready ? 'is-ready' : 'is-pending'; ?>">
-				<?php echo $sidrena_android_ready ? esc_html__( 'Cjenici objavljeni', 'brendigo-sidrena-cijena' ) : esc_html__( 'Čeka objavu', 'brendigo-sidrena-cijena' ); ?>
+			<span class="sidrena-android-bridge__status <?php echo $sidrena_android_ready && ! $sidrena_android_pending ? 'is-ready' : 'is-pending'; ?>">
+				<?php
+				echo $sidrena_android_pending
+					? esc_html__( 'Promjene čekaju objavu', 'brendigo-sidrena-cijena' )
+					: ( $sidrena_android_ready
+						? esc_html__( 'CSV datoteke objavljene', 'brendigo-sidrena-cijena' )
+						: esc_html__( 'Čeka objavu', 'brendigo-sidrena-cijena' ) );
+				?>
 			</span>
 		</div>
 		<p><?php echo esc_html__( 'U Android aplikaciju unesite HTTPS adresu ove WordPress stranice. Korisnička imena i lozinke nisu potrebni: aplikacija čita samo javni SIDRENA REST API.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'Objavljena datoteka ne dokazuje točnost sidrene, bazne ili najniže cijene u 30 dana. Povijesne cijene i datume treba potvrditi izvornom evidencijom. Pravilnik o baznoj cijeni bio je 2. 11. 2026. još u savjetovanju.', 'brendigo-sidrena-cijena' ); ?></p>
+		<?php if ( $sidrena_android_pending ) : ?>
+			<p class="sidrena-android-bridge__warning"><?php echo esc_html__( 'Upozorenje: katalog je izmijenjen nakon posljednje javne objave. Ponovno generirajte CSV/XML cjenike kako Android ne bi prikazivao zastarjele cijene.', 'brendigo-sidrena-cijena' ); ?></p>
+		<?php endif; ?>
 		<div class="sidrena-android-bridge__url">
 			<code><?php echo esc_html( home_url( '/' ) ); ?></code>
 			<button class="button button-secondary sidrena-cijena-copy" type="button" data-copy="<?php echo esc_attr( home_url( '/' ) ); ?>"><?php echo esc_html__( 'Kopiraj adresu', 'brendigo-sidrena-cijena' ); ?></button>
