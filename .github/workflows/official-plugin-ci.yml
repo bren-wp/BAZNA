@@ -8,6 +8,7 @@ on:
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
       - 'tools/test_public_catalog_markup.php'
+      - 'tools/test_legal_price_safety.php'
       - '.github/workflows/official-plugin-ci.yml'
   push:
     branches: [main]
@@ -18,6 +19,7 @@ on:
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
       - 'tools/test_public_catalog_markup.php'
+      - 'tools/test_legal_price_safety.php'
 permissions:
   contents: read
 jobs:
@@ -46,6 +48,8 @@ jobs:
         run: php tools/test_public_feed_columns.php
       - name: Test public mobile service cards and HTML escaping
         run: php tools/test_public_catalog_markup.php
+      - name: Test legally verified reference dates and no historical price inference
+        run: php tools/test_legal_price_safety.php
       - name: Package reproducibly and verify SHA-256
         shell: bash
         run: |
