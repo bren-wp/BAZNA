@@ -234,12 +234,19 @@ fun ProductCatalogScreen(
 }
 
 @Composable
-internal fun CatalogSearchBar(value: String, onQueryChange: (String) -> Unit, hint: String, accessibilityLabel: String) {
+internal fun CatalogSearchBar(
+    value: String,
+    onQueryChange: (String) -> Unit,
+    hint: String,
+    accessibilityLabel: String,
+    heightDp: Int = 52,
+    radiusDp: Int = 12,
+) {
     val focusManager = LocalFocusManager.current
     Row(
         modifier = Modifier.fillMaxWidth()
-            .height(52.dp)
-            .background(SurfaceRaised, RoundedCornerShape(12.dp))
+            .height(heightDp.dp)
+            .background(SurfaceRaised, RoundedCornerShape(radiusDp.dp))
             .semantics { contentDescription = accessibilityLabel }
             .padding(start = 13.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
