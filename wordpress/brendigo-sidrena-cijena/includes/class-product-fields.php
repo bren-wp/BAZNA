@@ -82,7 +82,7 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 
 		$sidrena_date_help = sprintf(
 			/* translators: 1: general reference date, 2: FMCG reference date. */
-			__( 'Ostavite prazno za zaključani opći referentni datum %1$s. Za obuhvaćene kategorije hrane, pića, kozmetike i kućanskih potrepština koristite %2$s. Vlastiti datum koristite samo kada je dopušten za novu stavku nakon referentnog datuma.', 'brendigo-sidrena-cijena' ),
+			__( 'Prazan datum znači da povijesni datum nije utvrđen; ne popunjava se automatski. Kad imate dokaz, koristite %1$s za opću referentnu skupinu ili %2$s za ranije obuhvaćene skupine. Za novu stavku primijenite pravila uvođenja i sačuvajte dokaz.', 'brendigo-sidrena-cijena' ),
 			Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_GENERAL,
 			Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_FMCG
 		);
@@ -92,7 +92,7 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 				'id'          => 'sidrena_cijena_datum',
 				'name'        => 'sidrena_cijena_datum',
 				'label'       => __( 'Referentni datum', 'brendigo-sidrena-cijena' ),
-				'placeholder' => Brendigo_Sidrena_Cijena_Settings::instance()->get( 'default_date' ),
+				'placeholder' => 'DD.MM.GGGG.',
 				'desc_tip'    => true,
 				'description' => $sidrena_date_help,
 				'value'       => $meta->get_date( $product_id ),
@@ -237,7 +237,7 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 			<?php endif; ?>
 			<p class="form-row form-row-first">
 				<label><?php echo esc_html__( 'Referentni datum', 'brendigo-sidrena-cijena' ); ?></label>
-				<input type="text" class="short" name="sidrena_cijena_datum[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $meta->get_date( $id ) ); ?>" placeholder="<?php echo esc_attr( Brendigo_Sidrena_Cijena_Settings::instance()->get( 'default_date' ) ); ?>" />
+				<input type="text" class="short" name="sidrena_cijena_datum[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $meta->get_date( $id ) ); ?>" placeholder="DD.MM.GGGG." />
 			</p>
 			<p class="form-row form-row-last">
 				<label><?php echo esc_html__( 'Naziv posebnog oblika prodaje', 'brendigo-sidrena-cijena' ); ?></label>
