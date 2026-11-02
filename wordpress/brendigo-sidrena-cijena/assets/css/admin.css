@@ -4096,3 +4096,65 @@ body.sidrena-cijena-screen #wpbody-content {
         white-space: normal;
     }
 }
+
+/* Cross-viewport QA (240–1920px): keep cards, controls and headings inside
+ * the admin content area. Wide product tables scroll inside their own wrapper,
+ * never through the whole WordPress page. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-shell,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-main,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-panels,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog-wrap {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog-wrap {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-topbar,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__outlets {
+    overflow-wrap: anywhere;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools__note {
+    flex: 1 1 100%;
+    min-width: 0;
+    margin: 0;
+    color: #a9bad1;
+    font-size: 12px;
+    line-height: 1.55;
+}
+@media (max-width: 782px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools label,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools input,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-woo-catalog-tools select {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-android-bridge__outlet-list span {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+@media (max-width: 480px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-topbar__meta {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-nav {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-card {
+        padding: 12px;
+    }
+}
