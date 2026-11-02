@@ -232,3 +232,52 @@ a:hover { color: #b7d5ff; }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; } }
+
+
+/* SIDRENA mobile catalog: same 07/18/2d background, 10/26/3d cards,
+ * 28/45/5f borders, and ff/85/2c price accent as Android screens 04–05.
+ * data-field is a stable public schema key; visible labels stay translated.
+ */
+.cjenik-table td[data-field="maloprodajna_cijena"] {
+	color: #ff852c;
+	font-weight: 800;
+	font-variant-numeric: tabular-nums;
+}
+.cjenik-table td[data-field="sidrena_cijena"] {
+	color: #a9bad1;
+	font-variant-numeric: tabular-nums;
+}
+@media (max-width: 720px) {
+	.cjenik-table-wrap {
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+		overflow: visible;
+	}
+	.cjenik-table tbody tr {
+		margin: 0 0 8px;
+		padding: 12px 14px;
+		border: 1px solid #28455f;
+		border-radius: 12px;
+		background: #10263d;
+	}
+	.cjenik-table tbody tr[data-kind="usluga"] {
+		border-color: #36526a;
+	}
+	.cjenik-table tr[data-kind="usluga"] td[data-field="naziv"] {
+		color: #fff;
+		font-size: 15px;
+		font-weight: 750;
+	}
+	.cjenik-table tr[data-kind="usluga"] td[data-field="maloprodajna_cijena"] {
+		font-size: 16px;
+		line-height: 1.45;
+	}
+	.cjenik-table td[data-field="sidrena_cijena"] {
+		color: #a9bad1;
+		font-size: 12px;
+	}
+	.cjenik-table tbody tr td::before {
+		color: #a9bad1;
+	}
+}
