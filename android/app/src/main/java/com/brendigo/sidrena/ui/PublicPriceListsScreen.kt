@@ -392,22 +392,29 @@ internal fun publicPriceListDocuments(
         )
     }
 
-    add(
-        title = "Cjenik proizvoda",
-        rawUrl = outlet?.productCsv ?: data.index.productsCsv,
-        format = "CSV",
-        group = 1,
-        date = data.index.publishedAt,
-        archived = false,
-    )
-    add(
-        title = "Cjenik usluga",
-        rawUrl = outlet?.serviceCsv ?: data.index.servicesCsv,
-        format = "CSV",
-        group = 2,
-        date = data.index.publishedAt,
-        archived = false,
-    )
+    // WordPress v1 publishes URLs even before the associated CSV file exists.
+    // A confirmed available_csv=false must never create an actionable card.
+    // Null means an older compatible plugin with no publication-status field.
+    if ((outlet?.productsCsvReady ?: data.index.productsCsvReady) != false) {
+        add(
+            title = "Cjenik proizvoda",
+            rawUrl = outlet?.productCsv ?: data.index.productsCsv,
+            format = "CSV",
+            group = 1,
+            date = data.index.publishedAt,
+            archived = false,
+        )
+    }
+    if ((outlet?.servicesCsvReady ?: data.index.servicesCsvReady) != false) {
+        add(
+            title = "Cjenik usluga",
+            rawUrl = outlet?.serviceCsv ?: data.index.servicesCsv,
+            format = "CSV",
+            group = 2,
+            date = data.index.publishedAt,
+            archived = false,
+        )
+    }
     add(
         title = "Javni cjenici — web stranica",
         rawUrl = data.index.publicPage,
