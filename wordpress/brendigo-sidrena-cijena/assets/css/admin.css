@@ -4206,3 +4206,25 @@ body.sidrena-cijena-screen #wpbody-content {
     color: #07182d !important;
     text-shadow: none !important;
 }
+
+
+/* SIDRENA admin — editable product rows remain usable inside their own
+ * horizontally scrollable catalog at phone/tablet widths.
+ * This deliberately leaves the published values and column order untouched. */
+@media (max-width: 782px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog input[type="text"],
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog input[type="url"],
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog input[type="number"],
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog input[type="date"],
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog select,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog button,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog .button {
+        box-sizing: border-box;
+        min-height: 44px;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog button,
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-cijena-catalog .button {
+        padding-inline: 12px;
+        white-space: nowrap;
+    }
+}
