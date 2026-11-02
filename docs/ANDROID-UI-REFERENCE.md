@@ -416,3 +416,18 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 - Za stvarnu **pixel-po-pixel potvrdu** još treba usporediti emulator screenshot i referencu na jednakom DP/DPI okruženju, Android 360/393/411 dp širine te WordPress 360/768/desktop prikaz. Nije moguće tvrditi potvrđen 1:1 bez te usporedbe.
 - Za stvarnu provjeru povezivanja: na testnom WordPressu objaviti cjenik, preko preglednika otvoriti \`/wp-json/brendigo-sidrena/v1/cjenici\`, provjeriti \`feeds.usluge.available_csv=true\`, otvoriti \`feeds.usluge.csv\`, provjeriti 302 odredište iste HTTPS domene, povezati Android, odabrati poslovnicu, osvježiti i otvoriti uslugu. Hosting/CDN/WAF mogu uzrokovati greške koje lokalni testovi ne oponašaju.
 
+
+## Referentni audit — zaslon 06/12 Detalj artikla i usluge (2. 11. 2026.)
+
+Nativni zaslon `ui/CatalogScreens.kt` dodatno je povezan s javnim WordPress CSV poljima. Primarna referenca je šesti telefon SIDRENA brendinga. Aplikacija ne izmišlja slike, stare cijene niti promotivne oznake: prikazuje samo informacije koje postoje u izvornom javnom katalogu.
+
+- Stvarno odobrena WooCommerce fotografija s iste HTTPS domene može se pojaviti u velikom hero bloku; ako je nema, koristi se postojeći lokalni narančasti piktogram. Veza se ne šalje vanjskom dobavljaču slika.
+- `PriceItem` i `CsvParser` osim stvarne trenutne i sidrene cijene sada čuvaju `cijena_jedinice_mjere`, `naziv_posebnog_oblika`, `sidrena_datum`, `barkod` i `marka`. Nijedno polje nije generirano iz dizajnerske slike.
+- Detalj prikazuje izvornu jediničnu cijenu, naziv posebnog oblika prodaje, marku i barkod kada postoje. **Bazna cijena nije poistovjećena sa sidrenom**, a najniža cijena tijekom 30 dana prije sniženja mora imati neovisni i potpuni dokaz.
+- Ako sidrena cijena postoji, ali datum **nije javno objavljen**, zaslon eksplicitno upozorava na neprovjeren povijesni datum. Ako cijene uopće nema, ona se ne računa iz današnje cijene.
+- Spremanje odabira preko rotacije ekrana sada prenosi 14 public polja, ali vraća i stare zapise od 9/10 polja, bez administratorskih podataka.
+- `LegalContract` i `AboutPage` dodatno čitaju informativni pravni profil provjeren 2. 11. 2026. i označavaju pravilnik o baznoj cijeni kao nacrt u savjetovanju. Ne prikazuje se potvrda da je konkretni trgovac zakonski usklađen.
+- `CatalogRepository` i Početna iz WordPress API-ja čitaju `publication.pending_changes`. Stara objavljena CSV datoteka uz kasnije promjene proizvoda prikazuje se kao potencijalno zastarjela, čak i kad su datoteke fizički dostupne.
+
+**Kontrole prije produkcije:** usporedba s izvornim PNG-om u emulatoru (isti DPI/inseti/font), vizualni pregled WordPress mobilnog i desktop kataloga, stvarna objava i preuzimanje JSON/CSV/XML na trgovčevoj domeni, test različitih poslovnica, WP-Cron/poslužiteljski cron do 08:00, pravna provjera dokaza za cijene iz 2025./2026., iznimaka i jediničnih cijena te konačnih pravilnika nakon 13. 11. Ovaj razvojni prolaz i uspješan CI ne znače automatsko zakonsko certificiranje ili izmjereno pixel-perfect 1:1.
+
