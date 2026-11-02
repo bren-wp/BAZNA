@@ -3,7 +3,6 @@ package com.brendigo.sidrena.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,14 +18,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -77,6 +77,7 @@ fun PublicPriceListsScreen(
     onRefresh: () -> Unit,
 ) {
     var search by rememberSaveable { mutableStateOf("") }
+    var showSearch by rememberSaveable { mutableStateOf(false) }
     var filter by rememberSaveable { mutableIntStateOf(0) }
     val documents = remember(data, selectedOutlet) {
         publicPriceListDocuments(data, selectedOutlet)
@@ -88,32 +89,34 @@ fun PublicPriceListsScreen(
     Column(Modifier.fillMaxSize().background(Background)) {
         PublicPriceListsToolbar(
             busy = busy,
+            filter = filter,
+            onFilter = { filter = it },
+            onSearch = { showSearch = !showSearch },
             onBack = onBack,
             onArchive = onArchive,
             onRefresh = onRefresh,
         )
-        Spacer(Modifier.height(7.dp))
-        CatalogSearchBar(
-            value = search,
-            onQueryChange = { search = it.take(256) },
-            hint = "Pretraži cjenike…",
-            accessibilityLabel = "Pretraži javne cjenike",
+        if (showSearch) {
+            CatalogSearchBar(
+                value = search,
+                onQueryChange = { search = it.take(256) },
+                hint = "Pretraži cjenike…",
+                accessibilityLabel = "Pretraži javno objavljene cjenike",
+                heightDp = 40,
+                radiusDp = 9,
+            )
+            Spacer(Modifier.height(10.dp))
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "Objavljeni dokumenti",
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 19.sp,
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(12.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            listOf("Svi", "Proizvodi", "Usluge", "Ostalo").forEachIndexed { index, title ->
-                CatalogFilterChip(
-                    label = title,
-                    selected = filter == index,
-                    onClick = { filter = index },
-                )
-            }
-        }
-        Spacer(Modifier.height(14.dp))
 
         if (busy) {
             LinearProgressIndicator(
@@ -121,51 +124,56 @@ fun PublicPriceListsScreen(
                 color = Accent,
                 trackColor = SurfaceRaised,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(9.dp))
         }
         if (!error.isNullOrBlank()) {
             Text(
-                text = error,
+                error,
+                modifier = Modifier.padding(bottom = 12.dp),
                 color = Color(0xFFFFC997),
-                fontSize = 13.sp,
+                fontSize = 12.sp,
+            )
+        }
+        if (data.index.pendingPublication == true) {
+            Text(
+                "WordPress ima neobjavljene izmjene. Cjenici mogu biti zastarjeli.",
+                color = Color(0xFFFFC997),
+                fontSize = 12.sp,
                 modifier = Modifier.padding(bottom = 12.dp),
             )
         }
 
         if (visible.isEmpty()) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 26.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(11.dp),
             ) {
                 Icon(
                     Icons.Outlined.Description,
                     contentDescription = null,
                     tint = TextMuted,
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(34.dp),
                 )
                 Text(
-                    text = if (documents.isEmpty()) {
-                        "Nema javno objavljenih cjenika."
-                    } else {
-                        "Nema cjenika za odabranu pretragu."
-                    },
+                    if (documents.isEmpty()) "Nema javno objavljenih cjenika."
+                    else "Nema cjenika za odabrani filtar.",
                     color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
-                if (documents.isNotEmpty()) {
-                    Text(
-                        "Promijenite pojam ili odaberite Svi.",
-                        color = TextMuted,
-                        fontSize = 12.sp,
-                    )
-                }
+                Text(
+                    if (documents.isEmpty())
+                        "Provjerite objavu CSV/XML cjenika u WordPress dodatku."
+                    else "U izborniku odaberite Sve ili promijenite pretragu.",
+                    color = TextMuted,
+                    fontSize = 12.sp,
+                )
             }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(9.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(bottom = 24.dp),
             ) {
                 items(visible, key = { it.url }) { document ->
@@ -182,6 +190,9 @@ fun PublicPriceListsScreen(
 @Composable
 private fun PublicPriceListsToolbar(
     busy: Boolean,
+    filter: Int,
+    onFilter: (Int) -> Unit,
+    onSearch: () -> Unit,
     onBack: () -> Unit,
     onArchive: () -> Unit,
     onRefresh: () -> Unit,
@@ -191,35 +202,60 @@ private fun PublicPriceListsToolbar(
         modifier = Modifier.fillMaxWidth().height(61.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+        IconButton(onClick = onBack, modifier = Modifier.size(33.dp)) {
             Icon(
                 Icons.Outlined.ArrowBack,
                 contentDescription = "Natrag na početnu",
-                tint = Color.White,
-                modifier = Modifier.size(25.dp),
+                tint = Accent,
+                modifier = Modifier.size(19.dp),
             )
         }
-        Spacer(Modifier.width(4.dp))
+        Spacer(Modifier.width(6.dp))
         Text(
-            text = "Cjenici",
+            "Javni cjenici",
             color = Color.White,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Box {
-            IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp)) {
+            IconButton(onClick = { menu = true }, modifier = Modifier.size(43.dp)) {
                 Icon(
                     Icons.Outlined.MoreVert,
-                    contentDescription = "Opcije cjenika",
-                    tint = Color.White,
-                    modifier = Modifier.size(25.dp),
+                    contentDescription = "Opcije javnih cjenika",
+                    tint = TextMuted,
+                    modifier = Modifier.size(24.dp),
                 )
             }
             DropdownMenu(
                 expanded = menu,
                 onDismissRequest = { menu = false },
             ) {
+                listOf("Svi dokumenti", "Proizvodi", "Usluge", "Ostalo")
+                    .forEachIndexed { index, label ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            leadingIcon = {
+                                if (index == filter) Icon(
+                                    Icons.Outlined.Check, contentDescription = null
+                                )
+                            },
+                            onClick = {
+                                onFilter(index)
+                                menu = false
+                            },
+                        )
+                    }
+                DropdownMenuItem(
+                    text = { Text("Pretraži cjenike") },
+                    leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+                    onClick = {
+                        menu = false
+                        onSearch()
+                    },
+                )
                 DropdownMenuItem(
                     text = { Text("Osvježi cjenike") },
                     enabled = !busy,
@@ -242,16 +278,12 @@ private fun PublicPriceListsToolbar(
     }
 }
 
+/** Native card from reference 07, with genuine CSV/XML/WEB identity only. */
 @Composable
 private fun PublicPriceListRow(
     document: PublicPriceListDocument,
     onOpen: () -> Unit,
 ) {
-    val tone = when (document.format) {
-        "CSV" -> Color(0xFF52D9A3)
-        "XML" -> Color(0xFFFF852C)
-        else -> SoftBlue
-    }
     Card(
         modifier = Modifier.fillMaxWidth()
             .clickable(onClick = onOpen)
@@ -260,63 +292,54 @@ private fun PublicPriceListRow(
             },
         colors = CardDefaults.cardColors(containerColor = Surface),
         border = BorderStroke(1.dp, Border),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-                .heightIn(min = 80.dp)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .heightIn(min = 76.dp)
+                .padding(horizontal = 9.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(11.dp),
         ) {
             Box(
                 modifier = Modifier.size(44.dp)
-                    .background(tone.copy(alpha = 0.13f), RoundedCornerShape(10.dp)),
+                    .background(SurfaceRaised, RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    Icons.Outlined.Description,
-                    contentDescription = null,
-                    tint = tone,
-                    modifier = Modifier.size(26.dp),
+                Text(
+                    document.format,
+                    color = Accent,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    maxLines = 1,
                 )
             }
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 Text(
-                    text = document.title,
+                    document.title,
                     color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    lineHeight = 18.sp,
+                    lineHeight = 19.sp,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = document.format + " · " +
-                        (if (document.archived) "Arhiva" else "Aktualni cjenik"),
+                    document.format + (document.date?.let { " • " + it } ?: ""),
                     color = TextMuted,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                document.date?.let { date ->
-                    Text(
-                        text = date,
-                        color = Color(0xFFD8E3EF),
-                        fontSize = 11.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
             }
-            IconButton(onClick = onOpen, modifier = Modifier.size(48.dp)) {
+            IconButton(onClick = onOpen, modifier = Modifier.size(41.dp)) {
                 Icon(
-                    imageVector = Icons.Outlined.OpenInNew,
-                    contentDescription = "Otvori dokument",
-                    tint = Color(0xFFDBE9F7),
+                    imageVector = Icons.Outlined.ArrowDownward,
+                    contentDescription = "Otvori dokument u pregledniku",
+                    tint = Accent,
                     modifier = Modifier.size(22.dp),
                 )
             }
