@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -151,7 +152,7 @@ fun HomePage(
 
         Card(
             modifier = Modifier.fillMaxWidth()
-                .clickable { onNavigate("locations") },
+                .clickable(role = Role.Button) { onNavigate("locations") },
             colors = CardDefaults.cardColors(containerColor = Surface),
             border = BorderStroke(1.dp, Border),
             shape = RoundedCornerShape(16.dp),
@@ -327,6 +328,8 @@ private fun HomeConnectedCard(
     onEdit: () -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+    // Pending local changes must not be presented with a green success check.
+    val pending = publicationPending || changesPending
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -338,17 +341,17 @@ private fun HomeConnectedCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier.size(30.dp).background(
-                        if (publicationPending) Accent.copy(alpha = 0.16f)
+                        if (pending) Accent.copy(alpha = 0.16f)
                         else HomeConnectedTint,
                         CircleShape,
                     ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = if (publicationPending) Icons.Outlined.Info
+                        imageVector = if (pending) Icons.Outlined.Info
                         else Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = if (publicationPending) Accent else Background,
+                        tint = if (pending) Accent else Background,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -364,7 +367,7 @@ private fun HomeConnectedCard(
                 Box {
                     IconButton(
                         onClick = { menuExpanded = true },
-                        modifier = Modifier.size(44.dp),
+                        modifier = Modifier.size(48.dp),
                     ) {
                         Icon(
                             Icons.Outlined.MoreVert,
@@ -430,7 +433,8 @@ private fun HomeMetricCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = modifier.heightIn(min = 132.dp).clickable(onClick = onClick),
+        modifier = modifier.heightIn(min = 132.dp)
+            .clickable(role = Role.Button, onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Surface),
         border = BorderStroke(1.dp, Border),
         shape = RoundedCornerShape(16.dp),
@@ -477,7 +481,7 @@ private fun HomeRecentRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(role = Role.Button, onClick = onClick)
             .height(62.dp)
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
