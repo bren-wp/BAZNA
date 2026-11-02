@@ -7,9 +7,12 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.AlertDialog
@@ -22,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -138,10 +142,19 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
             }
         },
     ) { insets ->
-        Column(
-            Modifier.fillMaxSize().padding(insets)
-                .padding(horizontal = if (state.isEditingSite || snapshot == null) 0.dp else 16.dp)
+        // Preserve the original phone layout, but stop stretching a single
+        // column and its price cards edge-to-edge on tablets/landscape screens.
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize().padding(insets),
+            contentAlignment = Alignment.TopCenter,
         ) {
+            val connecting = state.isEditingSite || snapshot == null
+            val maxDp = if (connecting) AdaptiveSizing.MAX_CONNECTION_WIDTH_DP
+                else AdaptiveSizing.MAX_CONTENT_WIDTH_DP
+            Column(
+                Modifier.width(minOf(maxWidth, maxDp.dp)).fillMaxHeight()
+                    .padding(horizontal = if (connecting) 0.dp else 16.dp)
+            ) {
             if (state.isEditingSite || snapshot == null) {
                 ConnectionPage(
                     input = state.siteInput,
@@ -289,6 +302,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         selectedOutlet = state.outlet,
                     )
                 }
+            }
             }
         }
     }
