@@ -60,6 +60,10 @@ jobs:
           set -euo pipefail
           php tools/test_bazna_license_domain.php
           php licenca/tests/test.php
+          output=$(php -r '$_SERVER["HTTPS"]="on";$_SERVER["REQUEST_METHOD"]="GET";require "licenca/api.php";')
+          [[ "$output" == *'"code":"server_not_provisioned"'* ]] || {
+            echo "API without a private master key MUST reject ready status"; exit 1;
+          }
           find licenca -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-license-lint.log
           tail -n 4 /tmp/bazna-license-lint.log
       - name: Test optional product imagery and CSV field compatibility
