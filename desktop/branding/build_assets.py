@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build original SIDRENA Windows icon and installer artwork, standard library only.
+"""Build BAZNA Windows icon and installer artwork, standard library only.
 
 Produces a real multi-resolution ICO and two 24-bit BMP files with the
 same brand geometry; does not need external fonts, images or services.
@@ -24,14 +24,17 @@ def distance(x,y,x1,y1,x2,y2):
     t=max(0.0,min(1.0,((x-x1)*vx+(y-y1)*vy)/(vx*vx+vy*vy))) if vx*vx+vy*vy else 0
     return math.hypot(x-(x1+vx*t),y-(y1+vy*t))
 
-def sidrena_mark(u,v):
-    """Shared stylized S geometry for the Windows icon and installer art."""
-    top=distance(u,v,.72,.26,.32,.26)<.068
-    bend_top=distance(u,v,.32,.26,.30,.42)<.064
-    middle=distance(u,v,.30,.42,.70,.59)<.070
-    bend_bottom=distance(u,v,.70,.59,.70,.74)<.064
-    bottom=distance(u,v,.70,.74,.29,.74)<.068
-    return top or bend_top or middle or bend_bottom or bottom
+def bazna_mark(u,v):
+    """Brand B formed from local scalable strokes, without external assets."""
+    stem=distance(u,v,.30,.23,.30,.77)<.067
+    upper=distance(u,v,.30,.23,.58,.23)<.066
+    shoulder=distance(u,v,.58,.23,.72,.35)<.066
+    upper_round=distance(u,v,.72,.35,.59,.49)<.067
+    middle=distance(u,v,.30,.49,.60,.49)<.064
+    lower_round=distance(u,v,.60,.49,.76,.64)<.069
+    lower_turn=distance(u,v,.76,.64,.59,.77)<.070
+    baseline=distance(u,v,.30,.77,.59,.77)<.069
+    return stem or upper or shoulder or upper_round or middle or lower_round or lower_turn or baseline
 
 def pixel(x,y,w,h,round_corners=True):
     u=(x+0.5)/w;v=(y+0.5)/h
@@ -40,7 +43,7 @@ def pixel(x,y,w,h,round_corners=True):
         dx=max(abs(u-.5)-(.5-r),0.0);dy=max(abs(v-.5)-(.5-r),0.0)
         if dx*dx+dy*dy>r*r:return (0,0,0,0)
     base=tuple(round(NAVY[i]+(NAVY_LIGHT[i]-NAVY[i])*(.3*u+.35*v)) for i in range(3))
-    if sidrena_mark(u,v):
+    if bazna_mark(u,v):
         tint=.12+u*.22
         return tuple(round(ORANGE[i]*(1-tint)+GOLD[i]*tint) for i in range(3))+(255,)
     return base+(255,)
@@ -74,14 +77,14 @@ def bmp(w,h,small=False):
     data=bytearray()
     for y in range(h-1,-1,-1):
         for x in range(w):
-            # Windows welcome panel uses the same SIDRENA S mark as the application.
+            # Windows welcome panel uses the same BAZNA B mark as the application.
             u=x/max(1,w-1);v=y/max(1,h-1)
             base=tuple(round(NAVY[i]+(NAVY_LIGHT[i]-NAVY[i])*(.2+.4*v)) for i in range(3))
             if small:
                 uu=(u-.06)/.88;vv=(v-.06)/.88
             else:
                 uu=u;vv=(v-.26)/.48
-            color=ORANGE if sidrena_mark(uu,vv) else base
+            color=ORANGE if bazna_mark(uu,vv) else base
             data.extend(bytes((color[2],color[1],color[0])))
         data.extend(b"\0"*(rowlen-w*3))
     length=54+len(data)
