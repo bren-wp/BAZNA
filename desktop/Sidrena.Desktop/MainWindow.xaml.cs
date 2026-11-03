@@ -10,10 +10,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using Sidrena.Core;
-using U=Sidrena.Desktop.UiKit;
+using Bazna.Core;
+using U=Bazna.Desktop.UiKit;
 
-namespace Sidrena.Desktop;
+namespace Bazna.Desktop;
 
 public partial class MainWindow : Window
 {
@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        EditionLabel.Text="SIDRENA Desktop "+GetDesktopVersion()+" · Brendigo LTD";
+        EditionLabel.Text="BAZNA Desktop "+GetDesktopVersion()+" · Brendigo LTD";
         ConfigureNavigationIcons();
         var workArea=SystemParameters.WorkArea;
         var initialSize=ResponsiveLayoutPolicy.Initial(workArea.Width,workArea.Height);
@@ -102,7 +102,7 @@ public partial class MainWindow : Window
                     }
                     if(adaptiveCount!=20)
                         throw new InvalidOperationException("Responsive screen coverage incomplete.");
-                    File.WriteAllText(marker,"SIDRENA UI screens: 10/10 passed; responsive 20/20 passed.");
+                    File.WriteAllText(marker,"BAZNA UI screens: 10/10 passed; responsive 20/20 passed.");
                     Application.Current.Shutdown(0);
                 }
                 catch(Exception ex)
@@ -200,7 +200,7 @@ public partial class MainWindow : Window
     private static Brush Brush(string key)=>(Brush)Application.Current.FindResource(key);
     private void Status(string message)=>StatusLabel.Text=message;
     private void Error(Exception ex)=>MessageBox.Show(this,UserFacingError.Describe(ex),
-        "SIDRENA — obavijest",MessageBoxButton.OK,MessageBoxImage.Warning);
+        "BAZNA — obavijest",MessageBoxButton.OK,MessageBoxImage.Warning);
     private static string Euro(long cents)=>PriceStore.FormatEur(cents)+" €";
     private static string DateText(string? iso)
         => iso is not null && DateTime.TryParseExact(iso,"yyyy-MM-dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out var date)
@@ -237,7 +237,7 @@ public partial class MainWindow : Window
         foreach(var file in newest)
             exports.Children.Add(U.Muted($"{file.CreatedUtc.ToLocalTime():dd. MM. yyyy. HH:mm}  · {file.Format}  · {Path.GetFileName(file.FilePath)}"));
         exports.Children.Add(U.Action("Otvori arhivu →",()=>Navigate("Arhiva")));
-        exports.Children.Add(U.Notice("Sidrena cijena predstavlja dokumentirani povijesni podatak, a ne automatski izračunati popust."));
+        exports.Children.Add(U.Notice("Bazna cijena predstavlja dokumentirani povijesni podatak, a ne automatski izračunati popust."));
         outer.Children.Add(U.Split(history,U.Card("Status izvoza",exports)));
         return outer;
     }
@@ -252,11 +252,11 @@ public partial class MainWindow : Window
     {
         var outer=U.Vertical();
         var grid=U.Grid(("Naziv","Name",0),("Šifra","Sku",100),("Barkod","Barcode",130),
-            ("Aktualna","Current",100),("Sidrena","Anchor",119),("Referentni datum","AnchorDate",137));
+            ("Aktualna","Current",100),("Bazna","Anchor",119),("Referentni datum","AnchorDate",137));
         Expander? newItemExpander=null;
         var filter=U.Horizontal();
         var search=U.Box("Pretražite naziv, šifru ili barkod",325);
-        var anchorFilter=U.Choice("Sve stavke","Potvrđena sidrena","Sidrena nije potvrđena");
+        var anchorFilter=U.Choice("Sve stavke","Potvrđena sidrena","Bazna nije potvrđena");
         filter.Children.Add(U.Field("Referentna cijena",anchorFilter));
         filter.Children.Add(U.Field("Pretraživanje",search));
         filter.Children.Add(U.Action("+  "+(kind=="Proizvod"?"Novi artikl":"Nova usluga"),
@@ -309,7 +309,7 @@ public partial class MainWindow : Window
                 current.Clear();reason.Clear();
             }catch(Exception ex) when(ex is ArgumentException or InvalidOperationException or Microsoft.Data.Sqlite.SqliteException){Error(ex);}
         },true));
-        var left=U.Card("Popis i upravljanje cijenama",grid,U.Muted("Odaberite redak pa unesite novu aktualnu cijenu. Sidrena cijena ostaje nepromijenjena."),changeControls);
+        var left=U.Card("Popis i upravljanje cijenama",grid,U.Muted("Odaberite redak pa unesite novu aktualnu cijenu. Bazna cijena ostaje nepromijenjena."),changeControls);
         var name=U.Box("Naziv",250);
         var sku=U.Box("Šifra",160);
         var barcode=U.Box("Barkod",160);
@@ -328,7 +328,7 @@ public partial class MainWindow : Window
         rightFields.Children.Add(money);
         rightFields.Children.Add(U.Field("Referentni datum (samo uz sidrenu)",date));
         rightFields.Children.Add(U.Field("Izvor povijesne cijene",source));
-        rightFields.Children.Add(U.Notice("Sidrena cijena ne izračunava se iz današnje. Datum i izvor unose se samo uz dokaziv povijesni iznos."));
+        rightFields.Children.Add(U.Notice("Bazna cijena ne izračunava se iz današnje. Datum i izvor unose se samo uz dokaziv povijesni iznos."));
         rightFields.Children.Add(U.Action("Spremi novu stavku",()=>{
             try{
                 var historical=string.IsNullOrWhiteSpace(anchor.Text)?(decimal?)null:MoneyParser.Parse(anchor.Text);
@@ -347,7 +347,7 @@ public partial class MainWindow : Window
         var eBarcode=U.Box("Barkod",165);
         var eUnit=U.Box("Jedinica",115);
         var eReason=U.Box("Razlog izmjene podataka",260);
-        var locked=U.Muted("Sidrena cijena i aktualna cijena mogu se mijenjati samo kroz odgovarajuće postupke.");
+        var locked=U.Muted("Bazna cijena i aktualna cijena mogu se mijenjati samo kroz odgovarajuće postupke.");
         var editor=U.Vertical();
         editor.Children.Add(chosen);
         editor.Children.Add(U.Field("Naziv",eName));
@@ -375,7 +375,7 @@ public partial class MainWindow : Window
             chosen.Text=item.Name+"  ·  "+item.Kind;
             eName.Text=item.Name;eSku.Text=item.Sku;eBarcode.Text=item.Barcode;eUnit.Text=item.Unit;
             eReason.Clear();
-            locked.Text=$"Aktualna: {Euro(item.CurrentCents)} · Sidrena: "+
+            locked.Text=$"Aktualna: {Euro(item.CurrentCents)} · Bazna: "+
                 (item.AnchorCents.HasValue?Euro(item.AnchorCents.Value):"nije potvrđena")+
                 $" · Datum: {DateText(item.AnchorDate)}\nPovijesni iznos i datum nisu uređivi u ovom obrascu.";
         };
@@ -409,7 +409,7 @@ public partial class MainWindow : Window
                 preview+remaining+"\n\n"+
                 "Postojeći proizvodi, cijene i povijest neće biti promijenjeni.\n"+
                 "Uvoz dodaje isključivo nove stavke bez sukoba šifri ili naziva. Nastaviti?",
-                "SIDRENA — potvrda uvoza",MessageBoxButton.YesNo,MessageBoxImage.Question);
+                "BAZNA — potvrda uvoza",MessageBoxButton.YesNo,MessageBoxImage.Question);
             if(answer!=MessageBoxResult.Yes)return;
             int imported=_prices.ImportNewRows(rows);
             refresh();
@@ -463,7 +463,7 @@ public partial class MainWindow : Window
             var rows=Filtered();
             if(rows.Count==0){Status("Nema zapisa za odabrane filtre.");return;}
             var dialog=new SaveFileDialog { Title="Izvoz povijesti cijena",FileName=
-                "SIDRENA_POVIJEST_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+".csv",
+                "BAZNA_POVIJEST_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+".csv",
                 Filter="CSV (*.csv)|*.csv",AddExtension=true };
             if(dialog.ShowDialog(this)!=true)return;
             try{DraftExport.HistoryCsv(rows,dialog.FileName);
@@ -501,7 +501,7 @@ public partial class MainWindow : Window
         var preview=U.Vertical();
         preview.Children.Add(U.Text("Pregled kataloga",16,true));
         var grid=U.Grid(("Naziv","Name",0),("Vrsta","Kind",100),("Aktualna cijena","Current",145),
-            ("Sidrena cijena","Anchor",145));
+            ("Bazna cijena","Anchor",145));
         var kind=U.Choice("Svi artikli i usluge","Samo artikli","Samo usluge");
         List<PriceItem> SelectedItems()=>
             _prices.ListItems().Where(x=>kind.SelectedIndex switch
@@ -521,11 +521,11 @@ public partial class MainWindow : Window
             {
                 var folder=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "Brendigo","SIDRENA","pregledi");
-                var path=Path.Combine(folder,"SIDRENA_PREGLED_"+
+                var path=Path.Combine(folder,"BAZNA_PREGLED_"+
                     DateTime.Now.ToString("yyyyMMdd_HHmmss_fff",Hr)+".html");
                 var scope=kind.SelectedIndex switch
                 {1=>"artikli",2=>"usluge",_=>"artikli i usluge"};
-                LocalPricelistPreview.Write(selected,path,"SIDRENA — pregled cjenika: "+scope);
+                LocalPricelistPreview.Write(selected,path,"BAZNA — pregled cjenika: "+scope);
                 OpenLocal(path);
                 Status("Cjenik je otvoren za pregled i ispis. Prije javne objave provjerite njegovu usklađenost.");
             }
@@ -549,7 +549,7 @@ public partial class MainWindow : Window
         if(items.Count==0){Status("Odabrani obuhvat nema artikala ili usluga.");return;}
         var dlg=new SaveFileDialog{
             Title="Spremi cjenik za pregled",
-            FileName="SIDRENA_NACRT_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+
+            FileName="BAZNA_NACRT_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+
                 (format=="CSV"?".csv":".xml"),
             Filter=format=="CSV"?"CSV (*.csv)|*.csv":"XML (*.xml)|*.xml",
             AddExtension=true };
@@ -567,15 +567,15 @@ public partial class MainWindow : Window
     {
         if(items.Count==0){Status("Nema stavki za izvoz u WordPress.");return;}
         var dlg=new SaveFileDialog{
-            Title="Spremi CSV za pregled u WordPress SIDRENA uvozu",
-            FileName="SIDRENA_ZA_WORDPRESS_UVOZ_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+".csv",
+            Title="Spremi CSV za pregled u WordPress BAZNA uvozu",
+            FileName="BAZNA_ZA_WORDPRESS_UVOZ_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+".csv",
             Filter="CSV (*.csv)|*.csv", AddExtension=true};
         if(dlg.ShowDialog(this)!=true)return;
         try
         {
             OfficialPluginImportCsv.Write(items,dlg.FileName);
             _workspace.RecordDraftExport(dlg.FileName,"CSV",items.Count);
-            Status("CSV je spremljen. U WordPressu otvorite SIDRENA > Uvoz cjenika, provjerite mapiranje i izričito potvrdite promjene.");
+            Status("CSV je spremljen. U WordPressu otvorite BAZNA > Uvoz cjenika, provjerite mapiranje i izričito potvrdite promjene.");
             if(_activePage=="Cjenici"||_activePage=="Arhiva")Navigate(_activePage);
         }
         catch(Exception ex)when(ex is ArgumentException or IOException or UnauthorizedAccessException
@@ -611,7 +611,7 @@ public partial class MainWindow : Window
     {
         var outer=U.Vertical();
         outer.Children.Add(U.Card("WordPress i vaše poslovnice",
-            U.Text("Brendigo Sidrena Cijena 1.5.3",18,true),
+            U.Text("Brendigo Bazna Cijena 1.5.3",18,true),
             U.Muted("Učitajte javne cjenike i povijest objava povezane web-stranice.")));
 
         var site=U.Box("https://primjer.hr/",420);
@@ -641,7 +641,7 @@ public partial class MainWindow : Window
                     result.PublishedAt.Value.ToLocalTime().ToString("dd. MM. yyyy. HH:mm",Hr):
                     "nije evidentirana")+$"\nDostupna su {result.Feeds.Count} tipizirana izvora i {result.OutletCount} poslovnica."+
                     (result.Legal is null?
-                        "\\nNema pravnog API profila. Ažurirajte WordPress SIDRENA dodatak na 1.5.3.":
+                        "\\nNema pravnog API profila. Ažurirajte WordPress BAZNA dodatak na 1.5.11.":
                         "\\nPravni profil: "+result.Legal.RulesRevision+
                         " · početak primjene "+result.Legal.EffectiveFrom.ToString("dd. MM. yyyy.",Hr)+
                         " · referentni datumi "+result.Legal.LegacyReferenceDate.ToString("dd. MM. yyyy.",Hr)+
@@ -749,7 +749,7 @@ public partial class MainWindow : Window
                     var decision=MessageBox.Show(this,
                         "Datoteka je izmijenjena nakon spremanja. Želite li je ipak otvoriti?"+
                         "\nIzvorna SHA-256 provjera više ne odgovara.",
-                        "SIDRENA — datoteka je izmijenjena",MessageBoxButton.YesNo,MessageBoxImage.Warning);
+                        "BAZNA — datoteka je izmijenjena",MessageBoxButton.YesNo,MessageBoxImage.Warning);
                     if(decision!=MessageBoxResult.Yes)return;
                 }
                 OpenLocal(x.Path);
@@ -771,14 +771,14 @@ public partial class MainWindow : Window
         data.Children.Add(U.Muted("Zaštitite svoju evidenciju sigurnosnom kopijom. Podatke možete vratiti kada god zatreba."));
         var actions=U.Horizontal();
         actions.Children.Add(U.Action("Izradi sigurnosnu kopiju",()=>{
-            var dlg=new SaveFileDialog{Filter="Sigurnosna kopija SIDRENA (*.db)|*.db",FileName="SIDRENA_backup_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+".db"};
+            var dlg=new SaveFileDialog{Filter="Sigurnosna kopija BAZNA (*.db)|*.db",FileName="BAZNA_backup_"+DateTime.Now.ToString("yyyyMMdd_HHmm",Hr)+".db"};
             if(dlg.ShowDialog(this)!=true)return;
             try{_workspace.BackupTo(dlg.FileName);Status("Sigurnosna kopija uspješno je izrađena.");}
             catch(Exception ex)when(ex is IOException or UnauthorizedAccessException or ArgumentException or Microsoft.Data.Sqlite.SqliteException){Error(ex);}
         },true));
         actions.Children.Add(U.Action("Provjeri i vrati sigurnosnu kopiju",()=>{
-            var dlg=new OpenFileDialog{Title="Odaberi prethodno spremljenu SIDRENA sigurnosnu kopiju",
-                Filter="Sigurnosna kopija SIDRENA (*.db)|*.db",CheckFileExists=true,Multiselect=false};
+            var dlg=new OpenFileDialog{Title="Odaberi prethodno spremljenu BAZNA sigurnosnu kopiju",
+                Filter="Sigurnosna kopija BAZNA (*.db)|*.db",CheckFileExists=true,Multiselect=false};
             if(dlg.ShowDialog(this)!=true)return;
             try
             {
@@ -790,11 +790,11 @@ public partial class MainWindow : Window
                     "Postojeći podaci bit će zamijenjeni odabranom kopijom.\n"+
                     "Prije povrata automatski će se izraditi zasebna zaštitna kopija postojećih podataka.\n"+
                     "Želite li nastaviti?";
-                if(MessageBox.Show(this,question,"SIDRENA — potvrda vraćanja podataka",
+                if(MessageBox.Show(this,question,"BAZNA — potvrda vraćanja podataka",
                     MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
                 var recoveryDir=Path.Combine(Path.GetDirectoryName(_databasePath)!,"backups");
                 var recovery=Path.Combine(recoveryDir,
-                    "SIDRENA_prije_povrata_"+DateTime.Now.ToString("yyyyMMdd_HHmmss",Hr)+
+                    "BAZNA_prije_povrata_"+DateTime.Now.ToString("yyyyMMdd_HHmmss",Hr)+
                     "_"+Guid.NewGuid().ToString("N")[..8]+".db");
                 // The other open SQLite connection must not hold locks during online restore.
                 _prices.Dispose();
@@ -809,7 +809,7 @@ public partial class MainWindow : Window
                     Navigate("Pregled");
                 }
                 Status("Podaci su uspješno vraćeni. Prethodno stanje sigurno je spremljeno.");
-                MessageBox.Show(this,"Podaci su uspješno vraćeni. Sačuvana je i sigurnosna kopija prethodnog stanja.","SIDRENA — povrat dovršen",MessageBoxButton.OK,MessageBoxImage.Information);
+                MessageBox.Show(this,"Podaci su uspješno vraćeni. Sačuvana je i sigurnosna kopija prethodnog stanja.","BAZNA — povrat dovršen",MessageBoxButton.OK,MessageBoxImage.Information);
             }
             catch(Exception ex)when(ex is IOException or UnauthorizedAccessException or ArgumentException or
                 InvalidDataException or InvalidOperationException or AggregateException or Microsoft.Data.Sqlite.SqliteException)
@@ -821,9 +821,9 @@ public partial class MainWindow : Window
         outer.Children.Add(U.Card("Opće postavke",U.Muted("Jezik: Hrvatski · Izgled: Tamni · Jednostavno upravljanje"),
             U.Notice("Vaše poslovne podatke možete dodatno zaštititi izradom redovitih sigurnosnih kopija.")));
         outer.Children.Add(U.Card("Informacije o izdanju",
-            U.Text("SIDRENA Desktop "+GetDesktopVersion(),18,true),
+            U.Text("BAZNA Desktop "+GetDesktopVersion(),18,true),
             U.Muted("Windows 10/11 · Brendigo LTD · Komercijalna licencija"),
-            U.Notice("WordPress dodatak SIDRENA 1.5.3 dijeli javni pravni profil s Androidom i Windowsom."),
+            U.Notice("WordPress dodatak BAZNA 1.5.3 dijeli javni pravni profil s Androidom i Windowsom."),
             U.Action("Preuzmi najnoviju Windows aplikaciju",()=>
                 OpenUrl("https://github.com/bren-wp/SIDRENA/releases"),true),
             U.Action("Uvjeti komercijalne licence",ShowCommercialLicense),
@@ -854,18 +854,18 @@ public partial class MainWindow : Window
 
     private void ShowCommercialLicense()
     {
-        const string resource="Sidrena.Desktop.Licensing.EULA-HR.txt";
+        const string resource="Bazna.Desktop.Licensing.EULA-HR.txt";
         using var stream=typeof(MainWindow).Assembly.GetManifestResourceStream(resource);
         if(stream is null)
         {
             MessageBox.Show(this,"Uvjeti licence trenutačno nisu dostupni. Obratite se podršci.",
-                "SIDRENA — licencija",MessageBoxButton.OK,MessageBoxImage.Warning);
+                "BAZNA — licencija",MessageBoxButton.OK,MessageBoxImage.Warning);
             return;
         }
         using var reader=new StreamReader(stream,Encoding.UTF8);
         var window=new Window
         {
-            Title="SIDRENA — komercijalna licencija",Owner=this,
+            Title="BAZNA — komercijalna licencija",Owner=this,
             WindowStartupLocation=WindowStartupLocation.CenterOwner,
             Width=Math.Min(800,SystemParameters.WorkArea.Width*0.86),
             Height=Math.Min(670,SystemParameters.WorkArea.Height*0.86),
