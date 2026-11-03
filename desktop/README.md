@@ -1,10 +1,10 @@
-# SIDRENA Desktop za Windows
+# BAZNA Desktop za Windows
 
 ![SIDRENA](branding/sidrena-banner.svg)
 
 **Vaše cijene. Vaša evidencija. Vaša kontrola.**
 
-SIDRENA Desktop **0.10.6** je Windows aplikacija Brendigo LTD za upravljanje proizvodima, uslugama, trenutačnim i sidrenim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
+BAZNA Desktop **0.10.6** je Windows aplikacija Brendigo LTD za upravljanje proizvodima, uslugama, trenutačnim i sidrenim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
 
 ## Funkcionalnosti
 
