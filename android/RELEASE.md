@@ -2,11 +2,11 @@
 
 | Komponenta | Verzija |
 |---|---|
-| Android | **1.5.12 (izdanje za CI validaciju)** |
+| Android | **1.5.13 (izdanje za CI validaciju)** |
 | Windows Desktop | **0.10.6** |
-| WordPress dodatak | **1.5.12 (izdanje za CI validaciju)** |
+| WordPress dodatak | **1.5.13 (izdanje za CI validaciju)** |
 
-Verzije su **odvojene**. Android 1.5.12 i WordPress 1.5.12 sadrže stvarne, međusobno usklađene promjene u PR-u za izdanje 1.5.12. Izdanje se objavljuje tek nakon uspješnog Android, WordPress, Windows i sigurnosnog CI-ja; debug APK i nepotpisani AAB nisu produkcijski potpisani. WordPress dodatak 1.5.12 potrebno je zasebno instalirati ili ažurirati da bi novi statusi objave CSV-a bili dostupni Androidu.
+Verzije su **odvojene**. Android 1.5.13 i WordPress 1.5.13 sadrže stvarne, međusobno usklađene promjene u PR-u za izdanje 1.5.13. Izdanje se objavljuje tek nakon uspješnog Android, WordPress, Windows i sigurnosnog CI-ja; debug APK i nepotpisani AAB nisu produkcijski potpisani. WordPress dodatak 1.5.13 potrebno je zasebno instalirati ili ažurirati da bi novi statusi objave CSV-a bili dostupni Androidu.
 
 ## Provjere i artefakti
 
@@ -17,9 +17,9 @@ Novo objedinjeno izdanje sadrži:
 - `SIDRENA-Android-unsigned.aab` — AAB bez produkcijskog potpisa.
 - `SIDRENA-Desktop-win-x64-Portable.exe` — Windows prijenosna aplikacija.
 - `SIDRENA-Desktop-win-x64-Setup.exe` — Windows instalacijski program.
-- `brendigo-sidrena-cijena-1.5.12.zip` — predviđeni ažurirani WordPress paket nakon uspješnog CI-ja i izdavanja.
+- `brendigo-sidrena-cijena-1.5.13.zip` — predviđeni ažurirani WordPress paket nakon uspješnog CI-ja i izdavanja.
 - Kontrolne SHA-256 datoteke i Windows izvještaj o porijeklu binarnih datoteka.
 
-Objava paketa moguća je tek kada Android i WordPress CI uspješno završe za isti commit i svi novi reproducibilni ZIP paketi imaju potvrđene SHA-256 kontrolne zbrojeve. WordPress ZIP 1.5.12 namjerno ima novi hash zbog promjena izvornog koda. U nedostatku produkcijskog potpisnog ključa Android AAB ne treba predstavljati kao spreman za Google Play.
+Objava paketa moguća je tek kada Android i WordPress CI uspješno završe za isti commit i svi novi reproducibilni ZIP paketi imaju potvrđene SHA-256 kontrolne zbrojeve. WordPress ZIP 1.5.13 namjerno ima novi hash zbog promjena izvornog koda. U nedostatku produkcijskog potpisnog ključa Android AAB ne treba predstavljati kao spreman za Google Play.
 
 [GitHub izdanja](https://github.com/bren-wp/SIDRENA/releases)
