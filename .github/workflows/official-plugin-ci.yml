@@ -60,6 +60,12 @@ jobs:
           set -euo pipefail
           php tools/test_bazna_license_domain.php
           php licenca/tests/test.php
+          preflight=$(php licenca/bin/preflight.php "$PWD" 2>&1) && {
+            echo "Unconfigured licensing preflight unexpectedly succeeded"; exit 1;
+          }
+          [[ "$preflight" == *"Nedostaje private/config.php"* ]] || {
+            echo "Preflight missing a clear configuration failure"; exit 1;
+          }
           output=$(php -r '$_SERVER["HTTPS"]="on";$_SERVER["REQUEST_METHOD"]="GET";require "licenca/api.php";')
           [[ "$output" == *'"code":"server_not_provisioned"'* ]] || {
             echo "API without a private master key MUST reject ready status"; exit 1;
