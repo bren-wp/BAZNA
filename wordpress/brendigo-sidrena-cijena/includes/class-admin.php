@@ -171,6 +171,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 			'javni-xml'    => __( 'HTML prikaz, XML/CSV datoteke i arhiva javnog cjenika.', 'brendigo-sidrena-cijena' ),
 			'poslovnice'   => __( 'Više lokacija, zasebni javni cjenici i datoteke po poslovnici.', 'brendigo-sidrena-cijena' ),
 			'upute'        => __( 'Korisničke upute za WordPress i WooCommerce – korak po korak.', 'brendigo-sidrena-cijena' ),
+			'licenca'      => __( 'Unesite licencni ključ za otključavanje svih administracijskih mogućnosti.', 'brendigo-sidrena-cijena' ),
 		);
 		$page_subtitle = isset( $page_subtitles[ $tab ] ) ? $page_subtitles[ $tab ] : '';
 		?>
@@ -199,7 +200,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 				<main class="brendigo-admin-main">
 					<header class="brendigo-admin-topbar">
 						<div>
-							<p class="brendigo-admin-eyebrow"><?php echo esc_html__( 'Upravljanje sidrenim cijenama', 'brendigo-sidrena-cijena' ); ?></p>
+							<p class="brendigo-admin-eyebrow"><?php echo esc_html__( 'Upravljanje baznim cijenama', 'brendigo-sidrena-cijena' ); ?></p>
 							<h1><?php echo esc_html( $page_title ); ?></h1>
 							<p><?php echo esc_html( $page_subtitle ); ?></p>
 						</div>
@@ -235,8 +236,10 @@ class Brendigo_Sidrena_Cijena_Admin {
 							$this->render_tab_poslovnice();
 						} elseif ( 'postavke' === $tab ) {
 							$this->render_tab_postavke( $settings );
-						} elseif ( 'upute' === $tab ) {
-							$this->render_tab_upute();
+						} elseif ( 'licenca' === $tab ) {
+                            $this->render_tab_licenca();
+                        } elseif ( 'upute' === $tab ) {
+                            $this->render_tab_upute();
 						} else {
 							do_action( 'sidrena_cijena_render_settings_tab', $tab );
 						}
@@ -258,8 +261,78 @@ class Brendigo_Sidrena_Cijena_Admin {
 	 *
 	 * @return array<string, array{label:string, icon:string}>
 	 */
-	private function get_tabs() {
+	    /**
+     * License activation is always accessible. No key is ever embedded in HTML
+     * or returned by the public REST API.
+     */
+    private function render_tab_licenca() {
+        $active = Brendigo_Sidrena_Cijena_License::valid();
+        $host = Brendigo_Sidrena_Cijena_License::site_host();
+        $status = isset($_GET['bazna_license_status'])
+            ? sanitize_key(wp_unslash($_GET['bazna_license_status'])) : '';
+        $messages = array(
+            'active' => 'BAZNA licencija je aktivna za ovu domenu.',
+            'deactivated' => 'Licencija je odvezana s ove domene.',
+            'invalid_key' => 'Neispravan oblik licencnog ključa.',
+            'invalid_site_domain' => 'Domena web-stranice nije javno dostupna i valjana.',
+            'domain_proof_failed' => 'Servis nije mogao HTTPS-om potvrditi vlasništvo nad domenom. Provjerite DNS, certifikat i WordPress REST API.',
+            'already_used_on_another_domain' => 'Ovaj ključ već je aktiviran na drugoj domeni.',
+            'not_activated_for_domain' => 'Ključ nije povezan s ovom domenom.',
+            'service_unreachable' => 'Licencni servis trenutačno nije dostupan. Provjerite HTTPS izlazne zahtjeve.',
+            'invalid_service_reply' => 'Servis je vratio neispravan odgovor.',
+            'license_service_unavailable' => 'Servis nije spreman. Kontaktirajte podršku.',
+            'encryption_unavailable' => 'Poslužitelj ne podržava sigurno spremanje licencnog ključa.',
+            'rate_limit_exceeded' => 'Previše pokušaja provjere. Pokušajte ponovno kasnije.',
+            'server_not_provisioned' => 'Licencni servis još nije konfiguriran.',
+            'activation_failed' => 'Aktivacija nije dovršena.',
+        );
+        ?>
+        <section class="sidrena-cijena-card brendigo-settings-card">
+            <div class="sidrena-cijena-card__head">
+                <span class="dashicons dashicons-admin-network" aria-hidden="true"></span>
+                <div>
+                    <h2><?php echo esc_html__('BAZNA — licencija', 'brendigo-sidrena-cijena'); ?></h2>
+                    <p><?php echo esc_html__('Jedan licencni ključ za jednu domenu. Podaci i javno objavljeni cjenici ne brišu se kada licencija nije aktivna.', 'brendigo-sidrena-cijena'); ?></p>
+                </div>
+            </div>
+            <?php if ( isset($messages[$status]) ) : ?>
+                <div class="notice notice-info inline" role="status"><p><?php echo esc_html($messages[$status]); ?></p></div>
+            <?php endif; ?>
+            <p><strong><?php echo esc_html__('Domena:', 'brendigo-sidrena-cijena'); ?></strong> <code><?php echo esc_html($host); ?></code></p>
+            <p><strong><?php echo esc_html__('Status:', 'brendigo-sidrena-cijena'); ?></strong>
+                <?php echo esc_html($active ? 'Aktivna — sve administratorske mogućnosti otključane' : 'Nije aktivna — unos ključa je obvezan'); ?>
+            </p>
+            <?php if ( !$active ) : ?>
+                <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
+                    <?php wp_nonce_field('bazna_license_action', 'bazna_license_nonce'); ?>
+                    <input type="hidden" name="bazna_license_action" value="activate" />
+                    <label for="bazna_license_key"><strong><?php echo esc_html__('Licencni ključ', 'brendigo-sidrena-cijena'); ?></strong></label>
+                    <input type="text" class="regular-text" id="bazna_license_key" name="bazna_license_key"
+                        maxlength="90" placeholder="BAZNA-00001-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+                        autocomplete="off" spellcheck="false" required />
+                    <button type="submit" class="button button-primary"><?php echo esc_html__('Aktiviraj licenciju', 'brendigo-sidrena-cijena'); ?></button>
+                </form>
+            <?php else : ?>
+                <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
+                    <?php wp_nonce_field('bazna_license_action', 'bazna_license_nonce'); ?>
+                    <button type="submit" name="bazna_license_action" value="refresh" class="button button-secondary"><?php echo esc_html__('Provjeri licenciju', 'brendigo-sidrena-cijena'); ?></button>
+                    <button type="submit" name="bazna_license_action" value="deactivate" class="button button-secondary"><?php echo esc_html__('Odveži ovu domenu', 'brendigo-sidrena-cijena'); ?></button>
+                </form>
+            <?php endif; ?>
+            <p class="description"><?php echo esc_html__('Provjera je povezana sa servisom licenca.brendigo.com. Za javne cjenike i Android pregled ne traži se unos administratorskih vjerodajnica.', 'brendigo-sidrena-cijena'); ?></p>
+        </section>
+        <?php
+    }
+
+    private function get_tabs() {
 		$tabs = array();
+        $tabs['licenca'] = array(
+            'label' => __( 'Licencija', 'brendigo-sidrena-cijena' ),
+            'icon' => 'dashicons-admin-network',
+        );
+        if ( ! Brendigo_Sidrena_Cijena_License::valid() ) {
+            return $tabs;
+        }
 
 		$tabs['pregled'] = array(
 			'label' => __( 'Pregled', 'brendigo-sidrena-cijena' ),
