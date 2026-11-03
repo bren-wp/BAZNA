@@ -36,6 +36,13 @@ try {
 }
 $base = sys_get_temp_dir() . '/bazna-license-test-' . bin2hex(random_bytes(6));
 mkdir($base, 0700);
+// Even when directories do not yet exist, refuse private JSON inside webroot.
+expect_bazna(!bazna_license_storage_is_private($base, $base . '/new/storage'),
+    'never create JSON registry under public document root');
+expect_bazna(bazna_license_storage_is_private($base, dirname($base) . '/separate-bazna-private'),
+    'allow a separate, existing writable ancestor outside document root');
+expect_bazna(!bazna_license_storage_is_private($base, 'relative/storage'),
+    'reject relative storage paths');
 $challenge = str_repeat('a', 64);
 $proof = static function ($host, $path, $token) use ($challenge): bool {
     return $token === $challenge && $path === '/';
