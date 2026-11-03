@@ -175,6 +175,58 @@ function bazna_license_store(string $dir, callable $handler): array {
     }
 }
 
+/** Per-peer sliding-minute limit. IP is hashed; only transient counts persist. */
+function bazna_license_rate_limit(string $dir, string $remoteIp): void {
+    if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
+        throw new RuntimeException('storage_not_writable');
+    }
+    $handle = fopen($dir . '/rate.lock', 'c');
+    if (!$handle || !flock($handle, LOCK_EX)) {
+        throw new RuntimeException('rate_limit_storage_failure');
+    }
+    try {
+        $path = $dir . '/rate.json';
+        $state = is_file($path) ? json_decode((string) file_get_contents($path), true) : array();
+        if (!is_array($state)) {
+            $state = array();
+        }
+        $now = time();
+        foreach ($state as $hash => $entry) {
+            if (!is_array($entry) || ($entry['minute'] ?? 0) < $now - 120) {
+                unset($state[$hash]);
+            }
+        }
+        $key = hash('sha256', $remoteIp);
+        $entry = $state[$key] ?? array('minute' => $now, 'count' => 0);
+        if (!is_array($entry) || $now - (int) ($entry['minute'] ?? 0) >= 60) {
+            $entry = array('minute' => $now, 'count' => 0);
+        }
+        $entry['count'] = (int) ($entry['count'] ?? 0) + 1;
+        $state[$key] = $entry;
+        $tmp = tempnam($dir, 'rate-');
+        if ($tmp === false) {
+            throw new RuntimeException('rate_limit_storage_failure');
+        }
+        try {
+            chmod($tmp, 0600);
+            if (file_put_contents($tmp, json_encode($state, JSON_THROW_ON_ERROR)) === false ||
+                !rename($tmp, $path)) {
+                throw new RuntimeException('rate_limit_storage_failure');
+            }
+        } finally {
+            if (is_file($tmp)) {
+                unlink($tmp);
+            }
+        }
+        if ($entry['count'] > 60) {
+            throw new RuntimeException('rate_limit_exceeded');
+        }
+    } finally {
+        flock($handle, LOCK_UN);
+        fclose($handle);
+    }
+}
+
 function bazna_license_action(string $secret, string $dir, string $action, string $key,
     string $hostname, string $path, string $challenge = '', ?callable $proof = null): array {
     $serial = bazna_license_serial($secret, $key);
