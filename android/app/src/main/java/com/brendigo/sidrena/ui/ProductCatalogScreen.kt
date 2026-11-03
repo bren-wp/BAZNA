@@ -91,7 +91,7 @@ internal fun filterProductCatalog(
 }
 
 /**
- * 04/12: SIDRENA products.
+ * 04/12: BAZNA products.
  * The WordPress v1 public CSV optionally exposes real product thumbnails.
  * There are no guaranteed sale badges, new-product flags or category fields.
  * Preserve the reference layout without inventing photos or product metadata.
