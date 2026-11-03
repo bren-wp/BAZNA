@@ -1,4 +1,4 @@
-name: SIDRENA Android build, tests and audited artifacts
+name: BAZNA Android build, tests and audited artifacts
 
 on:
   pull_request:
