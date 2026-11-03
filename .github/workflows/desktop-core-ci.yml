@@ -1,4 +1,4 @@
-name: SIDRENA cross-platform core regression tests
+name: BAZNA cross-platform core regression tests
 
 on:
   pull_request:
