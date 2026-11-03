@@ -58,6 +58,33 @@ function bazna_license_public_ip(string $ip): bool {
 }
 
 /**
+ * Reject JSON storage in DOCUMENT_ROOT, including not-yet-created directories.
+ * Walk to the nearest real parent to avoid a missing-path check bypass.
+ */
+function bazna_license_storage_is_private(string $webRoot, string $storage): bool {
+    $root = realpath($webRoot);
+    if ($root === false || $storage === '' ||
+        (!str_starts_with($storage, DIRECTORY_SEPARATOR) &&
+         !preg_match('/^[A-Za-z]:[\\\\\\/]/', $storage))) {
+        return false;
+    }
+    $probe = $storage;
+    for ($i = 0; $i < 32 && !file_exists($probe); ++$i) {
+        $parent = dirname($probe);
+        if ($parent === $probe) {
+            return false;
+        }
+        $probe = $parent;
+    }
+    $base = realpath($probe);
+    if ($base === false) {
+        return false;
+    }
+    $prefix = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    return $base !== $root && strncmp($base, $prefix, strlen($prefix)) !== 0;
+}
+
+/**
  * Prove that the claimant controls the publicly reachable HTTPS WordPress
  * installation. CURLOPT_RESOLVE pins the already validated public DNS A
  * address, preventing DNS rebinding SSRF. No redirects or private IPs.
