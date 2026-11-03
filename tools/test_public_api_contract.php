@@ -32,8 +32,22 @@ function rest_url( $route ) {
 	}
 	return 'https://primjer.hr/wp-json/' . $route;
 }
+// Mirror the WordPress REST response API, including HTTP headers, while
+// retaining array access for the existing contract assertions.
+class WP_REST_Response implements ArrayAccess, JsonSerializable {
+    private $data;
+    private $headers = array();
+    public function __construct( $data = null, $status = 200 ) { $this->data = $data; }
+    public function header( $key, $value ) { $this->headers[ $key ] = $value; }
+    public function get_headers() { return $this->headers; }
+    public function jsonSerialize() { return $this->data; }
+    public function offsetExists( $offset ): bool { return isset( $this->data[ $offset ] ); }
+    public function offsetGet( $offset ): mixed { return $this->data[ $offset ]; }
+    public function offsetSet( $offset, $value ): void { $this->data[ $offset ] = $value; }
+    public function offsetUnset( $offset ): void { unset( $this->data[ $offset ] ); }
+}
 function rest_ensure_response( $data ) {
-	return $data;
+	return new WP_REST_Response( $data );
 }
 function add_query_arg( $key, $value, $url ) {
 	$separator = false === strpos( $url, '?' ) ? '?' : '&';
@@ -115,6 +129,10 @@ foreach ( $sidrena_registered_routes as $registered ) {
 	sidrena_contract_assert( '__return_true' === $registered['permission_callback'], 'Public endpoints have no admin authentication' );
 }
 $json = $api->index();
+sidrena_contract_assert(
+    'no-store, max-age=0, must-revalidate' === $json->get_headers()['Cache-Control'],
+    'Public discovery must not cache publication/readiness flags'
+);
 sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
 sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
 sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
