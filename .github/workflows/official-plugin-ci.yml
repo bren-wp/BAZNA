@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'wordpress/brendigo-sidrena-cijena/**'
+      - 'licenca/**'
+      - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
@@ -16,6 +18,8 @@ on:
     branches: [main]
     paths:
       - 'wordpress/brendigo-sidrena-cijena/**'
+      - 'licenca/**'
+      - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
@@ -48,6 +52,14 @@ jobs:
         run: php tools/test_legal_contract.php
       - name: Test public Android/WordPress feed discovery compatibility
         run: php tools/test_public_api_contract.php
+      - name: Verify BAZNA licence domain binding and server JSON engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          php tools/test_bazna_license_domain.php
+          php licenca/tests/test.php
+          find licenca -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-license-lint.log
+          tail -n 4 /tmp/bazna-license-lint.log
       - name: Test optional product imagery and CSV field compatibility
         run: php tools/test_public_feed_columns.php
       - name: Test public mobile service cards and HTML escaping
