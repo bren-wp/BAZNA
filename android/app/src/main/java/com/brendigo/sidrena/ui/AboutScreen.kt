@@ -83,7 +83,7 @@ internal fun aboutPublicPriceListUrl(data: CatalogSnapshot): String? =
     }.getOrNull()
 
 /**
- * SIDRENA Android — screen 12/12, "O aplikaciji".
+ * BAZNA Android — screen 12/12, "O aplikaciji".
  *
  * All assets are local. The logo is the same drawable as the splash screen.
  * Content uses real build metadata and the published WordPress public API.
@@ -155,7 +155,7 @@ fun AboutPage(
             AboutActionRow(
                 icon = Icons.Outlined.HelpOutline,
                 title = "Kako povezati stranicu",
-                subtitle = "HTTPS adresa i SIDRENA dodatak",
+                subtitle = "HTTPS adresa i BAZNA dodatak",
                 onClick = onConnectHelp,
             )
             AboutDivider()
@@ -246,7 +246,7 @@ fun AboutPage(
         }
 
         Text(
-            text = "SIDRENA samo prikazuje javno objavljene podatke " +
+            text = "BAZNA samo prikazuje javno objavljene podatke " +
                 "povezane WordPress stranice. Cijene i datume " +
                 "provjerite u izvornim cjenicima.",
             color = TextMuted,
@@ -255,7 +255,7 @@ fun AboutPage(
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
         )
         Text(
-            text = "SIDRENA by Brendigo",
+            text = "BAZNA by Brendigo",
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
@@ -294,13 +294,13 @@ private fun AboutHero() {
                 ) {
                     Image(
                         painter = painterResource(R.drawable.ic_sidrena_mark),
-                        contentDescription = "Logotip SIDRENA",
+                        contentDescription = "Logotip BAZNA – Bazne cijene",
                         modifier = Modifier.size(67.dp),
                     )
                 }
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = "SIDRENA",
+                    text = "BAZNA",
                     fontSize = 27.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 0.9.sp,
