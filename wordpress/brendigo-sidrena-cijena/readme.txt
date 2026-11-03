@@ -1,16 +1,24 @@
-=== SIDRENA – Sidrene cijene i cjenici ===
+=== BAZNA – Bazne cijene i cjenici ===
 Contributors: brendigo
 Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.10
+Stable tag: 1.5.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Manage reference prices and dates, publish a public HTML pricelist, and generate XML/CSV archives for WooCommerce or standalone catalogs.
+BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva za WordPress i WooCommerce.
 
 == Changelog ==
+
+= 1.5.11 =
+* Rebrand the user-facing system as BAZNA — Bazne cijene, including WordPress administration and Android/Windows interfaces.
+* Keep the existing WordPress plugin folder, REST v1 routes, database options and WooCommerce meta for in-place updates.
+* Add bazna_cijena, bazna_cjenik and bazna_arhiva shortcode aliases while preserving legacy shortcodes.
+* Migrate only factory default reference-price labels and tooltips; preserve merchant customizations.
+* Introduce a BAZNA vector icon and legacy-install-safe desktop branding.
+* Add compatibility and regression checks, legal terminology review and staged migration documentation.
 
 = 1.5.10 =
 * Prevent stale public REST publication status and 302 feed redirects with explicit no-store cache policy.
