@@ -50,7 +50,13 @@ final class Brendigo_Sidrena_Cijena_License {
     }
 
     public static function site_path() {
-        $path = (string) wp_parse_url(home_url('/'), PHP_URL_PATH);
+        // The public home URL can differ from the WordPress installation
+        // directory. Use REST URL to locate the proof endpoint correctly.
+        $path = (string) wp_parse_url(rest_url('brendigo-sidrena/v1/license-proof'), PHP_URL_PATH);
+        $suffix = '/wp-json/brendigo-sidrena/v1/license-proof';
+        if (substr($path, -strlen($suffix)) === $suffix) {
+            $path = substr($path, 0, -strlen($suffix));
+        }
         return '' !== $path ? trailingslashit($path) : '/';
     }
 
@@ -96,6 +102,13 @@ final class Brendigo_Sidrena_Cijena_License {
     private static function call_service($action, $key, $challenge = '') {
         $host = self::site_host();
         $path = self::site_path();
+        $restHost = self::canonical_domain((string) wp_parse_url(
+            rest_url('brendigo-sidrena/v1/license-proof'), PHP_URL_HOST
+        ));
+        // Never prove a different hostname than the one being licensed.
+        if ('' === $restHost || !hash_equals(self::canonical_domain($host), $restHost)) {
+            return array('ok' => false, 'code' => 'invalid_site_domain');
+        }
         if (!preg_match('/^(?:[a-z0-9-]+\\.)+[a-z]{2,63}$/D', $host) ||
             !preg_match('#^/(?:[a-zA-Z0-9_.~-]+/)*$#D', $path)) {
             return array('ok' => false, 'code' => 'invalid_site_domain');
@@ -158,6 +171,11 @@ final class Brendigo_Sidrena_Cijena_License {
         check_admin_referer('bazna_license_action', 'bazna_license_nonce');
         $state = get_option(self::OPTION, array());
         if ('activate' === $action) {
+            // Fail before contacting the central service so an activation is
+            // never registered if this WordPress host cannot store its key.
+            if (!function_exists('openssl_encrypt') || !function_exists('openssl_decrypt')) {
+                $this->redirect('encryption_unavailable');
+            }
             // The administrator must explicitly enter the domain as well as
             // the key; a different website must never claim this activation.
             $domainInput = isset($_POST['bazna_license_domain']) && is_string($_POST['bazna_license_domain'])
