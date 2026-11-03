@@ -33,6 +33,9 @@ class CatalogRepository {
         val serviceUrl = selected?.serviceCsv ?: index.servicesCsv
 
         val warnings = mutableListOf<String>()
+        if (index.wordpressLicenseActive == false) {
+            warnings.add("BAZNA licenca za administratorsko uređivanje nije aktivna. Već objavljeni javni cjenici i arhiva ostaju dostupni za pregled.")
+        }
         if (index.pendingPublication == true) {
             warnings.add("WordPress ima neobjavljene izmjene. Prikazane CSV cijene mogu biti zastarjele dok se cjenik ponovno ne objavi.")
         }
