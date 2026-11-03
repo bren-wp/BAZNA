@@ -48,7 +48,34 @@ $GLOBALS['bazna_home'] = 'https://www.primjer.hr/';
 $GLOBALS['bazna_options'][$license::OPTION]['checked'] = time() - 4 * DAY_IN_SECONDS;
 bazna_assert(!$license::valid(), 'offline verification expires after grace period');
 
+// A transient remote-service outage must never immediately revoke a
+// previously verified license. Only explicit domain/key denials may do so.
+foreach (array(
+    array('ok' => false, 'code' => 'rate_limit_exceeded'),
+    array('ok' => false, 'code' => 'service_unreachable'),
+    array('ok' => false, 'code' => 'license_service_unavailable'),
+    array('ok' => false, 'code' => 'invalid_service_reply'),
+    array('ok' => false, 'code' => 'unsafe_storage_path'),
+) as $temporary) {
+    bazna_assert(!$license::is_authoritative_denial($temporary),
+        'remote outage must not revoke license: ' . $temporary['code']);
+}
+foreach (array('invalid_key', 'not_activated_for_domain',
+    'already_used_on_another_domain') as $reason) {
+    bazna_assert($license::is_authoritative_denial(array('ok' => false, 'code' => $reason)),
+        'explicit denial revokes license: ' . $reason);
+}
+bazna_assert($license::is_valid_active_reply(array(
+    'ok' => true, 'code' => 'active', 'domain' => 'primjer.hr',
+)), 'active reply for own domain');
+bazna_assert(!$license::is_valid_active_reply(array(
+    'ok' => true, 'code' => 'active', 'domain' => 'druga.hr',
+)), 'cannot activate from response for second domain');
+bazna_assert(!$license::is_valid_active_reply(array(
+    'ok' => true, 'code' => 'not_activated_for_domain', 'domain' => 'primjer.hr',
+)), 'success flag alone cannot activate');
+
 $source = file_get_contents(__DIR__ . '/../wordpress/brendigo-sidrena-cijena/includes/class-admin.php');
 bazna_assert(strpos($source, 'name="bazna_license_domain"') !== false, 'activation form has domain input');
 bazna_assert(strpos($source, 'name="bazna_license_key"') !== false, 'activation form has license key input');
-echo "PASS: BAZNA licence domain input, canonical binding, REST paths and offline expiry\n";
+echo "PASS: BAZNA licence domain input, canonical binding, REST paths, offline expiry and outage-safe license refresh\n";
