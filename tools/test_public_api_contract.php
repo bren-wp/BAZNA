@@ -87,6 +87,18 @@ class Brendigo_Sidrena_Cijena_Settings {
 	public function is_multi_poslovnica() {
 		return true;
 	}
+    public function normalize_oznaka( $code ) { return trim( (string) $code ); }
+}
+class Brendigo_Sidrena_Cijena_Archive {
+    public static function instance() { return new self(); }
+    public function separate_archive_files( $kind, $outlet ) { return array(); }
+}
+class SIDRENA_Test_Request {
+    private $params;
+    public function __construct( $params ) { $this->params = $params; }
+    public function get_param( $name ) {
+        return isset( $this->params[ $name ] ) ? $this->params[ $name ] : null;
+    }
 }
 class Brendigo_Sidrena_Cijena_Poslovnice {
 	public static function instance() {
@@ -105,6 +117,9 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 		$part = '' !== $oznaka ? '-' . $oznaka : '';
 		return self::$dir . '/' . $kind . $part . '.' . $format;
 	}
+    public function get_type_public_url( $kind, $format = 'csv', $oznaka = '' ) {
+        return 'https://primjer.hr/wp-content/uploads/sidrena-cijena/' . $kind . '.' . $format;
+    }
 }
 
 require_once __DIR__ . '/../wordpress/brendigo-sidrena-cijena/includes/class-public-api.php';
@@ -134,6 +149,23 @@ $json = $api->index();
 sidrena_contract_assert(
     'no-store, max-age=0, must-revalidate' === $json->get_headers()['Cache-Control'],
     'Public discovery must not cache publication/readiness flags'
+);
+$archive_response = $api->archive_index( new SIDRENA_Test_Request( array() ) );
+sidrena_contract_assert(
+    'no-store, max-age=0, must-revalidate' === $archive_response->get_headers()['Cache-Control'],
+    'Public archive must not retain stale publication information'
+);
+$feed_response = $api->feed( new SIDRENA_Test_Request( array(
+    'kind' => 'proizvodi', 'format' => 'csv', 'oznaka' => '',
+) ) );
+sidrena_contract_assert(
+    'no-store, max-age=0, must-revalidate' === $feed_response->get_headers()['Cache-Control'],
+    'Public CSV redirect must be revalidated after republishing'
+);
+sidrena_contract_assert(
+    'https://primjer.hr/wp-content/uploads/sidrena-cijena/proizvodi.csv' ===
+        $feed_response->get_headers()['Location'],
+    'Public feed redirect remains same-origin'
 );
 sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
 sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
