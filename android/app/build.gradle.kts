@@ -12,8 +12,8 @@ android {
         applicationId = "com.brendigo.sidrena"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13
-        versionName = "1.5.10"
+        versionCode = 14
+        versionName = "1.5.11"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
