@@ -256,7 +256,7 @@ public partial class MainWindow : Window
         Expander? newItemExpander=null;
         var filter=U.Horizontal();
         var search=U.Box("Pretražite naziv, šifru ili barkod",325);
-        var anchorFilter=U.Choice("Sve stavke","Potvrđena sidrena","Bazna nije potvrđena");
+        var anchorFilter=U.Choice("Sve stavke","Potvrđena bazna","Bazna nije potvrđena");
         filter.Children.Add(U.Field("Referentna cijena",anchorFilter));
         filter.Children.Add(U.Field("Pretraživanje",search));
         filter.Children.Add(U.Action("+  "+(kind=="Proizvod"?"Novi artikl":"Nova usluga"),
@@ -324,7 +324,7 @@ public partial class MainWindow : Window
         rightFields.Children.Add(line);
         rightFields.Children.Add(U.Field("Jedinica mjere",unit));
         var money=U.Horizontal();money.Children.Add(U.Field("Aktualna cijena (€) *",actual));
-        money.Children.Add(U.Field("Potvrđena sidrena (€)",anchor));
+        money.Children.Add(U.Field("Potvrđena bazna (€)",anchor));
         rightFields.Children.Add(money);
         rightFields.Children.Add(U.Field("Referentni datum (samo uz sidrenu)",date));
         rightFields.Children.Add(U.Field("Izvor povijesne cijene",source));
@@ -611,7 +611,7 @@ public partial class MainWindow : Window
     {
         var outer=U.Vertical();
         outer.Children.Add(U.Card("WordPress i vaše poslovnice",
-            U.Text("Brendigo Bazna Cijena 1.5.3",18,true),
+            U.Text("BAZNA WordPress 1.5.11",18,true),
             U.Muted("Učitajte javne cjenike i povijest objava povezane web-stranice.")));
 
         var site=U.Box("https://primjer.hr/",420);
@@ -854,7 +854,7 @@ public partial class MainWindow : Window
 
     private void ShowCommercialLicense()
     {
-        const string resource="Bazna.Desktop.Licensing.EULA-HR.txt";
+        const string resource="Sidrena.Desktop.Licensing.EULA-HR.txt";
         using var stream=typeof(MainWindow).Assembly.GetManifestResourceStream(resource);
         if(stream is null)
         {
