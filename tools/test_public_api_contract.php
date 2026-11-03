@@ -40,10 +40,10 @@ class WP_REST_Response implements ArrayAccess, JsonSerializable {
     public function __construct( $data = null, $status = 200 ) { $this->data = $data; }
     public function header( $key, $value ) { $this->headers[ $key ] = $value; }
     public function get_headers() { return $this->headers; }
-    #[\\ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() { return $this->data; }
     public function offsetExists( $offset ): bool { return isset( $this->data[ $offset ] ); }
-    #[\\ReturnTypeWillChange]
+    #[\ReturnTypeWillChange]
     public function offsetGet( $offset ) { return $this->data[ $offset ]; }
     public function offsetSet( $offset, $value ): void { $this->data[ $offset ] = $value; }
     public function offsetUnset( $offset ): void { unset( $this->data[ $offset ] ); }
