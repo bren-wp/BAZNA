@@ -3,15 +3,15 @@
 #define DesktopVersion "0.10.6"
 [Setup]
 AppId={{9A25D162-6FB4-4B48-BD20-5EE4D4766BA3}
-AppName=SIDRENA
+AppName=BAZNA
 AppVersion={#DesktopVersion}
-AppVerName=SIDRENA Desktop {#DesktopVersion}
+AppVerName=BAZNA Desktop {#DesktopVersion}
 AppPublisher=Brendigo LTD
 AppPublisherURL=https://brendigo.com/
 AppSupportURL=https://github.com/bren-wp/SIDRENA/issues
 AppUpdatesURL=https://github.com/bren-wp/SIDRENA/releases
 DefaultDirName={localappdata}\Programs\Brendigo\SIDRENA
-DefaultGroupName=SIDRENA
+DefaultGroupName=BAZNA
 PrivilegesRequired=lowest
 UsePreviousAppDir=yes
 DisableProgramGroupPage=yes
@@ -30,16 +30,16 @@ DisableWelcomePage=no
 DisableReadyPage=no
 DisableFinishedPage=no
 UsePreviousTasks=yes
-UninstallDisplayName=SIDRENA Desktop
+UninstallDisplayName=BAZNA Desktop
 UninstallDisplayIcon={app}\SIDRENA.exe
 AppMutex=Local\Brendigo.SIDRENA.Desktop
 CloseApplications=yes
 RestartApplications=no
 SetupLogging=yes
 VersionInfoVersion=0.10.6.1
-VersionInfoDescription=SIDRENA Desktop Installer
+VersionInfoDescription=BAZNA Desktop Installer
 VersionInfoCompany=Brendigo LTD
-VersionInfoProductName=SIDRENA Desktop
+VersionInfoProductName=BAZNA Desktop
 VersionInfoCopyright=Copyright (C) 2026 Brendigo LTD
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -52,5 +52,5 @@ Source: "..\legal\EULA-HR.txt"; DestDir: "{app}"; DestName: "SIDRENA-Licenca.txt
 Name: "{autoprograms}\SIDRENA"; Filename: "{app}\SIDRENA.exe"; WorkingDir: "{app}"
 Name: "{autodesktop}\SIDRENA"; Filename: "{app}\SIDRENA.exe"; Tasks: desktopicon
 [Run]
-Filename: "{app}\SIDRENA.exe"; Description: "Pokreni SIDRENA Desktop"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\SIDRENA.exe"; Description: "Pokreni BAZNA Desktop"; Flags: nowait postinstall skipifsilent
 ; Deliberately no [UninstallDelete] entry: local SQLite data and backups survive uninstall.
