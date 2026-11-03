@@ -13,7 +13,7 @@ object CatalogDiscovery {
 
     fun parse(json: JSONObject, site: SiteUrl): CatalogIndex {
         require(json.optInt("api_version", -1) == 1) {
-            "Ova verzija javnog SIDRENA API-ja nije podržana."
+            "Ova verzija javnog BAZNA API-ja nije podržana."
         }
         // Optional for older plugins, mandatory to validate when supplied:
         // Android can display public prices but must never negotiate an admin
@@ -22,10 +22,10 @@ object CatalogDiscovery {
             null, JSONObject.NULL -> Unit
             is JSONObject -> {
                 require(connection.optString("mode") == "public_read_only") {
-                    "SIDRENA dopušta samo javno čitanje cjenika."
+                    "BAZNA dopušta samo javno čitanje cjenika."
                 }
                 require(connection.opt("authentication_required") == false) {
-                    "SIDRENA ne podržava prijavu u WordPress administraciju."
+                    "BAZNA ne podržava prijavu u WordPress administraciju."
                 }
                 require(connection.opt("csv_publication_required") == true) {
                     "Poslužitelj ne potvrđuje sigurnu objavu CSV cjenika."
