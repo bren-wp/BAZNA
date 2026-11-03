@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 		<section class="sidrena-cijena-card sidrena-cijena-import" id="sidrena-cijena-bulk-import">
 			<div class="sidrena-cijena-card__head">
 				<h2><?php echo esc_html__( 'Uvoz cjenika', 'brendigo-sidrena-cijena' ); ?></h2>
-				<p><?php echo esc_html( Brendigo_Sidrena_Cijena_Plugin::woocommerce_active() ? __( 'Učitajte CSV, XML ili XLSX. Retci se spajaju prvo po SKU-u, a ako SKU ne nađe proizvod onda po postojećem stupcu ID. Uvoz u webshop ažurira Woo proizvod, uključujući zalihu. Uvoz u drugu poslovnicu upisuje dostupnost samo na tu poslovnicu. Ako ni SKU ni ID ne pogode postojeći proizvod, redak postaje ručna stavka te poslovnice.', 'brendigo-sidrena-cijena' ) : __( 'Učitajte CSV, XML ili XLSX. Retci se spajaju prvo po SKU-u u odabranoj poslovnici, zatim po ID-u. Ostali se dodaju u taj cjenik. Naziv, redovna i sidrena cijena su obavezni za nove retke. Prazna polja ne brišu postojeće vrijednosti.', 'brendigo-sidrena-cijena' ) ); ?></p>
+				<p><?php echo esc_html( Brendigo_Sidrena_Cijena_Plugin::woocommerce_active() ? __( 'Učitajte CSV, XML ili XLSX. Retci se spajaju prvo po SKU-u, a ako SKU ne nađe proizvod onda po postojećem stupcu ID. Uvoz u webshop ažurira Woo proizvod, uključujući zalihu. Uvoz u drugu poslovnicu upisuje dostupnost samo na tu poslovnicu. Ako ni SKU ni ID ne pogode postojeći proizvod, redak postaje ručna stavka te poslovnice.', 'brendigo-sidrena-cijena' ) : __( 'Učitajte CSV, XML ili XLSX. Retci se spajaju prvo po SKU-u u odabranoj poslovnici, zatim po ID-u. Ostali se dodaju u taj cjenik. Naziv, redovna i bazna cijena su obavezni za nove retke. Prazna polja ne brišu postojeće vrijednosti.', 'brendigo-sidrena-cijena' ) ); ?></p>
 			</div>
 
 			<div class="sidrena-cijena-drop" id="sidrena-import-drop">
@@ -61,11 +61,11 @@ defined( 'ABSPATH' ) || exit;
 						<select id="sidrena-import-map-sale"></select>
 					</label>
 					<label class="sidrena-cijena-mapfield">
-						<span><?php echo esc_html__( 'Sidrena cijena', 'brendigo-sidrena-cijena' ); ?></span>
+						<span><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ); ?></span>
 						<select id="sidrena-import-map-sidrena"></select>
 					</label>
 					<label class="sidrena-cijena-mapfield">
-						<span><?php echo esc_html__( 'Sidrena cijena datum', 'brendigo-sidrena-cijena' ); ?></span>
+						<span><?php echo esc_html__( 'Bazna cijena datum', 'brendigo-sidrena-cijena' ); ?></span>
 						<select id="sidrena-import-map-datum"></select>
 					</label>
 					<label class="sidrena-cijena-mapfield">
@@ -143,7 +143,7 @@ defined( 'ABSPATH' ) || exit;
 		<section class="sidrena-cijena-card">
 			<div class="sidrena-cijena-card__head">
 				<h2><?php echo esc_html__( 'Izvoz cjenika', 'brendigo-sidrena-cijena' ); ?></h2>
-				<p><?php echo esc_html__( 'Izvoz cjenika je isti javni CSV ili XML: vrsta, datum, maloprodajna cijena, marka, naziv posebnog oblika, jedinica mjere, cijena jedinice mjere, sidrena cijena, barkod i dostupnost. Uključeni su samo objavljeni proizvodi. Varijacije su zasebni redovi, a dodatne stavke idu na kraj. Izvoz bez sidrene cijene ostaje interni popis (naziv, SKU, redovna, akcijska i sidrena cijena).', 'brendigo-sidrena-cijena' ); ?></p>
+				<p><?php echo esc_html__( 'Izvoz cjenika je isti javni CSV ili XML: vrsta, datum, maloprodajna cijena, marka, naziv posebnog oblika, jedinica mjere, cijena jedinice mjere, bazna cijena, barkod i dostupnost. Uključeni su samo objavljeni proizvodi. Varijacije su zasebni redovi, a dodatne stavke idu na kraj. Izvoz bez bazne cijene ostaje interni popis (naziv, SKU, redovna, akcijska i bazna cijena).', 'brendigo-sidrena-cijena' ); ?></p>
 			</div>
 			<form method="post" action="<?php echo esc_url( $this->get_settings_tab_url( 'uvoz-izvoz' ) ); ?>">
 				<?php wp_nonce_field( 'sidrena_cijena_export', 'sidrena_cijena_export_nonce' ); ?>
@@ -161,7 +161,7 @@ defined( 'ABSPATH' ) || exit;
 					</button>
 					<button type="submit" class="button button-secondary" name="sidrena_cijena_action" value="export_missing">
 						<span class="dashicons dashicons-download" aria-hidden="true"></span>
-						<?php echo esc_html__( 'Izvezi proizvode bez sidrene cijene', 'brendigo-sidrena-cijena' ); ?>
+						<?php echo esc_html__( 'Izvezi proizvode bez bazne cijene', 'brendigo-sidrena-cijena' ); ?>
 					</button>
 					<button type="submit" class="button button-secondary" name="sidrena_cijena_action" value="export_template">
 						<span class="dashicons dashicons-media-spreadsheet" aria-hidden="true"></span>
