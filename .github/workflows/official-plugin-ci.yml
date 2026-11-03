@@ -42,7 +42,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.12' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.13' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -105,21 +105,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.12 --output artifacts/brendigo-sidrena-cijena-1.5.12.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.12.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.12 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.12.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.12.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.12.zip
+          python3 tools/package_plugin.py --version 1.5.13 --output artifacts/brendigo-sidrena-cijena-1.5.13.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.13.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.13 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.13.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.13.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.13.zip
       - name: Package standalone BAZNA JSON license server reproducibly without secrets
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_license.py --version 1.5.12 --output artifacts/BAZNA-Licenca-Server-1.5.12.zip
-          python3 tools/package_license.py --version 1.5.12 --output /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.12.zip
-          cmp artifacts/BAZNA-Licenca-Server-1.5.12.zip /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.12.zip
-          (cd artifacts && sha256sum -c BAZNA-Licenca-Server-1.5.12.zip.sha256)
+          python3 tools/package_license.py --version 1.5.13 --output artifacts/BAZNA-Licenca-Server-1.5.13.zip
+          python3 tools/package_license.py --version 1.5.13 --output /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.13.zip
+          cmp artifacts/BAZNA-Licenca-Server-1.5.13.zip /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.13.zip
+          (cd artifacts && sha256sum -c BAZNA-Licenca-Server-1.5.13.zip.sha256)
           python3 - <<'PY'
           import zipfile
-          path = 'artifacts/BAZNA-Licenca-Server-1.5.12.zip'
+          path = 'artifacts/BAZNA-Licenca-Server-1.5.13.zip'
           with zipfile.ZipFile(path) as archive:
               files = archive.namelist()
               assert 'licenca/api.php' in files and 'licenca/lib.php' in files
