@@ -13,11 +13,13 @@ defined( 'ABSPATH' ) || exit;
 class Brendigo_Sidrena_Cijena_Settings {
 
 	const OPTION_KEY       = 'sidrena_cijena_settings';
-	const DEFAULT_PREFIX          = 'Sidrena cijena';
+	const DEFAULT_PREFIX          = 'Bazna cijena';
+	const PREVIOUS_BRAND_PREFIX  = 'Sidrena cijena';
 	const LEGACY_PREFIX           = 'Cijena';
 	const REFERENCE_DATE_GENERAL  = '10.09.2026.';
 	const REFERENCE_DATE_FMCG     = '02.05.2025.';
-	const DEFAULT_TOOLTIP         = 'Sidrena cijena je referentna maloprodajna cijena koja je za proizvod ili uslugu vrijedila na navedeni datum.';
+	const DEFAULT_TOOLTIP         = 'Bazna cijena je dokumentirana maloprodajna cijena koja je vrijedila na točno određeni referentni dan. Nije isto što i najniža cijena prije sniženja.';
+	const PREVIOUS_BRAND_TOOLTIP = 'Sidrena cijena je referentna maloprodajna cijena koja je za proizvod ili uslugu vrijedila na navedeni datum.';
 	const PREVIOUS_TOOLTIP_HASH  = '4fdd1b2eba2678023ab9618dc15839bd2efc789ee3404c799ba199eb47dd5404';
 	const LEGACY_TOOLTIP_HASH    = '2c8ca8cdc51d22e369144a40b69c504ba24db0b1a08a1e42a04bb065d1102661';
 
@@ -137,6 +139,12 @@ class Brendigo_Sidrena_Cijena_Settings {
 			}
 		}
 
+		if ( isset( $stored['prefix'] ) && self::PREVIOUS_BRAND_PREFIX === trim( (string) $stored['prefix'] ) ) {
+			// Migrate only our old factory default, never a merchant's custom label.
+			$stored['prefix'] = self::DEFAULT_PREFIX;
+			$dirty = true;
+		}
+
 		if ( isset( $stored['prefix'] ) && self::LEGACY_PREFIX === trim( (string) $stored['prefix'] ) ) {
 			$stored['prefix'] = self::DEFAULT_PREFIX;
 			$dirty            = true;
@@ -144,7 +152,8 @@ class Brendigo_Sidrena_Cijena_Settings {
 
 		if ( isset( $stored['tooltip'] ) ) {
 			$tooltip_hash = hash( 'sha256', trim( (string) $stored['tooltip'] ) );
-			if ( in_array( $tooltip_hash, array( self::LEGACY_TOOLTIP_HASH, self::PREVIOUS_TOOLTIP_HASH ), true ) ) {
+			if ( trim( (string) $stored['tooltip'] ) === self::PREVIOUS_BRAND_TOOLTIP ||
+				in_array( $tooltip_hash, array( self::LEGACY_TOOLTIP_HASH, self::PREVIOUS_TOOLTIP_HASH ), true ) ) {
 				$stored['tooltip'] = self::DEFAULT_TOOLTIP;
 				$dirty             = true;
 			}
