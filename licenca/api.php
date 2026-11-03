@@ -35,10 +35,8 @@ if (!is_array($config) || !isset($config['master_secret_hex']) ||
 // The JSON registry must live outside any publicly served document root.
 $storage = isset($config['storage_dir']) && is_string($config['storage_dir'])
     ? $config['storage_dir'] : dirname(__DIR__, 2) . '/bazna-license-private';
-$documentRoot = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''));
-$targetStorage = realpath($storage);
-if ($documentRoot === false || ($targetStorage !== false &&
-    ($targetStorage === $documentRoot || strncmp($targetStorage, $documentRoot . DIRECTORY_SEPARATOR, strlen($documentRoot) + 1) === 0))) {
+$documentRoot = (string) ($_SERVER['DOCUMENT_ROOT'] ?? '');
+if (!bazna_license_storage_is_private($documentRoot, $storage)) {
     bazna_respond(503, array('ok' => false, 'code' => 'unsafe_storage_path'));
 }
 if (!function_exists('curl_init') || !function_exists('flock') ||
