@@ -391,7 +391,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 			return $tab;
 		}
 
-		if ( isset( $_GET['sidrena_xml'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['sidrena_xml'] ) && isset( $tabs['javni-xml'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return 'javni-xml';
 		}
 
