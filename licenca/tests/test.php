@@ -1,6 +1,7 @@
 <?php
 /** Offline deterministic regression tests; never access the public Internet. */
 declare(strict_types=1);
+if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 define('BAZNA_LICENSE_INTERNAL', true);
 require_once dirname(__DIR__) . '/lib.php';
 
