@@ -101,7 +101,7 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 	?>
 	<section class="sidrena-android-bridge" aria-labelledby="sidrena-android-bridge-title">
 		<div class="sidrena-android-bridge__head">
-			<h3 id="sidrena-android-bridge-title"><?php echo esc_html__( 'SIDRENA Android · Povezivanje', 'brendigo-sidrena-cijena' ); ?></h3>
+			<h3 id="sidrena-android-bridge-title"><?php echo esc_html__( 'BAZNA Android · Povezivanje', 'brendigo-sidrena-cijena' ); ?></h3>
 			<span class="sidrena-android-bridge__status <?php echo $sidrena_android_ready && ! $sidrena_android_pending ? 'is-ready' : 'is-pending'; ?>">
 				<?php
 				echo $sidrena_android_pending
