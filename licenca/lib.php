@@ -64,8 +64,7 @@ function bazna_license_public_ip(string $ip): bool {
 function bazna_license_storage_is_private(string $webRoot, string $storage): bool {
     $root = realpath($webRoot);
     if ($root === false || $storage === '' ||
-        (!str_starts_with($storage, DIRECTORY_SEPARATOR) &&
-         !preg_match('/^[A-Za-z]:[\\\\\\/]/', $storage))) {
+        !str_starts_with($storage, DIRECTORY_SEPARATOR)) {
         return false;
     }
     $probe = $storage;
