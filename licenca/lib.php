@@ -186,8 +186,14 @@ function bazna_license_rate_limit(string $dir, string $remoteIp): void {
     }
     try {
         $path = $dir . '/rate.json';
-        $state = is_file($path) ? json_decode((string) file_get_contents($path), true) : array();
-        if (!is_array($state)) {
+        if (is_file($path)) {
+            $raw = file_get_contents($path);
+            $state = is_string($raw) ? json_decode($raw, true) : null;
+            if (!is_array($state)) {
+                // Corrupt storage must not silently reset brute-force limits.
+                throw new RuntimeException('rate_limit_storage_failure');
+            }
+        } else {
             $state = array();
         }
         $now = time();
