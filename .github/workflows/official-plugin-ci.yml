@@ -6,6 +6,7 @@ on:
       - 'licenca/**'
       - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
+      - 'tools/package_license.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
@@ -21,6 +22,7 @@ on:
       - 'licenca/**'
       - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
+      - 'tools/package_license.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
@@ -96,3 +98,22 @@ jobs:
           (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.12.zip.sha256)
           python3 tools/package_plugin.py --version 1.5.12 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.12.zip
           cmp artifacts/brendigo-sidrena-cijena-1.5.12.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.12.zip
+      - name: Package standalone BAZNA JSON license server reproducibly without secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/package_license.py --version 1.5.12 --output artifacts/BAZNA-Licenca-Server-1.5.12.zip
+          python3 tools/package_license.py --version 1.5.12 --output /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.12.zip
+          cmp artifacts/BAZNA-Licenca-Server-1.5.12.zip /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.12.zip
+          (cd artifacts && sha256sum -c BAZNA-Licenca-Server-1.5.12.zip.sha256)
+          python3 - <<'PY'
+          import zipfile
+          path = 'artifacts/BAZNA-Licenca-Server-1.5.12.zip'
+          with zipfile.ZipFile(path) as archive:
+              files = archive.namelist()
+              assert 'licenca/api.php' in files and 'licenca/lib.php' in files
+              assert 'licenca/private/config.php' not in files
+              assert not any(x.endswith(('.json', '.lock')) for x in files)
+              assert all(x.startswith('licenca/') for x in files)
+          print('PASS: portable BAZNA server ZIP and no embedded credentials')
+          PY
