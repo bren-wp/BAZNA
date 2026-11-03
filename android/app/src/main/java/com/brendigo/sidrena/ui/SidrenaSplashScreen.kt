@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.semantics.contentDescription
@@ -22,11 +23,9 @@ import kotlinx.coroutines.delay
 import kotlin.math.min
 
 /**
- * Reference artwork: SIDRENA-Android-Branding/logos/sidrena-splash.svg
- * and the pixel-identical screens_concept/01_splash.png (1080 × 1920).
- *
- * Use the actual source SVG path and geometry, not the unrelated small
- * launcher icon, an invented icon frame, fake progress bar or angular shapes.
+ * BAZNA rebrand: retains the established 1080 × 1920 layout grid,
+ * native gradients and typography while replacing the old S vector with B.
+ * New branded reference screenshots are required before a 1:1 claim.
  */
 private const val DESIGN_WIDTH = 1080f
 private const val DESIGN_HEIGHT = 1920f
@@ -47,7 +46,7 @@ internal data class SplashGeometry(
 
 /**
  * Exact SVG coordinates on a 1080×1920 screen. On other aspect ratios the
- * letter S and font sizes scale uniformly; vertical landmarks remain anchored
+ * letter B and font sizes scale uniformly; vertical landmarks remain anchored
  * to screen height, so the logo will never become stretched.
  */
 internal fun splashGeometry(widthPx: Float, heightPx: Float): SplashGeometry {
@@ -69,27 +68,28 @@ internal fun splashGeometry(widthPx: Float, heightPx: Float): SplashGeometry {
     )
 }
 
-/** The real SIDRENA source vector, preserving every quadratic curve. */
+/** BAZNA: custom compact B vector using the original navy/orange palette. */
 private fun splashSymbolPath(): Path = Path().apply {
-    moveTo(72f, 76f)
-    quadraticBezierTo(80f, 61f, 102f, 61f)
-    lineTo(181f, 61f)
-    quadraticBezierTo(193f, 61f, 193f, 76f)
-    lineTo(193f, 89f)
-    lineTo(107f, 89f)
-    quadraticBezierTo(98f, 89f, 100f, 98f)
-    quadraticBezierTo(101f, 105f, 118f, 112f)
-    lineTo(158f, 128f)
-    quadraticBezierTo(193f, 140f, 193f, 164f)
-    quadraticBezierTo(193f, 195f, 155f, 195f)
-    lineTo(69f, 195f)
-    lineTo(69f, 172f)
-    lineTo(151f, 172f)
-    quadraticBezierTo(169f, 172f, 168f, 160f)
-    quadraticBezierTo(168f, 149f, 152f, 143f)
-    lineTo(106f, 125f)
-    quadraticBezierTo(69f, 111f, 69f, 91f)
-    quadraticBezierTo(69f, 82f, 72f, 76f)
+    fillType = PathFillType.EvenOdd
+    moveTo(80f, 61f)
+    lineTo(135f, 61f)
+    quadraticBezierTo(190f, 61f, 190f, 95f)
+    quadraticBezierTo(190f, 113f, 173f, 125f)
+    quadraticBezierTo(195f, 135f, 195f, 159f)
+    quadraticBezierTo(195f, 195f, 135f, 195f)
+    lineTo(80f, 195f)
+    close()
+    moveTo(107f, 88f)
+    lineTo(134f, 88f)
+    quadraticBezierTo(159f, 88f, 159f, 101f)
+    quadraticBezierTo(159f, 115f, 134f, 115f)
+    lineTo(107f, 115f)
+    close()
+    moveTo(107f, 141f)
+    lineTo(136f, 141f)
+    quadraticBezierTo(164f, 141f, 164f, 155f)
+    quadraticBezierTo(164f, 169f, 136f, 169f)
+    lineTo(107f, 169f)
     close()
 }
 
@@ -115,7 +115,7 @@ internal fun SidrenaSplashArtwork(modifier: Modifier = Modifier) {
     Canvas(
         modifier = modifier.fillMaxSize().semantics {
             contentDescription =
-                "SIDRENA. Cijene pod kontrolom. Poslovanje s povjerenjem. by Brendigo."
+                "BAZNA. Cijene pod kontrolom. Poslovanje s povjerenjem. by Brendigo."
         },
     ) {
         val layout = splashGeometry(size.width, size.height)
@@ -145,7 +145,7 @@ internal fun SidrenaSplashArtwork(modifier: Modifier = Modifier) {
             )
         }
 
-        // Exact S path from the logo source SVG (translate 16 188 / scale 4).
+        // BAZNA B vector on the established splash geometry.
         withTransform({
             translate(left = layout.logoLeft, top = layout.logoTop)
             scale(4f * scale, 4f * scale, pivot = Offset.Zero)
@@ -164,7 +164,7 @@ internal fun SidrenaSplashArtwork(modifier: Modifier = Modifier) {
         // dp-based widgets whose vertical drift grows with screen height.
         val nativeCanvas = drawContext.canvas.nativeCanvas
         drawCenteredText(
-            nativeCanvas, "SIDRENA", layout.centerX, layout.headingBaseline,
+            nativeCanvas, "BAZNA", layout.centerX, layout.headingBaseline,
             119f * scale, 0xFFFFFFFF.toInt(), bold = true,
             trackingPx = 10f * scale,
         )
@@ -218,13 +218,13 @@ private fun drawCenteredText(
     }
 }
 
-@Preview(name = "SIDRENA Splash 01 — 360x640 reference", widthDp = 360, heightDp = 640, showBackground = true)
+@Preview(name = "BAZNA Splash 01 — 360x640 reference", widthDp = 360, heightDp = 640, showBackground = true)
 @Composable
 internal fun SidrenaSplashReferencePreview() {
     SidrenaTheme { SidrenaSplashArtwork() }
 }
 
-@Preview(name = "SIDRENA Splash 01 — tall 393x852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "BAZNA Splash 01 — tall 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaSplashTallPreview() {
     SidrenaTheme { SidrenaSplashArtwork() }

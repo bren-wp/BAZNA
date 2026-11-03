@@ -71,7 +71,7 @@ if not (SOURCE_ROOT/"Sidrena.Core"/"DocumentOpenPolicy.cs").exists():
 if "DocumentOpenPolicy.Validate(path)" not in ui_cs:
     findings.append("Local document launch bypasses extension allowlist")
 
-print("SIDRENA desktop code audit")
+print("BAZNA desktop code audit")
 print(f"  Source/XAML files: {len(FILES)}")
 print("  Scope: private declarations, WPF named handlers, raw UI errors, dev copy and document launch")
 print("  Semantic analysis: CI also runs Roslyn unused-member rules for Sidrena.Core")

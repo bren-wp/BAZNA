@@ -71,7 +71,7 @@ private val HomeArchiveTint = Color(0xFFFF8053)
 private val HomeConnectedTint = Color(0xFF52D9A3)
 
 /**
- * SIDRENA screen 03/12 — public dashboard.
+ * BAZNA screen 03/12 — public dashboard.
  *
  * Follows the approved layout: wordmark/search, connection status,
  * 2×2 catalog cards, outlet card, and latest real archived publications.
@@ -299,7 +299,7 @@ private fun HomeTopBar(onSearch: () -> Unit) {
         )
         Spacer(Modifier.width(5.dp))
         Text(
-            "SIDRENA",
+            "BAZNA",
             color = Color.White,
             fontSize = 22.sp,
             letterSpacing = 0.2.sp,
@@ -552,7 +552,7 @@ internal fun homeDateKey(raw: String): Long {
     }.getOrDefault(Long.MIN_VALUE)
 }
 
-@Preview(name = "03 SIDRENA Početna 393x852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "03 BAZNA Početna 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaHomePreview() {
     val site = CatalogSnapshot(

@@ -13,7 +13,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 	<span class="brendigo-overview-icon brendigo-overview-icon--shield"><span class="dashicons dashicons-shield" aria-hidden="true"></span></span>
 	<div>
 		<p class="brendigo-section-kicker"><?php echo esc_html__( 'Pravna napomena', 'brendigo-sidrena-cijena' ); ?></p>
-		<h2><?php echo esc_html__( 'Prikaz sidrene cijene', 'brendigo-sidrena-cijena' ); ?></h2>
+		<h2><?php echo esc_html__( 'Prikaz bazne cijene', 'brendigo-sidrena-cijena' ); ?></h2>
 		<p><?php echo esc_html__( 'Odredite naziv, datum i način prikaza referentne cijene uz proizvod.', 'brendigo-sidrena-cijena' ); ?></p>
 	</div>
 </section>
@@ -27,12 +27,12 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 		<section class="sidrena-cijena-card brendigo-settings-card">
 			<div class="sidrena-cijena-card__head brendigo-card-title">
 				<span class="dashicons dashicons-desktop" aria-hidden="true"></span>
-				<div><h2><?php echo esc_html( $sidrena_woo ? __( 'Prikaz na trgovini', 'brendigo-sidrena-cijena' ) : __( 'Prikaz na web-stranici', 'brendigo-sidrena-cijena' ) ); ?></h2><p><?php echo esc_html( $sidrena_woo ? __( 'Kontrolirajte način na koji se sidrena cijena prikazuje kupcu.', 'brendigo-sidrena-cijena' ) : __( 'Postavite prikaz sidrene cijene za samostalne proizvode i usluge.', 'brendigo-sidrena-cijena' ) ); ?></p></div>
+				<div><h2><?php echo esc_html( $sidrena_woo ? __( 'Prikaz na trgovini', 'brendigo-sidrena-cijena' ) : __( 'Prikaz na web-stranici', 'brendigo-sidrena-cijena' ) ); ?></h2><p><?php echo esc_html( $sidrena_woo ? __( 'Kontrolirajte način na koji se bazna cijena prikazuje kupcu.', 'brendigo-sidrena-cijena' ) : __( 'Postavite prikaz bazne cijene za samostalne proizvode i usluge.', 'brendigo-sidrena-cijena' ) ); ?></p></div>
 			</div>
 
 			<?php if ( $sidrena_woo ) : ?>
 			<div class="brendigo-setting-row">
-				<div><strong><?php echo esc_html__( 'Automatski prikaz sidrene cijene', 'brendigo-sidrena-cijena' ); ?></strong><small><?php echo esc_html__( 'Prikaži sidrenu cijenu uz WooCommerce cijenu proizvoda.', 'brendigo-sidrena-cijena' ); ?></small></div>
+				<div><strong><?php echo esc_html__( 'Automatski prikaz bazne cijene', 'brendigo-sidrena-cijena' ); ?></strong><small><?php echo esc_html__( 'Prikaži baznu cijenu uz WooCommerce cijenu proizvoda.', 'brendigo-sidrena-cijena' ); ?></small></div>
 				<?php $this->render_toggle( 'sidrena_cijena_auto_display', 'sidrena_cijena_auto_display', 'yes' === $sidrena_settings->get( 'auto_display' ), __( 'Automatski prikaz', 'brendigo-sidrena-cijena' ) ); ?>
 			</div>
 			<div class="brendigo-setting-row">
@@ -43,21 +43,21 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 			<?php endif; ?>
 
 			<div class="brendigo-setting-row">
-				<div><strong><?php echo esc_html__( 'Prikaži tooltip', 'brendigo-sidrena-cijena' ); ?></strong><small><?php echo esc_html__( 'Kupcu kratko objasnite što sidrena cijena znači.', 'brendigo-sidrena-cijena' ); ?></small></div>
+				<div><strong><?php echo esc_html__( 'Prikaži tooltip', 'brendigo-sidrena-cijena' ); ?></strong><small><?php echo esc_html__( 'Kupcu kratko objasnite što bazna cijena znači.', 'brendigo-sidrena-cijena' ); ?></small></div>
 				<?php $this->render_toggle( 'sidrena_cijena_enable_tooltip', 'sidrena_cijena_enable_tooltip', 'yes' === $sidrena_settings->get( 'enable_tooltip' ), __( 'Tooltip', 'brendigo-sidrena-cijena' ) ); ?>
 			</div>
 
 			<label class="brendigo-field" for="sidrena_cijena_prefix">
 				<span><?php echo esc_html__( 'Oznaka retka', 'brendigo-sidrena-cijena' ); ?></span>
 				<input type="text" id="sidrena_cijena_prefix" name="sidrena_cijena_prefix" value="<?php echo esc_attr( $sidrena_settings->get( 'prefix' ) ); ?>" />
-				<small><?php echo esc_html__( 'Preporučeno: “Sidrena cijena”.', 'brendigo-sidrena-cijena' ); ?></small>
+				<small><?php echo esc_html__( 'Preporučeno: “Bazna cijena”.', 'brendigo-sidrena-cijena' ); ?></small>
 			</label>
 
 			<div class="brendigo-field">
 				<span><?php echo esc_html__( 'Format datuma', 'brendigo-sidrena-cijena' ); ?></span>
 				<div class="sidrena-cijena-choices">
-					<label class="sidrena-cijena-choice"><input type="radio" name="sidrena_cijena_date_style" value="parens" <?php checked( $sidrena_settings->get( 'date_style' ), 'parens' ); ?> /><span><?php echo esc_html__( 'Sidrena cijena (datum)', 'brendigo-sidrena-cijena' ); ?></span></label>
-					<label class="sidrena-cijena-choice"><input type="radio" name="sidrena_cijena_date_style" value="plain" <?php checked( $sidrena_settings->get( 'date_style' ), 'plain' ); ?> /><span><?php echo esc_html__( 'Sidrena cijena datum', 'brendigo-sidrena-cijena' ); ?></span></label>
+					<label class="sidrena-cijena-choice"><input type="radio" name="sidrena_cijena_date_style" value="parens" <?php checked( $sidrena_settings->get( 'date_style' ), 'parens' ); ?> /><span><?php echo esc_html__( 'Bazna cijena (datum)', 'brendigo-sidrena-cijena' ); ?></span></label>
+					<label class="sidrena-cijena-choice"><input type="radio" name="sidrena_cijena_date_style" value="plain" <?php checked( $sidrena_settings->get( 'date_style' ), 'plain' ); ?> /><span><?php echo esc_html__( 'Bazna cijena datum', 'brendigo-sidrena-cijena' ); ?></span></label>
 				</div>
 				<code id="sidrena-cijena-preview"><?php echo esc_html( $sidrena_settings->get_preview_label() . $sidrena_settings->preview_separator() . '19,99 €' ); ?></code>
 			</div>
@@ -95,7 +95,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 		</section>
 
 		<section class="sidrena-cijena-card brendigo-settings-card brendigo-live-preview">
-			<div class="sidrena-cijena-card__head brendigo-card-title"><span class="dashicons dashicons-visibility" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Pregled prikaza', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Pregled izgleda sidrene cijene uz proizvod.', 'brendigo-sidrena-cijena' ); ?></p></div></div>
+			<div class="sidrena-cijena-card__head brendigo-card-title"><span class="dashicons dashicons-visibility" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Pregled prikaza', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Pregled izgleda bazne cijene uz proizvod.', 'brendigo-sidrena-cijena' ); ?></p></div></div>
 			<div class="brendigo-preview-demo">
 				<div class="brendigo-preview-demo__media"><span class="dashicons dashicons-products" aria-hidden="true"></span></div>
 				<h3><?php echo esc_html__( 'Primjer proizvoda', 'brendigo-sidrena-cijena' ); ?></h3>
@@ -103,7 +103,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 				<div class="brendigo-preview-price-row"><span><?php
 				printf(
 					/* translators: %s: locked general reference date. */
-					esc_html__( 'Sidrena cijena (%s)', 'brendigo-sidrena-cijena' ),
+					esc_html__( 'Bazna cijena (%s)', 'brendigo-sidrena-cijena' ),
 					esc_html( Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_GENERAL )
 				);
 				?></span><strong>179,99 €</strong></div>
@@ -126,7 +126,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 	</div>
 	<div class="brendigo-info-box">
 		<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
-		<p><?php echo esc_html__( 'Za svaku stavku utvrdite je li primjenjiv 2. 5. 2025. ili 10. 9. 2026.; koristite sačuvanu evidenciju i ručno unesite odgovarajući iznos i datum. Bazna cijena i najniža cijena u 30 dana ne smiju se automatski izvoditi iz sidrene cijene.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'Za svaku stavku utvrdite je li primjenjiv 2. 5. 2025. ili 10. 9. 2026.; koristite sačuvanu evidenciju i ručno unesite odgovarajući iznos i datum. Bazna cijena i najniža cijena u 30 dana ne smiju se automatski izvoditi iz bazne cijene.', 'brendigo-sidrena-cijena' ); ?></p>
 	</div>
 </section>
 <?php endif; ?>

@@ -37,12 +37,16 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'sidrena_cijena', array( $this, 'render_action' ), 10, 1 );
 		add_shortcode( 'sidrena-cijena', array( $this, 'shortcode' ) );
+		// BAZNA aliases; the historical names remain valid for existing pages.
+		add_shortcode( 'bazna_cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'sidrena_cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'sidrena-cjenik', array( $this, 'cjenik_shortcode' ) );
+		add_shortcode( 'bazna_cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'sidrena_cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'sidrena-arhiva', array( $this, 'arhiva_shortcode' ) );
+		add_shortcode( 'bazna_arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'sidrena_arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-arhiva', array( $this, 'arhiva_shortcode' ) );
 
@@ -507,7 +511,8 @@ class Brendigo_Sidrena_Cijena_Frontend {
 			return false;
 		}
 
-		return has_shortcode( $post->post_content, 'sidrena_graf_cijena' )
+		return has_shortcode( $post->post_content, 'bazna_cijena' )
+			|| has_shortcode( $post->post_content, 'sidrena_graf_cijena' )
 			|| has_shortcode( $post->post_content, 'sidrena_povijest_cijena' )
 			|| has_shortcode( $post->post_content, 'sidrena_najniza_prije_snizenja' )
 			|| has_shortcode( $post->post_content, 'sidrena_stavka' )
@@ -527,7 +532,8 @@ class Brendigo_Sidrena_Cijena_Frontend {
 			return false;
 		}
 
-		return has_shortcode( $post->post_content, 'sidrena-cjenik' )
+		return has_shortcode( $post->post_content, 'bazna_cjenik' )
+			|| has_shortcode( $post->post_content, 'sidrena-cjenik' )
 			|| has_shortcode( $post->post_content, 'sidrena_cjenik' )
 			|| has_shortcode( $post->post_content, 'sidrena_objava_cjenika' )
 			|| has_shortcode( $post->post_content, 'sidrena-objava-cjenika' )

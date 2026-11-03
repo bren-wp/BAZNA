@@ -116,7 +116,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     alert?.let { message ->
         AlertDialog(
             onDismissRequest = { alert = null },
-            title = { Text("SIDRENA") },
+            title = { Text("BAZNA") },
             text = { Text(message) },
             confirmButton = { TextButton(onClick = { alert = null }) { Text("U redu") } },
         )
@@ -304,7 +304,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     "about" -> AboutPage(
                         data = snapshot,
                         onBack = { navigate("settings") },
-                        onConnectHelp = { alert = "Unesite HTTPS adresu svoje WordPress stranice s aktivnim dodatkom SIDRENA. Nakon povezivanja odaberite poslovnicu i pregledajte objavljene cjenike." },
+                        onConnectHelp = { alert = "Unesite HTTPS adresu svoje WordPress stranice s aktivnim dodatkom BAZNA. Nakon povezivanja odaberite poslovnicu i pregledajte objavljene cjenike." },
                         onAnchorHelp = { alert = "Sidrena cijena je dokumentirana referentna vrijednost uz pripadajući datum. Uvijek provjerite podatke na izvornoj WordPress stranici." },
                         onSupport = ::supportEmail,
                         onOpenPublic = ::openPublic,

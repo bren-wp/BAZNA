@@ -63,7 +63,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 	}
 
 	/**
-	 * Whether the current request is the Sidrena cijena settings screen.
+	 * Whether the current request is the Bazna cijena settings screen.
 	 *
 	 * @return bool
 	 */
@@ -118,7 +118,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 	 */
 	public function register_menu() {
 		$cap   = Brendigo_Sidrena_Cijena_Plugin::manage_capability();
-		$title = __( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' );
+		$title = __( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' );
 
 		if ( Brendigo_Sidrena_Cijena_Plugin::woocommerce_active() ) {
 			add_submenu_page(
@@ -162,24 +162,25 @@ class Brendigo_Sidrena_Cijena_Admin {
 		$xml_empty = '2' === $xml_flag;
 		$multi     = $settings->is_multi_poslovnica();
 		$xml_url   = $export->get_public_url();
-		$page_title = 'pregled' === $tab ? __( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' ) : ( isset( $tabs[ $tab ]['label'] ) ? $tabs[ $tab ]['label'] : __( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' ) );
+		$page_title = 'pregled' === $tab ? __( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' ) : ( isset( $tabs[ $tab ]['label'] ) ? $tabs[ $tab ]['label'] : __( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' ) );
 		$page_subtitles = array(
-			'pregled'      => __( 'Sidrene cijene, digitalni cjenik, arhiva, poslovnice i razmjena podataka u jednom sučelju.', 'brendigo-sidrena-cijena' ),
+			'pregled'      => __( 'Bazne cijene, digitalni cjenik, arhiva, poslovnice i razmjena podataka u jednom sučelju.', 'brendigo-sidrena-cijena' ),
 			'proizvodi'    => __( 'Ručno upravljanje proizvodima i uslugama koje ulaze u javni cjenik.', 'brendigo-sidrena-cijena' ),
-			'postavke'     => __( 'Prikaz, tekstovi, pravila i alati za sidrene cijene.', 'brendigo-sidrena-cijena' ),
-			'uvoz-izvoz'   => __( 'CSV i XML razmjena podataka za sidrene cijene i javni cjenik.', 'brendigo-sidrena-cijena' ),
+			'postavke'     => __( 'Prikaz, tekstovi, pravila i alati za bazne cijene.', 'brendigo-sidrena-cijena' ),
+			'uvoz-izvoz'   => __( 'CSV i XML razmjena podataka za bazne cijene i javni cjenik.', 'brendigo-sidrena-cijena' ),
 			'javni-xml'    => __( 'HTML prikaz, XML/CSV datoteke i arhiva javnog cjenika.', 'brendigo-sidrena-cijena' ),
 			'poslovnice'   => __( 'Više lokacija, zasebni javni cjenici i datoteke po poslovnici.', 'brendigo-sidrena-cijena' ),
 			'upute'        => __( 'Korisničke upute za WordPress i WooCommerce – korak po korak.', 'brendigo-sidrena-cijena' ),
+			'licenca'      => __( 'Unesite domenu i licencni ključ za otključavanje svih administracijskih mogućnosti.', 'brendigo-sidrena-cijena' ),
 		);
 		$page_subtitle = isset( $page_subtitles[ $tab ] ) ? $page_subtitles[ $tab ] : '';
 		?>
 		<div class="wrap sidrena-cijena-settings brendigo-sidrena-admin">
 			<div class="brendigo-admin-shell">
-				<aside class="brendigo-admin-sidebar" aria-label="<?php echo esc_attr__( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' ); ?>">
+				<aside class="brendigo-admin-sidebar" aria-label="<?php echo esc_attr__( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' ); ?>">
 					<a class="brendigo-admin-brand" href="<?php echo esc_url( $this->get_settings_tab_url( 'pregled' ) ); ?>">
-						<span class="brendigo-admin-brand__mark brendigo-admin-brand__mark--sidrena" aria-hidden="true"><img src="<?php echo esc_url( BRENDIGO_SIDRENA_CIJENA_URL . 'assets/images/sidrena-brand-mark.png' ); ?>" alt="" width="48" height="48" loading="eager" decoding="async" /></span>
-						<span class="brendigo-admin-brand__text"><strong>SIDRENA</strong><small>Brendigo</small></span>
+						<span class="brendigo-admin-brand__mark brendigo-admin-brand__mark--bazna" aria-hidden="true">B</span>
+						<span class="brendigo-admin-brand__text"><strong>BAZNA</strong><small>Brendigo</small></span>
 					</a>
 					<nav class="brendigo-admin-nav">
 						<?php foreach ( $tabs as $key => $item ) : ?>
@@ -191,7 +192,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 					</nav>
 					<div class="brendigo-admin-sidebar__legal">
 						<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
-						<strong><?php echo esc_html__( 'Sidrena cijena', 'brendigo-sidrena-cijena' ); ?></strong>
+						<strong><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ); ?></strong>
 						<small><?php echo esc_html__( 'Referentna cijena s datumom na koji je vrijedila.', 'brendigo-sidrena-cijena' ); ?></small>
 					</div>
 				</aside>
@@ -199,7 +200,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 				<main class="brendigo-admin-main">
 					<header class="brendigo-admin-topbar">
 						<div>
-							<p class="brendigo-admin-eyebrow"><?php echo esc_html__( 'Upravljanje sidrenim cijenama', 'brendigo-sidrena-cijena' ); ?></p>
+							<p class="brendigo-admin-eyebrow"><?php echo esc_html__( 'Upravljanje baznim cijenama', 'brendigo-sidrena-cijena' ); ?></p>
 							<h1><?php echo esc_html( $page_title ); ?></h1>
 							<p><?php echo esc_html( $page_subtitle ); ?></p>
 						</div>
@@ -235,15 +236,17 @@ class Brendigo_Sidrena_Cijena_Admin {
 							$this->render_tab_poslovnice();
 						} elseif ( 'postavke' === $tab ) {
 							$this->render_tab_postavke( $settings );
-						} elseif ( 'upute' === $tab ) {
-							$this->render_tab_upute();
+						} elseif ( 'licenca' === $tab ) {
+                            $this->render_tab_licenca();
+                        } elseif ( 'upute' === $tab ) {
+                            $this->render_tab_upute();
 						} else {
 							do_action( 'sidrena_cijena_render_settings_tab', $tab );
 						}
 						?>
 
 						<footer class="sidrena-cijena-card sidrena-cijena-credit">
-							<div><strong><?php echo esc_html__( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' ); ?></strong><p><?php echo esc_html__( 'Sidrene cijene i javni cjenik na jednom mjestu.', 'brendigo-sidrena-cijena' ); ?></p></div>
+							<div><strong><?php echo esc_html__( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' ); ?></strong><p><?php echo esc_html__( 'Bazne cijene i javni cjenik na jednom mjestu.', 'brendigo-sidrena-cijena' ); ?></p></div>
 							<a class="sidrena-cijena-credit__brand" href="https://brendigo.com" target="_blank" rel="noopener noreferrer" aria-label="Brendigo.com"><span class="brendigo-admin-brand__mark brendigo-admin-brand__mark--small" aria-hidden="true">B</span><span>Brendigo</span></a>
 						</footer>
 					</div>
@@ -258,8 +261,85 @@ class Brendigo_Sidrena_Cijena_Admin {
 	 *
 	 * @return array<string, array{label:string, icon:string}>
 	 */
-	private function get_tabs() {
+	    /**
+     * License activation is always accessible. No key is ever embedded in HTML
+     * or returned by the public REST API.
+     */
+    private function render_tab_licenca() {
+        $active = Brendigo_Sidrena_Cijena_License::valid();
+        $host = Brendigo_Sidrena_Cijena_License::site_host();
+        $status = isset($_GET['bazna_license_status'])
+            ? sanitize_key(wp_unslash($_GET['bazna_license_status'])) : '';
+        $messages = array(
+            'active' => 'BAZNA licenca aktivna je za ovu domenu.',
+            'deactivated' => 'Licenca je deaktivirana; ključ ostaje trajno vezan uz prvotno upisanu domenu.',
+            'invalid_key' => 'Neispravan oblik licencnog ključa.',
+            'invalid_site_domain' => 'Domena web-stranice nije javno dostupna i valjana.',
+            'domain_mismatch' => 'Upisana domena ne odgovara domeni ove WordPress stranice. Unesite domenu prikazanu iznad.',
+            'domain_proof_failed' => 'Servis nije mogao HTTPS-om potvrditi vlasništvo nad domenom. Provjerite DNS, certifikat i WordPress REST API.',
+            'already_used_on_another_domain' => 'Ključ je već trajno vezan uz drugu domenu i ovdje se ne može aktivirati.',
+            'not_activated_for_domain' => 'Ključ nije povezan s ovom domenom.',
+            'service_unreachable' => 'Licencni servis trenutačno nije dostupan. Provjerite HTTPS izlazne zahtjeve.',
+            'invalid_service_reply' => 'Servis je vratio neispravan odgovor.',
+            'license_service_unavailable' => 'Servis nije spreman. Kontaktirajte podršku.',
+            'encryption_unavailable' => 'Poslužitelj ne podržava sigurno spremanje licencnog ključa.',
+            'rate_limit_exceeded' => 'Previše pokušaja provjere. Pokušajte ponovno kasnije.',
+            'server_not_provisioned' => 'Licencni servis još nije konfiguriran.',
+            'activation_failed' => 'Aktivacija nije dovršena.',
+        );
+        ?>
+        <section class="sidrena-cijena-card brendigo-settings-card">
+            <div class="sidrena-cijena-card__head">
+                <span class="dashicons dashicons-admin-network" aria-hidden="true"></span>
+                <div>
+                    <h2><?php echo esc_html__('BAZNA — licenca', 'brendigo-sidrena-cijena'); ?></h2>
+                    <p><?php echo esc_html__('Jedan ključ trajno pripada jednoj domeni. Deaktivacija ne dopušta prijenos na drugu domenu. Podaci i javni cjenici ostaju sačuvani.', 'brendigo-sidrena-cijena'); ?></p>
+                </div>
+            </div>
+            <?php if ( isset($messages[$status]) ) : ?>
+                <div class="notice notice-info inline" role="status"><p><?php echo esc_html($messages[$status]); ?></p></div>
+            <?php endif; ?>
+            <p><strong><?php echo esc_html__('Domena:', 'brendigo-sidrena-cijena'); ?></strong> <code><?php echo esc_html($host); ?></code></p>
+            <p><strong><?php echo esc_html__('Status:', 'brendigo-sidrena-cijena'); ?></strong>
+                <?php echo esc_html($active ? 'Aktivna — administratorske mogućnosti otključane' : 'Nije aktivna — unesite domenu i licencni ključ'); ?>
+            </p>
+            <?php if ( !$active ) : ?>
+                <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
+                    <?php wp_nonce_field('bazna_license_action', 'bazna_license_nonce'); ?>
+                    <input type="hidden" name="bazna_license_action" value="activate" />
+                    <label for="bazna_license_domain"><strong><?php echo esc_html__('Domena web-stranice', 'brendigo-sidrena-cijena'); ?></strong></label>
+                    <input type="text" class="regular-text" id="bazna_license_domain" name="bazna_license_domain"
+                        maxlength="253" placeholder="primjer.hr" autocomplete="off" spellcheck="false"
+                        aria-describedby="bazna-domain-help" required />
+                    <p class="description" id="bazna-domain-help"><?php echo esc_html__('Upišite samo domenu (bez https:// i putanje). Mora odgovarati domeni ove WordPress stranice; www i bez www smatraju se istom domenom.', 'brendigo-sidrena-cijena'); ?></p>
+                    <label for="bazna_license_key"><strong><?php echo esc_html__('Licencni ključ', 'brendigo-sidrena-cijena'); ?></strong></label>
+                    <input type="text" class="regular-text" id="bazna_license_key" name="bazna_license_key"
+                        maxlength="90" placeholder="BAZNA-00001-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+                        autocomplete="off" spellcheck="false" required />
+                    <button type="submit" class="button button-primary"><?php echo esc_html__('Aktiviraj licencu', 'brendigo-sidrena-cijena'); ?></button>
+                </form>
+            <?php else : ?>
+                <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
+                    <?php wp_nonce_field('bazna_license_action', 'bazna_license_nonce'); ?>
+                    <button type="submit" name="bazna_license_action" value="refresh" class="button button-secondary"><?php echo esc_html__('Provjeri licencu', 'brendigo-sidrena-cijena'); ?></button>
+                    <button type="submit" name="bazna_license_action" value="deactivate" class="button button-secondary"><?php echo esc_html__('Deaktiviraj licencu', 'brendigo-sidrena-cijena'); ?></button>
+                    <p class="description"><?php echo esc_html__('Deaktivacija zaključava administratorske funkcije, ali ključ se ni tada ne može koristiti na drugoj domeni.', 'brendigo-sidrena-cijena'); ?></p>
+                </form>
+            <?php endif; ?>
+            <p class="description"><?php echo esc_html__('Provjera je povezana sa servisom licenca.brendigo.com. Za javne cjenike i Android pregled ne traži se unos administratorskih vjerodajnica.', 'brendigo-sidrena-cijena'); ?></p>
+        </section>
+        <?php
+    }
+
+    private function get_tabs() {
 		$tabs = array();
+        $tabs['licenca'] = array(
+            'label' => __( 'Licenca', 'brendigo-sidrena-cijena' ),
+            'icon' => 'dashicons-admin-network',
+        );
+        if ( ! Brendigo_Sidrena_Cijena_License::valid() ) {
+            return $tabs;
+        }
 
 		$tabs['pregled'] = array(
 			'label' => __( 'Pregled', 'brendigo-sidrena-cijena' ),
@@ -296,7 +376,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 		);
 
 		/**
-		 * Extra Sidrena cijena settings tabs.
+		 * Extra Bazna cijena settings tabs.
 		 *
 		 * @param array<string, array{label:string, icon:string}> $tabs Tabs.
 		 */
@@ -318,7 +398,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 			return $tab;
 		}
 
-		if ( isset( $_GET['sidrena_xml'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['sidrena_xml'] ) && isset( $tabs['javni-xml'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return 'javni-xml';
 		}
 
@@ -732,11 +812,11 @@ class Brendigo_Sidrena_Cijena_Admin {
 						'doneToday'    => __( 'Gotovo. Prazna polja su popunjena današnjim datumom.', 'brendigo-sidrena-cijena' ),
 						'todayConfirm' => sprintf(
 							/* translators: %s: locked general reference date. */
-							__( 'Ovo popunjava prazne sidrene cijene trenutnom redovnom cijenom i upisuje današnji datum kao referentni (samo ako datum još nije unesen). Proizvodi koji su postojali na %s trebaju ostati na zadanom datumu. Nastaviti?', 'brendigo-sidrena-cijena' ),
+							__( 'Ovo popunjava prazne bazne cijene trenutnom redovnom cijenom i upisuje današnji datum kao referentni (samo ako datum još nije unesen). Proizvodi koji su postojali na %s trebaju ostati na zadanom datumu. Nastaviti?', 'brendigo-sidrena-cijena' ),
 							Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_GENERAL
 						),
 						'error'        => __( 'Došlo je do pogreške. Pokušajte ponovno.', 'brendigo-sidrena-cijena' ),
-						'purgeConfirm' => __( 'Ovo će trajno obrisati sve sidrene cijene, ručni cjenik, evidenciju povijesti cijena, postavke, javni XML i arhivu, zatim deaktivirati dodatak. Radnja se ne može poništiti. Nastaviti?', 'brendigo-sidrena-cijena' ),
+						'purgeConfirm' => __( 'Ovo će trajno obrisati sve bazne cijene, ručni cjenik, evidenciju povijesti cijena, postavke, javni XML i arhivu, zatim deaktivirati dodatak. Radnja se ne može poništiti. Nastaviti?', 'brendigo-sidrena-cijena' ),
 						'purging'      => __( 'Brisanje podataka…', 'brendigo-sidrena-cijena' ),
 						'copied'       => __( 'Kopirano', 'brendigo-sidrena-cijena' ),
 						'copyFailed'   => __( 'Kopiranje nije uspjelo', 'brendigo-sidrena-cijena' ),
@@ -804,7 +884,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 						'unsavedLabel'   => __( 'Nespremljene promjene', 'brendigo-sidrena-cijena' ),
 						'saving'         => __( 'Spremanje…', 'brendigo-sidrena-cijena' ),
 						'wooNoChanges'      => __( 'Nema nespremljenih promjena.', 'brendigo-sidrena-cijena' ),
-						'wooLeaveWarning'   => __( 'Imate nespremljene promjene sidrenih cijena. Ako napustite stranicu, promjene će se izgubiti.', 'brendigo-sidrena-cijena' ),
+						'wooLeaveWarning'   => __( 'Imate nespremljene promjene baznih cijena. Ako napustite stranicu, promjene će se izgubiti.', 'brendigo-sidrena-cijena' ),
 						'wooResetConfirm'   => __( 'Poništiti sve nespremljene promjene na ovoj stranici?', 'brendigo-sidrena-cijena' ),
 						'wooVisibleRows'     => __( 'Prikazano {visible} od {total} stavki na ovoj stranici.', 'brendigo-sidrena-cijena' ),
 						/* translators: %d: number of changed WooCommerce rows. */
@@ -859,7 +939,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 	 * @return array<string, string>
 	 */
 	public function add_product_column( $columns ) {
-		$columns['sidrena_cijena'] = __( 'Sidrena cijena', 'brendigo-sidrena-cijena' );
+		$columns['sidrena_cijena'] = __( 'Bazna cijena', 'brendigo-sidrena-cijena' );
 		return $columns;
 	}
 

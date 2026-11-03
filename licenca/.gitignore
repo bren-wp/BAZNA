@@ -1,0 +1,7 @@
+private/config.php
+private/*.json
+private/*.lock
+storage/
+*.csv
+*.txt
+!README.md

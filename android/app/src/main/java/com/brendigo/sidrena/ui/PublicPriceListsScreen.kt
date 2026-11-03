@@ -59,7 +59,7 @@ import com.brendigo.sidrena.data.CatalogSnapshot
 import com.brendigo.sidrena.data.SiteUrl
 
 /**
- * 07/12 — Public price lists, matching the SIDRENA reference layout.
+ * 07/12 — Public price lists, matching the BAZNA reference layout.
  *
  * Every link is based on the current connected WordPress installation.
  * CSV and XML are displayed only when the API actually returns them.

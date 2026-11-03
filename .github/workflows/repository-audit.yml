@@ -1,4 +1,4 @@
-name: SIDRENA all-platform source audit
+name: BAZNA all-platform source audit
 
 on:
   pull_request:

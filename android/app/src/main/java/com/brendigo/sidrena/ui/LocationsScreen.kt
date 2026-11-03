@@ -88,9 +88,9 @@ internal fun filterPublishedLocations(
 }
 
 /**
- * Screen 09/12: Poslovnice, inspired by the ninth SIDRENA reference screen.
+ * Screen 09/12: Poslovnice, inspired by the ninth BAZNA reference screen.
  *
- * The SIDRENA API currently returns name/code and CSV links only: it has no
+ * The BAZNA API currently returns name/code and CSV links only: it has no
  * address, business hours, coordinates, phone number or map tiles. Therefore
  * this screen never draws fabricated pins or misleading working hours.
  */
@@ -199,7 +199,7 @@ fun LocationsPage(
             }
             item {
                 Text(
-                    text = "Podaci o adresama, radnom vremenu i koordinatama nisu objavljeni u javnom SIDRENA API-ju. Dostupne poslovnice imaju vlastite javne cjenike.",
+                    text = "Podaci o adresama, radnom vremenu i koordinatama nisu objavljeni u javnom BAZNA API-ju. Dostupne poslovnice imaju vlastite javne cjenike.",
                     color = TextMuted,
                     fontSize = 12.sp,
                     lineHeight = 18.sp,

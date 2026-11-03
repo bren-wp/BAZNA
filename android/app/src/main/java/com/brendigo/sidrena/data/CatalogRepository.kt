@@ -36,10 +36,10 @@ class CatalogRepository {
         if (index.pendingPublication == true) {
             warnings.add("WordPress ima neobjavljene izmjene. Prikazane CSV cijene mogu biti zastarjele dok se cjenik ponovno ne objavi.")
         }
-        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte dodatak SIDRENA.")
+        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte dodatak BAZNA.")
         fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
             if (ready == false) {
-                warnings.add("Cjenik za " + label + " još nije objavljen u WordPress dodatku. Objavite ga u administraciji SIDRENA.")
+                warnings.add("Cjenik za " + label + " još nije objavljen u WordPress dodatku. Objavite ga u administraciji BAZNA.")
                 return emptyList()
             }
             if (url.isBlank()) {
@@ -140,7 +140,7 @@ class CatalogRepository {
                 .header("Accept", "application/json, text/csv, */*")
                 // A public price list should be revalidated after publication.
                 .header("Cache-Control", "no-cache, max-age=0")
-                .header("User-Agent", "SIDRENA-Android")
+                .header("User-Agent", "BAZNA-Android")
                 .build()
             client.newCall(request).execute().use { response ->
                 val code = response.code

@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) || exit;
 		?>
 		<div class="sidrena-cijena-callout">
 			<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
-			<p><?php echo esc_html( $sidrena_woo ? __( 'Svi WooCommerce proizvodi povlače se automatski iz postojećeg kataloga i prikazuju po stranicama. Upišite samo sidrenu cijenu i, kada je potrebno, datum na koji je ta cijena vrijedila. Barkod i vidljivost možete doraditi na istom mjestu. Dodatne stavke koristite samo za ono što nije WooCommerce proizvod.', 'brendigo-sidrena-cijena' ) : __( 'Dodajte proizvode i usluge koji trebaju biti u javnom cjeniku. Za svaku stavku upišite važeću i sidrenu cijenu te datum na koji je sidrena cijena vrijedila.', 'brendigo-sidrena-cijena' ) ); ?></p>
+			<p><?php echo esc_html( $sidrena_woo ? __( 'Svi WooCommerce proizvodi povlače se automatski iz postojećeg kataloga i prikazuju po stranicama. Upišite samo baznu cijenu i, kada je potrebno, datum na koji je ta cijena vrijedila. Barkod i vidljivost možete doraditi na istom mjestu. Dodatne stavke koristite samo za ono što nije WooCommerce proizvod.', 'brendigo-sidrena-cijena' ) : __( 'Dodajte proizvode i usluge koji trebaju biti u javnom cjeniku. Za svaku stavku upišite važeću i baznu cijenu te datum na koji je bazna cijena vrijedila.', 'brendigo-sidrena-cijena' ) ); ?></p>
 		</div>
 
 		<?php if ( $sidrena_woo && is_array( $sidrena_woo_catalog ) ) : ?>
@@ -38,7 +38,7 @@ defined( 'ABSPATH' ) || exit;
 			<div class="sidrena-cijena-card__head">
 				<div>
 					<h2><?php echo esc_html__( 'WooCommerce proizvodi', 'brendigo-sidrena-cijena' ); ?></h2>
-					<p><?php echo esc_html__( 'Katalog je stalno povezan s WooCommerceom, bez zasebnog kopiranja proizvoda. Naziv, SKU i važeća cijena ostaju na izvornom proizvodu; ovdje unosite podatke potrebne za sidrenu cijenu.', 'brendigo-sidrena-cijena' ); ?></p>
+					<p><?php echo esc_html__( 'Katalog je stalno povezan s WooCommerceom, bez zasebnog kopiranja proizvoda. Naziv, SKU i važeća cijena ostaju na izvornom proizvodu; ovdje unosite podatke potrebne za baznu cijenu.', 'brendigo-sidrena-cijena' ); ?></p>
 				</div>
 				<span class="brendigo-admin-chip"><?php echo esc_html( number_format_i18n( (int) $sidrena_woo_catalog['total'] ) ); ?> <?php echo esc_html__( 'proizvoda', 'brendigo-sidrena-cijena' ); ?></span>
 			</div>
@@ -64,7 +64,7 @@ defined( 'ABSPATH' ) || exit;
 					<span><?php echo esc_html__( 'Prikaz', 'brendigo-sidrena-cijena' ); ?></span>
 					<select id="sidrena-wc-price-filter">
 						<option value="all"><?php echo esc_html__( 'Svi proizvodi', 'brendigo-sidrena-cijena' ); ?></option>
-						<option value="missing"><?php echo esc_html__( 'Bez sidrene cijene', 'brendigo-sidrena-cijena' ); ?></option>
+						<option value="missing"><?php echo esc_html__( 'Bez bazne cijene', 'brendigo-sidrena-cijena' ); ?></option>
 						<option value="complete"><?php echo esc_html__( 'Sa sidrenom cijenom', 'brendigo-sidrena-cijena' ); ?></option>
 					</select>
 				</label>
@@ -87,7 +87,7 @@ defined( 'ABSPATH' ) || exit;
 							<th><?php echo esc_html__( 'Proizvod', 'brendigo-sidrena-cijena' ); ?></th>
 							<th><?php echo esc_html__( 'SKU', 'brendigo-sidrena-cijena' ); ?></th>
 							<th><?php echo esc_html__( 'Važeća cijena', 'brendigo-sidrena-cijena' ); ?></th>
-							<th><?php echo esc_html__( 'Sidrena cijena', 'brendigo-sidrena-cijena' ); ?></th>
+							<th><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ); ?></th>
 							<th><?php echo esc_html__( 'Cijena je vrijedila na dan', 'brendigo-sidrena-cijena' ); ?></th>
 							<th><?php echo esc_html__( 'Barkod', 'brendigo-sidrena-cijena' ); ?></th>
 							<th><?php echo esc_html__( 'Javni cjenik', 'brendigo-sidrena-cijena' ); ?></th>
@@ -117,7 +117,7 @@ defined( 'ABSPATH' ) || exit;
 
 				<div class="brendigo-woo-catalog-footer">
 					<div class="brendigo-woo-catalog-footer__actions">
-						<button type="submit" class="button button-primary button-hero js-sidrena-wc-save"><?php echo esc_html__( 'Spremi sidrene cijene', 'brendigo-sidrena-cijena' ); ?></button>
+						<button type="submit" class="button button-primary button-hero js-sidrena-wc-save"><?php echo esc_html__( 'Spremi bazne cijene', 'brendigo-sidrena-cijena' ); ?></button>
 						<button type="button" class="button button-secondary js-sidrena-wc-reset"><?php echo esc_html__( 'Poništi nespremljene promjene', 'brendigo-sidrena-cijena' ); ?></button>
 					</div>
 					<?php if ( (int) $sidrena_woo_catalog['pages'] > 1 ) : ?>
@@ -214,7 +214,7 @@ defined( 'ABSPATH' ) || exit;
 								<th><?php echo esc_html__( 'Poseban oblik', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Jedinica mjere', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Cijena za jedinicu', 'brendigo-sidrena-cijena' ); ?></th>
-								<th><?php echo esc_html__( 'Sidrena cijena', 'brendigo-sidrena-cijena' ); ?></th>
+								<th><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Datum sidrene', 'brendigo-sidrena-cijena' ); ?></th>
 								<?php if ( Brendigo_Sidrena_Cijena_Settings::instance()->is_cjm_enabled() ) : ?>
 								<th><?php echo esc_html__( 'Mjerna jedinica', 'brendigo-sidrena-cijena' ); ?></th>

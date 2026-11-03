@@ -1,0 +1,4 @@
+# Apache 2.2/2.4: all private server configuration is forbidden over HTTP.
+Require all denied
+Deny from all
+Options -Indexes

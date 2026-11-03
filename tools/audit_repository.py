@@ -112,9 +112,9 @@ if len(legacy_section) < 2 or 'blocked\' => true' not in legacy_section[1].split
 if 'ignore_user_abort( true );' in legacy_section[1].split('public static function is_pending(', 1)[0]:
     issues.append("Legacy unreachable price-copy loop unexpectedly reintroduced")
 if f"RELEASE_VERSION: '{plugin_version}'" not in release_ci or 'tag="$RELEASE_VERSION"' not in release_ci:
-    issues.append("Unified SIDRENA release tag must match current plugin version")
-if '--title "SIDRENA"' not in release_ci:
-    issues.append("GitHub release title must be SIDRENA")
+    issues.append("Unified BAZNA release tag must match current plugin version")
+if '--title "BAZNA"' not in release_ci:
+    issues.append("GitHub release title must be BAZNA")
 
 # Surface candidate duplicated class names without modifying any code.
 for extension, roots, pattern in (
@@ -130,7 +130,7 @@ for extension, roots, pattern in (
         if count > 1:
             print(f"REVIEW: repeated declaration name {name} ({count} occurrences); may belong to different scopes")
 
-print(f"SIDRENA source preflight: plugin files={len(files)}, WordPress digest={source_digest}")
+print(f"BAZNA source preflight: plugin files={len(files)}, WordPress digest={source_digest}")
 if issues:
     for issue in issues:
         print("ERROR:", issue)

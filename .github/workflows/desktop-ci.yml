@@ -4,7 +4,7 @@
 # Plugin URI: https://brendigo.com/sidrene-cijene/
 # Support: sidrena@brendigo.com
 
-name: SIDRENA Desktop build and smoke test
+name: BAZNA Desktop build and smoke test
 
 on:
   pull_request:

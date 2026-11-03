@@ -1,3 +1,9 @@
+== BAZNA 1.5.11 ==
+- Novi javni brend BAZNA — Bazne cijene (Android, WordPress i Windows).
+- Stari podaci, WordPress ID i REST v1 ostaju kompatibilni.
+- Dodani novi shortcode aliasi; stari shortcodeovi ostaju važeći.
+- Zamjena samo zadanih naziva cijena bez brisanja korisničkih tekstova.
+
 = 1.5.4 – development candidate (2026-11-02) =
 * WordPress REST v1 now exposes optional available_csv for goods and services, including independent per-outlet readiness. Both missing and published-empty CSV files are represented honestly.
 * Product feeds optionally include the original public WooCommerce attachment URL in slika_url; no private images, image proxies, user data, or additional authentication are introduced.

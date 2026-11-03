@@ -111,8 +111,8 @@ class Brendigo_Sidrena_Cijena_I18n {
 		do_action( 'wpml_register_single_string', self::CONTEXT, 'tooltip', $tooltip );
 
 		if ( function_exists( 'pll_register_string' ) ) {
-			pll_register_string( 'prefix', $prefix, 'Sidrena cijena', false );
-			pll_register_string( 'tooltip', $tooltip, 'Sidrena cijena', true );
+			pll_register_string( 'prefix', $prefix, 'Bazna cijena', false );
+			pll_register_string( 'tooltip', $tooltip, 'Bazna cijena', true );
 		}
 	}
 
@@ -418,11 +418,11 @@ class Brendigo_Sidrena_Cijena_I18n {
 	 */
 	private function apply_gettext_default( $key, $value ) {
 		if ( 'prefix' === $key && Brendigo_Sidrena_Cijena_Settings::DEFAULT_PREFIX === $value ) {
-			return __( 'Sidrena cijena', 'brendigo-sidrena-cijena' );
+			return __( 'Bazna cijena', 'brendigo-sidrena-cijena' );
 		}
 
 		if ( 'tooltip' === $key && Brendigo_Sidrena_Cijena_Settings::DEFAULT_TOOLTIP === $value ) {
-			return __( 'Sidrena cijena je referentna maloprodajna cijena koja je za proizvod ili uslugu vrijedila na navedeni datum.', 'brendigo-sidrena-cijena' );
+			return __( 'Bazna cijena je referentna maloprodajna cijena koja je za proizvod ili uslugu vrijedila na navedeni datum.', 'brendigo-sidrena-cijena' );
 		}
 
 		return $value;

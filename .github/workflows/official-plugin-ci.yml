@@ -1,8 +1,10 @@
-name: Official Brendigo Sidrena Cijena checks
+name: BAZNA WordPress plugin checks
 on:
   pull_request:
     paths:
       - 'wordpress/brendigo-sidrena-cijena/**'
+      - 'licenca/**'
+      - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
@@ -16,6 +18,8 @@ on:
     branches: [main]
     paths:
       - 'wordpress/brendigo-sidrena-cijena/**'
+      - 'licenca/**'
+      - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
@@ -36,7 +40,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.10' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.11' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -48,6 +52,14 @@ jobs:
         run: php tools/test_legal_contract.php
       - name: Test public Android/WordPress feed discovery compatibility
         run: php tools/test_public_api_contract.php
+      - name: Verify BAZNA licence domain binding and server JSON engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          php tools/test_bazna_license_domain.php
+          php licenca/tests/test.php
+          find licenca -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-license-lint.log
+          tail -n 4 /tmp/bazna-license-lint.log
       - name: Test optional product imagery and CSV field compatibility
         run: php tools/test_public_feed_columns.php
       - name: Test public mobile service cards and HTML escaping
@@ -80,7 +92,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.10 --output artifacts/brendigo-sidrena-cijena-1.5.10.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.10.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.10 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.10.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.10.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.10.zip
+          python3 tools/package_plugin.py --version 1.5.11 --output artifacts/brendigo-sidrena-cijena-1.5.11.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.11.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.11 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.11.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.11.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.11.zip

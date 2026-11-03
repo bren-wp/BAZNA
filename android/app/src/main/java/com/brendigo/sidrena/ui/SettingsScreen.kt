@@ -90,7 +90,7 @@ internal fun settingsSummary(
 }
 
 /**
- * SIDRENA screen 11/12 — settings.
+ * BAZNA screen 11/12 — settings.
  *
  * The dark theme and Croatian text are current fixed app capabilities,
  * deliberately presented as information rather than inactive switches.
@@ -297,7 +297,7 @@ fun SettingsPage(
             SettingsEntry(
                 icon = Icons.Outlined.Info,
                 title = "O aplikaciji",
-                subtitle = "SIDRENA " + BuildConfig.VERSION_NAME + " · by Brendigo",
+                subtitle = "BAZNA " + BuildConfig.VERSION_NAME + " · by Brendigo",
                 onClick = onAbout,
             )
         }
@@ -476,7 +476,7 @@ private fun SettingsDivider() {
     )
 }
 
-@Preview(name = "11 SIDRENA Postavke 393×852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "11 BAZNA Postavke 393×852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaSettingsPreview() {
     val data = CatalogSnapshot(
@@ -515,7 +515,7 @@ internal fun SidrenaSettingsPreview() {
     }
 }
 
-@Preview(name = "11 SIDRENA Postavke kompaktno", widthDp = 360, heightDp = 640, showBackground = true)
+@Preview(name = "11 BAZNA Postavke kompaktno", widthDp = 360, heightDp = 640, showBackground = true)
 @Composable
 internal fun SidrenaSettingsCompactPreview() {
     SidrenaSettingsPreview()

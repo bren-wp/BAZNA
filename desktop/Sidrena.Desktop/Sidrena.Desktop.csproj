@@ -10,7 +10,7 @@
     <Version>0.10.6</Version>
     <Company>Brendigo LTD</Company>
     <Authors>Brendigo LTD</Authors>
-    <Product>SIDRENA Desktop</Product>
+    <Product>BAZNA Desktop</Product>
     <Copyright>Copyright © 2026 Brendigo LTD</Copyright>
     <ApplicationIcon>../branding/generated/SIDRENA.ico</ApplicationIcon>
   </PropertyGroup>

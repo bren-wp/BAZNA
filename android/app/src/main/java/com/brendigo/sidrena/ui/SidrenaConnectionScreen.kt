@@ -80,7 +80,7 @@ internal fun acceptedSiteInput(value: String): String? =
     }
 
 /**
- * SIDRENA screen 02/12 — connects to a real public WordPress website.
+ * BAZNA screen 02/12 — connects to a real public WordPress website.
  *
  * Reference: screens_concept/02_povezivanje.png (1080 × 1920).
  * Demo badges, sample addresses as real values and simulated status bar icons
@@ -336,7 +336,7 @@ fun ConnectionPage(
 
             Spacer(Modifier.height(spacing.footer))
             Text(
-                text = "SIDRENA • by Brendigo",
+                text = "BAZNA • by Brendigo",
                 color = TextMuted,
                 fontSize = 13.sp,
             )
@@ -345,7 +345,7 @@ fun ConnectionPage(
     }
 }
 
-@Preview(name = "02 SIDRENA Connection 360x640", widthDp = 360, heightDp = 640, showBackground = true)
+@Preview(name = "02 BAZNA Connection 360x640", widthDp = 360, heightDp = 640, showBackground = true)
 @Composable
 internal fun SidrenaConnectReferencePreview() {
     SidrenaTheme {
@@ -361,7 +361,7 @@ internal fun SidrenaConnectReferencePreview() {
     }
 }
 
-@Preview(name = "02 SIDRENA Connection tall 393x852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "02 BAZNA Connection tall 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaConnectTallPreview() {
     SidrenaTheme {
