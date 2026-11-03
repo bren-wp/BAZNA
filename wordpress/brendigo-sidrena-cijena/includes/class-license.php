@@ -49,6 +49,14 @@ final class Brendigo_Sidrena_Cijena_License {
         return preg_replace('/^www\\./', '', $domain);
     }
 
+    /** Explicitly entered domain must identify this exact installation. */
+    public static function domain_matches_site($input) {
+        $claimed = self::canonical_domain($input);
+        $actual = self::canonical_domain(self::site_host());
+        return '' !== $claimed && '' !== $actual &&
+            hash_equals($actual, $claimed);
+    }
+
     public static function site_path() {
         // The public home URL can differ from the WordPress installation
         // directory. Use REST URL to locate the proof endpoint correctly.
@@ -180,10 +188,7 @@ final class Brendigo_Sidrena_Cijena_License {
             // the key; a different website must never claim this activation.
             $domainInput = isset($_POST['bazna_license_domain']) && is_string($_POST['bazna_license_domain'])
                 ? sanitize_text_field(wp_unslash($_POST['bazna_license_domain'])) : '';
-            $claimedDomain = self::canonical_domain($domainInput);
-            $actualDomain = self::canonical_domain(self::site_host());
-            if ('' === $claimedDomain || '' === $actualDomain ||
-                !hash_equals($actualDomain, $claimedDomain)) {
+            if (!self::domain_matches_site($domainInput)) {
                 $this->redirect('domain_mismatch');
             }
             $key = isset($_POST['bazna_license_key'])
