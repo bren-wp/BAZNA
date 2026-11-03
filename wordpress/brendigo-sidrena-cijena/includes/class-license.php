@@ -36,6 +36,19 @@ final class Brendigo_Sidrena_Cijena_License {
         return strtolower(rtrim($host, '.'));
     }
 
+    /**
+     * A key belongs to one canonical DNS domain, not to an arbitrary domain
+     * provided by an administrator. www is treated as the same website.
+     */
+    public static function canonical_domain($input) {
+        $domain = strtolower(trim((string) $input));
+        if (strlen($domain) > 253 ||
+            !preg_match('/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$/D', $domain)) {
+            return '';
+        }
+        return preg_replace('/^www\\./', '', $domain);
+    }
+
     public static function site_path() {
         $path = (string) wp_parse_url(home_url('/'), PHP_URL_PATH);
         return '' !== $path ? trailingslashit($path) : '/';
@@ -46,7 +59,8 @@ final class Brendigo_Sidrena_Cijena_License {
         $state = get_option(self::OPTION, array());
         return is_array($state) && !empty($state['active']) &&
             isset($state['host'], $state['checked']) &&
-            hash_equals((string) $state['host'], self::site_host()) &&
+            '' !== self::canonical_domain(self::site_host()) &&
+            hash_equals((string) $state['host'], self::canonical_domain(self::site_host())) &&
             (int) $state['checked'] > time() - self::OFFLINE_GRACE;
     }
 
@@ -139,11 +153,21 @@ final class Brendigo_Sidrena_Cijena_License {
             return;
         }
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Samo administrator smije upravljati licencijom.', 'brendigo-sidrena-cijena'), '', array('response' => 403));
+            wp_die(esc_html__('Samo administrator smije upravljati licencom.', 'brendigo-sidrena-cijena'), '', array('response' => 403));
         }
         check_admin_referer('bazna_license_action', 'bazna_license_nonce');
         $state = get_option(self::OPTION, array());
         if ('activate' === $action) {
+            // The administrator must explicitly enter the domain as well as
+            // the key; a different website must never claim this activation.
+            $domainInput = isset($_POST['bazna_license_domain']) && is_string($_POST['bazna_license_domain'])
+                ? sanitize_text_field(wp_unslash($_POST['bazna_license_domain'])) : '';
+            $claimedDomain = self::canonical_domain($domainInput);
+            $actualDomain = self::canonical_domain(self::site_host());
+            if ('' === $claimedDomain || '' === $actualDomain ||
+                !hash_equals($actualDomain, $claimedDomain)) {
+                $this->redirect('domain_mismatch');
+            }
             $key = isset($_POST['bazna_license_key'])
                 ? strtoupper(trim(sanitize_text_field(wp_unslash($_POST['bazna_license_key'])))) : '';
         } else {
@@ -172,8 +196,14 @@ final class Brendigo_Sidrena_Cijena_License {
             if ('' === $encrypted) {
                 $this->redirect('encryption_unavailable');
             }
+            $confirmedDomain = self::canonical_domain(self::site_host());
+            // A successful HTTPS response must be for precisely this domain.
+            if (!isset($result['domain']) || !is_string($result['domain']) ||
+                !hash_equals($confirmedDomain, $result['domain'])) {
+                $this->redirect('domain_mismatch');
+            }
             update_option(self::OPTION, array(
-                'active' => true, 'host' => self::site_host(),
+                'active' => true, 'host' => $confirmedDomain,
                 'checked' => time(), 'encrypted_key' => $encrypted,
             ), false);
             $this->redirect('active');
@@ -227,13 +257,13 @@ final class Brendigo_Sidrena_Cijena_License {
             ? sanitize_key(wp_unslash($_REQUEST['action'])) : '';
         $blocked = $postAction !== '' || preg_match('/^sidrena_cijena_(?:import|snapshot)/', $ajaxAction);
         if ($blocked) {
-            wp_die(esc_html__('Za uređivanje i izvoz potrebna je aktivna BAZNA licencija.', 'brendigo-sidrena-cijena'), '', array('response' => 403));
+            wp_die(esc_html__('Za uređivanje i izvoz potrebna je aktivna BAZNA licenca.', 'brendigo-sidrena-cijena'), '', array('response' => 403));
         }
         // Deliberately leave data erasure accessible to administrators.
     }
 
     private function redirect($code) {
-        $allowed = array('active', 'deactivated', 'invalid_key', 'invalid_site_domain',
+        $allowed = array('active', 'deactivated', 'invalid_key', 'invalid_site_domain', 'domain_mismatch',
             'domain_proof_failed', 'already_used_on_another_domain',
             'not_activated_for_domain', 'service_unreachable', 'invalid_service_reply',
             'license_service_unavailable', 'encryption_unavailable',
