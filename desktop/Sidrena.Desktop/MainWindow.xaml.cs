@@ -10,10 +10,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using Bazna.Core;
-using U=Bazna.Desktop.UiKit;
+using Sidrena.Core;
+using U=Sidrena.Desktop.UiKit;
 
-namespace Bazna.Desktop;
+namespace Sidrena.Desktop;
 
 public partial class MainWindow : Window
 {
