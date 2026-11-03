@@ -21,7 +21,7 @@ SOURCE = ROOT / "licenca"
 REQUIRED = [
     "api.php", "lib.php", ".htaccess", "DEPLOY.md", "README.md",
     "private/.htaccess", "private/index.php", "private/config.example.php",
-    "bin/generate.php", "bin/.htaccess",
+    "bin/generate.php", "bin/preflight.php", "bin/.htaccess",
     "tests/test.php", "tests/.htaccess", "nginx.conf.example",
 ]
 FORBIDDEN = ("activations.json", "rate.json", "activation.lock", "rate.lock")
