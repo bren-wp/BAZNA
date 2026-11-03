@@ -38,6 +38,25 @@ class CatalogDiscoveryTest {
         assertEquals(null, index.legal)
     }
 
+    @Test fun rejectsUnexpectedAuthenticationAndUnsafeConnectionModes() {
+        val valid = JSONObject(
+            """{"mode":"public_read_only","authentication_required":false,
+            "csv_publication_required":true,
+            "rest_endpoint":"https://primjer.hr/wp-json/brendigo-sidrena/v1/cjenici"}"""
+        )
+        assertEquals("1.5.2", CatalogDiscovery.parse(payload().put("connection", valid), site).pluginVersion)
+        for (mutated in listOf(
+            JSONObject(valid.toString()).put("mode", "admin_write"),
+            JSONObject(valid.toString()).put("authentication_required", true),
+            JSONObject(valid.toString()).put("csv_publication_required", false),
+            JSONObject(valid.toString()).put("rest_endpoint", "https://other.example/api"),
+        )) {
+            assertThrows(IllegalArgumentException::class.java) {
+                CatalogDiscovery.parse(payload().put("connection", mutated), site)
+            }
+        }
+    }
+
     @Test fun rejectsUnknownOrMissingApiVersion() {
         for (value in listOf(0, 2, 99)) {
             assertThrows(IllegalArgumentException::class.java) {
