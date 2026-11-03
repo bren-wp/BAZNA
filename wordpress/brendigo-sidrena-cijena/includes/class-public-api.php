@@ -58,6 +58,15 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		$out = array(
 			'api_version'  => 1,
 			'plugin_version' => BRENDIGO_SIDRENA_CIJENA_VERSION,
+            'branding' => array(
+                'name' => 'BAZNA',
+                'description' => 'Bazne cijene',
+            ),
+            // No license key, admin identity or secret ever leaves the server.
+            'licensing' => array(
+                'required' => true,
+                'active' => Brendigo_Sidrena_Cijena_License::valid(),
+            ),
 			// Public-only Android integration. No credentials, session data, or
 			// unpublished WooCommerce metadata are available through this route.
 			'connection' => array(
