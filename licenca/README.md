@@ -34,6 +34,7 @@ Repozitorij sadrži **kod** za servis. Privatni master ključ i 10.000 aktivacij
 ## Izdavanje i testovi
 
 ```bash
+php licenca/bin/preflight.php /apsolutna/putanja/do/document-roota
 php licenca/tests/test.php
 php -l licenca/lib.php
 php -l licenca/api.php
