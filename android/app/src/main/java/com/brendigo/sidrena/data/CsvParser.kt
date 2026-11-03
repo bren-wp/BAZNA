@@ -71,10 +71,18 @@ object CsvParser {
         val lines = parse(csv)
         if (lines.isEmpty()) return emptyList()
         val columns = lines.first().map { it.trim().lowercase() }
+        // Reject ambiguous headers instead of silently taking the first value:
+        // a duplicated "maloprodajna_cijena" can otherwise display a false price.
+        require(columns.all { it.isNotBlank() } && columns.size == columns.toSet().size) {
+            "CSV sadrži prazne ili ponovljene nazive stupaca."
+        }
         require(columns.contains("naziv") && columns.contains("maloprodajna_cijena")) {
             "Datoteka nije SIDRENA javni CSV cjenik."
         }
         return lines.drop(1).filter { row -> row.any { it.isNotBlank() } }.map { row ->
+            require(row.size == columns.size) {
+                "CSV redak ima neispravan broj stupaca."
+            }
             fun value(column: String): String = columns.indexOf(column)
                 .takeIf { it >= 0 }
                 ?.let { row.getOrNull(it) }
