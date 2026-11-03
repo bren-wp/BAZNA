@@ -4260,3 +4260,21 @@ body.sidrena-cijena-screen #wpbody-content {
         text-align: center;
     }
 }
+
+
+/* BAZNA: local CSS-only replacement for the legacy S image. No webfonts. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-admin-brand__mark--bazna {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 48px;
+    color: #ffaa55;
+    border-color: rgba(255, 170, 85, 0.55);
+    background: linear-gradient(145deg, #123457, #07182d);
+    box-shadow: 0 0 0 5px rgba(255, 133, 44, 0.07), 0 12px 30px rgba(7, 24, 45, 0.22);
+    font-family: Arial, sans-serif;
+    font-size: 31px;
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 1;
+}
