@@ -1,6 +1,6 @@
 # Apache: expose only the public JSON API. Config, sources and tests remain private.
 Options -Indexes
-<FilesMatch "^(?!api\\.php$).+">
+<FilesMatch "^(?!api\.php$).+">
     Require all denied
 </FilesMatch>
 <IfModule mod_headers.c>
