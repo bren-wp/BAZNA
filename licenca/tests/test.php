@@ -57,15 +57,23 @@ try {
     });
     expect_bazna(!$badProof['ok'], 'domain proof required to release');
     $released = bazna_license_action($master, $base, 'deactivate', $key, 'primjer.hr', '/', $challenge, $proof);
-    expect_bazna($released['ok'], 'release current domain');
+    expect_bazna($released['ok'], 'deactivate original domain');
+    $inactive = bazna_license_action($master, $base, 'check', $key, 'primjer.hr', '/');
+    expect_bazna(!$inactive['ok'], 'deactivated license cannot unlock WordPress');
     $moved = bazna_license_action($master, $base, 'activate', $key, 'druga.hr', '/', $challenge, $proof);
-    expect_bazna($moved['ok'], 'domain switch only after release');
+    expect_bazna(!$moved['ok'] && $moved['code'] === 'already_used_on_another_domain',
+        'deactivation cannot rebind key to another domain');
+    $renewed = bazna_license_action($master, $base, 'activate', $key, 'primjer.hr', '/', $challenge, $proof);
+    expect_bazna($renewed['ok'], 'reactivation allowed only on original domain');
     $record = json_decode((string) file_get_contents($base . '/activations.json'), true);
-    expect_bazna(is_array($record) && $record['1']['domain'] === 'druga.hr', 'atomic JSON registry');
+    expect_bazna(is_array($record) && $record['1']['domain'] === 'primjer.hr', 'permanent JSON domain binding');
+    expect_bazna($record['1']['status'] === 'active', 'server records current license status');
+    expect_bazna(isset($record['1']['activated_at'], $record['1']['checked_at']),
+        'server records binding and verification dates');
     bazna_license_rate_limit($base, '203.0.113.15');
     $limitData = json_decode((string) file_get_contents($base . '/rate.json'), true);
     expect_bazna(is_array($limitData) && count($limitData) === 1, 'JSON rate limiter');
-    echo "PASS: BAZNA 10,000 unique keys, domain binding, proof, release and JSON registry\n";
+    echo "PASS: BAZNA 10,000 unique keys, permanent domain binding, proof, deactivation and JSON registry\n";
 } finally {
     foreach (glob($base . '/*') as $file) {
         if (is_file($file)) {
