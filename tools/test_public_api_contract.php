@@ -7,7 +7,7 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
-define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.10' );
+define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.11' );
 
 function sidrena_contract_assert( $condition, $label ) {
 	if ( ! $condition ) {
@@ -74,6 +74,9 @@ class Brendigo_Sidrena_Cijena_Export {
 	public function get_public_url() {
 		return 'https://primjer.hr/sidrena-cijena.xml';
 	}
+}
+class Brendigo_Sidrena_Cijena_License {
+    public static function valid() { return true; }
 }
 class Brendigo_Sidrena_Cijena_Legal {
 	public static function public_contract() {
@@ -168,6 +171,11 @@ sidrena_contract_assert(
     'Public feed redirect remains same-origin'
 );
 sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
+sidrena_contract_assert( 'BAZNA' === $json['branding']['name'], 'New product name in public Android discovery' );
+sidrena_contract_assert( 'Bazne cijene' === $json['branding']['description'], 'Human-readable brand description' );
+sidrena_contract_assert( true === $json['licensing']['required'], 'WordPress license controls are declared' );
+sidrena_contract_assert( true === $json['licensing']['active'], 'Activation is represented without key disclosure' );
+sidrena_contract_assert( false === strpos( wp_json_encode( $json ), 'BAZNA-00001-' ), 'No license keys in public REST response' );
 sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
 sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
 sidrena_contract_assert( true === $json['connection']['csv_publication_required'], 'CSV readiness is not fabricated on first install' );
