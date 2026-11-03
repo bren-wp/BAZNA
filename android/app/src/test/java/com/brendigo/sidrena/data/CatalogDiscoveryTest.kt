@@ -57,6 +57,23 @@ class CatalogDiscoveryTest {
         }
     }
 
+    @Test fun publicPricesRemainReadableWhenWordPressLicenseIsInactive() {
+        val licensing = JSONObject().put("required", true).put("active", false)
+        val index = CatalogDiscovery.parse(payload().put("licensing", licensing), site)
+        assertEquals(false, index.wordpressLicenseActive)
+        assertEquals("https://primjer.hr/usluge.csv?oznaka=RI-01", index.outlets.single().serviceCsv)
+        licensing.put("active", true)
+        assertEquals(true, CatalogDiscovery.parse(payload().put("licensing", licensing), site).wordpressLicenseActive)
+        for (invalid in listOf(
+            JSONObject().put("required", true).put("active", "active"),
+            JSONObject().put("required", false).put("active", true),
+        )) {
+            assertThrows(IllegalArgumentException::class.java) {
+                CatalogDiscovery.parse(payload().put("licensing", invalid), site)
+            }
+        }
+    }
+
     @Test fun rejectsUnknownOrMissingApiVersion() {
         for (value in listOf(0, 2, 99)) {
             assertThrows(IllegalArgumentException::class.java) {

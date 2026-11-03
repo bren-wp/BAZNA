@@ -26,6 +26,7 @@ const chrome = process.env.CHROME_BIN || "google-chrome";
 const profile = await mkdtemp(join(tmpdir(), "sidrena-browser-"));
 const browser = spawn(chrome, [
     "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
+    "--disable-dev-shm-usage", "--no-first-run", "--no-default-browser-check",
     "--allow-file-access-from-files",
     "--remote-debugging-port=0", "--user-data-dir=" + profile,
     "about:blank",
@@ -35,7 +36,7 @@ const widths = [240, 280, 320, 360, 393, 411, 480, 600, 720, 782, 1024, 1280, 19
 let socket;
 try {
     let port;
-    for (let attempt = 0; attempt < 100; attempt++) {
+    for (let attempt = 0; attempt < 300; attempt++) {
         if (browser.exitCode !== null) throw new Error("Chrome exited: " + browser.exitCode);
         try {
             port = Number((await readFile(join(profile, "DevToolsActivePort"), "utf8"))

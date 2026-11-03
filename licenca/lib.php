@@ -58,6 +58,32 @@ function bazna_license_public_ip(string $ip): bool {
 }
 
 /**
+ * Reject JSON storage in DOCUMENT_ROOT, including not-yet-created directories.
+ * Walk to the nearest real parent to avoid a missing-path check bypass.
+ */
+function bazna_license_storage_is_private(string $webRoot, string $storage): bool {
+    $root = realpath($webRoot);
+    if ($root === false || $storage === '' ||
+        !str_starts_with($storage, DIRECTORY_SEPARATOR)) {
+        return false;
+    }
+    $probe = $storage;
+    for ($i = 0; $i < 32 && !file_exists($probe); ++$i) {
+        $parent = dirname($probe);
+        if ($parent === $probe) {
+            return false;
+        }
+        $probe = $parent;
+    }
+    $base = realpath($probe);
+    if ($base === false) {
+        return false;
+    }
+    $prefix = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    return $base !== $root && strncmp($base, $prefix, strlen($prefix)) !== 0;
+}
+
+/**
  * Prove that the claimant controls the publicly reachable HTTPS WordPress
  * installation. CURLOPT_RESOLVE pins the already validated public DNS A
  * address, preventing DNS rebinding SSRF. No redirects or private IPs.
@@ -186,8 +212,14 @@ function bazna_license_rate_limit(string $dir, string $remoteIp): void {
     }
     try {
         $path = $dir . '/rate.json';
-        $state = is_file($path) ? json_decode((string) file_get_contents($path), true) : array();
-        if (!is_array($state)) {
+        if (is_file($path)) {
+            $raw = file_get_contents($path);
+            $state = is_string($raw) ? json_decode($raw, true) : null;
+            if (!is_array($state)) {
+                // Corrupt storage must not silently reset brute-force limits.
+                throw new RuntimeException('rate_limit_storage_failure');
+            }
+        } else {
             $state = array();
         }
         $now = time();

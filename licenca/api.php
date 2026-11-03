@@ -11,7 +11,6 @@ header('Cache-Control: no-store, max-age=0');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: no-referrer');
 header('X-Frame-Options: DENY');
-header('Access-Control-Allow-Origin: none');
 
 function bazna_respond(int $status, array $data): void {
     http_response_code($status);
@@ -23,8 +22,37 @@ if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
     // Reverse proxy must set HTTPS correctly at the PHP gateway.
     bazna_respond(403, array('ok' => false, 'code' => 'https_required'));
 }
+// Never report "ready" on an unconfigured installation.
+$configPath = __DIR__ . '/private/config.php';
+if (!is_file($configPath)) {
+    bazna_respond(503, array('ok' => false, 'code' => 'server_not_provisioned'));
+}
+$config = require $configPath;
+if (!is_array($config) || !isset($config['master_secret_hex']) ||
+    !is_string($config['master_secret_hex']) || !preg_match('/^[a-f0-9]{64}$/i', $config['master_secret_hex'])) {
+    bazna_respond(503, array('ok' => false, 'code' => 'server_configuration_error'));
+}
+// The JSON registry must live outside any publicly served document root.
+$storage = isset($config['storage_dir']) && is_string($config['storage_dir'])
+    ? $config['storage_dir'] : dirname(__DIR__, 2) . '/bazna-license-private';
+$documentRoot = (string) ($_SERVER['DOCUMENT_ROOT'] ?? '');
+if (!bazna_license_storage_is_private($documentRoot, $storage)) {
+    bazna_respond(503, array('ok' => false, 'code' => 'unsafe_storage_path'));
+}
+if (!function_exists('curl_init') || !function_exists('flock') ||
+    !function_exists('random_bytes') || PHP_VERSION_ID < 80100) {
+    bazna_respond(503, array('ok' => false, 'code' => 'missing_php_requirement'));
+}
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
-    bazna_respond(200, array('name' => 'BAZNA License API', 'version' => 1, 'status' => 'ready'));
+    // A useful health check without disclosing the secret, domains or records.
+    $parent = realpath(dirname($storage));
+    $ready = is_dir($storage) ? is_writable($storage)
+        : ($parent !== false && is_writable($parent));
+    if (!$ready) {
+        bazna_respond(503, array('ok' => false, 'code' => 'storage_not_writable'));
+    }
+    bazna_respond(200, array('ok' => true, 'name' => 'BAZNA License API',
+        'version' => 1, 'status' => 'ready'));
 }
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     header('Allow: GET, POST');
@@ -38,17 +66,6 @@ $request = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($request)) {
     bazna_respond(400, array('ok' => false, 'code' => 'invalid_json'));
 }
-$configPath = __DIR__ . '/private/config.php';
-if (!is_file($configPath)) {
-    bazna_respond(503, array('ok' => false, 'code' => 'server_not_provisioned'));
-}
-$config = require $configPath;
-if (!is_array($config) || !isset($config['master_secret_hex']) ||
-    !is_string($config['master_secret_hex']) || !preg_match('/^[a-f0-9]{64}$/i', $config['master_secret_hex'])) {
-    bazna_respond(503, array('ok' => false, 'code' => 'server_configuration_error'));
-}
-$storage = isset($config['storage_dir']) && is_string($config['storage_dir'])
-    ? $config['storage_dir'] : dirname(__DIR__, 2) . '/bazna-license-private';
 try {
     // Do not trust X-Forwarded-For: rate limit on the actual PHP peer address.
     $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');

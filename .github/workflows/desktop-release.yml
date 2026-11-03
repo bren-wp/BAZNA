@@ -25,10 +25,10 @@ jobs:
       GH_REPO: ${{ github.repository }}
       CI_SHA: ${{ github.event.workflow_run.head_sha }}
       ANDROID_RUN_ID: ${{ github.event.workflow_run.id }}
-      RELEASE_VERSION: '1.5.11'
-      ANDROID_VERSION: '1.5.11'
+      RELEASE_VERSION: '1.5.12'
+      ANDROID_VERSION: '1.5.12'
       WINDOWS_VERSION: '0.10.6'
-      WORDPRESS_VERSION: '1.5.11'
+      WORDPRESS_VERSION: '1.5.12'
       ORIGINAL_PLUGIN_SHA: '58e9b44b8054ef0076a329aa7a8a3ec663947d33bfa375c4203bc109925409f8'
     steps:
       - name: Verify target commit and original WordPress release
@@ -71,6 +71,28 @@ jobs:
           done
           echo "Timed out waiting for Windows CI of $CI_SHA"
           exit 1
+      - name: Require matching successful WordPress and security audits
+        if: env.ALREADY_EXISTS != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for workflow in official-plugin-ci.yml repository-audit.yml; do
+            endpoint="repos/$GH_REPO/actions/workflows/$workflow/runs?head_sha=$CI_SHA&per_page=20"
+            found=0
+            for attempt in $(seq 1 90); do
+              result=$(gh api "$endpoint" --jq '.workflow_runs | map(select(.event=="push" and .head_branch=="main")) | sort_by(.created_at) | last | [.status, (.conclusion // "pending")] | @tsv' || true)
+              if [[ -n "$result" && "$result" != "null" ]]; then
+                read -r status conclusion <<< "$result"
+                if [[ "$status" == "completed" ]]; then
+                  [[ "$conclusion" == "success" ]] || { echo "$workflow failed: $conclusion"; exit 1; }
+                  found=1
+                  break
+                fi
+              fi
+              sleep 10
+            done
+            [[ "$found" -eq 1 ]] || { echo "Missing successful $workflow for $CI_SHA"; exit 1; }
+          done
       - name: Download actual Android and Windows binaries
         if: env.ALREADY_EXISTS != '1'
         shell: bash
@@ -93,6 +115,11 @@ jobs:
           python3 tools/audit_repository.py
           python3 tools/package_plugin.py --version "$WORDPRESS_VERSION" --output "release/brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip"
           (cd release && sha256sum -c "brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256")
+          # Public source only; the previously issued 10000 keys require the
+          # separate private config.php bundled directly with the customer.
+          php licenca/tests/test.php
+          python3 tools/package_license.py --version "$RELEASE_VERSION" --output "release/BAZNA-Licenca-Server-$RELEASE_VERSION.zip"
+          (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
       - name: Verify all platforms and SHA-256 hashes
         if: env.ALREADY_EXISTS != '1'
         shell: bash
@@ -103,12 +130,14 @@ jobs:
             SIDRENA-Android-SHA256SUMS.txt \
             SIDRENA-Desktop-win-x64-Portable.exe SIDRENA-Desktop-win-x64-Setup.exe \
             SIDRENA-Desktop-win-x64-SHA256SUMS.txt SIDRENA-Desktop-release-info.json \
-            brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256; do
+            brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256 \
+            BAZNA-Licenca-Server-$RELEASE_VERSION.zip BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256; do
             test -s "release/$file" || { echo "Missing release/$file"; exit 1; }
           done
           (cd release && sha256sum -c SIDRENA-Android-SHA256SUMS.txt)
           (cd release && sha256sum -c SIDRENA-Desktop-win-x64-SHA256SUMS.txt)
           (cd release && sha256sum -c "brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256")
+          (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
           src_sha=$(python3 -c 'import json;print(json.load(open("release/SIDRENA-Desktop-release-info.json"))["source_commit"])')
           [[ "$src_sha" == "$CI_SHA" ]] || { echo "Windows provenance mismatch"; exit 1; }
           win_version=$(python3 -c 'import json;print(json.load(open("release/SIDRENA-Desktop-release-info.json"))["desktop_version"])')
@@ -137,6 +166,10 @@ jobs:
           ## WordPress
           **BAZNA — Bazne cijene $WORDPRESS_VERSION** — zajednički REST v1 katalog s provjerom objave CSV cjenika, opcionalnim slikama proizvoda i usklađenim BAZNA brendingom. Pravni profil NN 101/2026 i NN 110/2026 ostaje sačuvan. SHA-256: $wp_sha.
 
+          ## Licencni servis
+          ZIP **BAZNA-Licenca-Server-$RELEASE_VERSION.zip** sadrži sav PHP/JSON kod, Apache/Nginx pravila, testove i upute za https://licenca.brendigo.com/licenca/api.php.
+          **Zbog sigurnosti ne sadrži privatni master secret.** Prije prve aktivacije treba dodati isti privatni config.php kojim je izdano postojećih 10.000 ključeva. API vraća 503 dok konfiguracija nije valjana. Ne objavljivati master ključ niti privatni popis ključeva u GitHub izdanju.
+
           ## Hrvatska pravila
           Proširene obveze počinju 17. studenoga 2026.; referentni datumi su 2. svibnja 2025. i 10. rujna 2026. (NN 101/2026 i NN 110/2026).
           Nacrti pravilnika iz listopada nisu automatski konačni propisi.
@@ -150,5 +183,5 @@ jobs:
             --title "BAZNA" \
             --notes-file notes.md --prerelease
           count=$(gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json assets --jq '.assets | length')
-          [[ "$count" -eq 9 ]] || { echo "Expected 9 assets, got $count"; exit 1; }
+          [[ "$count" -eq 11 ]] || { echo "Expected 11 assets, got $count"; exit 1; }
           echo "Published $RELEASE_TAG with $count verified assets."

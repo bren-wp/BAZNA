@@ -36,6 +36,13 @@ try {
 }
 $base = sys_get_temp_dir() . '/bazna-license-test-' . bin2hex(random_bytes(6));
 mkdir($base, 0700);
+// Even when directories do not yet exist, refuse private JSON inside webroot.
+expect_bazna(!bazna_license_storage_is_private($base, $base . '/new/storage'),
+    'never create JSON registry under public document root');
+expect_bazna(bazna_license_storage_is_private($base, dirname($base) . '/separate-bazna-private'),
+    'allow a separate, existing writable ancestor outside document root');
+expect_bazna(!bazna_license_storage_is_private($base, 'relative/storage'),
+    'reject relative storage paths');
 $challenge = str_repeat('a', 64);
 $proof = static function ($host, $path, $token) use ($challenge): bool {
     return $token === $challenge && $path === '/';
@@ -73,6 +80,15 @@ try {
     bazna_license_rate_limit($base, '203.0.113.15');
     $limitData = json_decode((string) file_get_contents($base . '/rate.json'), true);
     expect_bazna(is_array($limitData) && count($limitData) === 1, 'JSON rate limiter');
+    // A corrupted limiter must fail closed, not reset counts to zero.
+    file_put_contents($base . '/rate.json', '{broken-json');
+    try {
+        bazna_license_rate_limit($base, '203.0.113.15');
+        throw new RuntimeException('Corrupt rate registry unexpectedly accepted');
+    } catch (RuntimeException $expected) {
+        expect_bazna($expected->getMessage() === 'rate_limit_storage_failure',
+            'corrupt rate registry must fail closed');
+    }
     echo "PASS: BAZNA 10,000 unique keys, permanent domain binding, proof, deactivation and JSON registry\n";
 } finally {
     foreach (glob($base . '/*') as $file) {
