@@ -250,26 +250,41 @@ function bazna_license_action(string $secret, string $dir, string $action, strin
     return bazna_license_store($dir, static function (array &$data, bool &$changed) use ($action, $serial, $domain): array {
         $id = (string) $serial;
         $existing = isset($data[$id]) && is_array($data[$id]) ? $data[$id] : null;
-        if ($action === 'check') {
-            return $existing !== null && ($existing['domain'] ?? '') === $domain
-                ? array('ok' => true, 'code' => 'active', 'domain' => $domain)
-                : array('ok' => false, 'code' => 'not_activated_for_domain');
-        }
-        if ($action === 'deactivate') {
-            if ($existing === null || ($existing['domain'] ?? '') !== $domain) {
-                return array('ok' => false, 'code' => 'not_activated_for_domain');
-            }
-            unset($data[$id]);
-            $changed = true;
-            return array('ok' => true, 'code' => 'deactivated');
-        }
+        // A serial belongs to ONE canonical domain for its lifetime. Even
+        // deactivation retains the binding: it is not a public transfer API.
+        // A transfer, if ever allowed by policy, requires a separate audited
+        // server-side administrator operation (never this public endpoint).
         if ($existing !== null && ($existing['domain'] ?? '') !== $domain) {
             return array('ok' => false, 'code' => 'already_used_on_another_domain');
         }
+        if ($action === 'check') {
+            if ($existing === null || ($existing['status'] ?? 'active') !== 'active') {
+                return array('ok' => false, 'code' => 'not_activated_for_domain');
+            }
+            // Record successful checks but avoid rewriting JSON on each call.
+            $last = isset($existing['last_checked_unix']) ? (int) $existing['last_checked_unix'] : 0;
+            if ($last < time() - 3600) {
+                $data[$id]['checked_at'] = gmdate('c');
+                $data[$id]['last_checked_unix'] = time();
+                $changed = true;
+            }
+            return array('ok' => true, 'code' => 'active', 'domain' => $domain);
+        }
+        if ($action === 'deactivate') {
+            if ($existing === null || ($existing['status'] ?? 'active') !== 'active') {
+                return array('ok' => false, 'code' => 'not_activated_for_domain');
+            }
+            $data[$id]['status'] = 'inactive';
+            $data[$id]['deactivated_at'] = gmdate('c');
+            $changed = true;
+            return array('ok' => true, 'code' => 'deactivated', 'domain' => $domain);
+        }
         $data[$id] = array(
             'domain' => $domain,
+            'status' => 'active',
             'activated_at' => $existing['activated_at'] ?? gmdate('c'),
             'checked_at' => gmdate('c'),
+            'last_checked_unix' => time(),
         );
         $changed = true;
         return array('ok' => true, 'code' => 'active', 'domain' => $domain);
