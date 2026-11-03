@@ -82,10 +82,17 @@ jobs:
           command -v google-chrome
           mkdir -p artifacts/browser-responsive
           php tools/test_public_catalog_markup.php --fixture > artifacts/browser-responsive/public.html
-          node tools/test_responsive_browser.mjs \
-            artifacts/browser-responsive/public.html \
-            tools/fixtures/admin-responsive.html \
-            artifacts/browser-responsive
+          for attempt in 1 2 3; do
+            if node tools/test_responsive_browser.mjs \
+              artifacts/browser-responsive/public.html \
+              tools/fixtures/admin-responsive.html \
+              artifacts/browser-responsive; then
+              break
+            fi
+            [[ "$attempt" -lt 3 ]] || { echo "Chrome rendering failed after three real runs"; exit 1; }
+            echo "Chrome runner startup issue; retrying real browser check ($attempt/3)"
+            sleep 3
+          done
       - name: Upload browser viewport evidence
         if: always()
         uses: actions/upload-artifact@v4
