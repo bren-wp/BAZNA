@@ -133,6 +133,7 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	private function __construct() {
 		Brendigo_Sidrena_Cijena_Settings::instance();
+		Brendigo_Sidrena_Cijena_License::instance();
 		Brendigo_Sidrena_Cijena_I18n::instance();
 		Brendigo_Sidrena_Cijena_Audit_Log::instance();
 		Brendigo_Sidrena_Cijena_Catalog::instance();
@@ -145,14 +146,16 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 
 		if ( is_admin() ) {
 			Brendigo_Sidrena_Cijena_Admin::instance();
-			Brendigo_Sidrena_Cijena_Bulk_Import::instance();
+			if ( Brendigo_Sidrena_Cijena_License::valid() ) {
+				Brendigo_Sidrena_Cijena_Bulk_Import::instance();
+			}
 		}
 
-		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		if ( Brendigo_Sidrena_Cijena_License::valid() && defined( 'WP_CLI' ) && WP_CLI ) {
 			WP_CLI::add_command( 'sidrena-cijena', 'Brendigo_Sidrena_Cijena_CLI' );
 		}
 
-		if ( ! self::woocommerce_active() ) {
+		if ( ! Brendigo_Sidrena_Cijena_License::valid() || ! self::woocommerce_active() ) {
 			return;
 		}
 
