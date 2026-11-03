@@ -1,5 +1,11 @@
 # BAZNA — licencni servis (PHP + JSON, bez SQL-a)
 
+**Verzija 1.5.12 — paket za upload:** u GitHub izdanju preuzmite `BAZNA-Licenca-Server-1.5.12.zip` s cjelokupnom mapom `/licenca` (PHP API, biblioteka, generiranje, testovi, .htaccess, Nginx predložak, DEPLOY.md). **Jedini privatni korak:** dodajte postojeći `private/config.php` iz odvojeno predanog privatnog paketa koji odgovara 10.000 već izdanih ključeva. Bez toga namjerno odgovara HTTP 503, a ne lažno `ready`.
+
+**Jedan ZIP sa svim datotekama, uključujući tajnu:** na privatnom računalu s pristupom izvornom kodu i `config.php` pokrenite `python3 tools/package_license.py --version 1.5.12 --output /sigurna/lokacija/BAZNA-Licenca-PRIVATE.zip --private-config /sigurna/licenca/private/config.php`. Takav ZIP je povjerljiv — ne učitavati ga u javni GitHub ni javnu pohranu. Raspakirajte ga u korijen poddomene tako da ostane mapa `/licenca`.
+
+[Detaljan postupak i sigurnosni preduvjeti](DEPLOY.md).
+
 Repozitorij sadrži **kod** za servis. Privatni master ključ i 10.000 aktivacijskih ključeva NISU dio javnog GitHub repozitorija. Čuvajte ih odvojeno i nikada ih ne izlažite HTTP-om.
 
 ## Postavljanje na licenca.brendigo.com
@@ -9,7 +15,7 @@ Repozitorij sadrži **kod** za servis. Privatni master ključ i 10.000 aktivacij
 3. Provjerite može li PHP pisati u **privatnu direktorijsku putanju izvan web korijena**. Zadana putanja je `dirname(__DIR__, 2) . '/bazna-license-private'` relativno od `licenca/api.php`. Možete je po potrebi zadati apsolutnim `storage_dir` unutar privatnog `config.php`.
 4. Omogućite izlazni HTTPS/cURL s licencnog poslužitelja prema korisničkim WordPress domenama, radi **dokaza vlasništva nad domenom**. TLS mora potvrditi odgovarajući certifikat; servis ne prati preusmjeravanja i odbija privatne/rezerverirane DNS adrese.
 5. Ako koristite Nginx, **ručno blokirajte pristup `/licenca/private/` i `/licenca/bin/`**, jer Nginx ne čita `.htaccess`. Na Apacheu su dodana lokalna `.htaccess` pravila. Ne postavljajte `activations.json` ni `rate.json` u javno dohvatljivu mapu.
-6. Testirajte `GET https://licenca.brendigo.com/licenca/api.php` i očekujte JSON s nazivom servisa. Zatim instalirajte WordPress dodatak BAZNA te u **BAZNA → Licenca** obvezno upišite **domenu web-stranice** (npr. `primjer.hr`, bez `https://`) i **licencni ključ**. Domena mora odgovarati stvarnoj WordPress domeni. Nakon uspješne provjere svi administracijski moduli postaju dostupni. Android se povezuje samo unosom WordPress HTTPS adrese i čita već objavljene podatke; **Android ne dobiva licencni ključ**.
+6. Nakon učitavanja privatne konfiguracije i osiguravanja JSON pohrane testirajte `GET https://licenca.brendigo.com/licenca/api.php` i očekujte HTTP 200 s `ok:true` i `status:ready`. Bez konfiguracije očekivani odgovor je HTTP 503. Zatim instalirajte WordPress dodatak BAZNA te u **BAZNA → Licenca** obvezno upišite **domenu web-stranice** (npr. `primjer.hr`, bez `https://`) i **licencni ključ**. Domena mora odgovarati stvarnoj WordPress domeni. Nakon uspješne provjere svi administracijski moduli postaju dostupni. Android se povezuje samo unosom WordPress HTTPS adrese i čita već objavljene podatke; **Android ne dobiva licencni ključ**.
 
 ## Dizajn i ograničenja
 
