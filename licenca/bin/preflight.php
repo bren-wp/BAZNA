@@ -2,10 +2,9 @@
 /**
  * BAZNA hosting preflight. CLI only: no HTTP exposure and no secret output.
  *
- *   php licenca/bin/preflight.php [ABSOLUTE_DOCUMENT_ROOT] [OPTIONAL_SAMPLE_KEY]
+ *   php licenca/bin/preflight.php [ABSOLUTE_DOCUMENT_ROOT]
  *
- * The sample key is checked only in memory. Never copy it to shell logs on
- * shared servers; omit it when a key file cannot be handled privately.
+ * No licence keys or secret values are ever printed or accepted as arguments.
  */
 declare(strict_types=1);
 if (PHP_SAPI !== 'cli') {
@@ -54,12 +53,6 @@ $writable = is_dir($storage) ? is_writable($storage) :
     ($parent !== false && is_writable($parent));
 if (!$writable) {
     $errors[] = 'PHP nema dozvolu pisanja u JSON mapu niti njen roditeljski direktorij.';
-}
-$sampleKey = $argv[2] ?? '';
-if ($sampleKey !== '' && is_string($master) &&
-    preg_match('/^[a-f0-9]{64}$/i', $master) &&
-    bazna_license_serial($master, $sampleKey) === 0) {
-    $errors[] = 'Uzorak ključa ne odgovara ovom master ključu.';
 }
 if ($errors) {
     fwrite(STDERR, "BAZNA licencni servis: NIJE SPREMAN\n");
