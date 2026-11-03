@@ -4,13 +4,20 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.11
+Stable tag: 1.5.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva za WordPress i WooCommerce.
 
 == Changelog ==
+
+= 1.5.12 =
+* Publish a deployable standalone BAZNA PHP/JSON license-server archive, with protected paths, Nginx/Apache instructions and private-config overlay.
+* License API readiness now refuses to claim success if the required master secret, PHP modules or private JSON storage are unavailable.
+* Keep a permanent one-domain registration, reject unsafe JSON registry states and never publish keys to Android REST clients.
+* Android now checks the optional non-sensitive license status and continues displaying published prices even when the admin license is inactive.
+* Add CI tests, reproducible checksums, 2026 Croatian legal notes and hardened infrastructure documentation.
 
 = 1.5.11 =
 * Rebrand the user-facing system as BAZNA — Bazne cijene, including WordPress administration and Android/Windows interfaces.
