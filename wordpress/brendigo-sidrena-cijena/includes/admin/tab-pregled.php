@@ -90,7 +90,7 @@ if ( $sidrena_pending_since > 0 ) {
 		<span class="brendigo-overview-icon brendigo-overview-icon--shield"><span class="dashicons dashicons-shield" aria-hidden="true"></span></span>
 		<div>
 			<p class="brendigo-section-kicker"><?php echo esc_html__( 'Pregled podataka', 'brendigo-sidrena-cijena' ); ?></p>
-			<h2><?php echo esc_html__( 'Sidrene cijene i datumi na jednom mjestu', 'brendigo-sidrena-cijena' ); ?></h2>
+			<h2><?php echo esc_html__( 'Bazne cijene i datumi na jednom mjestu', 'brendigo-sidrena-cijena' ); ?></h2>
 			<p><?php echo esc_html__( 'Uredite cijenu koja je vrijedila na odgovarajući datum, a javni cjenik i arhiva generiraju se iz spremljenih podataka.', 'brendigo-sidrena-cijena' ); ?></p>
 		</div>
 	</div>
@@ -105,7 +105,7 @@ if ( $sidrena_pending_since > 0 ) {
     <div class="sidrena-cijena-card__head brendigo-card-title">
         <span class="dashicons dashicons-shield-alt" aria-hidden="true"></span>
         <div>
-            <h2 id="sidrena-legal-2026-title"><?php echo esc_html__( 'Propisi o sidrenim cijenama — 2026.', 'brendigo-sidrena-cijena' ); ?></h2>
+            <h2 id="sidrena-legal-2026-title"><?php echo esc_html__( 'Propisi o baznim cijenama — 2026.', 'brendigo-sidrena-cijena' ); ?></h2>
             <p><?php
             /* translators: %s: effective date in Croatian locale. */
             echo esc_html( sprintf(
@@ -118,7 +118,7 @@ if ( $sidrena_pending_since > 0 ) {
     <p><?php
         /* translators: 1: legacy FMCG reference date, 2: general reference date. */
         echo esc_html( sprintf(
-            __( 'Za ranije obuhvaćenu robu provjerite stvarnu cijenu na dan %1$s, a za ostalu robu i usluge na dan %2$s. Sidrene cijene ne smiju se zaključivati iz sadašnje cijene.', 'brendigo-sidrena-cijena' ),
+            __( 'Za ranije obuhvaćenu robu provjerite stvarnu cijenu na dan %1$s, a za ostalu robu i usluge na dan %2$s. Bazne cijene ne smiju se zaključivati iz sadašnje cijene.', 'brendigo-sidrena-cijena' ),
             wp_date( 'j. n. Y.', strtotime( Brendigo_Sidrena_Cijena_Legal::REFERENCE_FMCG . ' 12:00:00 UTC' ) ),
             wp_date( 'j. n. Y.', strtotime( Brendigo_Sidrena_Cijena_Legal::REFERENCE_GENERAL . ' 12:00:00 UTC' ) )
         ) );
@@ -172,7 +172,7 @@ if ( $sidrena_pending_since > 0 ) {
 	</article>
 
 	<article class="sidrena-cijena-card brendigo-dashboard-card brendigo-product-preview">
-		<div class="sidrena-cijena-card__head brendigo-card-title"><span class="dashicons dashicons-visibility" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Prikaz na proizvodu', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Pregled kako će spremljena sidrena cijena izgledati uz proizvod.', 'brendigo-sidrena-cijena' ); ?></p></div></div>
+		<div class="sidrena-cijena-card__head brendigo-card-title"><span class="dashicons dashicons-visibility" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Prikaz na proizvodu', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Pregled kako će spremljena bazna cijena izgledati uz proizvod.', 'brendigo-sidrena-cijena' ); ?></p></div></div>
 		<?php if ( '' !== $sidrena_preview_name ) : ?>
 			<div class="brendigo-product-preview__body">
 				<div class="brendigo-product-preview__media">
@@ -183,14 +183,14 @@ if ( $sidrena_pending_since > 0 ) {
 					<div class="brendigo-preview-price-row"><span><?php echo esc_html__( 'Važeća cijena', 'brendigo-sidrena-cijena' ); ?></span><strong><?php echo wp_kses_post( $sidrena_preview_current ); ?></strong></div>
 					<?php
 					/* translators: %s: reference date. */
-					$sidrena_preview_anchor_label = sprintf( __( 'Sidrena cijena (%s)', 'brendigo-sidrena-cijena' ), $sidrena_preview_date );
+					$sidrena_preview_anchor_label = sprintf( __( 'Bazna cijena (%s)', 'brendigo-sidrena-cijena' ), $sidrena_preview_date );
 					?>
 					<div class="brendigo-preview-price-row"><span><?php echo esc_html( $sidrena_preview_anchor_label ); ?></span><strong><?php echo wp_kses_post( $sidrena_preview_anchor ); ?></strong></div>
-					<div class="brendigo-preview-note"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span><?php echo esc_html__( 'Prikaz koristi stvarne podatke proizvoda i spremljeni datum sidrene cijene.', 'brendigo-sidrena-cijena' ); ?></span></div>
+					<div class="brendigo-preview-note"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span><?php echo esc_html__( 'Prikaz koristi stvarne podatke proizvoda i spremljeni datum bazne cijene.', 'brendigo-sidrena-cijena' ); ?></span></div>
 				</div>
 			</div>
 		<?php else : ?>
-			<div class="brendigo-empty-state"><span class="dashicons dashicons-products" aria-hidden="true"></span><p><?php echo esc_html__( 'Dodajte sidrenu cijenu proizvodu kako bi se ovdje prikazao stvarni pregled.', 'brendigo-sidrena-cijena' ); ?></p></div>
+			<div class="brendigo-empty-state"><span class="dashicons dashicons-products" aria-hidden="true"></span><p><?php echo esc_html__( 'Dodajte baznu cijenu proizvodu kako bi se ovdje prikazao stvarni pregled.', 'brendigo-sidrena-cijena' ); ?></p></div>
 		<?php endif; ?>
 	</article>
 </section>
