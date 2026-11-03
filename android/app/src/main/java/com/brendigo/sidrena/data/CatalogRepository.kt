@@ -138,6 +138,8 @@ class CatalogRepository {
                 .url(url.toASCIIString())
                 .get()
                 .header("Accept", "application/json, text/csv, */*")
+                // A public price list should be revalidated after publication.
+                .header("Cache-Control", "no-cache, max-age=0")
                 .header("User-Agent", "SIDRENA-Android")
                 .build()
             client.newCall(request).execute().use { response ->
@@ -148,7 +150,9 @@ class CatalogRepository {
                         ?: throw IOException("Preusmjeravanje nema odredište.")
                     url = site.approved(url.resolve(destination).toASCIIString())
                 } else {
-                    if (code !in 200..299) throw IOException("HTTP " + code)
+                    // Do not interpret a 204 or partial 206 response as a
+                    // complete price list; incomplete exports are unsafe.
+                    if (code != 200) throw IOException("HTTP " + code)
                     val output = ByteArrayOutputStream()
                     val body = response.body ?: throw IOException("Nedostaje sadržaj cjenika.")
                     body.byteStream().use { stream ->

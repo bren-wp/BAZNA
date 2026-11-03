@@ -15,6 +15,27 @@ object CatalogDiscovery {
         require(json.optInt("api_version", -1) == 1) {
             "Ova verzija javnog SIDRENA API-ja nije podržana."
         }
+        // Optional for older plugins, mandatory to validate when supplied:
+        // Android can display public prices but must never negotiate an admin
+        // login or a write-capable API from an unexpected discovery response.
+        when (val connection = json.opt("connection")) {
+            null, JSONObject.NULL -> Unit
+            is JSONObject -> {
+                require(connection.optString("mode") == "public_read_only") {
+                    "SIDRENA dopušta samo javno čitanje cjenika."
+                }
+                require(connection.opt("authentication_required") == false) {
+                    "SIDRENA ne podržava prijavu u WordPress administraciju."
+                }
+                require(connection.opt("csv_publication_required") == true) {
+                    "Poslužitelj ne potvrđuje sigurnu objavu CSV cjenika."
+                }
+                val endpoint = connection.optString("rest_endpoint")
+                if (endpoint.isNotBlank()) site.approved(endpoint)
+            }
+            else -> throw IllegalArgumentException("Nevaljan opis WordPress povezivanja.")
+        }
+
         val sources = json.optJSONObject("feeds")
             ?: throw IllegalArgumentException("Nedostaju izvori službenih cjenika.")
 

@@ -114,13 +114,19 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			// This technical status is never certification of legal price accuracy.
 			'compliance_certified' => false,
 		);
-		return rest_ensure_response( $out );
+		// Discovery includes live publication/readiness flags. Never serve a
+		// cached "not published" or "no pending changes" status to Android.
+		$response = rest_ensure_response( $out );
+		$response->header( 'Cache-Control', 'no-store, max-age=0, must-revalidate' );
+		return $response;
 	}
 
 	public function archive_index( $request ) {
 		$kind = $request->get_param( 'kind' );
 		$outlet = $request->get_param( 'outlet' );
-		return rest_ensure_response( Brendigo_Sidrena_Cijena_Archive::instance()->separate_archive_files( $kind ? $kind : '', $outlet ? sanitize_key( $outlet ) : '' ) );
+		$response = rest_ensure_response( Brendigo_Sidrena_Cijena_Archive::instance()->separate_archive_files( $kind ? $kind : '', $outlet ? sanitize_key( $outlet ) : '' ) );
+		$response->header( 'Cache-Control', 'no-store, max-age=0, must-revalidate' );
+		return $response;
 	}
 
 	public function feed( $request ) {
@@ -138,7 +144,8 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		// Read only already-published files. Never regenerate on a public REST hit.
 		$response = new WP_REST_Response( null, 302 );
 		$response->header( 'Location', $files->get_type_public_url( $kind, $ext, $oznaka ) );
-		$response->header( 'Cache-Control', 'public, max-age=300' );
+		// A cached 302 can point at an older published file after rebuilding.
+		$response->header( 'Cache-Control', 'no-store, max-age=0, must-revalidate' );
 		return $response;
 	}
 }

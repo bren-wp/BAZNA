@@ -7,7 +7,7 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
-define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.9' );
+define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.10' );
 
 function sidrena_contract_assert( $condition, $label ) {
 	if ( ! $condition ) {
@@ -32,8 +32,24 @@ function rest_url( $route ) {
 	}
 	return 'https://primjer.hr/wp-json/' . $route;
 }
+// Mirror the WordPress REST response API, including HTTP headers, while
+// retaining array access for the existing contract assertions.
+class WP_REST_Response implements ArrayAccess, JsonSerializable {
+    private $data;
+    private $headers = array();
+    public function __construct( $data = null, $status = 200 ) { $this->data = $data; }
+    public function header( $key, $value ) { $this->headers[ $key ] = $value; }
+    public function get_headers() { return $this->headers; }
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize() { return $this->data; }
+    public function offsetExists( $offset ): bool { return isset( $this->data[ $offset ] ); }
+    #[\ReturnTypeWillChange]
+    public function offsetGet( $offset ) { return $this->data[ $offset ]; }
+    public function offsetSet( $offset, $value ): void { $this->data[ $offset ] = $value; }
+    public function offsetUnset( $offset ): void { unset( $this->data[ $offset ] ); }
+}
 function rest_ensure_response( $data ) {
-	return $data;
+	return new WP_REST_Response( $data );
 }
 function add_query_arg( $key, $value, $url ) {
 	$separator = false === strpos( $url, '?' ) ? '?' : '&';
@@ -71,6 +87,18 @@ class Brendigo_Sidrena_Cijena_Settings {
 	public function is_multi_poslovnica() {
 		return true;
 	}
+    public function normalize_oznaka( $code ) { return trim( (string) $code ); }
+}
+class Brendigo_Sidrena_Cijena_Archive {
+    public static function instance() { return new self(); }
+    public function separate_archive_files( $kind, $outlet ) { return array(); }
+}
+class SIDRENA_Test_Request {
+    private $params;
+    public function __construct( $params ) { $this->params = $params; }
+    public function get_param( $name ) {
+        return isset( $this->params[ $name ] ) ? $this->params[ $name ] : null;
+    }
 }
 class Brendigo_Sidrena_Cijena_Poslovnice {
 	public static function instance() {
@@ -89,6 +117,9 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 		$part = '' !== $oznaka ? '-' . $oznaka : '';
 		return self::$dir . '/' . $kind . $part . '.' . $format;
 	}
+    public function get_type_public_url( $kind, $format = 'csv', $oznaka = '' ) {
+        return 'https://primjer.hr/wp-content/uploads/sidrena-cijena/' . $kind . '.' . $format;
+    }
 }
 
 require_once __DIR__ . '/../wordpress/brendigo-sidrena-cijena/includes/class-public-api.php';
@@ -115,6 +146,27 @@ foreach ( $sidrena_registered_routes as $registered ) {
 	sidrena_contract_assert( '__return_true' === $registered['permission_callback'], 'Public endpoints have no admin authentication' );
 }
 $json = $api->index();
+sidrena_contract_assert(
+    'no-store, max-age=0, must-revalidate' === $json->get_headers()['Cache-Control'],
+    'Public discovery must not cache publication/readiness flags'
+);
+$archive_response = $api->archive_index( new SIDRENA_Test_Request( array() ) );
+sidrena_contract_assert(
+    'no-store, max-age=0, must-revalidate' === $archive_response->get_headers()['Cache-Control'],
+    'Public archive must not retain stale publication information'
+);
+$feed_response = $api->feed( new SIDRENA_Test_Request( array(
+    'kind' => 'proizvodi', 'format' => 'csv', 'oznaka' => '',
+) ) );
+sidrena_contract_assert(
+    'no-store, max-age=0, must-revalidate' === $feed_response->get_headers()['Cache-Control'],
+    'Public CSV redirect must be revalidated after republishing'
+);
+sidrena_contract_assert(
+    'https://primjer.hr/wp-content/uploads/sidrena-cijena/proizvodi.csv' ===
+        $feed_response->get_headers()['Location'],
+    'Public feed redirect remains same-origin'
+);
 sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
 sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
 sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
