@@ -100,6 +100,9 @@ class Brendigo_Sidrena_Cijena_Fields {
 	 * @param int|null $index      Variation loop index, or null.
 	 */
 	private static function save_posted( $product_id, $index ) {
+		if ( ! Brendigo_Sidrena_Cijena_License::valid() ) {
+			return;
+		}
 		$meta   = Brendigo_Sidrena_Cijena_Product_Meta::instance();
 		$cjm_on = ( 'yes' === Brendigo_Sidrena_Cijena_Settings::instance()->get( 'enable_cjm' ) );
 

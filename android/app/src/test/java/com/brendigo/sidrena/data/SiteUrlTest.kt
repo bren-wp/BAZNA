@@ -15,6 +15,19 @@ class SiteUrlTest {
             site.endpoint("wp-json/brendigo-sidrena/v1/cjenici").toASCIIString())
     }
 
+    @Test fun bareWordPressDomainConnectsOverHttpsAutomatically() {
+        val bare = SiteUrl.parse("primjer.hr")
+        assertEquals("https://primjer.hr", bare.display)
+        val subdirectory = SiteUrl.parse("www.primjer.hr/trgovina")
+        assertEquals("https://www.primjer.hr/trgovina", subdirectory.display)
+        assertEquals(
+            "https://www.primjer.hr/trgovina/wp-json/brendigo-sidrena/v1/cjenici",
+            subdirectory.endpoint("wp-json/brendigo-sidrena/v1/cjenici").toASCIIString(),
+        )
+        // Every accepted shorthand is normalized to HTTPS, never HTTP.
+        assertEquals("https://primjer.hr", SiteUrl.parse("  PRIMJER.HR  ").display)
+    }
+
     @Test fun supportsSameOriginPlainPermalinkRestApiWithoutCredentials() {
         val root = SiteUrl.parse("https://primjer.hr")
         assertEquals(

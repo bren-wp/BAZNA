@@ -8,7 +8,13 @@ class SiteUrl private constructor(val base: URI) {
 
     companion object {
         fun parse(value: String): SiteUrl {
-            val uri = try { URI(value.trim()) } catch (_: Exception) {
+            val raw = value.trim()
+            // A common user input is only "trgovina.hr". Treat it strictly
+            // as HTTPS (never fallback to cleartext HTTP). Full URLs still
+            // undergo the same host, path and same-origin security checks.
+            val bareHost = Regex("^[A-Za-z0-9][A-Za-z0-9.-]*(?:/[A-Za-z0-9._~-]+)*/?$")
+            val candidate = if (bareHost.matches(raw)) "https://$raw" else raw
+            val uri = try { URI(candidate) } catch (_: Exception) {
                 throw IllegalArgumentException("Unesite valjanu HTTPS adresu WordPress stranice.")
             }
             val host = uri.host?.lowercase().orEmpty()

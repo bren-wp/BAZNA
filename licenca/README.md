@@ -1,8 +1,8 @@
 # BAZNA — licencni servis (PHP + JSON, bez SQL-a)
 
-**Verzija 1.5.12 — paket za upload:** u GitHub izdanju preuzmite `BAZNA-Licenca-Server-1.5.12.zip` s cjelokupnom mapom `/licenca` (PHP API, biblioteka, generiranje, testovi, .htaccess, Nginx predložak, DEPLOY.md). **Jedini privatni korak:** dodajte postojeći `private/config.php` iz odvojeno predanog privatnog paketa koji odgovara 10.000 već izdanih ključeva. Bez toga namjerno odgovara HTTP 503, a ne lažno `ready`.
+**Verzija 1.5.13 — paket za upload:** u GitHub izdanju preuzmite `BAZNA-Licenca-Server-1.5.13.zip` s cjelokupnom mapom `/licenca` (PHP API, biblioteka, generiranje, testovi, .htaccess, Nginx predložak, DEPLOY.md). **Jedini privatni korak:** dodajte postojeći `private/config.php` iz odvojeno predanog privatnog paketa koji odgovara 10.000 već izdanih ključeva. Bez toga namjerno odgovara HTTP 503, a ne lažno `ready`.
 
-**Jedan ZIP sa svim datotekama, uključujući tajnu:** na privatnom računalu s pristupom izvornom kodu i `config.php` pokrenite `python3 tools/package_license.py --version 1.5.12 --output /sigurna/lokacija/BAZNA-Licenca-PRIVATE.zip --private-config /sigurna/licenca/private/config.php`. Takav ZIP je povjerljiv — ne učitavati ga u javni GitHub ni javnu pohranu. Raspakirajte ga u korijen poddomene tako da ostane mapa `/licenca`.
+**Jedan ZIP sa svim datotekama, uključujući tajnu:** na privatnom računalu s pristupom izvornom kodu i `config.php` pokrenite `python3 tools/package_license.py --version 1.5.13 --output /sigurna/lokacija/BAZNA-Licenca-PRIVATE.zip --private-config /sigurna/licenca/private/config.php`. Takav ZIP je povjerljiv — ne učitavati ga u javni GitHub ni javnu pohranu. Raspakirajte ga u korijen poddomene tako da ostane mapa `/licenca`.
 
 [Detaljan postupak i sigurnosni preduvjeti](DEPLOY.md).
 
@@ -34,6 +34,7 @@ Repozitorij sadrži **kod** za servis. Privatni master ključ i 10.000 aktivacij
 ## Izdavanje i testovi
 
 ```bash
+php licenca/bin/preflight.php /apsolutna/putanja/do/document-roota
 php licenca/tests/test.php
 php -l licenca/lib.php
 php -l licenca/api.php

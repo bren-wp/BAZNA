@@ -35,6 +35,9 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 	 * Simple / external product fields under sale price.
 	 */
 	public function render_simple_fields() {
+		if ( ! Brendigo_Sidrena_Cijena_License::valid() ) {
+			return;
+		}
 		$product_id = get_the_ID();
 		$meta       = Brendigo_Sidrena_Cijena_Product_Meta::instance();
 		$cjm_on     = ( 'yes' === Brendigo_Sidrena_Cijena_Settings::instance()->get( 'enable_cjm' ) );
@@ -202,7 +205,10 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 	 * @param array   $variation_data Variation data.
 	 * @param WP_Post $variation      Variation post.
 	 */
-	public function render_variation_fields( $loop, $variation_data, $variation ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+	public function render_variation_fields( $loop, $variation_data, $variation ) {
+		if ( ! Brendigo_Sidrena_Cijena_License::valid() ) {
+			return;
+		} // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 		$meta   = Brendigo_Sidrena_Cijena_Product_Meta::instance();
 		$id     = $variation->ID;
 		$cjm_on = ( 'yes' === Brendigo_Sidrena_Cijena_Settings::instance()->get( 'enable_cjm' ) );

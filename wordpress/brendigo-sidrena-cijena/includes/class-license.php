@@ -147,6 +147,30 @@ final class Brendigo_Sidrena_Cijena_License {
         return $data;
     }
 
+    /**
+     * Only an explicit, authenticated server decision can revoke a license.
+     * 429, 503, malformed replies, DNS or TLS outages are temporary failures;
+     * the existing 72h offline grace still applies in those situations.
+     */
+    public static function is_authoritative_denial($result) {
+        return is_array($result) && isset($result['ok'], $result['code']) &&
+            false === $result['ok'] &&
+            in_array($result['code'], array(
+                'invalid_key', 'not_activated_for_domain',
+                'already_used_on_another_domain',
+            ), true);
+    }
+
+    /** Reject a successful reply that claims a different domain. */
+    public static function is_valid_active_reply($result) {
+        $expected = self::canonical_domain(self::site_host());
+        return '' !== $expected && is_array($result) &&
+            true === ($result['ok'] ?? false) &&
+            'active' === ($result['code'] ?? '') &&
+            isset($result['domain']) && is_string($result['domain']) &&
+            hash_equals($expected, $result['domain']);
+    }
+
     /** Public, short-lived challenge, verified by DNS-pinned server-to-site TLS. */
     public function register_proof() {
         register_rest_route('brendigo-sidrena/v1', '/license-proof', array(
@@ -210,11 +234,14 @@ final class Brendigo_Sidrena_Cijena_License {
                 delete_option(self::PROOF_OPTION);
             }
         }
-        if (!empty($result['ok'])) {
-            if ('deactivate' === $action) {
-                delete_option(self::OPTION);
-                $this->redirect('deactivated');
-            }
+        if ('deactivate' === $action && true === ($result['ok'] ?? false) &&
+            'deactivated' === ($result['code'] ?? '') &&
+            isset($result['domain']) && is_string($result['domain']) &&
+            hash_equals(self::canonical_domain(self::site_host()), $result['domain'])) {
+            delete_option(self::OPTION);
+            $this->redirect('deactivated');
+        }
+        if ('deactivate' !== $action && self::is_valid_active_reply($result)) {
             $encrypted = self::encrypt_key($key);
             if ('' === $encrypted) {
                 $this->redirect('encryption_unavailable');
@@ -232,7 +259,7 @@ final class Brendigo_Sidrena_Cijena_License {
             $this->redirect('active');
         }
         if ('refresh' === $action && is_array($state) &&
-            !in_array($result['code'] ?? '', array('service_unreachable', 'license_service_unavailable'), true)) {
+            self::is_authoritative_denial($result)) {
             $state['active'] = false;
             update_option(self::OPTION, $state, false);
         }
@@ -254,10 +281,10 @@ final class Brendigo_Sidrena_Cijena_License {
             return;
         }
         $result = self::call_service('check', $key);
-        if (!empty($result['ok'])) {
+        if (self::is_valid_active_reply($result)) {
             $state['active'] = true;
             $state['checked'] = time();
-        } elseif (!in_array($result['code'] ?? '', array('service_unreachable', 'license_service_unavailable'), true)) {
+        } elseif (self::is_authoritative_denial($result)) {
             $state['active'] = false;
         }
         update_option(self::OPTION, $state, false);
