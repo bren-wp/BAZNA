@@ -75,7 +75,24 @@ bazna_assert(!$license::is_valid_active_reply(array(
     'ok' => true, 'code' => 'not_activated_for_domain', 'domain' => 'primjer.hr',
 )), 'success flag alone cannot activate');
 
+// A lapsed license must block premium Woo product writes while consumers
+// can still view the previously published reference price.
+require __DIR__ . '/../wordpress/brendigo-sidrena-cijena/includes/class-fields.php';
+class BaznaLockedTestProduct {
+    public function is_type($type) { return false; }
+    public function get_id() { return 42; }
+}
+$_POST['sidrena_cijena'] = '9999.99';
+Brendigo_Sidrena_Cijena_Fields::save_simple(new BaznaLockedTestProduct());
+Brendigo_Sidrena_Cijena_Fields::save_variation(42, 0);
+unset($_POST['sidrena_cijena']);
+$pluginSource = file_get_contents(__DIR__ . '/../wordpress/brendigo-sidrena-cijena/includes/class-plugin.php');
+$publicInit = strpos($pluginSource, 'Brendigo_Sidrena_Cijena_Woo_Blocks::instance();');
+$licenceGate = strpos($pluginSource, "if ( ! Brendigo_Sidrena_Cijena_License::valid() || ! self::woocommerce_active() )");
+bazna_assert($publicInit !== false && $licenceGate !== false && $publicInit < $licenceGate,
+    'Woo public pricing remains available before the administration license gate');
+
 $source = file_get_contents(__DIR__ . '/../wordpress/brendigo-sidrena-cijena/includes/class-admin.php');
 bazna_assert(strpos($source, 'name="bazna_license_domain"') !== false, 'activation form has domain input');
 bazna_assert(strpos($source, 'name="bazna_license_key"') !== false, 'activation form has license key input');
-echo "PASS: BAZNA licence domain input, canonical binding, REST paths, offline expiry and outage-safe license refresh\n";
+echo "PASS: BAZNA licence domain input, canonical binding, REST paths, offline expiry and outage-safe license refresh and locked Woo editing\n";
