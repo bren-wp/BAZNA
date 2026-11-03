@@ -55,7 +55,7 @@ fun formatPrice(raw: String): String {
 }
 
 /**
- * SIDRENA 06/12 — Reference screens_concept/06_detalj_proizvoda.png.
+ * BAZNA 06/12 — Reference screens_concept/06_detalj_proizvoda.png.
  * Three factual cards: item identity, current/reference prices and historical
  * reference data. Mockup's system status bar and DEMO badge are not rendered.
  * Every displayed value comes from the public WordPress CSV, never a demo.
@@ -478,7 +478,7 @@ internal fun restoreDetailItem(fields: List<String>): PriceItem? {
     )
 }
 
-@Preview(name = "06 SIDRENA detalj — 393×852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "06 BAZNA detalj — 393×852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaDetailPreview() {
     val demoItem = PriceItem(
