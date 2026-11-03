@@ -5,8 +5,8 @@
  </defs>
  <rect width="1000" height="260" rx="26" fill="url(#bg)"/>
  <circle cx="128" cy="128" r="91" fill="#19304A" stroke="#28455F" stroke-width="2"/>
- <path fill="url(#orange)" d="M72 76 Q80 61 102 61 H181 Q193 61 193 76 V89 H107 Q98 89 100 98 Q101 105 118 112 L158 128 Q193 140 193 164 Q193 195 155 195 H69 V172 H151 Q169 172 168 160 Q168 149 152 143 L106 125 Q69 111 69 91 Q69 82 72 76 Z"/>
- <text x="260" y="122" font-family="Segoe UI,Arial,sans-serif" font-size="66" font-weight="800" letter-spacing="5" fill="#ffffff">SIDRENA</text>
- <text x="265" y="169" font-family="Segoe UI,Arial,sans-serif" font-size="25" fill="#E0E9F2">Cijene pod kontrolom. Poslovanje s povjerenjem.</text>
+ <path fill="url(#orange)" fill-rule="evenodd" d="M80 61 L135 61 Q190 61 190 95 Q190 113 173 125 Q195 135 195 159 Q195 195 135 195 L80 195 Z M107 88 L134 88 Q159 88 159 101 Q159 115 134 115 L107 115 Z M107 141 L136 141 Q164 141 164 155 Q164 169 136 169 L107 169 Z"/>
+ <text x="260" y="122" font-family="Segoe UI,Arial,sans-serif" font-size="66" font-weight="800" letter-spacing="5" fill="#ffffff">BAZNA</text>
+ <text x="265" y="169" font-family="Segoe UI,Arial,sans-serif" font-size="25" fill="#E0E9F2">Bazne cijene · Javni cjenici · Evidencija i arhiva</text>
  <text x="265" y="213" font-family="Segoe UI,Arial,sans-serif" font-size="18" letter-spacing="2" fill="#FF852C">by Brendigo</text>
 </svg>
