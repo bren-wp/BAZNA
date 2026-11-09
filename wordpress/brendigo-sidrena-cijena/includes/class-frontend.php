@@ -1,6 +1,6 @@
 <?php
 /**
- * Storefront display of sidrena cijena.
+ * Storefront display of bazna cijena.
  *
  * @package Brendigo_Sidrena_Cijena
  */
