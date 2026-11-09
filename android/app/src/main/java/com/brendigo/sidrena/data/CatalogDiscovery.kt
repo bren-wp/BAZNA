@@ -82,6 +82,14 @@ object CatalogDiscovery {
             }
             val feed = row.optJSONObject("feeds")
                 ?: throw IllegalArgumentException("Poslovnica nema izvore cjenika.")
+            val address = when (val raw = row.opt("address")) {
+                null, JSONObject.NULL -> ""
+                is String -> raw.trim()
+                else -> throw IllegalArgumentException("Adresa poslovnice nije tekst.")
+            }
+            require(address.length <= 400 && address.none(Char::isISOControl)) {
+                "Adresa poslovnice nije valjana."
+            }
             outlets.add(
                 Outlet(
                     name = name,
@@ -92,7 +100,7 @@ object CatalogDiscovery {
                     servicesCsvReady = ready(feed, "usluge"),
                     // Optional v1 addition. Older WordPress servers remain
                     // compatible and missing addresses stay genuinely empty.
-                    address = row.optString("address").trim().take(400),
+                    address = address,
                 ),
             )
         }
