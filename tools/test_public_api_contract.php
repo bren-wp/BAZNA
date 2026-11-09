@@ -25,6 +25,9 @@ function register_rest_route( $namespace, $route, $args ) {
 function esc_url_raw( $url ) {
 	return $url;
 }
+function sanitize_text_field( $value ) {
+    return trim( strip_tags( (string) $value ) );
+}
 // Equivalent to WordPress JSON encoding in this isolated PHP test fixture.
 function wp_json_encode( $value ) {
 	return json_encode( $value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
