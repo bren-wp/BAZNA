@@ -351,6 +351,7 @@ private fun LocationReferenceCard(
             }
             .semantics {
                 contentDescription = option.name +
+                    (if (option.address.isBlank()) "" else ", " + option.address) +
                     (if (selected) ", odabrano, otvori cjenike" else ", odaberi poslovnicu")
             },
         colors = CardDefaults.cardColors(containerColor = Surface),
@@ -403,6 +404,16 @@ private fun LocationReferenceCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (option.address.isNotBlank()) {
+                    Text(
+                        text = option.address,
+                        color = Color(0xFFD9E6F2),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
                 if (selected) {
                     Text(
                         text = "Odabrano",
