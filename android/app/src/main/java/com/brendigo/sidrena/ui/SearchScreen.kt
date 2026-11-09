@@ -92,7 +92,7 @@ internal fun searchResultPrice(item: PriceItem): String =
     else formatPrice(item.currentPrice)
 
 internal fun searchReferencePrice(item: PriceItem): String? =
-    item.referencePrice.takeIf { it.isNotBlank() }?.let { "Sidrena: " + formatPrice(it) }
+    item.referencePrice.takeIf { it.isNotBlank() }?.let { "Bazna: " + formatPrice(it) }
 
 /**
  * SIDRENA Android screen 10/12 — unified public catalog search.
