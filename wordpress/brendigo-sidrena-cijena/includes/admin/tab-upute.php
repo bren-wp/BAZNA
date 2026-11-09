@@ -28,7 +28,7 @@ $sidrena_help_common = array(
 	array(
 		'title' => __( 'Prije prvog korištenja', 'brendigo-sidrena-cijena' ),
 		'steps' => array(
-			array( __( 'Za novu instalaciju otvorite Dodaci → Dodaj novi → Prenesi dodatak, odaberite SIDRENA ZIP i aktivirajte ga. Pri nadogradnji postojećeg dodatka prvo napravite sigurnosnu kopiju.', 'brendigo-sidrena-cijena' ), 'wp-plugins', __( 'Otvori dodatke', 'brendigo-sidrena-cijena' ) ),
+			array( __( 'Za novu instalaciju otvorite Dodaci → Dodaj novi → Prenesi dodatak, odaberite BAZNA ZIP i aktivirajte ga. Pri nadogradnji postojećeg dodatka prvo napravite sigurnosnu kopiju.', 'brendigo-sidrena-cijena' ), 'wp-plugins', __( 'Otvori dodatke', 'brendigo-sidrena-cijena' ) ),
 			array( __( 'Napravite sigurnosnu kopiju stranice i baze podataka, posebno ako prelazite sa starije verzije dodatka.', 'brendigo-sidrena-cijena' ) ),
 			array( __( 'U WordPressu otvorite Postavke → Općenito i provjerite vremensku zonu stranice. Ona određuje vrijeme dnevne objave.', 'brendigo-sidrena-cijena' ), 'wp-settings', __( 'Otvori postavke WordPressa', 'brendigo-sidrena-cijena' ) ),
 			array( __( 'U kartici Poslovnice provjerite naziv vrste objekta, adresu i oznaku. Ako imate više lokacija, unesite svaku zasebno i spremite.', 'brendigo-sidrena-cijena' ), 'poslovnice', __( 'Otvori Poslovnice', 'brendigo-sidrena-cijena' ) ),
@@ -41,21 +41,21 @@ $sidrena_help_standalone = array(
 	'title' => __( 'Upute: obični WordPress bez WooCommercea', 'brendigo-sidrena-cijena' ),
 	'intro'  => __( 'Za cjenik proizvoda i usluga ne trebate internetsku trgovinu. Ovaj način rada ne uključuje košaricu ni naplatu.', 'brendigo-sidrena-cijena' ),
 	'steps' => array(
-		array( __( 'Nakon aktivacije u lijevom izborniku otvorite Brendigo Sidrena Cijena → Proizvodi i usluge.', 'brendigo-sidrena-cijena' ), 'proizvodi', __( 'Otvori proizvode i usluge', 'brendigo-sidrena-cijena' ) ),
+		array( __( 'Nakon aktivacije u lijevom izborniku otvorite BAZNA → Proizvodi i usluge.', 'brendigo-sidrena-cijena' ), 'proizvodi', __( 'Otvori proizvode i usluge', 'brendigo-sidrena-cijena' ) ),
 		array( __( 'Kliknite „Dodaj proizvod ili uslugu” i odaberite vrstu stavke. Unesite naziv i redovnu cijenu; ostala polja, poput SKU-a, barkoda, marke i mjerne jedinice, ispunite kada su potrebna.', 'brendigo-sidrena-cijena' ) ),
-		array( __( 'U polje „Bazna cijena” upišite stvarni iznos iz evidencije, a u „Datum sidrene” odgovarajući datum. Za novu stavku ne izmišljajte cijenu iz ranijeg razdoblja.', 'brendigo-sidrena-cijena' ) ),
+		array( __( 'U polje „Bazna cijena” upišite stvarni iznos iz evidencije, a u „Cijena je vrijedila na dan” odgovarajući datum. Za novu stavku ne izmišljajte cijenu iz ranijeg razdoblja.', 'brendigo-sidrena-cijena' ) ),
 		array( __( 'Ako imate više poslovnica, odaberite onu kojoj stavka pripada. Zatim kliknite „Spremi cjenik”.', 'brendigo-sidrena-cijena' ) ),
 		array( __( 'Otvorite „Javni cjenik”, kliknite „Objavi cjenik sada” i potom „Otvori javni cjenik”. Provjerite naziv, iznose, datume i dostupnost.', 'brendigo-sidrena-cijena' ), 'javni-xml', __( 'Otvori Javni cjenik', 'brendigo-sidrena-cijena' ) ),
-		array( __( 'Ako želite cjenik na svojoj WordPress stranici, dodajte stranicu, umetnite blok „Kratki kod” i zalijepite [sidrena-cjenik]. Za javnu arhivu koristite [sidrena-arhiva].', 'brendigo-sidrena-cijena' ), 'wp-pages', __( 'Otvori stranice', 'brendigo-sidrena-cijena' ) ),
+		array( __( 'Ako želite cjenik na svojoj WordPress stranici, dodajte stranicu, umetnite blok „Kratki kod” i zalijepite [bazna_cjenik]. Za javnu arhivu koristite [bazna_arhiva]. Stari kratki kodovi [sidrena-cjenik] i [sidrena-arhiva] ostaju podržani radi kompatibilnosti.', 'brendigo-sidrena-cijena' ), 'wp-pages', __( 'Otvori stranice', 'brendigo-sidrena-cijena' ) ),
 	),
 );
 
 $sidrena_help_woocommerce = array(
 	'title' => __( 'Upute: WordPress s WooCommerceom', 'brendigo-sidrena-cijena' ),
-	'intro'  => __( 'WooCommerce upravlja nazivima proizvoda, zalihama i aktualnim cijenama. SIDRENA dodaje sidrene podatke i javne cjenike; proizvode nije potrebno ponovno unositi.', 'brendigo-sidrena-cijena' ),
+	'intro'  => __( 'WooCommerce upravlja nazivima proizvoda, zalihama i aktualnim cijenama. BAZNA dodaje podatke o baznim cijenama i javne cjenike; proizvode nije potrebno ponovno unositi.', 'brendigo-sidrena-cijena' ),
 	'steps' => array(
 		array( __( 'Provjerite jesu li WooCommerce i vaši proizvodi ispravno postavljeni. Otvorite Proizvodi → Svi proizvodi i pregledajte redovne, akcijske cijene te varijacije.', 'brendigo-sidrena-cijena' ), 'woo-products', __( 'Otvori WooCommerce proizvode', 'brendigo-sidrena-cijena' ) ),
-		array( __( 'Otvorite WooCommerce → Brendigo Sidrena Cijena → Dodatne stavke. U gornjem dijelu prikazani su WooCommerce proizvodi povezani s trgovinom.', 'brendigo-sidrena-cijena' ), 'proizvodi', __( 'Otvori Dodatne stavke', 'brendigo-sidrena-cijena' ) ),
+		array( __( 'Otvorite WooCommerce → BAZNA – Bazne cijene → Proizvodi i usluge. U gornjem dijelu prikazani su WooCommerce proizvodi povezani s trgovinom.', 'brendigo-sidrena-cijena' ), 'proizvodi', __( 'Otvori Dodatne stavke', 'brendigo-sidrena-cijena' ) ),
 		array( __( 'Za svaki proizvod ili varijaciju unesite točnu „Sidrenu cijenu” i „Cijena je vrijedila na dan”. Po potrebi upišite barkod te odaberite prikaz u javnom cjeniku.', 'brendigo-sidrena-cijena' ) ),
 		array( __( 'Kliknite „Spremi bazne cijene”. Ne koristite „Preuzmi važeću cijenu u prazna polja” kao zamjenu za povijesnu evidenciju.', 'brendigo-sidrena-cijena' ) ),
 		array( __( 'U Postavkama po potrebi uključite „Automatski prikaz bazne cijene”, spremite, a zatim otvorite javnu stranicu proizvoda i provjerite rezultat.', 'brendigo-sidrena-cijena' ), 'postavke', __( 'Otvori Postavke', 'brendigo-sidrena-cijena' ) ),
