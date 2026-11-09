@@ -38,6 +38,21 @@ class LegalContractTest {
         assertEquals(30, policy?.priceReductionLookbackDays)
         assertEquals(false, policy?.discountBaselineIsAnchorPrice)
         assertEquals("2026-09-26", policy?.unitPriceRuleEffectiveFrom)
+        val prepared = JSONObject(json.toString()).put("implementation", JSONObject().apply {
+            put("reference_price_data_entry", "verified_manual")
+            put("unpublished_draft_features", "not_automatically_enabled")
+            put("discount_30_day_low_independent", true)
+            put("published_decisions_ready_from", "2026-11-17")
+        })
+        assertEquals(
+            "2026-11-17",
+            LegalContract.parseOptional(prepared)?.implementationReadyFrom,
+        )
+        prepared.getJSONObject("implementation")
+            .put("discount_30_day_low_independent", false)
+        assertThrows(IllegalArgumentException::class.java) {
+            LegalContract.parseOptional(prepared)
+        }
         assertEquals(
             "preparation",
             policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 16)),
