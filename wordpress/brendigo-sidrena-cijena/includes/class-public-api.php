@@ -96,7 +96,15 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				if ( '' === $code ) {
 					continue;
 				}
-				$entry = array( 'name' => isset( $outlet['naziv'] ) ? $outlet['naziv'] : $code, 'code' => $code, 'feeds' => array() );
+				$entry = array(
+                    'name' => isset( $outlet['naziv'] ) ? $outlet['naziv'] : $code,
+                    'code' => $code,
+                    // Outlet addresses already appear in public price-list
+                    // filenames. Publish only the sanitized business address;
+                    // never send internal IDs, assignments or stock records.
+                    'address' => isset( $outlet['adresa'] ) ? sanitize_text_field( (string) $outlet['adresa'] ) : '',
+                    'feeds' => array(),
+                );
 				foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
 					$entry['feeds'][ $kind ] = array( 'available_csv' => $this->feed_available( $kind, 'csv', $code ) );
 				}
