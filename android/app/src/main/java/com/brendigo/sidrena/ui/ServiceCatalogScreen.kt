@@ -150,7 +150,7 @@ fun ServiceCatalogScreen(
         if (publication == false && data.services.isEmpty()) {
             ServiceEmptyState(
                 title = "CSV cjenik usluga još nije objavljen.",
-                description = "Objavite cjenik u WordPress dodatku SIDRENA, a zatim osvježite podatke.",
+                description = "Objavite cjenik u WordPress dodatku BAZNA, a zatim osvježite podatke.",
             )
         } else if (visible.isEmpty()) {
             ServiceEmptyState(
@@ -395,7 +395,7 @@ internal fun servicePublicationState(data: CatalogSnapshot, outletCode: String =
     return outlet.servicesCsvReady
 }
 
-@Preview(name = "05 SIDRENA Usluge 393x852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "05 BAZNA Usluge 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaServicePreview() {
     val demo = CatalogSnapshot(

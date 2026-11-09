@@ -38,7 +38,9 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 	 */
 	private function __construct() {
 		add_action( 'init', array( $this, 'register_meta' ) );
-		add_action( 'woocommerce_after_product_object_save', array( $this, 'maybe_autofill' ), 20, 1 );
+		// Do not register the obsolete autofill hook: today's price cannot
+		// establish a historical base price. The legacy no-op public method is
+		// retained for compatibility with older third-party integrations.
 		add_action( 'added_post_meta', array( $this, 'maybe_clear_overview_cache' ), 10, 4 );
 		add_action( 'updated_post_meta', array( $this, 'maybe_clear_overview_cache' ), 10, 4 );
 		add_action( 'deleted_post_meta', array( $this, 'maybe_clear_overview_cache' ), 10, 4 );

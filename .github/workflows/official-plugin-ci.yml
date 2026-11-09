@@ -50,8 +50,10 @@ jobs:
           find wordpress/brendigo-sidrena-cijena -name '*.php' -type f -print0 |
             xargs -0 -n 1 php -l > /tmp/sidrena-lint.log
           tail -n 3 /tmp/sidrena-lint.log
-      - name: Test shared legal contract
-        run: php tools/test_legal_contract.php
+      - name: Test shared legal contract and legacy-safe BAZNA branding
+        run: |
+          php tools/test_legal_contract.php
+          php tools/test_bazna_brand.php
       - name: Test public Android/WordPress feed discovery compatibility
         run: php tools/test_public_api_contract.php
       - name: Verify BAZNA licence domain binding and server JSON engine
