@@ -169,6 +169,7 @@ fun ServiceCatalogScreen(
                 items(visible) { service ->
                     ServiceReferenceCard(
                         item = service,
+                        site = data.site,
                         onClick = { onDetails(service) },
                     )
                 }
@@ -275,7 +276,7 @@ private fun ServiceEmptyState(title: String, description: String) {
 }
 
 @Composable
-private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
+private fun ServiceReferenceCard(item: PriceItem, site: String, onClick: () -> Unit) {
     val current = serviceCurrentPrice(item.currentPrice)
     val anchor = serviceReferenceWithDate(item.referencePrice, item.referenceDate)
 
@@ -301,6 +302,19 @@ private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(11.dp),
             ) {
+                if (approvedProductImageUrl(site, item.imageUrl) != null) {
+                    // Use a genuine public service photo when a WordPress feed
+                    // supplies one. The shared HTTPS/same-origin image loader
+                    // enforces MIME, DNS, byte and decoded-pixel limits.
+                    ProductThumbnail(
+                        site = site,
+                        imageUrl = item.imageUrl,
+                        modifier = Modifier.size(
+                            width = if (compact) 52.dp else 76.dp,
+                            height = if (compact) 62.dp else 82.dp,
+                        ),
+                    )
+                } else {
                 Box(
                     modifier = Modifier
                         .size(
@@ -322,6 +336,7 @@ private fun ServiceReferenceCard(item: PriceItem, onClick: () -> Unit) {
                         tint = Accent,
                         modifier = Modifier.size(if (compact) 26.dp else 34.dp),
                     )
+                }
                 }
 
                 Column(
