@@ -254,6 +254,14 @@ try {
                             const selected = document.querySelector(
                                 '[data-qa-tab="' + tab + '"][aria-current="page"]'
                             );
+                            // The WP sidebar and topbar can push the active
+                            // content below the viewport on 240px phones.
+                            // Scroll the ACTUAL selected panel into view before
+                            // visual capture; do not mistake normal scrolling
+                            // for a missing or nonresponsive admin screen.
+                            panel?.scrollIntoView({
+                                block: "start", inline: "nearest", behavior: "instant"
+                            });
                             const rect = panel?.getBoundingClientRect();
                             const width = document.documentElement.clientWidth;
                             const htmlOverflow = document.documentElement.scrollWidth - width;
