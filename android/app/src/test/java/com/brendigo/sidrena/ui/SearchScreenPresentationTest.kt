@@ -53,7 +53,7 @@ class SearchScreenPresentationTest {
 
     @Test fun pricesArePublishedValuesNeverPromotionalAssumptions() {
         assertTrue(searchResultPrice(products[0]).startsWith("5,99"))
-        assertTrue(searchReferencePrice(products[0])?.startsWith("Sidrena: 8,49") == true)
+        assertTrue(searchReferencePrice(products[0])?.startsWith("Bazna: 8,49") == true)
         assertNull(searchReferencePrice(products[1]))
         assertEquals("Cijena nije objavljena", searchResultPrice(services[1]))
         assertFalse(searchResultPrice(products[0]).contains("od ", ignoreCase = true))
