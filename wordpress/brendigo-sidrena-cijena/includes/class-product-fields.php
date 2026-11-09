@@ -47,7 +47,7 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 		<div class="sidrena-cijena-admin-fields__head">
 			<span class="sidrena-cijena-admin-fields__mark" aria-hidden="true">B</span>
 			<div>
-				<strong><?php echo esc_html__( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' ); ?></strong>
+				<strong><?php echo esc_html__( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' ); ?></strong>
 				<small><?php echo esc_html__( 'Referentna cijena i podaci javnog cjenika', 'brendigo-sidrena-cijena' ); ?></small>
 			</div>
 		</div>
@@ -63,7 +63,7 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 			array(
 				'id'          => 'sidrena_cijena',
 				'name'        => 'sidrena_cijena',
-				'label'       => __( 'Sidrena cijena', 'brendigo-sidrena-cijena' ) . ' (' . get_woocommerce_currency_symbol() . ')',
+				'label'       => __( 'Bazna cijena', 'brendigo-sidrena-cijena' ) . ' (' . get_woocommerce_currency_symbol() . ')',
 				'desc_tip'    => true,
 				'description' => __( 'Referentna maloprodajna cijena koja je vrijedila na datumu upisanom uz proizvod.', 'brendigo-sidrena-cijena' ),
 				'value'       => $meta->get_price( $product_id ),
@@ -216,11 +216,11 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 		?>
 		<div class="sidrena-cijena-variation-fields">
 			<div class="sidrena-cijena-variation-fields__head">
-				<strong><?php echo esc_html__( 'Brendigo Sidrena Cijena', 'brendigo-sidrena-cijena' ); ?></strong>
+				<strong><?php echo esc_html__( 'BAZNA – Bazne cijene', 'brendigo-sidrena-cijena' ); ?></strong>
 				<small><?php echo esc_html__( 'Referentna cijena i datum', 'brendigo-sidrena-cijena' ); ?></small>
 			</div>
 			<p class="form-row form-row-first">
-				<label><?php echo esc_html__( 'Sidrena cijena', 'brendigo-sidrena-cijena' ) . ' (' . esc_html( get_woocommerce_currency_symbol() ) . ')'; ?></label>
+				<label><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ) . ' (' . esc_html( get_woocommerce_currency_symbol() ) . ')'; ?></label>
 				<input type="text" class="short wc_input_price" name="sidrena_cijena[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( wc_format_localized_price( $meta->get_price( $id ) ) ); ?>" />
 			</p>
 			<?php if ( $cjm_on ) : ?>
