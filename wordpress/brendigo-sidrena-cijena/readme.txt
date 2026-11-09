@@ -200,7 +200,11 @@ Yes. The daily publication time is configurable in the Public pricelist tab.
 
 = Does the plugin send catalog data to an external service? =
 
-No. The plugin does not make remote API requests for catalog processing. The administrator guide is built into the plugin and does not require an external connection.
+No. Catalog processing, exports and the administrator guide run on your WordPress site. The private distribution uses a separate licensing endpoint only for license activation and periodic verification, not for processing catalog prices.
+
+= What information does the private license service receive? =
+
+When the administrator explicitly activates a license, the private distribution sends the entered license key and the site's canonical domain over HTTPS to https://licenca.brendigo.com for one-domain registration and verification. Periodic license checks follow. Product records, price histories and catalog contents are not sent to this service. The independent WordPress.org candidate distribution does not include this license client and does not require a key.
 
 == Upgrade Notice ==
 
