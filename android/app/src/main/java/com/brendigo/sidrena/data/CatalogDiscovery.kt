@@ -4,7 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Single validated reader for the official public WordPress discovery contract.
+ * Single validated reader for the official public BAZNA discovery contract.
  * No catalogue or legal profile is accepted from an unsupported or ambiguous API.
  */
 object CatalogDiscovery {
