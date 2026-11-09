@@ -262,13 +262,32 @@ fun HomePage(
                     Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(7.dp),
                 ) {
-                    Text("Sidrene cijene — pravni okvir", fontWeight = FontWeight.Bold)
+                    Text("Bazne cijene — pravni okvir", fontWeight = FontWeight.Bold)
                     val legal = data.index.legal
                     if (legal != null) {
-                        Text("Početak primjene: ${legal.effectiveFrom}", color = TextMuted, fontSize = 13.sp)
+                        val phase = legal.publishedDecisionPhaseOn(
+                            java.time.LocalDate.now(java.time.ZoneId.of("Europe/Zagreb")),
+                        )
+                        Text(
+                            if (phase == "preparation")
+                                "Priprema za početak primjene: ${legal.effectiveFrom}"
+                            else "Datum početka primjene objavljenih odluka: ${legal.effectiveFrom}",
+                            color = TextMuted,
+                            fontSize = 13.sp,
+                        )
+                        Text(
+                            "Bazna cijena: povijesni dokaz na ${legal.legacyReferenceDate} ili ${legal.generalReferenceDate}, prema vrsti robe/usluge.",
+                            color = TextMuted,
+                            fontSize = 13.sp,
+                        )
                         Text(
                             "Arhiva: najmanje ${legal.archiveMinDays} dana · Dnevna objava do ${legal.dailyDeadline}",
                             color = TextMuted, fontSize = 13.sp,
+                        )
+                        Text(
+                            "Najniža cijena u prethodnih 30 dana zasebna je od bazne cijene. Pravilnici iz savjetovanja nisu automatski potvrđeni propisi.",
+                            color = TextMuted,
+                            fontSize = 12.sp,
                         )
                     } else {
                         Text(
