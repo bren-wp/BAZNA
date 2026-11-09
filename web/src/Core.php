@@ -50,6 +50,12 @@ final class Core
         if (!is_dir($this->storage) && !mkdir($this->storage, 0700, true) && !is_dir($this->storage)) {
             throw new RuntimeException('Privatna mapa nije dostupna.');
         }
+        $realRoot = $root === '' ? false : realpath($root);
+        $realData = realpath($this->storage);
+        if ($realRoot !== false && $realData !== false &&
+            ($realData === $realRoot || str_starts_with($realData, rtrim($realRoot, '/') . '/'))) {
+            throw new RuntimeException('BAZNA_PRIVATE_DIR vodi u javni DocumentRoot.');
+        }
         if (!is_writable($this->storage)) {
             throw new RuntimeException('Privatna mapa nema dozvolu pisanja.');
         }
@@ -193,8 +199,17 @@ final class Core
         if (isset($existing['published_at'])) {
             $history = $this->read('archive.json');
             $versions = $history['versions'] ?? [];
-            array_unshift($versions, $existing);
-            $history['versions'] = array_slice($versions, 0, 250);
+            // Immutable archive snapshots get stable IDs; URL numbering would
+            // shift with each publication. Never silently discard versions
+            // before the statutory retention period, even during rapid edits.
+            $archiveId = gmdate('YmdHis') . '-' . bin2hex(random_bytes(6));
+            $archiveFile = 'archive-' . $archiveId . '.json';
+            $this->write($archiveFile, $existing);
+            array_unshift($versions, [
+                'id' => $archiveId, 'file' => $archiveFile,
+                'published_at' => $existing['published_at'],
+            ]);
+            $history['versions'] = $versions;
             $this->write('archive.json', $history);
         }
         $catalog['published_at'] = $timestamp;
@@ -301,23 +316,32 @@ final class Core
     {
         $out = [];
         $history = $this->read('archive.json')['versions'] ?? [];
-        foreach ($history as $i => $v) {
+        foreach ($history as $v) {
+            $id = (string) ($v['id'] ?? '');
+            if (!preg_match('/^[0-9]{14}-[a-f0-9]{12}$/D', $id)) continue;
             $date = substr((string) ($v['published_at'] ?? ''), 0, 10);
             foreach (self::KINDS as $kind) {
                 $out[] = [
                     'date' => $date, 'kind' => $kind, 'outlet' => 'webshop', 'format' => 'csv',
-                    'url' => $this->link('bazna/v1/arhiva/' . $i . '/' . $kind . '/csv'),
+                    'url' => $this->link('bazna/v1/arhiva/' . $id . '/' . $kind . '/csv'),
                 ];
             }
         }
         return $out;
     }
 
-    public function archiveCsv(int $index, string $kind): string
+    public function archiveCsv(string $id, string $kind): string
     {
+        if (!preg_match('/^[0-9]{14}-[a-f0-9]{12}$/D', $id)) {
+            throw new InvalidArgumentException('Neispravan identifikator arhive.');
+        }
         $history = $this->read('archive.json')['versions'] ?? [];
-        if ($index < 0 || !isset($history[$index])) throw new InvalidArgumentException('Arhivski zapis ne postoji.');
-        return $this->csv($kind, '', $history[$index]);
+        foreach ($history as $v) {
+            if (($v['id'] ?? '') === $id && ($v['file'] ?? '') === 'archive-' . $id . '.json') {
+                return $this->csv($kind, '', $this->read($v['file']));
+            }
+        }
+        throw new InvalidArgumentException('Arhivski zapis ne postoji.');
     }
 
     public static function esc(string $value): string
