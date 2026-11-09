@@ -239,6 +239,32 @@ final class Core
         return (string) $csv;
     }
 
+    public function xml(string $kind, string $outlet = ''): string
+    {
+        $csv = $this->csv($kind, $outlet);
+        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $doc->formatOutput = true;
+        $root = $doc->createElement('bazna-cjenik');
+        $root->setAttribute('vrsta', $kind);
+        $doc->appendChild($root);
+        $handle = fopen('php://temp', 'w+');
+        fwrite($handle, $csv);
+        rewind($handle);
+        $headers = fgetcsv($handle, 0, ';', '"', '');
+        while (($values = fgetcsv($handle, 0, ';', '"', '')) !== false) {
+            if (count($values) !== count($headers)) continue;
+            $entry = $doc->createElement('stavka');
+            foreach ($headers as $i => $name) {
+                $field = $doc->createElement($name);
+                $field->appendChild($doc->createTextNode((string) $values[$i]));
+                $entry->appendChild($field);
+            }
+            $root->appendChild($entry);
+        }
+        fclose($handle);
+        return (string) $doc->saveXML();
+    }
+
     public function legal(): array
     {
         return [
