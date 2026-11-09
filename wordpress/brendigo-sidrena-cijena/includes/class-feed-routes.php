@@ -601,7 +601,7 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 	public function serve_archive_page() {
 		$files = Brendigo_Sidrena_Cijena_Archive::instance()->get_archive_files();
 		$shop  = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
-		$title = __( 'Arhiva sidrene cijene', 'brendigo-sidrena-cijena' );
+		$title = __( 'Arhiva baznih cijena', 'brendigo-sidrena-cijena' );
 
 		$this->open_public_document(
 			$title,
@@ -770,7 +770,7 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 
 		$count     = (int) $snapshot['count'];
 		$shop      = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
-		$title     = __( 'Cjenik - sidrena cijena', 'brendigo-sidrena-cijena' );
+		$title     = __( 'Cjenik - bazna cijena', 'brendigo-sidrena-cijena' );
 		$label     = $settings->get_preview_label();
 		$scope     = is_array( $outlet ) ? $this->outlet_label( $outlet ) : ( $settings->is_multi_poslovnica() ? $this->webshop_oznaka() : '' );
 		$format    = Brendigo_Sidrena_Cijena_Feed_Files::instance()->export_format();
@@ -789,7 +789,7 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 		);
 		wp_enqueue_script( 'brendigo-sidrena-cijena-cjenik' );
 		/* translators: %s: shop name. */
-		$meta_description = sprintf( __( 'Važeći cjenik sa sidrenom cijenom: %s', 'brendigo-sidrena-cijena' ), $shop );
+		$meta_description = sprintf( __( 'Važeći cjenik s baznom cijenom: %s', 'brendigo-sidrena-cijena' ), $shop );
 		$this->open_public_document(
 			$shop . ' - ' . $title,
 			'index,follow',
@@ -902,7 +902,7 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 	 */
 	public function serve_cjenik_empty_page() {
 		$shop  = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
-		$title = __( 'Cjenik - sidrena cijena', 'brendigo-sidrena-cijena' );
+		$title = __( 'Cjenik - bazna cijena', 'brendigo-sidrena-cijena' );
 
 		$this->open_public_document(
 			$shop . ' - ' . $title,
@@ -924,7 +924,7 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 	 */
 	public function serve_cjenik_pending_page() {
 		$shop  = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
-		$title = __( 'Cjenik - sidrena cijena', 'brendigo-sidrena-cijena' );
+		$title = __( 'Cjenik - bazna cijena', 'brendigo-sidrena-cijena' );
 
 		$this->open_public_document(
 			$shop . ' - ' . $title,
