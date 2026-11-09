@@ -65,27 +65,8 @@ try {
             header('Content-Type: text/csv; charset=utf-8');
             echo $csv; exit;
         }
-        $xml = new DOMDocument('1.0', 'UTF-8');
-        $xml->formatOutput = true;
-        $root = $xml->createElement('bazna-cjenik');
-        $root->setAttribute('vrsta', $parts[1]);
-        $xml->appendChild($root);
-        $stream = fopen('php://temp', 'w+');
-        fwrite($stream, $csv); rewind($stream);
-        $header = fgetcsv($stream, 0, ';', '"', '');
-        while (($row = fgetcsv($stream, 0, ';', '"', '')) !== false) {
-            if (count($row) !== count($header)) continue;
-            $entry = $xml->createElement('stavka');
-            foreach ($header as $i => $key) {
-                $node = $xml->createElement($key);
-                $node->appendChild($xml->createTextNode((string) $row[$i]));
-                $entry->appendChild($node);
-            }
-            $root->appendChild($entry);
-        }
-        fclose($stream);
         header('Content-Type: application/xml; charset=utf-8');
-        echo $xml->saveXML(); exit;
+        echo $core->xml($parts[1], $outlet); exit;
     }
     if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $parts)) {
         header('Content-Type: text/csv; charset=utf-8');
