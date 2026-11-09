@@ -7,6 +7,7 @@ data class Outlet(
     val serviceCsv: String,
     val productsCsvReady: Boolean? = null,
     val servicesCsvReady: Boolean? = null,
+    val address: String = "",
 )
 
 data class CatalogIndex(
