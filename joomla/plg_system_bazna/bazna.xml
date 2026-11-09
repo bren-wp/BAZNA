@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="system" method="upgrade">
+  <name>BAZNA — Bazne cijene</name>
+  <version>1.0.0</version>
+  <creationDate>2026-11-10</creationDate>
+  <author>Brendigo</author>
+  <authorUrl>https://brendigo.com</authorUrl>
+  <copyright>Copyright Brendigo</copyright>
+  <license>GPL-2.0-or-later</license>
+  <description>BAZNA javni cjenici, provjerene povijesne cijene, poslovnice, licence i Android API.</description>
+  <namespace path="src">Brendigo\Plugin\System\Bazna</namespace>
+  <files>
+    <folder plugin="bazna">services</folder>
+    <folder>src</folder>
+    <folder>vendor</folder>
+    <folder>assets</folder>
+  </files>
+</extension>
