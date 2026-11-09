@@ -80,7 +80,7 @@ internal fun acceptedSiteInput(value: String): String? =
     }
 
 /**
- * BAZNA screen 02/12 — connects to a real public WordPress website.
+ * BAZNA screen 02/12 — connects to public BAZNA on WordPress, PHP, Joomla or Shopify.
  *
  * Reference: screens_concept/02_povezivanje.png (1080 × 1920).
  * Demo badges, sample addresses as real values and simulated status bar icons
@@ -128,7 +128,7 @@ fun ConnectionPage(
                     )
                 }
                 Text(
-                    "Poveži WordPress stranicu",
+                    "Poveži BAZNA stranicu",
                     color = Color.White,
                     fontSize = if (viewportWidthDp >= 360f) 27.sp else 21.sp,
                     fontWeight = FontWeight.Bold,
@@ -204,7 +204,7 @@ fun ConnectionPage(
                         modifier = Modifier.fillMaxWidth()
                             .heightIn(min = 25.dp)
                             .semantics {
-                                contentDescription = "HTTPS adresa WordPress stranice"
+                                contentDescription = "HTTPS adresa BAZNA stranice"
                             },
                         enabled = !busy,
                         singleLine = true,
@@ -325,8 +325,8 @@ fun ConnectionPage(
                         )
                     }
                     Text(
-                        text = "Koristi se javno dostupni WordPress " +
-                            "sadržaj bez uređivanja cijena.",
+                        text = "Koristi se javni BAZNA katalog " +
+                            "bez pristupa administratorskim podacima.",
                         color = TextMuted,
                         fontSize = 14.sp,
                         lineHeight = 20.sp,
