@@ -22,6 +22,14 @@ data class LegalContract(
     val historicalPriceVerificationRequired: Boolean? = null,
     val legalComplianceCertified: Boolean? = null,
 ) {
+    /**
+     * The publication decisions' scheduled application date, NOT evidence
+     * that the draft rulebooks were enacted or a merchant is compliant.
+     */
+    fun publishedDecisionPhaseOn(localDate: LocalDate): String =
+        if (localDate.isBefore(LocalDate.parse(effectiveFrom))) "preparation"
+        else "published_decisions_effective"
+
     companion object {
         const val REVISION = "NN-101-2026-NN-110-2026"
         const val EFFECTIVE = "2026-11-17"
@@ -63,7 +71,7 @@ data class LegalContract(
             } else null
             val anchorBaseline = if (json.has("discount_baseline_is_anchor_price")) {
                 val v = json.get("discount_baseline_is_anchor_price")
-                require(v is Boolean && !v) { "Sidrena cijena nije osnova za popust." }
+                require(v is Boolean && !v) { "Bazna cijena nije osnova za izračun popusta." }
                 v
             } else null
             val unitEffective = if (json.has("unit_price_rule_effective_from")) {
