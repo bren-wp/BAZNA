@@ -23,6 +23,7 @@ data class CatalogIndex(
     val servicesCsvReady: Boolean? = null,
     val pendingPublication: Boolean? = null,
     val wordpressLicenseActive: Boolean? = null,
+    val platform: String = "wordpress",
 )
 
 data class PriceItem(
