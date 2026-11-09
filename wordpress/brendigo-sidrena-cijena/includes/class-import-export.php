@@ -59,10 +59,10 @@ class Brendigo_Sidrena_Cijena_Import_Export {
 	 * @return array<string, string>
 	 */
 	public function export_columns( $columns ) {
-		$columns['sidrena_cijena']            = __( 'Sidrena cijena', 'brendigo-sidrena-cijena' );
-		$columns['sidrena_cijena_datum']      = __( 'Sidrena cijena datum', 'brendigo-sidrena-cijena' );
-		$columns['sidrena_cijena_cjm']                 = __( 'Sidrena cijena CJM', 'brendigo-sidrena-cijena' );
-		$columns['sidrena_cijena_cjm_suffix']          = __( 'Sidrena cijena CJM dodatak', 'brendigo-sidrena-cijena' );
+		$columns['sidrena_cijena']            = __( 'Bazna cijena', 'brendigo-sidrena-cijena' );
+		$columns['sidrena_cijena_datum']      = __( 'Bazna cijena datum', 'brendigo-sidrena-cijena' );
+		$columns['sidrena_cijena_cjm']                 = __( 'Bazna cijena CJM', 'brendigo-sidrena-cijena' );
+		$columns['sidrena_cijena_cjm_suffix']          = __( 'Bazna cijena CJM dodatak', 'brendigo-sidrena-cijena' );
 		$columns['sidrena_naziv_posebnog_oblika']      = __( 'Naziv posebnog oblika prodaje', 'brendigo-sidrena-cijena' );
 		$columns['sidrena_jedinica_mjere']             = __( 'Jedinica mjere', 'brendigo-sidrena-cijena' );
 		$columns['sidrena_cijena_jedinice_mjere']      = __( 'Cijena za jedinicu mjere', 'brendigo-sidrena-cijena' );
@@ -153,10 +153,10 @@ class Brendigo_Sidrena_Cijena_Import_Export {
 	 * @return array<string, string>
 	 */
 	public function import_options( $options ) {
-		$options['sidrena_cijena']            = __( 'Sidrena cijena', 'brendigo-sidrena-cijena' );
-		$options['sidrena_cijena_datum']      = __( 'Sidrena cijena datum', 'brendigo-sidrena-cijena' );
-		$options['sidrena_cijena_cjm']        = __( 'Sidrena cijena CJM', 'brendigo-sidrena-cijena' );
-		$options['sidrena_cijena_cjm_suffix']     = __( 'Sidrena cijena CJM dodatak', 'brendigo-sidrena-cijena' );
+		$options['sidrena_cijena']            = __( 'Bazna cijena', 'brendigo-sidrena-cijena' );
+		$options['sidrena_cijena_datum']      = __( 'Bazna cijena datum', 'brendigo-sidrena-cijena' );
+		$options['sidrena_cijena_cjm']        = __( 'Bazna cijena CJM', 'brendigo-sidrena-cijena' );
+		$options['sidrena_cijena_cjm_suffix']     = __( 'Bazna cijena CJM dodatak', 'brendigo-sidrena-cijena' );
 		$options['sidrena_naziv_posebnog_oblika'] = __( 'Naziv posebnog oblika prodaje', 'brendigo-sidrena-cijena' );
 		$options['sidrena_jedinica_mjere']        = __( 'Jedinica mjere', 'brendigo-sidrena-cijena' );
 		$options['sidrena_cijena_jedinice_mjere'] = __( 'Cijena za jedinicu mjere', 'brendigo-sidrena-cijena' );
@@ -170,10 +170,10 @@ class Brendigo_Sidrena_Cijena_Import_Export {
 	 * @return array<string, string>
 	 */
 	public function import_default_columns( $columns ) {
-		$columns[ __( 'Sidrena cijena', 'brendigo-sidrena-cijena' ) ]            = 'sidrena_cijena';
-		$columns[ __( 'Sidrena cijena datum', 'brendigo-sidrena-cijena' ) ]      = 'sidrena_cijena_datum';
-		$columns[ __( 'Sidrena cijena CJM', 'brendigo-sidrena-cijena' ) ]        = 'sidrena_cijena_cjm';
-		$columns[ __( 'Sidrena cijena CJM dodatak', 'brendigo-sidrena-cijena' ) ] = 'sidrena_cijena_cjm_suffix';
+		$columns[ __( 'Bazna cijena', 'brendigo-sidrena-cijena' ) ]            = 'sidrena_cijena';
+		$columns[ __( 'Bazna cijena datum', 'brendigo-sidrena-cijena' ) ]      = 'sidrena_cijena_datum';
+		$columns[ __( 'Bazna cijena CJM', 'brendigo-sidrena-cijena' ) ]        = 'sidrena_cijena_cjm';
+		$columns[ __( 'Bazna cijena CJM dodatak', 'brendigo-sidrena-cijena' ) ] = 'sidrena_cijena_cjm_suffix';
 		$columns['Sidrena cijena']                                     = 'sidrena_cijena';
 		$columns['Sidrena cijena datum']                               = 'sidrena_cijena_datum';
 		$columns['Sidrena cijena CJM']                                 = 'sidrena_cijena_cjm';
