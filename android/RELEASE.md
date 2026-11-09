@@ -22,4 +22,4 @@ Novo objedinjeno izdanje sadrži:
 
 Objava paketa moguća je tek kada Android i WordPress CI uspješno završe za isti commit i svi novi reproducibilni ZIP paketi imaju potvrđene SHA-256 kontrolne zbrojeve. WordPress ZIP 1.5.13 namjerno ima novi hash zbog promjena izvornog koda. U nedostatku produkcijskog potpisnog ključa Android AAB ne treba predstavljati kao spreman za Google Play.
 
-[GitHub izdanja](https://github.com/bren-wp/SIDRENA/releases)
+[GitHub izdanja](https://github.com/bren-wp/BAZNA/releases)
