@@ -90,6 +90,9 @@ object CatalogDiscovery {
                     serviceCsv = csvFrom(feed, "usluge"),
                     productsCsvReady = ready(feed, "proizvodi"),
                     servicesCsvReady = ready(feed, "usluge"),
+                    // Optional v1 addition. Older WordPress servers remain
+                    // compatible and missing addresses stay genuinely empty.
+                    address = row.optString("address").trim().take(400),
                 ),
             )
         }
