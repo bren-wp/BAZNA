@@ -60,21 +60,21 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 * Preserve REST v1, historical anchor prices and existing CSV/XML formats.
 
 = 1.5.6 =
-* Fix narrow WordPress administrator navigation so all SIDRENA tabs are visible in two columns without unwanted horizontal clipping.
+* Fix narrow WordPress administrator navigation so all BAZNA tabs are visible in two columns without unwanted horizontal clipping.
 * Increase navigation, search, select and save controls to 44px minimum touch height on mobile.
 * Add 13-viewport browser regression checks for navigation layout, tap targets and viewport clipping.
 * Preserve existing prices, historical records, public CSV/XML formats and REST v1 API.
 
 = 1.5.5 =
-* Improve mobile pricelist card wrapping and visual consistency with SIDRENA Android.
+* Improve mobile pricelist card wrapping and visual consistency with BAZNA Android.
 * Preserve existing CSV/XML fields, prices, historical dates and REST v1 compatibility.
 * Refine WordPress mobile interface regression checks without external runtime dependencies.
 
 = 1.5.4 =
-* Added public read-only CSV feed availability flags in the existing SIDRENA REST API, including separate business outlet statuses, to prevent misleading Android loading states.
+* Added public read-only CSV feed availability flags in the existing BAZNA REST API, including separate business outlet statuses, to prevent misleading Android loading states.
 * Added optional WooCommerce product thumbnails to the public product CSV/XML feed without changing the required price, date or service columns.
-* Added a WordPress dashboard connection panel for the SIDRENA Android application, with copyable HTTPS address and actual published-feed readiness.
-* Aligned SIDRENA admin and public price-list colors with the Android brand; no new third-party dependencies.
+* Added a WordPress dashboard connection panel for the BAZNA Android application, with copyable HTTPS address and actual published-feed readiness.
+* Aligned BAZNA admin and public price-list colors with the Android brand; no new third-party dependencies.
 * Kept API version 1 and compatibility with older Android clients. Changes are prepared in a PR and require deployment to become available.
 
 = 1.5.3 =
@@ -89,7 +89,7 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 
 == Description ==
 
-**SIDRENA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
+**BAZNA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
 
 = Publish with clarity =
 
@@ -104,7 +104,7 @@ The plugin does not invent historical prices or certify a shop's legal complianc
 = Designed for your workflow =
 
 
-Brendigo Sidrena Cijena provides one interface for managing reference-price data and publishing a public pricelist.
+Brendigo Bazne cijene provides one interface for managing reference-price data and publishing a public pricelist.
 
 Key features:
 
@@ -132,16 +132,16 @@ New installations default to a daily publication time of 07:00 in the WordPress 
 
 Reference prices and dates are entered or imported by the site administrator. The plugin does not infer historical prices.
 
-Documentation: https://brendigo.com/sidrene-cijene
+Documentation: https://brendigo.com/
 
 == Installation ==
 
-After activation, open the **Upute** (Guide) tab inside Brendigo Sidrena Cijena for a step-by-step onboarding guide in Croatian: separate instructions for standalone WordPress and WooCommerce, publishing, imports, public shortcodes, and troubleshooting.
+After activation, open the **Upute** (Guide) tab inside Brendigo Bazne cijene for a step-by-step onboarding guide in Croatian: separate instructions for standalone WordPress and WooCommerce, publishing, imports, public shortcodes, and troubleshooting.
 
 
 1. Install the ZIP from WordPress Plugins > Add New, or upload the `brendigo-sidrena-cijena` folder to `/wp-content/plugins/`.
-2. Activate **SIDRENA**.
-3. Open WooCommerce > SIDRENA. Without WooCommerce, use the standalone SIDRENA menu.
+2. Activate **BAZNA**.
+3. Open WooCommerce > BAZNA. Without WooCommerce, use the standalone BAZNA menu.
 4. Open **Products** to enter reference prices and dates.
 5. Open **Public pricelist** to choose the daily publication time and publish the first version.
 
@@ -153,7 +153,7 @@ Large catalogs are paginated, and variations are grouped with their parent produ
 
 == Standalone WordPress without WooCommerce ==
 
-WooCommerce is optional. Activate the plugin in a standard WordPress installation and use the **Brendigo Sidrena Cijena** menu. Add manual products and services in the Products tab, provide the current price, reference price and date, then publish the HTML/XML/CSV pricelist. No checkout or online payment module is added to WordPress by this plugin.
+WooCommerce is optional. Activate the plugin in a standard WordPress installation and use the **Brendigo Bazne cijene** menu. Add manual products and services in the Products tab, provide the current price, reference price and date, then publish the HTML/XML/CSV pricelist. No checkout or online payment module is added to WordPress by this plugin.
 
 Use `[sidrena_stavka id="123"]` for a named card showing the current and reference price, `[sidrena-cijena id="123"]` for the reference price, `[sidrena_povijest_cijena id="123"]` for observed price history, and `[sidrena-cjenik]` for the entire pricelist. When WooCommerce is also active, prefix the manual row ID with `d` for shortcodes that may otherwise resolve to a WooCommerce product: `id="d123"`. Individual manual item cards always use the manual catalog.
 
@@ -247,7 +247,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 == Changelog ==
 
 = 1.5.5 =
-* Improve mobile pricelist card wrapping and visual consistency with SIDRENA Android.
+* Improve mobile pricelist card wrapping and visual consistency with BAZNA Android.
 * Preserve existing CSV/XML fields, prices, historical dates and REST v1 compatibility.
 * Refine WordPress mobile interface regression checks without external runtime dependencies.
 
@@ -255,7 +255,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Expanded incomplete translations across 20 languages; these 20 remain partial.
 * Fixed Serbian Latin translation filenames to `sr_RS_latin` and regenerated all compiled locale catalogs.
 * Removed manual translation loading discouraged for WordPress.org-hosted plugins.
-* Added SIDRENA brand symbol to the WordPress admin and prepared separate WordPress.org icon/banner assets.
+* Added BAZNA brand symbol to the WordPress admin and prepared separate WordPress.org icon/banner assets.
 * Kept Croatian as the source language and reference-price logic unchanged.
 
 
