@@ -34,15 +34,15 @@ class CatalogRepository {
 
         val warnings = mutableListOf<String>()
         if (index.wordpressLicenseActive == false) {
-            warnings.add("BAZNA licenca za administratorsko uređivanje nije aktivna. Već objavljeni javni cjenici i arhiva ostaju dostupni za pregled.")
+            warnings.add("BAZNA licenca za uređivanje nije aktivna. Već objavljeni cjenici i arhiva ostaju javno dostupni.")
         }
         if (index.pendingPublication == true) {
-            warnings.add("WordPress ima neobjavljene izmjene. Prikazane CSV cijene mogu biti zastarjele dok se cjenik ponovno ne objavi.")
+            warnings.add("Povezana BAZNA platforma ima neobjavljene promjene. Cijene u javnom CSV-u mogu biti zastarjele.")
         }
-        if (index.legal == null) warnings.add("WordPress dodatak ne objavljuje pravni profil. Ažurirajte dodatak BAZNA.")
+        if (index.legal == null) warnings.add("Povezana BAZNA platforma ne objavljuje pravni profil.")
         fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
             if (ready == false) {
-                warnings.add("Cjenik za " + label + " još nije objavljen u WordPress dodatku. Objavite ga u administraciji BAZNA.")
+                warnings.add("Cjenik za " + label + " još nije javno objavljen. Objavite ga u administraciji BAZNA.")
                 return emptyList()
             }
             if (url.isBlank()) {
@@ -94,26 +94,27 @@ class CatalogRepository {
     }
 
     private fun readDiscovery(site: SiteUrl): JSONObject {
-        // WordPress supports /wp-json/ and /?rest_route=/...; do not silently
-        // retry authorization errors, DNS failures, TLS errors or timeouts.
-        return try {
-            JSONObject(
-                read(
-                    site,
-                    site.endpoint("wp-json/brendigo-sidrena/v1/cjenici"),
-                    256 * 1024,
-                ),
-            )
-        } catch (exception: Exception) {
-            if (!shouldFallbackToPlainRest(exception)) throw exception
-            JSONObject(
-                read(
-                    site,
-                    site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
-                    256 * 1024,
-                ),
-            )
+        // All endpoints are same-origin HTTPS. Retry only route-not-found
+        // (404/405) or a non-JSON CMS page; NEVER retry authentication,
+        // TLS/DNS failures, timeouts or server errors on another platform.
+        // Original WordPress pretty/plain aliases remain first.
+        val candidates = listOf(
+            site.endpoint("wp-json/brendigo-sidrena/v1/cjenici"),
+            site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
+            site.endpoint("bazna/v1/cjenici"),
+            site.endpoint("apps/bazna/v1/cjenici"),
+            site.endpoint("v1/cjenici"), // explicit custom Shopify proxy base
+        ).distinct()
+        var last: Exception? = null
+        for ((index, url) in candidates.withIndex()) {
+            try {
+                return JSONObject(read(site, url, 256 * 1024))
+            } catch (exception: Exception) {
+                if (index == candidates.lastIndex || !shouldFallbackToPlainRest(exception)) throw exception
+                last = exception
+            }
         }
+        throw last ?: IOException("BAZNA API nije dostupan.")
     }
 
     private val client: OkHttpClient = OkHttpClient.Builder()
