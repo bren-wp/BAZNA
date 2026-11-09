@@ -86,7 +86,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			)
 		);
 
-		$this->headers( 'text/csv; charset=utf-8', 'sidrena-cijena-predlozak.csv' );
+		$this->headers( 'text/csv; charset=utf-8', 'BAZNA-cjenik-predlozak.csv' );
 		echo chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) . implode( '', $lines ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}
@@ -939,7 +939,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			'cijena_jedinice_mjere' => array( 'label' => __( 'Cijena za jedinicu mjere', 'brendigo-sidrena-cijena' ), 'always' => false ),
 			'maloprodajna_cijena'   => array( 'label' => __( 'Maloprodajna cijena', 'brendigo-sidrena-cijena' ), 'always' => true ),
 			'naziv_posebnog_oblika' => array( 'label' => __( 'Poseban oblik prodaje', 'brendigo-sidrena-cijena' ), 'always' => false ),
-			'sidrena_cijena'        => array( 'label' => __( 'Sidrena cijena', 'brendigo-sidrena-cijena' ), 'always' => true ),
+			'sidrena_cijena'        => array( 'label' => __( 'Bazna cijena', 'brendigo-sidrena-cijena' ), 'always' => true ),
 			'sidrena_datum'         => array( 'label' => __( 'Datum sidrene', 'brendigo-sidrena-cijena' ), 'always' => false ),
 			'dostupnost'            => array( 'label' => __( 'Dostupnost', 'brendigo-sidrena-cijena' ), 'always' => false ),
 		);
