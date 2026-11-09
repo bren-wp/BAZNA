@@ -14,14 +14,14 @@
       <aside class="brendigo-admin-sidebar">
         <a class="brendigo-admin-brand" href="#"><span class="brendigo-admin-brand__mark brendigo-admin-brand__mark--bazna">B</span><span class="brendigo-admin-brand__text"><strong>BAZNA</strong><small>Brendigo</small></span></a>
         <nav class="brendigo-admin-nav">
-          <a class="brendigo-admin-nav__item is-active" href="#">Pregled</a>
-          <a class="brendigo-admin-nav__item" href="#">Proizvodi</a>
-          <a class="brendigo-admin-nav__item" href="#">Poslovnice</a>
-          <a class="brendigo-admin-nav__item" href="#">Uvoz/Izvoz</a>
-          <a class="brendigo-admin-nav__item" href="#">Javni cjenici</a>
-          <a class="brendigo-admin-nav__item" href="#">Postavke</a>
-          <a class="brendigo-admin-nav__item" href="#">Upute</a>
-          <a class="brendigo-admin-nav__item" href="#">Licenca</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="pregled" href="#qa-pregled">Pregled</a>
+          <a class="brendigo-admin-nav__item is-active" data-qa-tab="proizvodi" href="#qa-proizvodi">Proizvodi</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="poslovnice" href="#qa-poslovnice">Poslovnice</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="uvoz-izvoz" href="#qa-uvoz-izvoz">Uvoz/Izvoz</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="javni-xml" href="#qa-javni-xml">Javni cjenici</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="postavke" href="#qa-postavke">Postavke</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="upute" href="#qa-upute">Upute</a>
+          <a class="brendigo-admin-nav__item" data-qa-tab="licenca" href="#qa-licenca">Licenca</a>
         </nav>
       </aside>
       <main class="brendigo-admin-main">
@@ -35,7 +35,7 @@
           </div>
         </header>
         <div class="sidrena-cijena-panels">
-          <section class="sidrena-cijena-card brendigo-woo-catalog">
+          <section class="sidrena-cijena-card brendigo-woo-catalog" data-qa-panel="proizvodi">
             <div class="sidrena-cijena-card__head">
               <div><h2>WooCommerce proizvodi</h2><p>Javni cjenik, bazna i aktualna cijena.</p></div>
             </div>
@@ -49,7 +49,7 @@
               <table class="sidrena-cijena-catalog" id="sidrena-cijena-catalog">
                 <thead><tr>
                   <th>Naziv</th><th>Vrsta</th><th>SKU</th><th>Marka</th>
-                  <th>Redovna</th><th>Akcijska</th><th>Sidrena</th>
+                  <th>Redovna</th><th>Akcijska</th><th>Bazna</th>
                   <th>Datum</th><th>Barkod</th><th>Jedinica</th>
                   <th>Cijena po jedinici</th><th>Dostupnost</th>
                   <th>Poslovnica</th><th>URL</th><th>Radnje</th>
@@ -68,7 +68,7 @@
               <button class="button button-primary">Spremi bazne cijene</button>
             </div>
           </section>
-          <section class="sidrena-cijena-card">
+          <section class="sidrena-cijena-card" data-qa-panel="javni-xml">
             <h2>BAZNA Android povezivanje</h2>
             <div class="sidrena-android-bridge__outlets">
               <h4>Poslovnice</h4>
@@ -79,7 +79,7 @@
               </ul>
             </div>
           </section>
-          <section class="sidrena-cijena-card brendigo-settings-card">
+          <section class="sidrena-cijena-card brendigo-settings-card" data-qa-panel="licenca">
             <div class="sidrena-cijena-card__head">
               <div><h2>BAZNA — licenca</h2>
                 <p>Jedan ključ pripada jednoj domeni.</p></div>
@@ -95,10 +95,86 @@
               <button class="button button-primary" type="button">Aktiviraj licencu</button>
             </form>
           </section>
+
+          <!-- Each section is a geometric fixture of a distinct REAL admin tab,
+               not an isolated screenshot mockup of the production PHP output. -->
+          <section class="sidrena-cijena-card brendigo-dashboard-card" data-qa-panel="pregled">
+            <div class="sidrena-cijena-card__head"><div><h2>BAZNA — pregled</h2>
+              <p>Stanje objave i referentne cijene na dan 10.09.2026.</p></div></div>
+            <div class="brendigo-kpi-grid">
+              <article class="brendigo-kpi-card"><strong>1.248</strong><span>Proizvodi</span></article>
+              <article class="brendigo-kpi-card"><strong>320</strong><span>Usluge</span></article>
+              <article class="brendigo-kpi-card"><strong>18</strong><span>Javni cjenici</span></article>
+            </div>
+            <p>Objavljeni podaci uključuju proizvode i usluge, poslovnice te arhivu najmanje 30 dana.</p>
+          </section>
+          <section class="sidrena-cijena-card brendigo-settings-card" data-qa-panel="poslovnice">
+            <div class="sidrena-cijena-card__head"><div><h2>Poslovnice</h2>
+              <p>Adresa, naziv i interna oznaka poslovnog objekta.</p></div></div>
+            <div class="sidrena-poslovnica__grid">
+              <label>Naziv poslovnice<input type="text" value="Rijeka — glavni prodajni objekt"></label>
+              <label>Oblik prodajnog objekta<input type="text" value="prodavaonica"></label>
+              <label>Adresa<input type="text" value="Korzo 12, Rijeka"></label>
+              <label>Oznaka objekta<input type="text" value="RI-01"></label>
+              <label>Sljedeći broj pohrane<input type="number" value="100"></label>
+              <label>Odabrani proizvodi<select><option>Maslinovo ulje</option></select></label>
+            </div>
+            <p><button type="button" class="button button-primary">Spremi poslovnice</button></p>
+          </section>
+          <section class="sidrena-cijena-card brendigo-settings-card" data-qa-panel="uvoz-izvoz">
+            <div class="sidrena-cijena-card__head"><div><h2>Uvoz i izvoz</h2>
+              <p>Provjera mapiranja stupaca i siguran uvoz proizvoda.</p></div></div>
+            <p><label>Datoteka za uvoz<input type="file" accept=".csv,.xml,.xlsx"></label></p>
+            <p><label>Vrsta podataka<select><option>Proizvodi i usluge</option><option>Arhiva</option></select></label></p>
+            <p><label>Mapiranje bazne cijene<input type="text" value="sidrena_cijena"></label></p>
+            <p><button type="button" class="button button-primary">Provjeri uvoz</button>
+              <button type="button" class="button">Izvezi CSV</button></p>
+          </section>
+          <section class="sidrena-cijena-card brendigo-settings-card" data-qa-panel="postavke">
+            <div class="sidrena-cijena-card__head"><div><h2>Postavke</h2>
+              <p>Javni prikaz cijena, vrijeme objave i obavijesti.</p></div></div>
+            <p><label>Naslov javnog cjenika<input type="text" value="BAZNA — Bazne cijene"></label></p>
+            <p><label>Dnevna objava<input type="time" value="07:00"></label></p>
+            <p><label><input type="checkbox" checked> Objavi javni cjenik</label></p>
+            <p><button type="button" class="button button-primary">Spremi postavke</button></p>
+          </section>
+          <section class="sidrena-cijena-card brendigo-settings-card" data-qa-panel="upute">
+            <div class="sidrena-cijena-card__head"><div><h2>Upute za BAZNA</h2>
+              <p>Povezivanje Android aplikacije i pregled CSV/XML datoteka.</p></div></div>
+            <p>U Android aplikaciji unesite HTTPS adresu povezane WordPress stranice.</p>
+            <p>Objavljena bazna cijena mora odgovarati povijesnoj evidenciji, a najniža cijena prije sniženja vodi se odvojeno.</p>
+            <p><code>[bazna_cjenik]</code> i <code>[bazna_arhiva]</code></p>
+            <p><a class="button" href="#qa-javni-xml">Otvori javni cjenik</a></p>
+          </section>
         </div>
       </main>
     </div>
   </div>
 </div></div>
+
+<script>
+  // CI-only navigation for all eight WordPress admin surface fixtures.
+  window.__baznaFixtureSelectTab = function (tab) {
+    const panels = [...document.querySelectorAll("[data-qa-panel]")];
+    if (!panels.some(panel => panel.dataset.qaPanel === tab)) return false;
+    panels.forEach(panel => {
+      panel.style.display = panel.dataset.qaPanel === tab ? "" : "none";
+    });
+    document.querySelectorAll("[data-qa-tab]").forEach(link => {
+      const selected = link.dataset.qaTab === tab;
+      link.classList.toggle("is-active", selected);
+      if (selected) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+    return true;
+  };
+  document.querySelectorAll("[data-qa-tab]").forEach(link => {
+    link.addEventListener("click", event => {
+      event.preventDefault();
+      window.__baznaFixtureSelectTab(link.dataset.qaTab);
+    });
+  });
+  window.__baznaFixtureSelectTab("proizvodi");
+</script>
 </body>
 </html>
