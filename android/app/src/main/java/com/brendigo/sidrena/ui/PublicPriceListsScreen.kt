@@ -202,7 +202,7 @@ private fun PublicPriceListsToolbar(
         modifier = Modifier.fillMaxWidth().height(61.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.size(33.dp)) {
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
             Icon(
                 Icons.Outlined.ArrowBack,
                 contentDescription = "Natrag na početnu",
@@ -221,7 +221,7 @@ private fun PublicPriceListsToolbar(
             overflow = TextOverflow.Ellipsis,
         )
         Box {
-            IconButton(onClick = { menu = true }, modifier = Modifier.size(43.dp)) {
+            IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp)) {
                 Icon(
                     Icons.Outlined.MoreVert,
                     contentDescription = "Opcije javnih cjenika",
@@ -335,7 +335,7 @@ private fun PublicPriceListRow(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            IconButton(onClick = onOpen, modifier = Modifier.size(41.dp)) {
+            IconButton(onClick = onOpen, modifier = Modifier.size(48.dp)) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowDownward,
                     contentDescription = "Otvori dokument u pregledniku",

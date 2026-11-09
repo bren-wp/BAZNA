@@ -33,7 +33,7 @@ cases=(
 
 for entry in "${cases[@]}"; do
     IFS=: read -r resolution scale label <<<"$entry"
-    echo "::group::SIDRENA responsive emulator ${label} (${resolution}, font ${scale})"
+    echo "::group::BAZNA responsive emulator ${label} (${resolution}, font ${scale})"
     adb shell wm size "$resolution"
     adb shell wm density 160
     adb shell settings put system font_scale "$scale"
@@ -82,7 +82,7 @@ for entry in "${cases[@]}"; do
     test "$COUNT" -eq 12
 
     python3 - "$output" "$resolution" <<'PY'
-import pathlib, struct, sys
+import hashlib, pathlib, struct, sys
 folder = pathlib.Path(sys.argv[1])
 expected = tuple(map(int, sys.argv[2].split("x")))
 for path in sorted(folder.glob("*.png")):
@@ -91,9 +91,20 @@ for path in sorted(folder.glob("*.png")):
     assert header[:8] == b"\x89PNG\r\n\x1a\n", path
     dimensions = struct.unpack(">II", header[16:24])
     assert dimensions == expected, (path, dimensions, expected)
-print("PASS:", len(list(folder.glob("*.png"))), "screenshots at", expected)
+paths = sorted(folder.glob("*.png"))
+assert len(paths) == 12, (folder, "expected exactly 12 screenshot files")
+digests = {}
+for path in paths:
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    if digest in digests:
+        raise SystemExit(
+            f"ERROR: duplicated/stale screenshot: {digests[digest].name} "
+            f"and {path.name} ({folder.name}); the named screen was not captured reliably"
+        )
+    digests[digest] = path
+print("PASS:", len(paths), "distinct screenshots at", expected)
 PY
     echo "::endgroup::"
 done
 
-echo "PASS: 9 real Android emulator configurations x 12 SIDRENA screens = 108 PNG screenshots"
+echo "PASS: 9 real Android emulator configurations x 12 BAZNA screens = 108 distinct PNG screenshots"

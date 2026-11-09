@@ -11,6 +11,7 @@ class LocationsScreenPresentationTest {
         Outlet(
             name = "Rijeka Centar",
             code = "rijeka-centar",
+            address = "Korzo 12, Rijeka",
             productCsv = "https://primjer.hr/rijeka-products.csv",
             serviceCsv = "https://primjer.hr/rijeka-services.csv",
         ),
@@ -35,6 +36,7 @@ class LocationsScreenPresentationTest {
         assertTrue(options.first().isWebshop)
         assertEquals("Webshop", options.first().name)
         assertEquals(3, options.count { !it.isWebshop })
+        assertEquals("Korzo 12, Rijeka", options[1].address)
     }
 
     @Test fun outletSelectionUsesRealPublishedCodes() {
@@ -60,6 +62,14 @@ class LocationsScreenPresentationTest {
             listOf("opatija"),
             filterPublishedLocations(items, "OPATIJA").map { it.code },
         )
+    }
+
+    @Test fun searchesPublishedAddressWithoutFabricatingLocationFields() {
+        assertEquals(
+            listOf("rijeka-centar"),
+            filterPublishedLocations(publishedLocations(outlets), "Korzo 12").map { it.code },
+        )
+        assertTrue(publishedLocations(outlets)[2].address.isEmpty())
     }
 
     @Test fun webshopIsSearchableButNeverInventsAnotherPhysicalOutlet() {

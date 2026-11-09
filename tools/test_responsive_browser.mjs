@@ -151,6 +151,17 @@ try {
                         parseFloat(getComputedStyle(document.querySelector(".sidrena-cijena-catalog tbody input")).minHeight) : null,
                     catalogRowButtonMinHeight: type === "admin" ?
                         parseFloat(getComputedStyle(document.querySelector(".sidrena-cijena-catalog tbody button")).minHeight) : null,
+                    navItemCount: type === "admin"
+                        ? document.querySelectorAll(".brendigo-admin-nav__item").length : null,
+                    licenseInputOutside: type === "admin"
+                        ? [...document.querySelectorAll(".bazna-license-form input[type=text]")].some(el => {
+                            const r = el.getBoundingClientRect();
+                            return r.left < -2 || r.right > width + 2;
+                        }) : false,
+                    licenseButtonMinHeight: type === "admin"
+                        ? parseFloat(getComputedStyle(document.querySelector(".bazna-license-form .button")).minHeight) : null,
+                    licenseFieldCount: type === "admin"
+                        ? document.querySelectorAll(".bazna-license-form input[type=text]").length : null,
                     navItemOutside: type === "admin" && width <= 480 ?
                         [...document.querySelectorAll(".brendigo-admin-nav__item")].some(el => {
                             const r = el.getBoundingClientRect();
@@ -183,6 +194,15 @@ try {
             } else {
                 // Run all admin assertions independently: a contrast failure
                 // must not accidentally skip the mobile layout checks.
+                // Eight BAZNA administrator destinations must stay present,
+                // including the separate licensing screen.
+                if (result.navItemCount !== 8) {
+                    errors.push("admin fixture does not expose eight tabs");
+                }
+                if (result.licenseFieldCount !== 2 || result.licenseInputOutside ||
+                    result.licenseButtonMinHeight < 44) {
+                    errors.push("license form is clipped, missing, or has undersized actions");
+                }
                 if (result.primaryButtonColor !== "rgb(7, 24, 45)") {
                     errors.push("orange primary action text must be dark navy, got " + result.primaryButtonColor);
                 }
@@ -218,7 +238,7 @@ try {
     }
     await writeFile(join(output, "responsive-results.json"), JSON.stringify(results, null, 2));
     if (failures.length) throw new Error(failures.join("\n"));
-    console.log("PASS: 2 real WordPress styles × 13 Chrome viewports = 26 screenshots");
+    console.log("PASS: public template and eight-tab admin fixture × 13 Chrome viewports = 26 geometry screenshots");
 } finally {
     if (socket && socket.readyState === WebSocket.OPEN) socket.close();
     browser.kill("SIGTERM");

@@ -4278,3 +4278,63 @@ body.sidrena-cijena-screen #wpbody-content {
     letter-spacing: 0;
     line-height: 1;
 }
+
+
+/* BAZNA: license is a full admin tab, including 240–480px phones.
+ * Keep very long domain/key values inside the panel; never change fields or
+ * the license request itself. All selectors are limited to the BAZNA shell. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 720px;
+    min-width: 0;
+    margin-block: 16px;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form label {
+    display: block;
+    min-width: 0;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form input[type="text"] {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    overflow-wrap: anywhere;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form .description,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-settings-card > p > code {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form .button {
+    box-sizing: border-box;
+    min-height: 44px;
+    max-width: 100%;
+    height: auto;
+    padding-block: 8px;
+    white-space: normal;
+    text-align: center;
+    justify-self: start;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form--active {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form--active .description {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+@media (max-width: 480px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form .button {
+        width: 100%;
+        justify-self: stretch;
+    }
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .bazna-license-form--active {
+        flex-direction: column;
+    }
+}

@@ -3,31 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Mirrors SIDRENA wp-admin shell and catalogue classes, using the actual plugin CSS. -->
+  <!-- BAZNA responsive geometry fixture (not an actual WordPress installation). -->
   <link rel="stylesheet" href="../../wordpress/brendigo-sidrena-cijena/assets/css/admin.css">
-  <title>SIDRENA responsive WordPress admin test</title>
+  <title>BAZNA responsive WordPress admin test</title>
 </head>
 <body class="sidrena-cijena-screen">
 <div id="wpcontent"><div id="wpbody-content">
   <div class="wrap sidrena-cijena-settings brendigo-sidrena-admin">
     <div class="brendigo-admin-shell">
       <aside class="brendigo-admin-sidebar">
-        <a class="brendigo-admin-brand" href="#"><span>SIDRENA</span> Brendigo</a>
+        <a class="brendigo-admin-brand" href="#"><span class="brendigo-admin-brand__mark brendigo-admin-brand__mark--bazna">B</span><span class="brendigo-admin-brand__text"><strong>BAZNA</strong><small>Brendigo</small></span></a>
         <nav class="brendigo-admin-nav">
           <a class="brendigo-admin-nav__item is-active" href="#">Pregled</a>
           <a class="brendigo-admin-nav__item" href="#">Proizvodi</a>
           <a class="brendigo-admin-nav__item" href="#">Poslovnice</a>
+          <a class="brendigo-admin-nav__item" href="#">Uvoz/Izvoz</a>
           <a class="brendigo-admin-nav__item" href="#">Javni cjenici</a>
           <a class="brendigo-admin-nav__item" href="#">Postavke</a>
           <a class="brendigo-admin-nav__item" href="#">Upute</a>
+          <a class="brendigo-admin-nav__item" href="#">Licenca</a>
         </nav>
       </aside>
       <main class="brendigo-admin-main">
         <header class="brendigo-admin-topbar">
-          <div><p class="brendigo-admin-eyebrow">Upravljanje sidrenim cijenama</p>
+          <div><p class="brendigo-admin-eyebrow">Upravljanje baznim cijenama</p>
           <h1>Proizvodi i usluge</h1><p>Pregled objavljenih cijena s povijesnim podacima.</p></div>
           <div class="brendigo-admin-topbar__meta">
-            <span class="brendigo-admin-chip">v1.5.10</span>
+            <span class="brendigo-admin-chip">v1.5.13</span>
             <span class="brendigo-admin-chip brendigo-admin-chip--success">WooCommerce povezano</span>
             <a class="button brendigo-admin-docs" href="#">Upute korak po korak</a>
           </div>
@@ -35,7 +37,7 @@
         <div class="sidrena-cijena-panels">
           <section class="sidrena-cijena-card brendigo-woo-catalog">
             <div class="sidrena-cijena-card__head">
-              <div><h2>WooCommerce proizvodi</h2><p>Javni cjenik, sidrena i aktualna cijena.</p></div>
+              <div><h2>WooCommerce proizvodi</h2><p>Javni cjenik, bazna i aktualna cijena.</p></div>
             </div>
             <div class="brendigo-woo-catalog-tools">
               <label><span>Pretraži na ovoj stranici</span>
@@ -63,11 +65,11 @@
               </table>
             </div>
             <div class="brendigo-woo-catalog-footer">
-              <button class="button button-primary">Spremi sidrene cijene</button>
+              <button class="button button-primary">Spremi bazne cijene</button>
             </div>
           </section>
           <section class="sidrena-cijena-card">
-            <h2>SIDRENA Android povezivanje</h2>
+            <h2>BAZNA Android povezivanje</h2>
             <div class="sidrena-android-bridge__outlets">
               <h4>Poslovnice</h4>
               <ul class="sidrena-android-bridge__outlet-list">
@@ -76,6 +78,22 @@
                   <span>Proizvodi: nije objavljeno</span><span>Usluge: objavljeno</span></li>
               </ul>
             </div>
+          </section>
+          <section class="sidrena-cijena-card brendigo-settings-card">
+            <div class="sidrena-cijena-card__head">
+              <div><h2>BAZNA — licenca</h2>
+                <p>Jedan ključ pripada jednoj domeni.</p></div>
+            </div>
+            <p><strong>Domena:</strong> <code>jako-dugacka-domena-za-ispitivanje-prijeloma-i-odgovarajuceg-WordPress-prikaza.primjer.hr</code></p>
+            <form class="bazna-license-form" action="#" method="post">
+              <label for="bazna_license_domain"><strong>Domena web-stranice</strong></label>
+              <input type="text" id="bazna_license_domain" placeholder="primjer.hr" maxlength="253">
+              <p class="description">Domena mora odgovarati domeni ove WordPress stranice.</p>
+              <label for="bazna_license_key"><strong>Licencni ključ</strong></label>
+              <input type="text" id="bazna_license_key"
+                placeholder="BAZNA-00001-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" maxlength="90">
+              <button class="button button-primary" type="button">Aktiviraj licencu</button>
+            </form>
           </section>
         </div>
       </main>

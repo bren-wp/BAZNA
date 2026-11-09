@@ -112,7 +112,7 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 				?>
 			</span>
 		</div>
-		<p><?php echo esc_html__( 'U Android aplikaciju unesite HTTPS adresu ove WordPress stranice. Korisnička imena i lozinke nisu potrebni: aplikacija čita samo javni SIDRENA REST API.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'U Android aplikaciju unesite HTTPS adresu ove WordPress stranice. Korisnička imena i lozinke nisu potrebni: aplikacija čita samo javni BAZNA REST API.', 'brendigo-sidrena-cijena' ); ?></p>
 		<p><?php echo esc_html__( 'Objavljena datoteka ne dokazuje točnost sidrene, bazne ili najniže cijene u 30 dana. Povijesne cijene i datume treba potvrditi izvornom evidencijom. Pravilnik o baznoj cijeni bio je 2. 11. 2026. još u savjetovanju.', 'brendigo-sidrena-cijena' ); ?></p>
 		<?php if ( $sidrena_android_pending ) : ?>
 			<p class="sidrena-android-bridge__warning"><?php echo esc_html__( 'Upozorenje: katalog je izmijenjen nakon posljednje javne objave. Ponovno generirajte CSV/XML cjenike kako Android ne bi prikazivao zastarjele cijene.', 'brendigo-sidrena-cijena' ); ?></p>
