@@ -172,7 +172,7 @@ fun ProductCatalogScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf("Svi", "Sa sidrenom cijenom", "Dostupni").forEachIndexed { index, label ->
+            listOf("Svi", "S baznom cijenom", "Dostupni").forEachIndexed { index, label ->
                 CatalogFilterChip(
                     label = label,
                     selected = filter == index,
