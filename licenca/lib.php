@@ -84,8 +84,8 @@ function bazna_license_storage_is_private(string $webRoot, string $storage): boo
 }
 
 /**
- * Prove that the claimant controls the publicly reachable HTTPS WordPress
- * installation. CURLOPT_RESOLVE pins the already validated public DNS A
+ * Prove that the claimant controls the publicly reachable HTTPS site
+ * on WordPress, standalone PHP, Joomla or a Shopify app proxy. CURLOPT_RESOLVE pins the already validated public DNS A
  * address, preventing DNS rebinding SSRF. No redirects or private IPs.
  */
 function bazna_license_proof(string $hostname, string $sitePath, string $challenge): bool {
@@ -109,8 +109,12 @@ function bazna_license_proof(string $hostname, string $sitePath, string $challen
         return false;
     }
     $routes = array(
+        // Existing WordPress installation proof must stay unchanged for old keys.
         $sitePath . 'wp-json/brendigo-sidrena/v1/license-proof',
         $sitePath . '?rest_route=%2Fbrendigo-sidrena%2Fv1%2Flicense-proof',
+        // Same domain-bound challenge for BAZNA standalone PHP, Joomla and
+        // Shopify app-proxy sites. No arbitrary caller-controlled proof URL.
+        $sitePath . 'bazna/v1/license-proof',
     );
     foreach ($routes as $route) {
         $url = 'https://' . $hostname . $route;
