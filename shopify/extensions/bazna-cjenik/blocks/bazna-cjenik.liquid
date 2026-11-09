@@ -1,0 +1,22 @@
+{% comment %}
+  BAZNA Shopify storefront entry. The store domain handles the app proxy,
+  so no external iframe, unsafe inline JS or merchant secrets are exposed.
+{% endcomment %}
+<section class="bazna-public-link" style="border:1px solid #314a61;border-radius:14px;padding:20px;background:#102237;color:#fff">
+  <h2 style="margin:0 0 8px;color:#fff">{{ block.settings.title | escape }}</h2>
+  <p style="color:#c0d0df">{{ block.settings.description | escape }}</p>
+  <a style="display:inline-block;background:#ff982f;color:#07182d;border-radius:9px;padding:11px 16px;font-weight:700;text-decoration:none"
+     href="/apps/bazna/cjenik">{{ block.settings.button_text | escape }}</a>
+</section>
+
+{% schema %}
+{
+  "name": "BAZNA javni cjenik",
+  "target": "section",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Naslov", "default": "BAZNA — Bazne cijene" },
+    { "type": "text", "id": "description", "label": "Opis", "default": "Pregled objavljenih proizvoda, usluga i arhive cijena." },
+    { "type": "text", "id": "button_text", "label": "Gumb", "default": "Pogledaj javni cjenik" }
+  ]
+}
+{% endschema %}
