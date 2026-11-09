@@ -65,11 +65,12 @@ internal data class LocationOption(
     val code: String,
     val name: String,
     val isWebshop: Boolean,
+    val address: String = "",
 )
 
 internal fun publishedLocations(outlets: List<Outlet>): List<LocationOption> =
     listOf(LocationOption(code = "", name = "Webshop", isWebshop = true)) +
-        outlets.map { LocationOption(code = it.code, name = it.name, isWebshop = false) }
+        outlets.map { LocationOption(code = it.code, name = it.name, isWebshop = false, address = it.address) }
 
 /** Case-insensitive, multi-term search against actual published names/codes. */
 internal fun filterPublishedLocations(
@@ -82,6 +83,7 @@ internal fun filterPublishedLocations(
         terms.all { term ->
             option.name.contains(term, ignoreCase = true) ||
                 option.code.contains(term, ignoreCase = true) ||
+                option.address.contains(term, ignoreCase = true) ||
                 (option.isWebshop && "online trgovina".contains(term, ignoreCase = true))
         }
     }
@@ -90,8 +92,8 @@ internal fun filterPublishedLocations(
 /**
  * Screen 09/12: Poslovnice, inspired by the ninth BAZNA reference screen.
  *
- * The BAZNA API currently returns name/code and CSV links only: it has no
- * address, business hours, coordinates, phone number or map tiles. Therefore
+ * The public BAZNA API can return a configured business address, but has no
+ * verified opening hours, coordinates, phone number or map tiles. Therefore
  * this screen never draws fabricated pins or misleading working hours.
  */
 @Composable
@@ -199,7 +201,7 @@ fun LocationsPage(
             }
             item {
                 Text(
-                    text = "Podaci o adresama, radnom vremenu i koordinatama nisu objavljeni u javnom BAZNA API-ju. Dostupne poslovnice imaju vlastite javne cjenike.",
+                    text = "Adrese se prikazuju samo kada su objavljene u WordPressu. Radno vrijeme i koordinate nisu dio javnog BAZNA API-ja.",
                     color = TextMuted,
                     fontSize = 12.sp,
                     lineHeight = 18.sp,
@@ -326,7 +328,7 @@ private fun LocationsMapPlaceholder() {
                 fontSize = 15.sp,
             )
             Text(
-                text = "Lokacije nisu objavljene u povezanom katalogu.",
+                text = "Koordinate za kartu nisu objavljene u povezanom katalogu.",
                 color = Color(0xFFD4E4F3),
                 fontSize = 12.sp,
             )
