@@ -820,7 +820,7 @@ class Brendigo_Sidrena_Cijena_Admin {
 						'purging'      => __( 'Brisanje podataka…', 'brendigo-sidrena-cijena' ),
 						'copied'       => __( 'Kopirano', 'brendigo-sidrena-cijena' ),
 						'copyFailed'   => __( 'Kopiranje nije uspjelo', 'brendigo-sidrena-cijena' ),
-						'catalogRequired' => __( 'Naziv, redovna cijena i sidrena cijena obavezni su za svaki popunjeni redak. Ispravite označena polja prije spremanja.', 'brendigo-sidrena-cijena' ),
+						'catalogRequired' => __( 'Naziv, redovna cijena i bazna cijena obavezni su za svaki popunjeni redak. Ispravite označena polja prije spremanja.', 'brendigo-sidrena-cijena' ),
 						'noFile'       => __( 'Odaberite CSV, XML ili XLSX datoteku.', 'brendigo-sidrena-cijena' ),
 						'invalidFile'  => __( 'Dopušteni su CSV, XML i XLSX.', 'brendigo-sidrena-cijena' ),
 						'fileTooLarge' => __( 'Datoteka je veća od 20 MB.', 'brendigo-sidrena-cijena' ),
