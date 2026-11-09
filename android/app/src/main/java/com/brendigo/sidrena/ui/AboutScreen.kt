@@ -161,7 +161,7 @@ fun AboutPage(
             AboutDivider()
             AboutActionRow(
                 icon = Icons.Outlined.Description,
-                title = "Što su sidrene cijene?",
+                title = "Što su bazne cijene?",
                 subtitle = "Referentni podaci i datum primjene",
                 onClick = onAnchorHelp,
             )
