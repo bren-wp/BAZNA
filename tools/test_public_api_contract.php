@@ -113,7 +113,7 @@ class Brendigo_Sidrena_Cijena_Poslovnice {
 		return new self();
 	}
 	public function all() {
-		return array( array( 'naziv' => 'Rijeka', 'oznaka' => 'ri-01' ) );
+		return array( array( 'naziv' => 'Rijeka', 'oznaka' => 'ri-01', 'adresa' => 'Korzo 12, Rijeka' ) );
 	}
 }
 class Brendigo_Sidrena_Cijena_Feed_Files {
@@ -191,6 +191,7 @@ sidrena_contract_assert( true === $json['publication']['csv_ready'], 'Both main 
 sidrena_contract_assert( false === $json['publication']['pending_changes'], 'No unverified changes on a clean standalone installation' );
 sidrena_contract_assert( false === $json['publication']['compliance_certified'], 'Published CSV does not certify legally correct prices' );
 sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-sidrena/v1/cjenici/proizvodi/csv' === $json['feeds']['proizvodi']['csv'], 'Existing CSV URL unchanged' );
+sidrena_contract_assert( 'Korzo 12, Rijeka' === $json['outlets'][0]['address'], 'Only the configured public business address is published' );
 sidrena_contract_assert( true === $json['outlets'][0]['feeds']['proizvodi']['available_csv'], 'Outlet product available' );
 sidrena_contract_assert( false === $json['outlets'][0]['feeds']['usluge']['available_csv'], 'Outlet service missing, not falsely ready' );
 sidrena_contract_assert( false === strpos( json_encode( $json ), $dir ), 'No local filesystem paths in public JSON' );
