@@ -1,6 +1,7 @@
 package com.brendigo.sidrena.ui
 
 import android.graphics.Bitmap
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -14,10 +15,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.assertExists
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -95,11 +99,12 @@ class ResponsiveScreensInstrumentedTest {
                 // Scaffold with systemBarsPadding shifted the 1080x1920
                 // reference artwork and invalidated pixel comparisons.
                 if (currentScreen.intValue == 0) {
-                    SidrenaSplashArtwork(Modifier.fillMaxSize())
+                    SidrenaSplashArtwork(Modifier.fillMaxSize().testTag("bazna-screen-0"))
                 } else {
                     Scaffold(
                     modifier = Modifier.fillMaxSize()
-                        .background(Background).systemBarsPadding(),
+                        .background(Background).systemBarsPadding()
+                        .testTag("bazna-screen-${currentScreen.intValue}"),
                     containerColor = Background,
                     contentWindowInsets = WindowInsets(0),
                     bottomBar = {
@@ -207,9 +212,16 @@ class ResponsiveScreensInstrumentedTest {
         )
         assertTrue("Cannot create screenshot directory", directory.isDirectory || directory.mkdirs())
 
+        var previousCapture: Bitmap? = null
         names.forEachIndexed { index, name ->
             compose.runOnIdle { currentScreen.intValue = index }
+            // An idle composition is not necessarily a frame submitted to
+            // SurfaceFlinger. Identify the requested screen before capture.
+            compose.onNodeWithTag("bazna-screen-$index", useUnmergedTree = true)
+                .assertExists("Screenshot $name did not render its screen root")
             compose.waitForIdle()
+            instrumentation.waitForIdleSync()
+            SystemClock.sleep(180)
 
             val root = compose.onRoot().fetchSemanticsNode()
             val bounds = root.boundsInRoot
@@ -236,12 +248,29 @@ class ResponsiveScreensInstrumentedTest {
                     )
                 }
             }
-            val capture = instrumentation.uiAutomation.takeScreenshot()
-            assertTrue("Could not capture " + name, capture != null)
-            FileOutputStream(File(directory, name + ".png")).use { output ->
-                capture!!.compress(Bitmap.CompressFormat.PNG, 100, output)
+            var capture = instrumentation.uiAutomation.takeScreenshot()
+                ?: throw AssertionError("Could not capture " + name)
+            // The old runner wrote the preceding frame under the next screen
+            // name in multiple configurations. Retry the full-screen capture
+            // after more display frames, but never accept identical screens.
+            for (attempt in 1..4) {
+                if (previousCapture?.sameAs(capture) != true) break
+                capture.recycle()
+                SystemClock.sleep(250)
+                instrumentation.waitForIdleSync()
+                capture = instrumentation.uiAutomation.takeScreenshot()
+                    ?: throw AssertionError("Could not recapture " + name)
             }
-            capture?.recycle()
+            assertTrue(
+                "Stale frame: screenshot $name is identical to the previous screen",
+                previousCapture?.sameAs(capture) != true,
+            )
+            FileOutputStream(File(directory, name + ".png")).use { output ->
+                assertTrue("Could not write " + name, capture.compress(Bitmap.CompressFormat.PNG, 100, output))
+            }
+            previousCapture?.recycle()
+            previousCapture = capture
         }
+        previousCapture?.recycle()
     }
 }
