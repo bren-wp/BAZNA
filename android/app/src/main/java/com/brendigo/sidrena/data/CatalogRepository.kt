@@ -98,13 +98,7 @@ class CatalogRepository {
         // (404/405) or a non-JSON CMS page; NEVER retry authentication,
         // TLS/DNS failures, timeouts or server errors on another platform.
         // Original WordPress pretty/plain aliases remain first.
-        val candidates = listOf(
-            site.endpoint("wp-json/brendigo-sidrena/v1/cjenici"),
-            site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
-            site.endpoint("bazna/v1/cjenici"),
-            site.endpoint("apps/bazna/v1/cjenici"),
-            site.endpoint("v1/cjenici"), // explicit custom Shopify proxy base
-        ).distinct()
+        val candidates = platformDiscoveryCandidates(site)
         var last: Exception? = null
         for ((index, url) in candidates.withIndex()) {
             try {
