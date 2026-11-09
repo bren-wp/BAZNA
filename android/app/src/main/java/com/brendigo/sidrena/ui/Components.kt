@@ -64,7 +64,7 @@ fun BrandHeader(onNotifications: () -> Unit = {}) {
         )
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
-            Text("SIDRENA", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold,
+            Text("BAZNA", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 0.4.sp)
             Text("by Brendigo", style = MaterialTheme.typography.labelSmall, color = TextMuted)
         }
