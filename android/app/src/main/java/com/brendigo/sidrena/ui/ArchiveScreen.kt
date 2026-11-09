@@ -449,7 +449,7 @@ internal fun archiveDocumentTitle(entry: ArchiveEntry): String {
     }.getOrDefault(kind)
 }
 
-@Preview(name = "08 SIDRENA Arhiva 393x852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "08 BAZNA Arhiva 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaArchivePreview() {
     val example = CatalogSnapshot(
