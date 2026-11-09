@@ -1,6 +1,7 @@
 package com.brendigo.sidrena.ui
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,6 +23,7 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -206,6 +208,13 @@ class ResponsiveScreensInstrumentedTest {
             "05-services", "06-detail", "07-documents", "08-archive",
             "09-outlets", "10-search", "11-settings", "12-about",
         )
+        // The reference-facing title is used as a second independent screen
+        // identity check, in addition to the screen root testTag.
+        val titles = listOf(
+            "", "Poveži WordPress stranicu", "BAZNA", "Proizvodi",
+            "Usluge", "Detalji proizvoda", "Javni cjenici", "Arhiva",
+            "Poslovnice", "Pretraživanje", "Postavke", "O aplikaciji",
+        )
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val directory = File(
             instrumentation.targetContext.getExternalFilesDir(null), "responsive"
@@ -219,6 +228,10 @@ class ResponsiveScreensInstrumentedTest {
             // SurfaceFlinger. Identify the requested screen before capture.
             compose.onNodeWithTag("bazna-screen-$index", useUnmergedTree = true)
                 .assertExists("Screenshot $name did not render its screen root")
+            if (index > 0) {
+                compose.onNodeWithText(titles[index], useUnmergedTree = true)
+                    .assertExists("Screenshot $name does not show its expected screen heading")
+            }
             compose.waitForIdle()
             instrumentation.waitForIdleSync()
             SystemClock.sleep(180)
@@ -254,7 +267,7 @@ class ResponsiveScreensInstrumentedTest {
             // name in multiple configurations. Retry the full-screen capture
             // after more display frames, but never accept identical screens.
             for (attempt in 1..4) {
-                if (previousCapture?.sameAs(capture) != true) break
+                if (previousCapture?.sameAs(capture) != true && !looksBlank(capture)) break
                 capture.recycle()
                 SystemClock.sleep(250)
                 instrumentation.waitForIdleSync()
@@ -263,7 +276,7 @@ class ResponsiveScreensInstrumentedTest {
             }
             assertTrue(
                 "Stale frame: screenshot $name is identical to the previous screen",
-                previousCapture?.sameAs(capture) != true,
+                previousCapture?.sameAs(capture) != true && !looksBlank(capture),
             )
             FileOutputStream(File(directory, name + ".png")).use { output ->
                 assertTrue("Could not write " + name, capture.compress(Bitmap.CompressFormat.PNG, 100, output))
@@ -272,5 +285,21 @@ class ResponsiveScreensInstrumentedTest {
             previousCapture = capture
         }
         previousCapture?.recycle()
+    }
+
+    private fun looksBlank(frame: Bitmap): Boolean {
+        // The original CI archive contained an all-white 01-splash frame.
+        // Every BAZNA screen uses a dark background, so a white frame is
+        // emulator/startup timing rather than a valid reference candidate.
+        val x = intArrayOf(frame.width / 4, frame.width / 2, frame.width * 3 / 4)
+        val y = intArrayOf(frame.height / 4, frame.height / 2, frame.height * 3 / 4)
+        return x.all { px ->
+            y.all { py ->
+                val pixel = frame.getPixel(px, py)
+                Color.red(pixel) >= 245 &&
+                    Color.green(pixel) >= 245 &&
+                    Color.blue(pixel) >= 245
+            }
+        }
     }
 }
