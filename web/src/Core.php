@@ -251,6 +251,11 @@ final class Core
         fwrite($handle, $csv);
         rewind($handle);
         $headers = fgetcsv($handle, 0, ';', '"', '');
+        // CSV uses a UTF-8 BOM for spreadsheet compatibility. It is not a
+        // valid first character of an XML element name.
+        if (is_array($headers) && isset($headers[0])) {
+            $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+        }
         while (($values = fgetcsv($handle, 0, ';', '"', '')) !== false) {
             if (count($values) !== count($headers)) continue;
             $entry = $doc->createElement('stavka');
