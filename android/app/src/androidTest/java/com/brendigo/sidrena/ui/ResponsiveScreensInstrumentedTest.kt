@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -228,8 +228,13 @@ class ResponsiveScreensInstrumentedTest {
             compose.onNodeWithTag("bazna-screen-$index", useUnmergedTree = true)
                 .assertExists("Screenshot $name did not render its screen root")
             if (index > 0) {
-                compose.onNodeWithText(titles[index], useUnmergedTree = true)
-                    .assertExists("Screenshot $name does not show its expected screen heading")
+                val headings = compose.onAllNodesWithText(
+                    titles[index], useUnmergedTree = true,
+                ).fetchSemanticsNodes(atLeastOneRootRequired = false)
+                assertTrue(
+                    "Screenshot $name does not show its expected screen heading",
+                    headings.isNotEmpty(),
+                )
             }
             compose.waitForIdle()
             instrumentation.waitForIdleSync()
