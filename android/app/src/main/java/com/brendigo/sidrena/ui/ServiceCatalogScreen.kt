@@ -114,7 +114,7 @@ fun ServiceCatalogScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf("Sve", "Sa sidrenom", "Bez sidrene").forEachIndexed { index, label ->
+            listOf("Sve", "S baznom", "Bez bazne").forEachIndexed { index, label ->
                 CatalogFilterChip(
                     label = label,
                     selected = anchorFilter == index,
@@ -220,7 +220,7 @@ private fun ServiceToolbar(
                 )
             }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                listOf("Sve usluge", "Sa sidrenom cijenom", "Bez sidrene cijene")
+                listOf("Sve usluge", "S baznom cijenom", "Bez bazne cijene")
                     .forEachIndexed { index, label ->
                         DropdownMenuItem(
                             text = { Text(label) },

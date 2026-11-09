@@ -77,7 +77,7 @@ sidrena_markup_expect( false !== strpos( $html, '45,00 €' ), 'Actual service p
 sidrena_markup_expect( false !== strpos( $html, '60,00 €' ), 'Historical reference value retained' );
 sidrena_markup_expect( false === strpos( $html, '<script>' ), 'Product names are escaped in public HTML' );
 sidrena_markup_expect( false !== strpos( $html, '&lt;script&gt;' ), 'Escaped name is still visible' );
-sidrena_markup_expect( false !== strpos( $html, 'data-label="Sidrena cijena"' ), 'Translated price cell label retained' );
+sidrena_markup_expect( false !== strpos( $html, 'data-label="Bazna cijena"' ), 'Translated price cell label retained' );
 sidrena_markup_expect( false !== strpos( $html, 'href="https://primjer.hr/servis"' ), 'Existing public service link retained' );
 
 if ( isset( $argv ) && in_array( '--fixture', $argv, true ) ) {

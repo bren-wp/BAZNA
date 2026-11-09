@@ -21,7 +21,16 @@ data class LegalContract(
     val basePriceRuleEffectiveFrom: String? = null,
     val historicalPriceVerificationRequired: Boolean? = null,
     val legalComplianceCertified: Boolean? = null,
+    val implementationReadyFrom: String? = null,
 ) {
+    /**
+     * The publication decisions' scheduled application date, NOT evidence
+     * that the draft rulebooks were enacted or a merchant is compliant.
+     */
+    fun publishedDecisionPhaseOn(localDate: LocalDate): String =
+        if (localDate.isBefore(LocalDate.parse(effectiveFrom))) "preparation"
+        else "published_decisions_effective"
+
     companion object {
         const val REVISION = "NN-101-2026-NN-110-2026"
         const val EFFECTIVE = "2026-11-17"
@@ -63,7 +72,7 @@ data class LegalContract(
             } else null
             val anchorBaseline = if (json.has("discount_baseline_is_anchor_price")) {
                 val v = json.get("discount_baseline_is_anchor_price")
-                require(v is Boolean && !v) { "Sidrena cijena nije osnova za popust." }
+                require(v is Boolean && !v) { "Bazna cijena nije osnova za izračun popusta." }
                 v
             } else null
             val unitEffective = if (json.has("unit_price_rule_effective_from")) {
@@ -94,6 +103,24 @@ data class LegalContract(
             optionalFalse("base_price_is_automatically_derived")
             optionalFalse("consumer_30_day_low_is_anchor_price")
             optionalFalse("consumer_30_day_low_is_base_price")
+            // Optional rollout contract shared with the newer WordPress plugin.
+            // Older versions remain readable. Do not accept a server that
+            // claims an unverified draft was activated as binding law.
+            val implementation = json.optJSONObject("implementation")
+            val targetDate = implementation?.let { rollout ->
+                require(rollout.optString("reference_price_data_entry") == "verified_manual") {
+                    "Bazna cijena mora potjecati iz provjerene evidencije."
+                }
+                require(rollout.optString("unpublished_draft_features") == "not_automatically_enabled") {
+                    "Neobjavljeni pravilnici ne smiju se primijeniti automatski."
+                }
+                require(rollout.opt("discount_30_day_low_independent") == true) {
+                    "Najniža cijena prije sniženja mora ostati zasebna."
+                }
+                iso(rollout.getString("published_decisions_ready_from")).also {
+                    require(it == effective) { "Nepodudarni datumi primjene." }
+                }
+            }
             return LegalContract(
                 revision, effective, legacy, general, days, deadline,
                 optionalRevision("consumer_law_revision"),
@@ -102,6 +129,7 @@ data class LegalContract(
                 baseStatus, baseEffective,
                 optionalTrue("historical_price_verification_required"),
                 optionalFalse("legal_compliance_certified"),
+                targetDate,
             )
         }
 

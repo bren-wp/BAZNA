@@ -6,6 +6,7 @@ on:
       - 'licenca/**'
       - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
+      - 'tools/package_wporg.py'
       - 'tools/package_license.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
@@ -22,6 +23,7 @@ on:
       - 'licenca/**'
       - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
+      - 'tools/package_wporg.py'
       - 'tools/package_license.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
@@ -105,7 +107,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: SIDRENA-WordPress-responsive-Chrome
+          name: BAZNA-WordPress-responsive-Chrome
           path: artifacts/browser-responsive/
           retention-days: 7
           if-no-files-found: warn
@@ -117,6 +119,33 @@ jobs:
           (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.13.zip.sha256)
           python3 tools/package_plugin.py --version 1.5.13 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.13.zip
           cmp artifacts/brendigo-sidrena-cijena-1.5.13.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.13.zip
+      - name: Verify separate fully unlocked WordPress.org candidate package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/package_wporg.py --version 1.5.13 --output artifacts/BAZNA-WordPress-org-1.5.13.zip
+          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.13.zip.sha256)
+          python3 tools/package_wporg.py --version 1.5.13 --output /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.13.zip
+          cmp artifacts/BAZNA-WordPress-org-1.5.13.zip /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.13.zip
+          mkdir -p /tmp/bazna-wporg/extracted
+          unzip -q artifacts/BAZNA-WordPress-org-1.5.13.zip -d /tmp/bazna-wporg/extracted
+          find /tmp/bazna-wporg/extracted/bazna-cjenici -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-wporg-lint.log
+          grep -q 'Text Domain: bazna-cjenici' /tmp/bazna-wporg/extracted/bazna-cjenici/bazna-cjenici.php
+          grep -q 'return true;' /tmp/bazna-wporg/extracted/bazna-cjenici/includes/class-license.php
+          if grep -R 'licenca.brendigo.com' /tmp/bazna-wporg/extracted/bazna-cjenici --include='*.php'; then
+            echo "ERROR: WordPress.org distribution unexpectedly contains a license API call"
+            exit 1
+          fi
+          echo "PASS: separately packaged GPL WordPress.org candidate, no license lock"
+      - name: Upload WordPress.org review candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: BAZNA-WordPress-org-candidate
+          path: |
+            artifacts/BAZNA-WordPress-org-1.5.13.zip
+            artifacts/BAZNA-WordPress-org-1.5.13.zip.sha256
+          retention-days: 7
+          if-no-files-found: error
       - name: Package standalone BAZNA JSON license server reproducibly without secrets
         shell: bash
         run: |

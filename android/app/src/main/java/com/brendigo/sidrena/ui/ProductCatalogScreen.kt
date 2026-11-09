@@ -172,7 +172,7 @@ fun ProductCatalogScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            listOf("Svi", "Sa sidrenom cijenom", "Dostupni").forEachIndexed { index, label ->
+            listOf("Svi", "S baznom cijenom", "Dostupni").forEachIndexed { index, label ->
                 CatalogFilterChip(
                     label = label,
                     selected = filter == index,
@@ -327,7 +327,7 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
         modifier = Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick)
             .semantics {
                 contentDescription = item.name + ", trenutačna cijena " + currentPrice +
-                    if (item.referencePrice.isBlank()) "" else ", sidrena cijena " + referencePrice
+                    if (item.referencePrice.isBlank()) "" else ", bazna cijena " + referencePrice
             },
         shape = RoundedCornerShape(14.dp),
         border = BorderStroke(1.dp, Border.copy(alpha = 0.6f)),
@@ -380,7 +380,7 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
                             modifier = Modifier.weight(1f),
                         )
                         Text(
-                            if (item.referencePrice.isBlank()) "Bez sidrene"
+                            if (item.referencePrice.isBlank()) "Bez bazne"
                             else "Ref: " + referencePrice,
                             color = TextMuted, fontSize = 11.sp,
                             maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -440,7 +440,7 @@ private fun ProductReferenceRow(item: PriceItem, site: String, onClick: () -> Un
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            if (item.referencePrice.isBlank()) "Bez sidrene cijene"
+                            if (item.referencePrice.isBlank()) "Bez bazne cijene"
                             else "Ref. cijena: " + referencePrice,
                             color = TextMuted,
                             fontSize = 11.sp,

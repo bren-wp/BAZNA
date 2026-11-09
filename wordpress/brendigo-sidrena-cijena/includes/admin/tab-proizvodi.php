@@ -65,10 +65,10 @@ defined( 'ABSPATH' ) || exit;
 					<select id="sidrena-wc-price-filter">
 						<option value="all"><?php echo esc_html__( 'Svi proizvodi', 'brendigo-sidrena-cijena' ); ?></option>
 						<option value="missing"><?php echo esc_html__( 'Bez bazne cijene', 'brendigo-sidrena-cijena' ); ?></option>
-						<option value="complete"><?php echo esc_html__( 'Sa sidrenom cijenom', 'brendigo-sidrena-cijena' ); ?></option>
+						<option value="complete"><?php echo esc_html__( 'S baznom cijenom', 'brendigo-sidrena-cijena' ); ?></option>
 					</select>
 				</label>
-				<p class="brendigo-woo-catalog-tools__note"><?php echo esc_html__( 'Sidrenu cijenu i povijesni datum unosite samo uz provjeru izvorne evidencije. Današnja cijena nije dokaz povijesne cijene.', 'brendigo-sidrena-cijena' ); ?></p>
+				<p class="brendigo-woo-catalog-tools__note"><?php echo esc_html__( 'Baznu cijenu i povijesni datum unosite samo uz provjeru izvorne evidencije. Današnja cijena nije dokaz povijesne cijene.', 'brendigo-sidrena-cijena' ); ?></p>
 			</div>
 			<div class="brendigo-woo-catalog-summary">
 				<p class="description brendigo-woo-change-status" id="sidrena-wc-change-status" aria-live="polite"><?php echo esc_html__( 'Nema nespremljenih promjena.', 'brendigo-sidrena-cijena' ); ?></p>

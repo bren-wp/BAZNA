@@ -6,6 +6,7 @@
  * Usage: node tools/test_responsive_browser.mjs PUBLIC.html ADMIN.html OUTPUTDIR
  */
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -234,11 +235,93 @@ try {
             if (errors.length) failures.push(fixture.label + "/" + width + ": " + errors.join("; "));
             console.log((errors.length ? "FAIL " : "PASS ") + fixture.label + " " +
                 width + "px — page overflow " + result.overflow + "px");
+
+            // Render EVERY admin destination independently instead of only
+            // testing that eight navigation labels exist. The fixture uses
+            // real plugin CSS but is not a WordPress runtime or pixel oracle.
+            if (fixture.label === "admin") {
+                const tabs = [
+                    "pregled", "proizvodi", "poslovnice", "uvoz-izvoz",
+                    "javni-xml", "postavke", "upute", "licenca",
+                ];
+                const tabDigests = new Map();
+                for (const tab of tabs) {
+                    const inspect = await cdp("Runtime.evaluate", {
+                        expression: `(() => {
+                            const tab = ${JSON.stringify(tab)};
+                            const ok = window.__baznaFixtureSelectTab?.(tab) === true;
+                            const panel = document.querySelector('[data-qa-panel="' + tab + '"]');
+                            const selected = document.querySelector(
+                                '[data-qa-tab="' + tab + '"][aria-current="page"]'
+                            );
+                            // The WP sidebar and topbar can push the active
+                            // content below the viewport on 240px phones.
+                            // Scroll the ACTUAL selected panel into view before
+                            // visual capture; do not mistake normal scrolling
+                            // for a missing or nonresponsive admin screen.
+                            panel?.scrollIntoView({
+                                block: "start", inline: "nearest", behavior: "instant"
+                            });
+                            const rect = panel?.getBoundingClientRect();
+                            const width = document.documentElement.clientWidth;
+                            const htmlOverflow = document.documentElement.scrollWidth - width;
+                            const offenders = [];
+                            for (const el of panel?.querySelectorAll(
+                                "input,select,textarea,button,a.button,label,table"
+                            ) || []) {
+                                if (el.closest(".sidrena-cijena-catalog-wrap")) continue;
+                                const r = el.getBoundingClientRect();
+                                if (r.width <= 0 || r.height <= 0) continue;
+                                if (r.left < -2 || r.right > width + 2)
+                                    offenders.push({tag: el.tagName, left: r.left, right: r.right});
+                            }
+                            const visible = [...document.querySelectorAll("[data-qa-panel]")]
+                                .filter(el => el.getBoundingClientRect().height > 0);
+                            return {
+                                tab, ok, selected: !!selected, visible: visible.length,
+                                width, htmlOverflow,
+                                panelVisible: !!rect && rect.width > 0 && rect.height > 0 &&
+                                    rect.top < window.innerHeight && rect.bottom > 0,
+                                panelOutside: !!rect && (rect.left < -2 || rect.right > width + 2),
+                                offenders,
+                            };
+                        })()`,
+                        returnByValue: true,
+                    });
+                    const tabResult = inspect.result?.value;
+                    if (!tabResult) throw new Error("Missing admin tab geometry: " + tab);
+                    const tabErrors = [];
+                    if (!tabResult.ok || !tabResult.selected ||
+                        !tabResult.panelVisible || tabResult.visible !== 1)
+                        tabErrors.push("tab missing, inactive, or multiple panels visible");
+                    if (tabResult.width !== width || tabResult.panelOutside ||
+                        tabResult.htmlOverflow > 2 || tabResult.offenders.length)
+                        tabErrors.push("clipped admin surface: " + JSON.stringify(tabResult));
+                    const tabShot = await cdp("Page.captureScreenshot", {
+                        format: "png", captureBeyondViewport: false, fromSurface: true,
+                    });
+                    const png = Buffer.from(tabShot.data, "base64");
+                    const digest = createHash("sha256").update(png).digest("hex");
+                    if (tabDigests.has(digest)) {
+                        tabErrors.push("identical screenshot to " + tabDigests.get(digest));
+                    } else {
+                        tabDigests.set(digest, tab);
+                    }
+                    await writeFile(
+                        join(output, "admin-" + tab + "-" + width + ".png"),
+                        png,
+                    );
+                    results.push({view:"admin-" + tab, requestedWidth:width, ...tabResult,
+                        pass:tabErrors.length === 0});
+                    if (tabErrors.length) failures.push("admin/" + tab + "/" + width +
+                        ": " + tabErrors.join("; "));
+                }
+            }
         }
     }
     await writeFile(join(output, "responsive-results.json"), JSON.stringify(results, null, 2));
     if (failures.length) throw new Error(failures.join("\n"));
-    console.log("PASS: public template and eight-tab admin fixture × 13 Chrome viewports = 26 geometry screenshots");
+    console.log("PASS: public + admin overview and eight independent tab fixtures × 13 widths = 130 geometry screenshots");
 } finally {
     if (socket && socket.readyState === WebSocket.OPEN) socket.close();
     browser.kill("SIGTERM");

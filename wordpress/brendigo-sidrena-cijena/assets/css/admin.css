@@ -4338,3 +4338,43 @@ body.sidrena-cijena-screen #wpbody-content {
         flex-direction: column;
     }
 }
+
+
+/* BAZNA 8-tab responsive QA: mobile inputs must shrink INSIDE the admin
+ * card. CSS grid "1fr" alone permits min-content (input default width)
+ * to overflow 240/280px screens. Keep all changes scoped to this plugin. */
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__grid > *,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__field,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__field label,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-settings-card p > label {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__grid label,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-settings-card p > label {
+    display: block;
+    overflow-wrap: anywhere;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__grid input:not([type="checkbox"]):not([type="radio"]),
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__grid select,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__grid textarea,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-settings-card p > label input:not([type="checkbox"]):not([type="radio"]),
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-settings-card p > label select,
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin .brendigo-settings-card p > label textarea {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+.wrap.sidrena-cijena-settings.brendigo-sidrena-admin input[type="file"] {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+}
+@media (max-width: 782px) {
+    .wrap.sidrena-cijena-settings.brendigo-sidrena-admin .sidrena-poslovnica__grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}

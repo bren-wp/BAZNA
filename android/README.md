@@ -14,7 +14,7 @@ Pregledajte objavljene cjenike, proizvode, usluge i poslovnice sa svoje WordPres
 | Početna | Povezana stranica, pregled podataka, zadnja objava i brzi pristup |
 | Proizvodi | Popis, pretraga, filtri sidrenih cijena i dostupnost |
 | Usluge | Objavljene usluge i pripadajuće cijene |
-| Detalj stavke | SKU, trenutačna i sidrena cijena, datum i jedinica mjere |
+| Detalj stavke | SKU, trenutačna i bazna cijena, datum i jedinica mjere |
 | Arhiva | CSV/XML zapisi, filtriranje i otvaranje datoteka |
 | Poslovnice | Pregled i odabir poslovnice ili webshopa |
 | Pretraživanje | Pretraga po nazivima, šiframa i ID-ovima |

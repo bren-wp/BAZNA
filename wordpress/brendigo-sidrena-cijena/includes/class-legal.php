@@ -1,10 +1,10 @@
 <?php
 /**
- * Public legal metadata shared by WordPress, Android and SIDRENA Desktop.
+ * Public legal metadata shared by BAZNA WordPress, Android and Desktop.
  *
  * Source: NN 101/2026 (1212 and 1213), amended by NN 110/2026
  * (1309 and 1310). The proposed base-price and public-price-list rulebooks were still in
- * e-consultation on 2026-11-03 (until 2026-11-13), not enacted law.
+ * e-consultation on 2026-11-09 (until 2026-11-13), not enacted law.
  *
  * @package Brendigo_Sidrena_Cijena
  */
@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Brendigo_Sidrena_Cijena_Legal {
     const RULES_REVISION = 'NN-101-2026-NN-110-2026';
+    const REGULATION_STATUS = 'draft_consultation';
+    const CONSULTATION_END = '2026-11-13';
     const EFFECTIVE_DATE = '2026-11-17';
     const REFERENCE_FMCG = '2025-05-02';
     const REFERENCE_GENERAL = '2026-09-10';
@@ -33,7 +35,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
     public static function public_contract() {
         return array(
             'schema' => 1,
-            'reviewed_on' => '2026-11-03',
+            'reviewed_on' => '2026-11-09',
             'jurisdiction' => 'HR',
             'rules_revision' => self::RULES_REVISION,
             'consumer_law_revision' => self::CONSUMER_LAW_REVISION,
@@ -43,14 +45,25 @@ final class Brendigo_Sidrena_Cijena_Legal {
             'discount_baseline_is_anchor_price' => false,
             // Informational only: the new NN 59/2026 price-display provisions
             // begin 17 Nov; final base-price method is still in consultation.
-            'base_price_regulation_status' => 'draft_consultation',
+            'base_price_regulation_status' => self::REGULATION_STATUS,
             'base_price_rule_effective_from' => self::EFFECTIVE_DATE,
             'base_price_is_automatically_derived' => false,
             'historical_price_verification_required' => true,
             'legal_compliance_certified' => false,
             'consumer_30_day_low_is_anchor_price' => false,
             'consumer_30_day_low_is_base_price' => false,
-            'draft_rulebooks_consultation_until' => '2026-11-13',
+            'draft_rulebooks_consultation_until' => self::CONSULTATION_END,
+            // This prepares the published 17 November 2026 transition;
+            // it does NOT declare drafts legally enacted or data compliant.
+            'implementation' => array(
+                'published_decisions_ready_from' => self::EFFECTIVE_DATE,
+                'reference_price_data_entry' => 'verified_manual',
+                'product_service_publication' => 'csv_xml_html',
+                'publication_source_of_truth' => 'wordPress_published_feeds',
+                'unpublished_draft_features' => 'not_automatically_enabled',
+                'discount_30_day_low_independent' => true,
+                'automatic_historical_inference' => false,
+            ),
             'effective_from' => self::EFFECTIVE_DATE,
             'reference_dates' => array(
                 'legacy_fmcg' => self::REFERENCE_FMCG,
@@ -96,6 +109,16 @@ final class Brendigo_Sidrena_Cijena_Legal {
      * @param string $scope legacy_fmcg|general_goods_services
      * @return string ISO date or empty string on unverified input.
      */
+    public static function phase_on( $date ) {
+        // Validate calendar dates, never infer legal force from a draft or a
+        // server clock in the wrong timezone. Caller supplies local HR date.
+        if ( ! is_string( $date ) || ! preg_match( '/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $date, $parts ) ||
+            ! checkdate( (int) $parts[2], (int) $parts[3], (int) $parts[1] ) ) {
+            return 'unknown';
+        }
+        return $date < self::EFFECTIVE_DATE ? 'preparation' : 'published_decisions_effective';
+    }
+
     public static function reference_date( $scope ) {
         if ( 'legacy_fmcg' === $scope ) {
             return self::REFERENCE_FMCG;

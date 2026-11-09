@@ -64,7 +64,7 @@ class Brendigo_Sidrena_Cijena_Bulk_Import {
 		}
 		nocache_headers();
 		header( 'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' );
-		header( 'Content-Disposition: attachment; filename="sidrena-predlozak.xlsx"' );
+		header( 'Content-Disposition: attachment; filename="BAZNA-predlozak.xlsx"' );
 		header( 'Content-Length: ' . strlen( $bytes ) );
 		echo $bytes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XLSX binary.
 		exit;

@@ -171,8 +171,8 @@ fun DetailPage(
                         Separator()
                         Text(
                             if (view.referencePrice != null)
-                                "Sidrena cijena: " + view.referencePrice
-                            else "Sidrena cijena nije objavljena",
+                                "Bazna cijena: " + view.referencePrice
+                            else "Bazna cijena nije objavljena",
                             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 11.dp),
                             color = if (view.referencePrice != null) Color.White else TextMuted,
                             fontWeight = FontWeight.SemiBold,
@@ -180,7 +180,7 @@ fun DetailPage(
                         )
                         view.referenceDate?.let { published ->
                             Text(
-                                "Datum sidrene cijene: " + published,
+                                "Datum bazne cijene: " + published,
                                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 11.dp),
                                 color = TextMuted,
                                 fontSize = 12.sp,
@@ -192,7 +192,7 @@ fun DetailPage(
             item {
                 DetailReferenceCard {
                     Text(
-                        "Podaci o sidrenoj cijeni",
+                        "Podaci o baznoj cijeni",
                         color = Color.White,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,

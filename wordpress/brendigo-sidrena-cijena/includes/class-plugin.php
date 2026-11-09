@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstrap the Sidrena cijena plugin.
+ * Bootstrap the BAZNA plugin.
  *
  * @package Brendigo_Sidrena_Cijena
  */
@@ -62,8 +62,8 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 			return;
 		}
 
-		echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'Brendigo Sidrena Cijena je spremna za prijelaz.', 'brendigo-sidrena-cijena' ) . '</strong> ';
-		echo esc_html__( 'Deaktivirajte prethodne dodatke za sidrenu cijenu i cjenik kako biste izbjegli dvostruki prikaz i koristili samo objedinjeni Brendigo plugin. Podaci su migrirani ne-destruktivno.', 'brendigo-sidrena-cijena' );
+		echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'BAZNA – Bazne cijene spremna je za prijelaz.', 'brendigo-sidrena-cijena' ) . '</strong> ';
+		echo esc_html__( 'Deaktivirajte ranije dodatke za povijesne cijene i cjenik kako biste izbjegli dvostruki prikaz. BAZNA čuva postojeće podatke tijekom migracije.', 'brendigo-sidrena-cijena' );
 		echo ' <a href="' . esc_url( admin_url( 'plugins.php' ) ) . '">' . esc_html__( 'Otvori dodatke', 'brendigo-sidrena-cijena' ) . '</a></p></div>';
 	}
 
@@ -101,7 +101,7 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 		} else {
 			$exception_message = substr( $exception_message, 0, 1000 );
 		}
-		$message = 'Sidrena cijena [' . get_class( $exception ) . ']: ' . $exception_message;
+		$message = 'BAZNA [' . get_class( $exception ) . ']: ' . $exception_message;
 		if ( function_exists( 'wc_get_logger' ) ) {
 			wc_get_logger()->error( $message, array( 'source' => 'sidrena-cijena' ) );
 		}
@@ -175,7 +175,7 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	}
 
 	/**
-	 * Activation: defaults. Sidrena prices stay empty until someone fills them.
+	 * Activation: defaults. Base prices stay empty until verified and entered.
 	 */
 	public static function activate() {
 		Brendigo_Sidrena_Cijena_Migration::run();

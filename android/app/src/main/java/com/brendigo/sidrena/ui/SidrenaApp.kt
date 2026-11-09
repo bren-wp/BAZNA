@@ -305,7 +305,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         data = snapshot,
                         onBack = { navigate("settings") },
                         onConnectHelp = { alert = "Unesite HTTPS adresu svoje WordPress stranice s aktivnim dodatkom BAZNA. Nakon povezivanja odaberite poslovnicu i pregledajte objavljene cjenike." },
-                        onAnchorHelp = { alert = "Sidrena cijena je dokumentirana referentna vrijednost uz pripadajući datum. Uvijek provjerite podatke na izvornoj WordPress stranici." },
+                        onAnchorHelp = { alert = "Bazna cijena je dokumentirana referentna vrijednost uz pripadajući datum. Uvijek provjerite podatke na izvornoj WordPress stranici." },
                         onSupport = ::supportEmail,
                         onOpenPublic = ::openPublic,
                     )

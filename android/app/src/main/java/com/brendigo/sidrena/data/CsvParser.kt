@@ -1,7 +1,7 @@
 package com.brendigo.sidrena.data
 
 /**
- * RFC 4180-style quoted fields, with SIDRENA's semicolon separator.
+ * RFC 4180-style quoted fields, with the BAZNA public-feed semicolon separator.
  * Rejects unclosed fields and excessive row counts instead of silently truncating.
  */
 object CsvParser {
@@ -77,7 +77,7 @@ object CsvParser {
             "CSV sadrži prazne ili ponovljene nazive stupaca."
         }
         require(columns.contains("naziv") && columns.contains("maloprodajna_cijena")) {
-            "Datoteka nije SIDRENA javni CSV cjenik."
+            "Datoteka nije valjan BAZNA javni CSV cjenik."
         }
         return lines.drop(1).filter { row -> row.any { it.isNotBlank() } }.map { row ->
             require(row.size == columns.size) {

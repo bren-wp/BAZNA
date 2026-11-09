@@ -290,7 +290,7 @@ fun SettingsPage(
             SettingsEntry(
                 icon = Icons.Outlined.HelpOutline,
                 title = "Pomoć i vodiči",
-                subtitle = "Upute za povezivanje i sidrene cijene",
+                subtitle = "Upute za povezivanje i bazne cijene",
                 onClick = onHelp,
             )
             SettingsDivider()
