@@ -1,0 +1,21 @@
+# Copy to shopify.app.toml and complete via Shopify CLI / Dev Dashboard.
+name = "BAZNA — Bazne cijene"
+client_id = "YOUR_SHOPIFY_CLIENT_ID"
+application_url = "https://your-bazna-app.example/shopify"
+embedded = false
+
+[access_scopes]
+scopes = "read_products,write_app_proxy"
+
+[auth]
+redirect_urls = ["https://your-bazna-app.example/shopify/oauth/callback"]
+
+[app_proxy]
+url = "https://your-bazna-app.example/shopify/proxy"
+prefix = "apps"
+subpath = "bazna"
+
+# IMPORTANT: this source bundle does not implement the embedded merchant OAuth
+# lifecycle. For custom stores use Dev Dashboard's authorized installation
+# and client credentials, or complete official Shopify CLI app authentication
+# before public multi-merchant distribution.
