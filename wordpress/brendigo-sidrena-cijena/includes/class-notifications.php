@@ -69,7 +69,7 @@ final class Brendigo_Sidrena_Cijena_Notifications {
 		update_option( self::STATE_OPTION, $state, false );
 		$subject = sprintf(
 			/* translators: %s: website host name. */
-			__( '[SIDRENA] Problem s cjenikom – %s', 'brendigo-sidrena-cijena' ),
+			__( '[BAZNA] Problem s cjenikom – %s', 'brendigo-sidrena-cijena' ),
 			wp_parse_url( home_url(), PHP_URL_HOST )
 		);
 		$body = $message . "\n\n" . __( 'Web:', 'brendigo-sidrena-cijena' ) . ' ' . home_url( '/' ) . "\n"
