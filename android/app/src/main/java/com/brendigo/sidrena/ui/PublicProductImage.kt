@@ -38,7 +38,7 @@ import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
 /**
- * Optional photo from the public SIDRENA product CSV. Only a same-origin HTTPS
+ * Optional photo from the public BAZNA product CSV. Only a same-origin HTTPS
  * image is permitted; missing or unsupported sources use the local pictogram.
  */
 internal fun approvedProductImageUrl(site: String, image: String): String? =
@@ -74,7 +74,7 @@ internal object PublicProductImages {
         try {
             val request = Request.Builder().url(url).get()
                 .header("Accept", "image/jpeg,image/png,image/webp")
-                .header("User-Agent", "SIDRENA-Android")
+                .header("User-Agent", "BAZNA-Android")
                 .build()
             http.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) return@withContext null
