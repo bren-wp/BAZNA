@@ -33,6 +33,17 @@ class CatalogDiscoveryTest {
         assertEquals("https://primjer.hr/usluge.csv?oznaka=RI-01", index.outlets.single().serviceCsv)
     }
 
+    @Test fun optionalPublishedOutletAddressesAreBackwardCompatible() {
+        val json = payload()
+        val outlet = json.getJSONArray("outlets").getJSONObject(0)
+        assertEquals("", CatalogDiscovery.parse(json, site).outlets.single().address)
+        outlet.put("address", "Korzo 12, Rijeka")
+        assertEquals(
+            "Korzo 12, Rijeka",
+            CatalogDiscovery.parse(json, site).outlets.single().address,
+        )
+    }
+
     @Test fun supportsLegacyPluginWithoutOptionalLegalProfile() {
         val index = CatalogDiscovery.parse(payload().apply { remove("plugin_version") }, site)
         assertEquals(null, index.legal)
