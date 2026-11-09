@@ -1,0 +1,97 @@
+name: BAZNA Web Joomla Shopify integration checks
+
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'joomla/**'
+      - 'shopify/**'
+      - 'licenca/**'
+      - 'tools/package_platforms.py'
+      - '.github/workflows/multiplatform-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'joomla/**'
+      - 'shopify/**'
+      - 'licenca/**'
+      - 'tools/package_platforms.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: multi-platform-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  multi-platform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PHP availability and extensions
+        run: |
+          php -v
+          php -r 'foreach(["json","openssl","dom"] as $ext){if(!extension_loaded($ext)){fwrite(STDERR, "Missing: $ext\n");exit(1);}}'
+      - name: PHP lint on all new platforms and license service
+        run: |
+          set -euo pipefail
+          find web joomla shopify licenca -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
+      - name: Offline public contract, historical price and archive tests
+        run: php web/tests/test.php
+      - name: Shopify HMAC, replay and tenant isolation tests
+        run: php shopify/tests/test_proxy.php
+      - name: Central domain-bound license server regression
+        run: php licenca/tests/test.php
+      - name: Build deterministic standalone PHP, Joomla and Shopify ZIP files
+        run: |
+          set -euo pipefail
+          python3 tools/package_platforms.py --output-dir artifacts/multiplatform
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Web-1.0.0.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Joomla-Plugin-1.0.0.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Shopify-Adapter-1.0.0.zip.sha256)
+          python3 tools/package_platforms.py --output-dir /tmp/bazna-repeat
+          for file in artifacts/multiplatform/*.zip; do
+            cmp "$file" "/tmp/bazna-repeat/$(basename "$file")"
+          done
+      - name: Joomla extension manifest, vendored source and PHP smoke validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/bazna-joomla
+          unzip -q artifacts/multiplatform/BAZNA-Joomla-Plugin-1.0.0.zip -d /tmp/bazna-joomla
+          test -s /tmp/bazna-joomla/bazna.xml
+          test -s /tmp/bazna-joomla/vendor/Core.php
+          test -s /tmp/bazna-joomla/vendor/LicenseClient.php
+          test -s /tmp/bazna-joomla/services/provider.php
+          find /tmp/bazna-joomla -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
+          python3 - <<'PY'
+          from xml.etree import ElementTree as E
+          root = E.parse("/tmp/bazna-joomla/bazna.xml").getroot()
+          assert root.attrib["type"] == "plugin" and root.attrib["group"] == "system"
+          assert root.findtext("namespace") == "Brendigo\\Plugin\\System\\Bazna"
+          assert root.find("files/folder[@plugin='bazna']") is not None
+          print("PASS: valid Joomla plugin manifest and DI namespace")
+          PY
+      - name: Confirm Shopify bundle has no real credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/bazna-shopify
+          unzip -q artifacts/multiplatform/BAZNA-Shopify-Adapter-1.0.0.zip -d /tmp/bazna-shopify
+          test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/index.php
+          test -s /tmp/bazna-shopify/bazna-shopify/web/src/Core.php
+          if grep -R --include='*.php' 'shpat_[a-zA-Z0-9]\{20,\}' /tmp/bazna-shopify; then
+            echo "ERROR: Shopify access token leaked into source package"
+            exit 1
+          fi
+      - name: Publish review artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: BAZNA-web-joomla-shopify-candidate
+          path: artifacts/multiplatform/
+          retention-days: 14
+          if-no-files-found: error
