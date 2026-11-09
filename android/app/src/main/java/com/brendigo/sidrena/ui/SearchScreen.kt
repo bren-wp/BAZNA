@@ -401,7 +401,7 @@ private fun SearchEmptyState(catalogEmpty: Boolean, hasQuery: Boolean) {
     }
 }
 
-@Preview(name = "10 SIDRENA Search 393x852", widthDp = 393, heightDp = 852, showBackground = true)
+@Preview(name = "10 BAZNA Search 393x852", widthDp = 393, heightDp = 852, showBackground = true)
 @Composable
 internal fun SidrenaSearchPreview() {
     val example = CatalogSnapshot(
@@ -443,7 +443,7 @@ internal fun SidrenaSearchPreview() {
     }
 }
 
-@Preview(name = "10 SIDRENA Search compact", widthDp = 360, heightDp = 640, showBackground = true)
+@Preview(name = "10 BAZNA Search compact", widthDp = 360, heightDp = 640, showBackground = true)
 @Composable
 internal fun SidrenaSearchCompactPreview() {
     SidrenaSearchPreview()
