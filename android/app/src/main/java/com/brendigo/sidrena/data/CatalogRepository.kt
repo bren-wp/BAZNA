@@ -17,7 +17,7 @@ import java.net.URI
 import java.nio.charset.StandardCharsets
 
 /**
- * Uses only the current plugin's public v1 endpoints. No password, cookies or
+ * Uses only approved same-origin public BAZNA v1 endpoints. No password, cookies or
  * unpublished WordPress/WooCommerce records are accessed.
  */
 class CatalogRepository {
