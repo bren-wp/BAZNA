@@ -87,9 +87,9 @@ try {
         header('Content-Type: application/xml; charset=utf-8');
         echo $xml->saveXML(); exit;
     }
-    if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/(\d{1,3})/(proizvodi|usluge)/csv$#D', $path, $parts)) {
+    if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $parts)) {
         header('Content-Type: text/csv; charset=utf-8');
-        echo $core->archiveCsv((int) $parts[1], $parts[2]); exit;
+        echo $core->archiveCsv($parts[1], $parts[2]); exit;
     }
     $secret = (string) getenv('BAZNA_APP_KEY');
     $license = preg_match('/^[a-f0-9]{64}$/i', $secret) ? new LicenseClient($core, $secret) : null;
