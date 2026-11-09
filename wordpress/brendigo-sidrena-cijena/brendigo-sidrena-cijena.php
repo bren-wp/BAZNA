@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: BAZNA – Bazne cijene i cjenici
- * Plugin URI: https://brendigo.com/sidrene-cijene/
+ * Plugin URI: https://brendigo.com/
  * Description: Bazne cijene, javni HTML/XML/CSV cjenici i arhiva za WordPress s opcionalnom WooCommerce integracijom.
  * Version: 1.5.13
  * Requires at least: 6.6
