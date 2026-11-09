@@ -2,7 +2,7 @@
 
 **BAZNA by Brendigo** · **1.5.13** · `com.brendigo.sidrena`
 
-![SIDRENA](../desktop/branding/sidrena-banner.svg)
+![BAZNA](../desktop/branding/sidrena-banner.svg)
 
 Pregledajte objavljene cjenike, proizvode, usluge i poslovnice sa svoje WordPress stranice, uz prepoznatljiv tamnoplavi izgled i narančaste kontrole.
 
@@ -23,7 +23,7 @@ Pregledajte objavljene cjenike, proizvode, usluge i poslovnice sa svoje WordPres
 
 Izgled je usklađen s [Android dizajnerskim standardom](../docs/ANDROID-UI-REFERENCE.md).
 
-## Povezivanje sa SIDRENA dodatkom
+## Povezivanje s dodatkom BAZNA
 
 Aplikacija koristi javno dostupne rute postojećeg WordPress dodatka:
 
@@ -38,7 +38,7 @@ Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS dom
 
 ## Instalacija
 
-[Otvorite GitHub izdanja](https://github.com/bren-wp/SIDRENA/releases) i odaberite Android APK. Za izdavanje u Google Playu potreban je odgovarajući potpisani AAB.
+[Otvorite GitHub izdanja](https://github.com/bren-wp/BAZNA/releases) i odaberite Android APK. Za izdavanje u Google Playu potreban je odgovarajući potpisani AAB.
 
 ## Tehnička dokumentacija
 
