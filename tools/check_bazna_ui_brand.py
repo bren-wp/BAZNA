@@ -59,6 +59,28 @@ checks = {
         "SIDRENA ZIP",
         "Brendigo Sidrena Cijena →",
         "SIDRENA dodaje",
+        "Sidrenu cijenu unosite",
+    ],
+    "wordpress/brendigo-sidrena-cijena/includes/class-product-fields.php": [
+        "Brendigo Sidrena Cijena",
+        "'Sidrena cijena',",
+    ],
+    "wordpress/brendigo-sidrena-cijena/includes/class-feed-routes.php": [
+        "Arhiva sidrene cijene",
+        "Cjenik - sidrena cijena",
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/SearchScreen.kt": [
+        '"Sidrena: "',
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/HomeScreens.kt": [
+        'Text("Sidrene cijene',
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/ProductCatalogScreen.kt": [
+        '"Sa sidrenom cijenom"',
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/CatalogScreens.kt": [
+        '"Sidrena cijena:',
+        '"Datum sidrene cijene:',
     ],
 }
 for path, old_names in checks.items():

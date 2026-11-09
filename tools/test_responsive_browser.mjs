@@ -6,6 +6,7 @@
  * Usage: node tools/test_responsive_browser.mjs PUBLIC.html ADMIN.html OUTPUTDIR
  */
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -243,6 +244,7 @@ try {
                     "pregled", "proizvodi", "poslovnice", "uvoz-izvoz",
                     "javni-xml", "postavke", "upute", "licenca",
                 ];
+                const tabDigests = new Map();
                 for (const tab of tabs) {
                     const inspect = await cdp("Runtime.evaluate", {
                         expression: `(() => {
@@ -270,7 +272,8 @@ try {
                             return {
                                 tab, ok, selected: !!selected, visible: visible.length,
                                 width, htmlOverflow,
-                                panelVisible: !!rect && rect.width > 0 && rect.height > 0,
+                                panelVisible: !!rect && rect.width > 0 && rect.height > 0 &&
+                                    rect.top < window.innerHeight && rect.bottom > 0,
                                 panelOutside: !!rect && (rect.left < -2 || rect.right > width + 2),
                                 offenders,
                             };
@@ -289,9 +292,16 @@ try {
                     const tabShot = await cdp("Page.captureScreenshot", {
                         format: "png", captureBeyondViewport: false, fromSurface: true,
                     });
+                    const png = Buffer.from(tabShot.data, "base64");
+                    const digest = createHash("sha256").update(png).digest("hex");
+                    if (tabDigests.has(digest)) {
+                        tabErrors.push("identical screenshot to " + tabDigests.get(digest));
+                    } else {
+                        tabDigests.set(digest, tab);
+                    }
                     await writeFile(
                         join(output, "admin-" + tab + "-" + width + ".png"),
-                        Buffer.from(tabShot.data, "base64"),
+                        png,
                     );
                     results.push({view:"admin-" + tab, requestedWidth:width, ...tabResult,
                         pass:tabErrors.length === 0});

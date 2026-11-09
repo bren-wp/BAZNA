@@ -56,13 +56,13 @@ jobs:
           test -s app/build/outputs/apk/debug/app-debug.apk
           test -s app/build/outputs/bundle/release/app-release.aab
           mkdir -p ../artifacts/android
-          cp app/build/outputs/apk/debug/app-debug.apk ../artifacts/android/SIDRENA-Android-debug.apk
-          cp app/build/outputs/bundle/release/app-release.aab ../artifacts/android/SIDRENA-Android-unsigned.aab
+          cp app/build/outputs/apk/debug/app-debug.apk ../artifacts/android/BAZNA-Android-debug.apk
+          cp app/build/outputs/bundle/release/app-release.aab ../artifacts/android/BAZNA-Android-unsigned.aab
           cd ../artifacts/android
-          sha256sum SIDRENA-Android-debug.apk SIDRENA-Android-unsigned.aab > SIDRENA-Android-SHA256SUMS.txt
+          sha256sum BAZNA-Android-debug.apk BAZNA-Android-unsigned.aab > BAZNA-Android-SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: SIDRENA-Android-unsigned-build
+          name: BAZNA-Android-unsigned-build
           path: artifacts/android/
           if-no-files-found: error
           retention-days: 30
@@ -110,7 +110,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: SIDRENA-Android-responsive-screenshots
+          name: BAZNA-Android-responsive-screenshots
           path: artifacts/android-responsive/
           if-no-files-found: warn
           retention-days: 7
