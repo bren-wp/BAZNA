@@ -42,6 +42,12 @@ class CatalogDiscoveryTest {
             "Korzo 12, Rijeka",
             CatalogDiscovery.parse(json, site).outlets.single().address,
         )
+        for (invalid in listOf(42, "A".repeat(401), "Ulica\nprivatno")) {
+            outlet.put("address", invalid)
+            assertThrows(IllegalArgumentException::class.java) {
+                CatalogDiscovery.parse(json, site)
+            }
+        }
     }
 
     @Test fun supportsLegacyPluginWithoutOptionalLegalProfile() {
