@@ -304,7 +304,7 @@ class Brendigo_Sidrena_Cijena_Admin {
                 <?php echo esc_html($active ? 'Aktivna — administratorske mogućnosti otključane' : 'Nije aktivna — unesite domenu i licencni ključ'); ?>
             </p>
             <?php if ( !$active ) : ?>
-                <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
+                <form class="bazna-license-form" method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
                     <?php wp_nonce_field('bazna_license_action', 'bazna_license_nonce'); ?>
                     <input type="hidden" name="bazna_license_action" value="activate" />
                     <label for="bazna_license_domain"><strong><?php echo esc_html__('Domena web-stranice', 'brendigo-sidrena-cijena'); ?></strong></label>
@@ -319,7 +319,7 @@ class Brendigo_Sidrena_Cijena_Admin {
                     <button type="submit" class="button button-primary"><?php echo esc_html__('Aktiviraj licencu', 'brendigo-sidrena-cijena'); ?></button>
                 </form>
             <?php else : ?>
-                <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
+                <form class="bazna-license-form bazna-license-form--active" method="post" action="<?php echo esc_url(admin_url('admin.php?page=brendigo-sidrena-cijena&tab=licenca')); ?>">
                     <?php wp_nonce_field('bazna_license_action', 'bazna_license_nonce'); ?>
                     <button type="submit" name="bazna_license_action" value="refresh" class="button button-secondary"><?php echo esc_html__('Provjeri licencu', 'brendigo-sidrena-cijena'); ?></button>
                     <button type="submit" name="bazna_license_action" value="deactivate" class="button button-secondary"><?php echo esc_html__('Deaktiviraj licencu', 'brendigo-sidrena-cijena'); ?></button>
