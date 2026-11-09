@@ -74,7 +74,7 @@ if "gh release create" not in release:
 # Regression: no-op historical-price autofill must not run on each WooCommerce
 # product save. The backward-compatible public method may stay available.
 product_meta = read("wordpress/brendigo-sidrena-cijena/includes/class-product-meta.php")
-if re.search(r"add_action\\s*\\(\\s*'woocommerce_after_product_object_save'\\s*,\\s*array\\s*\\(\\s*\\$this\\s*,\\s*'maybe_autofill'", product_meta):
+if re.search(r"add_action\s*\(\s*'woocommerce_after_product_object_save'\s*,\s*array\s*\(\s*\$this\s*,\s*'maybe_autofill'", product_meta):
     errors.append("Obsolete historical-price autofill hook must remain unregistered")
 
 candidate_patterns=[
