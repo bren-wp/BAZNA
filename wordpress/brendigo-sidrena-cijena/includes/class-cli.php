@@ -78,7 +78,7 @@ class Brendigo_Sidrena_Cijena_CLI {
 		);
 
 		if ( 0 === (int) $stats['missing'] ) {
-			WP_CLI::success( 'Nothing to fill. Every eligible product already has a sidrena cijena.' );
+			WP_CLI::success( 'Nothing to fill. Every eligible product already has a bazna cijena.' );
 			return;
 		}
 
@@ -111,7 +111,7 @@ class Brendigo_Sidrena_Cijena_CLI {
 			$would = $safe ? (int) $result['written'] : (int) $stats['missing'];
 			WP_CLI::success(
 				sprintf(
-					'Dry-run: would fill %d empty sidrena field(s). Re-run without --dry-run to write.',
+					'Dry-run: would fill %d empty bazna field(s). Re-run without --dry-run to write.',
 					$would
 				)
 			);
@@ -123,7 +123,7 @@ class Brendigo_Sidrena_Cijena_CLI {
 		$after = Brendigo_Sidrena_Cijena_Activator::catalog_stats();
 		WP_CLI::success(
 			sprintf(
-				'Filled %d sidrena field(s) (inserted=%d updated=%d). Remaining empty: %d.',
+				'Filled %d bazna field(s) (inserted=%d updated=%d). Remaining empty: %d.',
 				(int) $result['written'],
 				(int) $result['inserted'],
 				(int) $result['updated'],
@@ -133,7 +133,7 @@ class Brendigo_Sidrena_Cijena_CLI {
 	}
 
 	/**
-	 * Show how many products/variations already have a sidrena cijena.
+	 * Show how many products/variations already have a bazna cijena.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -161,7 +161,7 @@ class Brendigo_Sidrena_Cijena_CLI {
 		WP_CLI::log( sprintf( 'missing=%d', $stats['missing'] ) );
 		WP_CLI::success(
 			sprintf(
-				'%d of %d eligible items have a sidrena cijena.',
+				'%d of %d eligible items have a bazna cijena.',
 				$stats['filled'],
 				$stats['eligible']
 			)
