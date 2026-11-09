@@ -38,6 +38,14 @@ class LegalContractTest {
         assertEquals(30, policy?.priceReductionLookbackDays)
         assertEquals(false, policy?.discountBaselineIsAnchorPrice)
         assertEquals("2026-09-26", policy?.unitPriceRuleEffectiveFrom)
+        assertEquals(
+            "preparation",
+            policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 16)),
+        )
+        assertEquals(
+            "published_decisions_effective",
+            policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 17)),
+        )
         assertThrows(IllegalArgumentException::class.java) {
             LegalContract.parseOptional(JSONObject(json.toString()).put("discount_baseline_is_anchor_price", true))
         }
