@@ -12,7 +12,6 @@ on:
       - '.github/workflows/multiplatform-ci.yml'
   push:
     branches: [main]
-      - 'tools/test_platform_responsive.mjs'
   workflow_dispatch:
 
 permissions:
