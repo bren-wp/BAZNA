@@ -20,7 +20,7 @@
 | Svojstvo | WordPress | Web PHP | Joomla | Shopify | Android |
 |---|---|---|---|---|---|
 | Javni API v1 | Da | Da | Da | App proxy | Čita |
-| Proizvodi i usluge | Da | JSON urednik | JSON urednik | Shopify varijante + ručne usluge | Čita |
+| Proizvodi i usluge | Da | Grafički editor + JSON uvoz | Grafički editor + JSON uvoz | Shopify varijante + ručne usluge | Čita |
 | Poslovnice | Da | Da | Da | Ručno | Čita |
 | CSV/XML | Da | Da | Da | Da | CSV čita |
 | Arhiva | Da | Da | Da | Da | Čita |
@@ -31,9 +31,9 @@
 ## Zahtjevi za dovršetak produkcijske paritete
 
 1. Provjeriti sve tri platforme na stvarnoj instalaciji/hostingu i testirati HTTPS, licencne izazove, deinstalaciju, migraciju i oporavak podataka.
-2. Joomla: puni komponentni grafički editor bez JSON textarea i native integracije iz stvarnih prodajnih sustava.
-3. Shopify: Shopify CLI OAuth/App Bridge token lifecycle, GDPR/CCPA webhooks, marketplace billing/instalacija, pravi embedded UI i multiple shops.
-4. Regresijska pixel-diff provjera svih WP/Android/Joomla/Shopify zaslona u odnosu na originalne reference. **CI layout/smoke test nije dokaz 0% vizualnog odstupanja.**
+2. Joomla: dovršiti nativnu Joomla MVC komponentu i integracije stvarnih prodajnih sustava; dijeljeni grafički editor već radi za proizvode, usluge i poslovnice.
+3. Shopify: dovršiti Shopify CLI OAuth/App Bridge token lifecycle, marketplace billing/instalaciju, pravi embedded UI i više autoriziranih trgovina. HMAC GDPR/CCPA webhook obrada i provjere brisanja već su implementirane.
+4. Regresijska pixel-diff provjera svih WP/Android/Joomla/Shopify zaslona u odnosu na originalne reference. Web/Joomla CSS i zajednički editor već prolaze 182 stvarne Chrome snimke u 13 veličina. **CI layout/smoke test nije dokaz 0% vizualnog odstupanja.**
 5. Pravni review službenih propisa i svih budućih konačnih pravilnika; necertificirane cijene neće automatski postati zakonski usklađene.
 
 ## Sigurnost

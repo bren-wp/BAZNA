@@ -6,7 +6,7 @@
 
 **BAZNA** povezuje evidenciju proizvoda, usluga, baznih cijena, javnih cjenika i arhiviranih objava. Postojeće platforme **Android, Windows i WordPress** nadopunjuju razvojne integracije za **samostalne PHP stranice, Joomlu i Shopify**, uz zajednički javni API v1 i domensko licenciranje.
 
-[Preuzmi BAZNA](https://github.com/bren-wp/BAZNA/releases) · [Web-stranica](https://brendigo.com/sidrene-cijene/) · [Podrška](mailto:sidrena@brendigo.com)
+[Preuzmi BAZNA](https://github.com/bren-wp/BAZNA/releases) · [Web-stranica](https://brendigo.com/) · [Podrška](https://brendigo.com/)
 
 ## Više platformi. Jedan BAZNA identitet.
 
@@ -18,13 +18,13 @@
 
 ### Novi BAZNA adapteri — PHP, Joomla, Shopify
 
-Ove integracije trenutačno su **prva funkcionalna razvojna inačica 1.0.0**, ne odobreni produkcijski dodaci za svaku platformu. Kod i instalacijske upute nalaze se u `/web`, `/joomla` i `/shopify`.
+Ove integracije trenutačno su **razvojni kandidati 1.1.0**, ne odobreni produkcijski dodaci za svaku platformu. Kod i instalacijske upute nalaze se u `/web`, `/joomla` i `/shopify`.
 
 | Integracija | Osnovne funkcije | Produkcijski status |
 |---|---|---|
-| **Web PHP** | Admin, lokalni JSON katalog, poslovnice, domenska licenca, CSV/XML, arhiva i javni API v1 | Offline CI provjeren; potreban hosting E2E |
-| **Joomla** | System plugin, Joomla administratorska prava/CSRF, isti PHP katalog i javni API v1 | Kandidat ZIP-a; potreban test na stvarnoj Joomla instalaciji |
-| **Shopify** | Potpisani app-proxy, izolirane trgovine, ručni uvoz varijanti u EUR, javni API i theme blok | Custom-store adapter; OAuth i App Store objava nisu dovršeni |
+| **Web PHP** | Devet kartica, grafički editor, lokalni JSON, domenska licenca, CSV/XML, arhiva i javni API v1 | 182-snimka Chrome QA; potreban hosting E2E |
+| **Joomla** | System plugin, Joomla ACL/CSRF, dijeljeni grafički editor i javni API v1 | Kandidat ZIP-a; potreban test na stvarnoj Joomla instalaciji |
+| **Shopify** | Potpisani app-proxy, izolirane trgovine, uvoz EUR varijanti, privacy webhooks i theme blok | Custom-store adapter; OAuth i App Store objava nisu dovršeni |
 
 Android automatski prepoznaje javne BAZNA putanje bez CMS lozinki; pritom zadržava izvorne WordPress REST putanje i sigurnosno ograničenje na istu HTTPS domenu. Pravilo povijesne bazne cijene ostaje ručna potvrda uz dokaz. Shopify `compareAtPrice` ne koristi se za izračun bazne cijene.
 
@@ -32,7 +32,7 @@ Android automatski prepoznaje javne BAZNA putanje bez CMS lozinki; pritom zadrž
 
 ### BAZNA Android
 
-Povežite BAZNA stranicu na podržanoj platformi, pregledajte proizvode i usluge, filtrirajte sidrene cijene, odaberite poslovnicu i otvorite objavljene cjenike ili arhivirane CSV/XML dokumente. Izgled aplikacije razvija se prema referentnim prikazima BAZNA. Za potvrdu 1:1 potrebno je usporediti stvarne snimke zaslona s izvornim referencama na jednakim dimenzijama.
+Povežite BAZNA stranicu na podržanoj platformi, pregledajte proizvode i usluge, filtrirajte bazne cijene, odaberite poslovnicu i otvorite objavljene cjenike ili arhivirane CSV/XML dokumente. Izgled aplikacije razvija se prema referentnim prikazima BAZNA. Za potvrdu 1:1 potrebno je usporediti stvarne snimke zaslona s izvornim referencama na jednakim dimenzijama.
 
 ![BAZNA vizualni identitet](desktop/branding/sidrena-banner.svg)
 

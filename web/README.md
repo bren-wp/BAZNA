@@ -3,7 +3,7 @@
 **Autor:** Brendigo · https://brendigo.com/  
 **Status:** prva funkcionalna inačica; nije objavljena niti testirana na stvarnom produkcijskom hostingu.
 
-BAZNA Web pruža administratorsku prijavu, uređivanje kataloga i poslovnica, zasebnu provjeru/licenciranje, objavu javnih HTML/CSV/XML cjenika i nepromjenjivu arhivu. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
+BAZNA Web 1.1.0 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, zasebnu domensku licencu, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
 
 ## Instalacija (Apache / PHP 8.1+)
 
@@ -43,8 +43,8 @@ Android prihvaća **samo isti HTTPS host**, ne treba administratorsku prijavu ni
 
 Povijesna bazna cijena zahtijeva \`historical_verified: true\` i stvarni datum. Nikad se ne izvodi iz današnje redovne ili Shopify usporedne cijene. Pravila iz NN 101/2026 i 110/2026 imaju budući datum primjene 17. 11. 2026.; pravni profil ne certificira trgovca.
 
-Objave su eksplicitne, stare objave ostaju u arhivi bez automatskog brisanja; lozinke/ključevi nisu u javnom API-ju. CSRF, sigurne sesije, ograničenja veličine i domene su u kodu. Prije produkcije provesti instalacijske, penetracijske, pravne i backup/restore testove.
+Objave su eksplicitne, stare objave ostaju u arhivi bez automatskog brisanja. Zajedničko zaključavanje između procesa sprečava gubitak arhivskih verzija pri istodobnim objavama; obrazac odbija zastarjelu izmjenu retka pomoću SHA-256 identiteta prethodnog zapisa; lozinke/ključevi nisu u javnom API-ju. CSRF, sigurne sesije, ograničenja veličine i domene su u kodu. Prije produkcije provesti instalacijske, penetracijske, pravne i backup/restore testove.
 
 ## Brzi test
 
-\`php web/tests/test.php\` iz korijena repozitorija. Test koristi lokalnu privremenu mapu i nema mrežne pozive.
+\`php web/tests/test.php\` iz korijena repozitorija. Pokrenite i \`php web/tests/test_editor.php\`. Testovi koriste lokalnu privremenu mapu i nemaju mrežne pozive. Chrome CI snima 14 Web/Joomla prikaza na 13 veličina (182 snimke), a to nije dokaz podudaranja piksela s izvornim dizajnom.
