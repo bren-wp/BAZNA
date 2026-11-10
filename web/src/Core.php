@@ -288,7 +288,7 @@ final class Core
                 'published_decisions_ready_from' => '2026-11-17',
                 'reference_price_data_entry' => 'verified_manual',
                 'product_service_publication' => 'csv_xml_html',
-                'publication_source_of_truth' => 'wordPress_published_feeds',
+                'publication_source_of_truth' => 'platform_published_feeds',
                 'unpublished_draft_features' => 'not_automatically_enabled',
                 'discount_30_day_low_independent' => true,
                 'automatic_historical_inference' => false,
@@ -351,17 +351,32 @@ final class Core
             $id = (string) ($v['id'] ?? '');
             if (!preg_match('/^[0-9]{14}-[a-f0-9]{12}$/D', $id)) continue;
             $date = substr((string) ($v['published_at'] ?? ''), 0, 10);
-            foreach (self::KINDS as $kind) {
-                $out[] = [
-                    'date' => $date, 'kind' => $kind, 'outlet' => 'webshop', 'format' => 'csv',
-                    'url' => $this->link('bazna/v1/arhiva/' . $id . '/' . $kind . '/csv'),
-                ];
+            // The archived snapshot, not the CURRENT outlet directory, is
+            // authoritative. Old outlet links remain stable after renaming or
+            // deleting a physical branch in a later publication.
+            $snapshot = $this->read('archive-' . $id . '.json');
+            $locations = ['webshop'];
+            foreach ($snapshot['outlets'] ?? [] as $outlet) {
+                $code = $outlet['code'] ?? null;
+                if (is_string($code) &&
+                    preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $code)) {
+                    $locations[] = $code;
+                }
+            }
+            foreach ($locations as $location) {
+                foreach (self::KINDS as $kind) {
+                    $out[] = [
+                        'date' => $date, 'kind' => $kind, 'outlet' => $location, 'format' => 'csv',
+                        'url' => $this->link('bazna/v1/arhiva/' . $id . '/' . $kind . '/csv') .
+                            ($location === 'webshop' ? '' : '?oznaka=' . rawurlencode($location)),
+                    ];
+                }
             }
         }
         return $out;
     }
 
-    public function archiveCsv(string $id, string $kind): string
+    public function archiveCsv(string $id, string $kind, string $outlet = ''): string
     {
         if (!preg_match('/^[0-9]{14}-[a-f0-9]{12}$/D', $id)) {
             throw new InvalidArgumentException('Neispravan identifikator arhive.');
@@ -369,7 +384,14 @@ final class Core
         $history = $this->read('archive.json')['versions'] ?? [];
         foreach ($history as $v) {
             if (($v['id'] ?? '') === $id && ($v['file'] ?? '') === 'archive-' . $id . '.json') {
-                return $this->csv($kind, '', $this->read($v['file']));
+                $snapshot = $this->read($v['file']);
+                if ($outlet !== '') {
+                    $known = array_column($snapshot['outlets'] ?? [], 'code');
+                    if (!in_array($outlet, $known, true)) {
+                        throw new InvalidArgumentException('Poslovnica ne postoji u arhivskoj snimci.');
+                    }
+                }
+                return $this->csv($kind, $outlet, $snapshot);
             }
         }
         throw new InvalidArgumentException('Arhivski zapis ne postoji.');
