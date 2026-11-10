@@ -1,4 +1,6 @@
-# BAZNA — Bazne cijene
+# BAZNA
+
+### Bazne cijene
 
 ![BAZNA — Bazne cijene by Brendigo](wordpress/brendigo-sidrena-cijena/assets/banner-1544x500.png)
 
