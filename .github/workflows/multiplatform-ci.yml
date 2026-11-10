@@ -8,6 +8,7 @@ on:
       - 'shopify/**'
       - 'licenca/**'
       - 'tools/package_platforms.py'
+      - 'tools/test_platform_responsive.mjs'
       - '.github/workflows/multiplatform-ci.yml'
   push:
     branches: [main]
@@ -17,6 +18,7 @@ on:
       - 'shopify/**'
       - 'licenca/**'
       - 'tools/package_platforms.py'
+      - 'tools/test_platform_responsive.mjs'
   workflow_dispatch:
 
 permissions:
@@ -50,6 +52,31 @@ jobs:
         run: php shopify/tests/test_webhooks.php
       - name: Central domain-bound license server regression
         run: php licenca/tests/test.php
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Render PHP/Joomla shared UI and test 14 pages at 13 viewport sizes
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v google-chrome
+          mkdir -p artifacts/platform-visual
+          php web/tests/render_visual_fixtures.php artifacts/platform-visual/fixtures
+          for attempt in 1 2 3; do
+            if node tools/test_platform_responsive.mjs               artifacts/platform-visual/fixtures               artifacts/platform-visual/screenshots; then
+              break
+            fi
+            [[ "$attempt" -lt 3 ]] || { echo "BAZNA visual Chrome regression failed"; exit 1; }
+            sleep 3
+          done
+      - name: Upload per-screen visual QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BAZNA-PHP-Joomla-responsive-Chrome
+          path: artifacts/platform-visual/
+          retention-days: 7
+          if-no-files-found: warn
       - name: Build deterministic standalone PHP, Joomla and Shopify ZIP files
         run: |
           set -euo pipefail
