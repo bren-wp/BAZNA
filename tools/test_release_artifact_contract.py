@@ -25,7 +25,7 @@ def require(condition: bool, description: str) -> None:
 def main_push_is_unconditional(yaml: str) -> bool:
     # A release is created from the Android run. WordPress and adapters must
     # run on each main commit, even when only the release workflow changed.
-    match = re.search(r"(?ms)^  push:\n(.*?)(?=^\S|\\Z)", yaml)
+    match = re.search(r"(?ms)^  push:\n(.*?)(?=^\S|\Z)", yaml)
     if match is None:
         return False
     block = match.group(1)
