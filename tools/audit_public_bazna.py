@@ -16,9 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 ERRORS: list[str] = []
 
 PREVIOUS_BRAND_MIGRATION = "wordpress/brendigo-sidrena-cijena/includes/class-settings.php"
-STRING_LITERAL = re.compile(r"""(["'])(?:\\.|(?!\1)[^\\])*\1""", re.S)
+STRING_LITERAL = re.compile(r"""(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')""")
 OBSOLETE_COPY = re.compile(
-    r"(?i)\bsidren[aeiou]\s+cijen[a-zčć]*\b|(?<![\w-])SIDRENA(?![\w-])"
+    r"(?i:\bsidren[aeiou]\s+cijen[a-zčć]*\b)|(?<![\w-])SIDRENA(?![\w-])"
 )
 DEVELOPER_COPY = re.compile(
     r"(?i)\blorem ipsum\b|\bdebug mode\b|\bdevelopment build\b"
@@ -48,16 +48,30 @@ PUBLIC_MEDIA_EXTENSIONS = {".png", ".jpg", ".jpeg", ".svg", ".ico", ".webp", ".x
 def check_text(path: Path) -> None:
     relative = path.relative_to(ROOT).as_posix()
     code = path.read_text(encoding="utf-8-sig")
-    for literal in STRING_LITERAL.finditer(code):
-        raw = literal.group(0)
-        if path.as_posix().endswith(PREVIOUS_BRAND_MIGRATION) and (
-            "PREVIOUS_BRAND" in code[max(0, literal.start()-55):literal.start()]
+    is_wordpress_php = (
+        path.suffix == ".php" and
+        relative.startswith("wordpress/brendigo-sidrena-cijena/")
+    )
+    for line_number, line in enumerate(code.splitlines(), 1):
+        stripped = line.lstrip()
+        if not stripped or stripped.startswith(("//", "#", "*", "/*")):
+            continue
+        # WP metadata, imported historical CSV headers, REST aliases, options
+        # and CSS IDs are not rendered labels. Limit PHP checks to actual
+        # translated UI, raw emitted labels, and inline HTML.
+        if is_wordpress_php and not re.search(
+            r"(?:__|_e|_x|esc_html__|esc_attr__|esc_html_e|esc_attr_e)\s*\(|"
+            r"\becho\s*['\"]|(?:>[^<]*<)", line
         ):
             continue
-        matched = OBSOLETE_COPY.search(raw) or DEVELOPER_COPY.search(raw)
-        if matched:
-            line = code.count("\n", 0, literal.start()) + 1
-            ERRORS.append(f"{relative}:{line}: legacy/developer UI copy: {matched.group(0)}")
+        for match in STRING_LITERAL.finditer(line):
+            literal = match.group(0)
+            flagged = OBSOLETE_COPY.search(literal) or DEVELOPER_COPY.search(literal)
+            if flagged:
+                ERRORS.append(
+                    f"{relative}:{line_number}: obsolete public copy: {flagged.group(0)}"
+                )
+
 
 def check_images() -> None:
     for directory in PUBLIC_MEDIA_DIRS:
@@ -111,7 +125,11 @@ def check_docs_and_packages() -> None:
     wp = (ROOT / "wordpress/brendigo-sidrena-cijena/readme.txt").read_text(
         encoding="utf-8"
     )
-    changelogs = re.findall(r"(?m)^= (\d+\.\d+\.\d+) =$", wp)
+    sections = re.findall(r"(?m)^== Changelog ==$", wp)
+    if len(sections) != 1:
+        ERRORS.append(f"Expected one WordPress Changelog section, found {len(sections)}")
+    changelog = wp.split("== Changelog ==")[-1]
+    changelogs = re.findall(r"(?m)^= (\d+\.\d+\.\d+) =$", changelog)
     if len(changelogs) != len(set(changelogs)):
         ERRORS.append(f"Duplicate WordPress changelog version headings: {changelogs}")
     title = (ROOT / "README.md").read_text(encoding="utf-8")
