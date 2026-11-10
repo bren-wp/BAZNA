@@ -13,6 +13,10 @@ require_once dirname(__DIR__) . '/src/AdminCatalog.php';
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\AdminCatalog;
 
+// admin.php is normally included from index.php, which supplies this escaped
+// text helper. Reuse the real helper in the isolated PHP-CLI rendering test.
+function bazna_html(string $value): string { return Core::esc($value); }
+
 $output = (string) ($argv[1] ?? '');
 if ($output === '' || str_contains($output, '..')) throw new RuntimeException('Safe output directory required.');
 if (!is_dir($output) && !mkdir($output, 0700, true)) throw new RuntimeException('Cannot create QA output');
