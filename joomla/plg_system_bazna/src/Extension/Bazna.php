@@ -73,7 +73,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 echo $m[2] === 'csv' ? $core->csv($m[1], $outlet) : $core->xml($m[1], $outlet);
             } elseif (preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $m)) {
                 header('Content-Type: text/csv; charset=utf-8');
-                echo $core->archiveCsv($m[1], $m[2]);
+                echo $core->archiveCsv($m[1], $m[2], (string) $app->input->getString('oznaka', ''));
             } elseif ($path === '/bazna/cjenik' || $path === '/bazna/arhiva') {
                 $this->publicPage($core, $path === '/bazna/arhiva');
             } else {
