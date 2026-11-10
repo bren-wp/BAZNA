@@ -48,7 +48,8 @@ try {
     // This module is embedded by the Joomla adapter as well as standalone.
     $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
     if ($method === 'GET' && $path === '/bazna/v1/cjenici') {
-        bazna_json(200, $core->discovery('web'));
+        $active = $license?->active();
+        bazna_json(200, $core->discovery('web', null, $active));
     }
     if ($method === 'GET' && $path === '/bazna/v1/arhiva') {
         $entries = $core->archives();
