@@ -38,6 +38,8 @@ jobs:
           python3 tools/audit_security.py
       - name: Guard release artifact names, same-commit versions and all distribution bundles
         run: python3 tools/test_release_artifact_contract.py
+      - name: Audit production BAZNA brand and developer-only public copy
+        run: python3 tools/audit_public_bazna.py
       - name: Verify BAZNA public UI labels and release links
         run: python3 tools/check_bazna_ui_brand.py
       - name: Desktop source and obvious dead-code audit

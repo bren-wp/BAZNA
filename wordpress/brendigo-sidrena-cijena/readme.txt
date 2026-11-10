@@ -4,103 +4,11 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.15
+Stable tag: 1.5.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva za WordPress i WooCommerce.
-
-== Changelog ==
-
-= 1.5.15 =
-* Show the actual connected BAZNA platform throughout the Android application, including About, Home, Services and public price lists.
-* Use BAZNA-only graphics in public assets and update public help text, WordPress shortcodes, copied codes and price previews.
-* Provide BAZNA product, service, archive and price-history aliases while retaining compatibility with existing content and stored WordPress metadata.
-* Update the shared Web, Joomla and Shopify catalog adapter; strengthen branded UI regression and source-checking rules.
-* Preserve historical price evidence, public read-only Android API, versioned archives, licensing and existing Android package IDs.
-
-
-= 1.5.15 =
-* Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
-* Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
-* Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
-* WordPress.org review candidate continues to ship with local features unlocked; the private licensed distribution remains separate.
-
-
-= 1.5.13 =
-* Keep already published WooCommerce reference prices visible in theme/builder layouts and cart/checkout blocks even when the admin license is inactive.
-* Preserve the bounded offline license grace during HTTP 429, temporary service failure or malformed network response; revoke only an explicit invalid-key/domain decision.
-* Restrict Woo product metadata editing and REST access until BAZNA license activation without deleting saved prices.
-* Android accepts bare WordPress domains and adds HTTPS automatically, retaining same-origin and safe-DNS checks.
-* Add license-server CLI preflight to the complete upload package, with extra Android/WordPress regression tests.
-* Retain legal distinction between actual, reference and 30-day lowest prices and publicly readable CSV/XML feeds.
-
-= 1.5.12 =
-* Publish a deployable standalone BAZNA PHP/JSON license-server archive, with protected paths, Nginx/Apache instructions and private-config overlay.
-* License API readiness now refuses to claim success if the required master secret, PHP modules or private JSON storage are unavailable.
-* Keep a permanent one-domain registration, reject unsafe JSON registry states and never publish keys to Android REST clients.
-* Android now checks the optional non-sensitive license status and continues displaying published prices even when the admin license is inactive.
-* Add CI tests, reproducible checksums, 2026 Croatian legal notes and hardened infrastructure documentation.
-
-= 1.5.11 =
-* Rebrand the user-facing system as BAZNA — Bazne cijene, including WordPress administration and Android/Windows interfaces.
-* Keep the existing WordPress plugin folder, REST v1 routes, database options and WooCommerce meta for in-place updates.
-* Add bazna_cijena, bazna_cjenik and bazna_arhiva shortcode aliases while preserving legacy shortcodes.
-* Migrate only factory default reference-price labels and tooltips; preserve merchant customizations.
-* Introduce a BAZNA vector icon and legacy-install-safe desktop branding.
-* Add compatibility and regression checks, legal terminology review and staged migration documentation.
-
-= 1.5.10 =
-* Prevent stale public REST publication status and 302 feed redirects with explicit no-store cache policy.
-* Harden Android CSV handling against duplicate or ambiguous price headers and malformed row widths.
-* Validate public read-only Android connection capabilities in the official WordPress discovery contract.
-* Request fresh published data and reject incomplete HTTP responses; add contract regression tests.
-* Preserve existing historical prices, public CSV/XML columns, archives and anonymous read-only REST v1 routes.
-
-= 1.5.9 =
-* Improve Android HTTPS linking on WordPress installations using plain or pretty REST permalinks, without allowing cross-origin or private network access.
-* Add explicit, anonymous, read-only Android connection details to the public v1 discovery API; all published CSV/XML and archive routes remain unchanged.
-* Remove unreachable legacy price-snapshot routines that must not infer historic reference prices.
-* Expand WordPress/Android API contract, security and legal regression checks.
-
-= 1.5.8 =
-* Improve responsive editor headings and action buttons on mobile and tablet WordPress admin screens.
-* Extend Chrome UI regression checks for wrapped catalog headings without modifying existing product or price data.
-* Keep public REST v1, archive, CSV/XML and legal reference prices compatible with prior versions.
-
-= 1.5.7 =
-* Improve mobile and tablet editing ergonomics in the wide catalog without changing catalog data or columns.
-* Use minimum 44px controls inside the horizontally scrollable price table.
-* Expand browser regression checks for editable rows and ensure all mobile failures are reported independently.
-* Preserve REST v1, historical anchor prices and existing CSV/XML formats.
-
-= 1.5.6 =
-* Fix narrow WordPress administrator navigation so all BAZNA tabs are visible in two columns without unwanted horizontal clipping.
-* Increase navigation, search, select and save controls to 44px minimum touch height on mobile.
-* Add 13-viewport browser regression checks for navigation layout, tap targets and viewport clipping.
-* Preserve existing prices, historical records, public CSV/XML formats and REST v1 API.
-
-= 1.5.5 =
-* Improve mobile pricelist card wrapping and visual consistency with BAZNA Android.
-* Preserve existing CSV/XML fields, prices, historical dates and REST v1 compatibility.
-* Refine WordPress mobile interface regression checks without external runtime dependencies.
-
-= 1.5.4 =
-* Added public read-only CSV feed availability flags in the existing BAZNA REST API, including separate business outlet statuses, to prevent misleading Android loading states.
-* Added optional WooCommerce product thumbnails to the public product CSV/XML feed without changing the required price, date or service columns.
-* Added a WordPress dashboard connection panel for the BAZNA Android application, with copyable HTTPS address and actual published-feed readiness.
-* Aligned BAZNA admin and public price-list colors with the Android brand; no new third-party dependencies.
-* Kept API version 1 and compatibility with older Android clients. Changes are prepared in a PR and require deployment to become available.
-
-= 1.5.3 =
-* Separate the 30-day sale baseline from documented historical reference prices in the public legal metadata.
-* Document the effective date of NN 105/2026 and pending 2026 rulebook consultation without changing existing public CSV/XML schemas or saved prices.
-
-
-= 1.5.2 =
-* Published machine-readable legal guidance for the 2026 reference-price dates, effective date and 30-day public archive requirement in the existing read-only REST catalog discovery endpoint.
-* Kept CSV/XML publication schemas backward-compatible with version 1.5.0 and made the public API identify the exact plugin version.
-* Preserved the administrator's responsibility to assign the appropriate historical reference date; no automatic invention of prices or inference of product categories.
 
 == Description ==
 
@@ -265,13 +173,11 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 
 == Changelog ==
 
-= 1.5.15 =
-* Show the actual connected BAZNA platform throughout the Android application, including About, Home, Services and public price lists.
-* Use BAZNA-only graphics in public assets and update public help text, WordPress shortcodes, copied codes and price previews.
-* Provide BAZNA product, service, archive and price-history aliases while retaining compatibility with existing content and stored WordPress metadata.
-* Update the shared Web, Joomla and Shopify catalog adapter; strengthen branded UI regression and source-checking rules.
-* Preserve historical price evidence, public read-only Android API, versioned archives, licensing and existing Android package IDs.
-
+= 1.5.16 =
+* Audit public BAZNA graphics and all user-visible brand labels on Android, WordPress, Web PHP, Joomla and Shopify.
+* Correct the WordPress version history and legacy package names in public release documentation.
+* Keep existing WordPress database keys and REST aliases and the Android application identity for uninterrupted upgrades.
+* Strengthen all-platform production-readiness checks without inferring historical prices or changing stored evidence.
 
 = 1.5.15 =
 * Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
@@ -279,11 +185,85 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
 * WordPress.org review candidate continues to ship with local features unlocked; the private licensed distribution remains separate.
 
+= 1.5.14 =
+* Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving existing WordPress REST v1 endpoints and historical price records.
+* Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
+* Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
+* Keep the WordPress.org review candidate with local features unlocked and the private licensed distribution separate.
+
+= 1.5.13 =
+* Keep already published WooCommerce reference prices visible in theme/builder layouts and cart/checkout blocks even when the admin license is inactive.
+* Preserve the bounded offline license grace during HTTP 429, temporary service failure or malformed network response; revoke only an explicit invalid-key/domain decision.
+* Restrict Woo product metadata editing and REST access until BAZNA license activation without deleting saved prices.
+* Android accepts bare WordPress domains and adds HTTPS automatically, retaining same-origin and safe-DNS checks.
+* Add license-server CLI preflight to the complete upload package, with extra Android/WordPress regression tests.
+* Retain legal distinction between actual, reference and 30-day lowest prices and publicly readable CSV/XML feeds.
+
+= 1.5.12 =
+* Publish a deployable standalone BAZNA PHP/JSON license-server archive, with protected paths, Nginx/Apache instructions and private-config overlay.
+* License API readiness now refuses to claim success if the required master secret, PHP modules or private JSON storage are unavailable.
+* Keep a permanent one-domain registration, reject unsafe JSON registry states and never publish keys to Android REST clients.
+* Android now checks the optional non-sensitive license status and continues displaying published prices even when the admin license is inactive.
+* Add CI tests, reproducible checksums, 2026 Croatian legal notes and hardened infrastructure documentation.
+
+= 1.5.11 =
+* Rebrand the user-facing system as BAZNA — Bazne cijene, including WordPress administration and Android/Windows interfaces.
+* Keep the existing WordPress plugin folder, REST v1 routes, database options and WooCommerce meta for in-place updates.
+* Add bazna_cijena, bazna_cjenik and bazna_arhiva shortcode aliases while preserving legacy shortcodes.
+* Migrate only factory default reference-price labels and tooltips; preserve merchant customizations.
+* Introduce a BAZNA vector icon and legacy-install-safe desktop branding.
+* Add compatibility and regression checks, legal terminology review and staged migration documentation.
+
+= 1.5.10 =
+* Prevent stale public REST publication status and 302 feed redirects with explicit no-store cache policy.
+* Harden Android CSV handling against duplicate or ambiguous price headers and malformed row widths.
+* Validate public read-only Android connection capabilities in the official WordPress discovery contract.
+* Request fresh published data and reject incomplete HTTP responses; add contract regression tests.
+* Preserve existing historical prices, public CSV/XML columns, archives and anonymous read-only REST v1 routes.
+
+= 1.5.9 =
+* Improve Android HTTPS linking on WordPress installations using plain or pretty REST permalinks, without allowing cross-origin or private network access.
+* Add explicit, anonymous, read-only Android connection details to the public v1 discovery API; all published CSV/XML and archive routes remain unchanged.
+* Remove unreachable legacy price-snapshot routines that must not infer historic reference prices.
+* Expand WordPress/Android API contract, security and legal regression checks.
+
+= 1.5.8 =
+* Improve responsive editor headings and action buttons on mobile and tablet WordPress admin screens.
+* Extend Chrome UI regression checks for wrapped catalog headings without modifying existing product or price data.
+* Keep public REST v1, archive, CSV/XML and legal reference prices compatible with prior versions.
+
+= 1.5.7 =
+* Improve mobile and tablet editing ergonomics in the wide catalog without changing catalog data or columns.
+* Use minimum 44px controls inside the horizontally scrollable price table.
+* Expand browser regression checks for editable rows and ensure all mobile failures are reported independently.
+* Preserve REST v1, historical anchor prices and existing CSV/XML formats.
+
+= 1.5.6 =
+* Fix narrow WordPress administrator navigation so all BAZNA tabs are visible in two columns without unwanted horizontal clipping.
+* Increase navigation, search, select and save controls to 44px minimum touch height on mobile.
+* Add 13-viewport browser regression checks for navigation layout, tap targets and viewport clipping.
+* Preserve existing prices, historical records, public CSV/XML formats and REST v1 API.
 
 = 1.5.5 =
 * Improve mobile pricelist card wrapping and visual consistency with BAZNA Android.
 * Preserve existing CSV/XML fields, prices, historical dates and REST v1 compatibility.
 * Refine WordPress mobile interface regression checks without external runtime dependencies.
+
+= 1.5.4 =
+* Added public read-only CSV feed availability flags in the existing BAZNA REST API, including separate business outlet statuses, to prevent misleading Android loading states.
+* Added optional WooCommerce product thumbnails to the public product CSV/XML feed without changing the required price, date or service columns.
+* Added a WordPress dashboard connection panel for the BAZNA Android application, with copyable HTTPS address and actual published-feed readiness.
+* Aligned BAZNA admin and public price-list colors with the Android brand; no new third-party dependencies.
+* Kept API version 1 and compatibility with older Android clients. Changes are prepared in a PR and require deployment to become available.
+
+= 1.5.3 =
+* Separate the 30-day sale baseline from documented historical reference prices in the public legal metadata.
+* Document the effective date of NN 105/2026 and pending 2026 rulebook consultation without changing existing public CSV/XML schemas or saved prices.
+
+= 1.5.2 =
+* Published machine-readable legal guidance for the 2026 reference-price dates, effective date and 30-day public archive requirement in the existing read-only REST catalog discovery endpoint.
+* Kept CSV/XML publication schemas backward-compatible with version 1.5.0 and made the public API identify the exact plugin version.
+* Preserved the administrator's responsibility to assign the appropriate historical reference date; no automatic invention of prices or inference of product categories.
 
 = 1.5.0 =
 * Expanded incomplete translations across 20 languages; these 20 remain partial.
@@ -291,7 +271,6 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Removed manual translation loading discouraged for WordPress.org-hosted plugins.
 * Added BAZNA brand symbol to the WordPress admin and prepared separate WordPress.org icon/banner assets.
 * Kept Croatian as the source language and reference-price logic unchanged.
-
 
 = 1.4.4 =
 * Added 27 partial language packs, POT template, and corrected locale selection and default label.
@@ -309,12 +288,10 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Linked help from the admin header, plugin action links and overview dashboard.
 * Kept current public price outputs and WordPress.org distribution clean of extra markdown files.
 
-
 = 1.4.1 =
 * Fixed WordPress.org Plugin Check errors for options, temporary XLSX files and product query filters.
 * Improved plugin-owned SQL safety and reduced repeat database reads while retaining up-to-date administrator audit information.
 * Removed internal development documentation from the distributable package.
-
 
 = 1.3.3 =
 * Added an administrator-only local change log for reference price edits in manual catalogs and plugin-managed WooCommerce writes, including WooCommerce CSV imports after successful saves.
