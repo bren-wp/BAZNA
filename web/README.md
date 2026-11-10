@@ -7,7 +7,7 @@ BAZNA Web pruža administratorsku prijavu, uređivanje kataloga i poslovnica, za
 
 ## Instalacija (Apache / PHP 8.1+)
 
-1. Raspakirajte \`BAZNA-Web-1.0.0.zip\` tako da imate \`src/\` i \`public/\`.
+1. Raspakirajte \`BAZNA-Web-1.1.0.zip\` tako da imate \`src/\` i \`public/\`.
 2. Postavite virtualni host DocumentRoot na **samo** \`/your-path/bazna-web/public\` (nikada na korijen paketa). Potrebni su PHP \`openssl\`, \`curl\`, \`dom\`, \`json\` i \`mbstring\` po potrebi.
 3. Postavite server-side environment variables (nginx fastcgi_param / PHP-FPM environment / Apache SetEnv, ne klijentski JavaScript):
 
