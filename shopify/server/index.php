@@ -61,7 +61,7 @@ try {
     }
     $tail = substr($path, strlen(rtrim($prefix, '/')));
     if ($tail === '/v1/cjenici') {
-        bazna_shop_response(200, $core->discovery('shopify'));
+        bazna_shop_response(200, $core->discovery('shopify', null, $license?->active()));
     }
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
