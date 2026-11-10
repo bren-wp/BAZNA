@@ -22,6 +22,19 @@ def require(condition: bool, description: str) -> None:
         errors.append(description)
 
 
+def main_push_is_unconditional(yaml: str) -> bool:
+    # A release is created from the Android run. WordPress and adapters must
+    # run on each main commit, even when only the release workflow changed.
+    match = re.search(r"(?ms)^  push:\n(.*?)(?=^\S|\\Z)", yaml)
+    if match is None:
+        return False
+    block = match.group(1)
+    return ("branches: [main]" in block
+            and "paths:" not in block
+            and "paths-ignore:" not in block)
+
+
+wp_ci = read(".github/workflows/official-plugin-ci.yml")
 android_ci = read(".github/workflows/android-ci.yml")
 windows_ci = read(".github/workflows/desktop-ci.yml")
 multi_ci = read(".github/workflows/multiplatform-ci.yml")
@@ -89,6 +102,10 @@ for workflow in ("official-plugin-ci.yml", "repository-audit.yml",
                  "multiplatform-ci.yml"):
     require(workflow in release_ci,
             f"Release does not await successful same-commit {workflow}")
+require(main_push_is_unconditional(wp_ci),
+        "WordPress checks must run on every main commit for release gates")
+require(main_push_is_unconditional(multi_ci),
+        "Web/Joomla/Shopify checks must run on every main commit for release gates")
 require("head_sha=$CI_SHA" in release_ci,
         "Release must validate source-commit provenance")
 require('sha256sum -c' in release_ci,
