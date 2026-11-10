@@ -360,20 +360,31 @@ final class Core
         return (string) $doc->saveXML();
     }
 
+    /**
+     * Cross-platform legal metadata aligned with the existing WordPress v1
+     * contract. This is NOT certification of the merchant's historical data.
+     * Proposed rulebooks may change before final publication.
+     */
     public function legal(): array
     {
         return [
-            'schema' => 1, 'jurisdiction' => 'HR',
+            'schema' => 1,
+            'reviewed_on' => '2026-11-10',
+            'jurisdiction' => 'HR',
             'rules_revision' => 'NN-101-2026-NN-110-2026',
-            'effective_from' => '2026-11-17',
-            'reference_dates' => self::REFERENCE_DATES,
-            'archive_min_days' => 30,
-            'product_publication_deadline' => '08:00',
+            'consumer_law_revision' => 'NN-59-2026',
+            'unit_price_rule_revision' => 'NN-105-2026',
+            'unit_price_rule_effective_from' => '2026-09-26',
+            'price_reduction_lookback_days' => 30,
+            'discount_baseline_is_anchor_price' => false,
             'base_price_regulation_status' => 'draft_consultation',
+            'base_price_rule_effective_from' => '2026-11-17',
+            'base_price_is_automatically_derived' => false,
             'historical_price_verification_required' => true,
             'legal_compliance_certified' => false,
-            'discount_baseline_is_anchor_price' => false,
+            'consumer_30_day_low_is_anchor_price' => false,
             'consumer_30_day_low_is_base_price' => false,
+            'draft_rulebooks_consultation_until' => '2026-11-13',
             'implementation' => [
                 'published_decisions_ready_from' => '2026-11-17',
                 'reference_price_data_entry' => 'verified_manual',
@@ -382,6 +393,36 @@ final class Core
                 'unpublished_draft_features' => 'not_automatically_enabled',
                 'discount_30_day_low_independent' => true,
                 'automatic_historical_inference' => false,
+            ],
+            'effective_from' => '2026-11-17',
+            'reference_dates' => self::REFERENCE_DATES,
+            'legacy_categories' => [
+                'hrana', 'pice', 'kozmetika', 'sredstva_za_ciscenje',
+                'toaletne_potrepstine', 'proizvodi_za_kucanstvo',
+            ],
+            'product_publication_deadline' => '08:00',
+            'service_change_deadline' => '08:00',
+            'timezone' => 'Europe/Zagreb',
+            'archive_min_days' => 30,
+            'formats' => ['csv', 'xml'],
+            'products_required_fields' => [
+                'naziv', 'sku', 'marka', 'jedinica_mjere',
+                'cijena_jedinice_mjere', 'maloprodajna_cijena',
+                'naziv_posebnog_oblika', 'sidrena_cijena', 'barkod', 'dostupnost',
+            ],
+            'services_required_fields' => [
+                'naziv', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena',
+            ],
+            'classification' => 'manual_verified',
+            'historical_prices' => 'not_inferred',
+            'source_urls' => [
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2025_05_75_979.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1212.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1213.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1309.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1310.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_06_59_728.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_105_1270.html',
             ],
         ];
     }
