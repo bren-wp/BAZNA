@@ -44,6 +44,8 @@ jobs:
         run: php web/tests/test.php
       - name: Shopify HMAC, replay and tenant isolation tests
         run: php shopify/tests/test_proxy.php
+      - name: Shopify signed privacy compliance and erasure tests
+        run: php shopify/tests/test_webhooks.php
       - name: Central domain-bound license server regression
         run: php licenca/tests/test.php
       - name: Build deterministic standalone PHP, Joomla and Shopify ZIP files
@@ -83,6 +85,8 @@ jobs:
           mkdir -p /tmp/bazna-shopify
           unzip -q artifacts/multiplatform/BAZNA-Shopify-Adapter-1.0.0.zip -d /tmp/bazna-shopify
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/index.php
+          test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/webhooks.php
+          test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/WebhookHandler.php
           test -s /tmp/bazna-shopify/bazna-shopify/web/src/Core.php
           if grep -R --include='*.php' 'shpat_[a-zA-Z0-9]\{20,\}' /tmp/bazna-shopify; then
             echo "ERROR: Shopify access token leaked into source package"
