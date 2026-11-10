@@ -149,6 +149,9 @@ file_put_contents( $outlet_products, "naziv;maloprodajna_cijena\n" );
 
 $api = Brendigo_Sidrena_Cijena_Public_API::instance();
 $api->register();
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/cjenici'] ), 'Canonical BAZNA discovery route registered' );
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/arhiva'] ), 'Canonical BAZNA archive registered' );
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/cjenici/(?P<kind>proizvodi|usluge)/(?P<format>xml|csv)'] ), 'Canonical BAZNA CSV/XML feeds registered' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/cjenici'] ), 'Discovery route registered on plugin init' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/arhiva'] ), 'Archive route registered on plugin init' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/cjenici/(?P<kind>proizvodi|usluge)/(?P<format>xml|csv)'] ), 'CSV/XML feed route registered' );
@@ -179,6 +182,7 @@ sidrena_contract_assert(
     'Public feed redirect remains same-origin'
 );
 sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
+sidrena_contract_assert( 'wordpress' === $json['platform'], 'Publisher type is accurate' );
 sidrena_contract_assert( 'BAZNA' === $json['branding']['name'], 'New product name in public Android discovery' );
 sidrena_contract_assert( 'Bazne cijene' === $json['branding']['description'], 'Human-readable brand description' );
 sidrena_contract_assert( true === $json['licensing']['required'], 'WordPress license controls are declared' );
@@ -187,13 +191,13 @@ sidrena_contract_assert( false === strpos( wp_json_encode( $json ), 'BAZNA-00001
 sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
 sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
 sidrena_contract_assert( true === $json['connection']['csv_publication_required'], 'CSV readiness is not fabricated on first install' );
-sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-sidrena/v1/cjenici' === $json['connection']['rest_endpoint'], 'Canonical REST connection endpoint present' );
+sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-bazna/v1/cjenici' === $json['connection']['rest_endpoint'], 'Canonical REST connection endpoint present' );
 sidrena_contract_assert( true === $json['feeds']['proizvodi']['available_csv'], 'Product feed ready' );
 sidrena_contract_assert( true === $json['feeds']['usluge']['available_csv'], 'Service feed ready' );
 sidrena_contract_assert( true === $json['publication']['csv_ready'], 'Both main feeds published' );
 sidrena_contract_assert( false === $json['publication']['pending_changes'], 'No unverified changes on a clean standalone installation' );
 sidrena_contract_assert( false === $json['publication']['compliance_certified'], 'Published CSV does not certify legally correct prices' );
-sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-sidrena/v1/cjenici/proizvodi/csv' === $json['feeds']['proizvodi']['csv'], 'Existing CSV URL unchanged' );
+sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-bazna/v1/cjenici/proizvodi/csv' === $json['feeds']['proizvodi']['csv'], 'Existing CSV URL unchanged' );
 sidrena_contract_assert( 'Korzo 12, Rijeka' === $json['outlets'][0]['address'], 'Only the configured public business address is published' );
 sidrena_contract_assert( true === $json['outlets'][0]['feeds']['proizvodi']['available_csv'], 'Outlet product available' );
 sidrena_contract_assert( false === $json['outlets'][0]['feeds']['usluge']['available_csv'], 'Outlet service missing, not falsely ready' );
@@ -206,11 +210,11 @@ sidrena_contract_assert( 1 === $json['legal']['schema'], 'Existing legal contrac
 $sidrena_plain_permalinks = true;
 $plain = $api->index();
 sidrena_contract_assert(
-	'https://primjer.hr/?rest_route=/brendigo-sidrena/v1/cjenici' === $plain['connection']['rest_endpoint'],
+	'https://primjer.hr/?rest_route=/brendigo-bazna/v1/cjenici' === $plain['connection']['rest_endpoint'],
 	'Plain permalink connection URL is discoverable'
 );
 sidrena_contract_assert(
-	'https://primjer.hr/?rest_route=/brendigo-sidrena/v1/cjenici/proizvodi/csv' === $plain['feeds']['proizvodi']['csv'],
+	'https://primjer.hr/?rest_route=/brendigo-bazna/v1/cjenici/proizvodi/csv' === $plain['feeds']['proizvodi']['csv'],
 	'Plain permalink product CSV endpoint'
 );
 sidrena_contract_assert(
@@ -229,4 +233,4 @@ unlink( $outlet_products );
 unlink( $products );
 rmdir( $dir );
 
-fwrite( STDOUT, "PASS: SIDRENA Android/WordPress public API v1 contract\n" );
+fwrite( STDOUT, "PASS: BAZNA Android/WordPress public API v1 contract\n" );

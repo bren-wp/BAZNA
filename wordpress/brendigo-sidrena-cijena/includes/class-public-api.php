@@ -16,12 +16,15 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 	}
 
 	public function register() {
-		register_rest_route( 'brendigo-sidrena/v1', '/cjenici', array(
+		// New BAZNA-facing paths are canonical; legacy paths stay read-only
+		// and fully functional for installed Android clients and old embeds.
+		foreach ( array( 'brendigo-bazna/v1', 'brendigo-sidrena/v1' ) as $namespace ) {
+		register_rest_route( $namespace, '/cjenici', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( $this, 'index' ),
 			'permission_callback' => '__return_true',
 		) );
-		register_rest_route( 'brendigo-sidrena/v1', '/arhiva', array(
+		register_rest_route( $namespace, '/arhiva', array(
 			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'archive_index' ),
 			'permission_callback' => '__return_true',
@@ -30,12 +33,13 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				'outlet' => array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ),
 			),
 		) );
-		register_rest_route( 'brendigo-sidrena/v1', '/cjenici/(?P<kind>proizvodi|usluge)/(?P<format>xml|csv)', array(
+		register_rest_route( $namespace, '/cjenici/(?P<kind>proizvodi|usluge)/(?P<format>xml|csv)', array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( $this, 'feed' ),
 			'permission_callback' => '__return_true',
 			'args'                => array( 'oznaka' => array( 'type' => 'string', 'default' => '', 'sanitize_callback' => 'sanitize_text_field' ) ),
 		) );
+		}
 	}
 
 	/**
@@ -57,6 +61,7 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		$meta = $export->get_public_meta();
 		$out = array(
 			'api_version'  => 1,
+			'platform'     => 'wordpress',
 			'plugin_version' => BRENDIGO_SIDRENA_CIJENA_VERSION,
             'branding' => array(
                 'name' => 'BAZNA',
@@ -73,13 +78,13 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				'mode' => 'public_read_only',
 				'authentication_required' => false,
 				'csv_publication_required' => true,
-				'rest_endpoint' => esc_url_raw( rest_url( 'brendigo-sidrena/v1/cjenici' ) ),
+				'rest_endpoint' => esc_url_raw( rest_url( 'brendigo-bazna/v1/cjenici' ) ),
 			),
 			'legal' => Brendigo_Sidrena_Cijena_Legal::public_contract(),
 			'published_at' => isset( $meta['generated'] ) ? gmdate( 'c', (int) $meta['generated'] ) : null,
 			'cjenik'       => esc_url_raw( $export->get_cjenik_url() ),
 			'archive'      => esc_url_raw( $export->get_archive_url() ),
-			'type_archive' => esc_url_raw( rest_url( 'brendigo-sidrena/v1/arhiva' ) ),
+			'type_archive' => esc_url_raw( rest_url( 'brendigo-bazna/v1/arhiva' ) ),
 			'combined'     => esc_url_raw( $export->get_public_url() ),
 			'feeds'        => array(),
 			'outlets'      => array(),
@@ -87,7 +92,7 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
 			$out['feeds'][ $kind ] = array( 'available_csv' => $this->feed_available( $kind ) );
 			foreach ( array( 'xml', 'csv' ) as $ext ) {
-				$out['feeds'][ $kind ][ $ext ] = esc_url_raw( rest_url( 'brendigo-sidrena/v1/cjenici/' . $kind . '/' . $ext ) );
+				$out['feeds'][ $kind ][ $ext ] = esc_url_raw( rest_url( 'brendigo-bazna/v1/cjenici/' . $kind . '/' . $ext ) );
 			}
 		}
 		if ( Brendigo_Sidrena_Cijena_Settings::instance()->is_multi_poslovnica() ) {
@@ -110,7 +115,7 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 				}
 				foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
 					foreach ( array( 'xml', 'csv' ) as $ext ) {
-						$entry['feeds'][ $kind ][ $ext ] = esc_url_raw( add_query_arg( 'oznaka', $code, rest_url( 'brendigo-sidrena/v1/cjenici/' . $kind . '/' . $ext ) ) );
+						$entry['feeds'][ $kind ][ $ext ] = esc_url_raw( add_query_arg( 'oznaka', $code, rest_url( 'brendigo-bazna/v1/cjenici/' . $kind . '/' . $ext ) ) );
 					}
 				}
 				$out['outlets'][] = $entry;
