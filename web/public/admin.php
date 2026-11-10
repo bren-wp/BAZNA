@@ -56,7 +56,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <p>Povijesni referentni datumi: <strong>2. 5. 2025.</strong> i <strong>10. 9. 2026.</strong>, prema klasifikaciji.</p>
 <p>Bazna cijena nije isto što i najniža cijena u 30 dana prije sniženja. Ne unosite povijesni iznos bez dokaza.</p></section>
 <?php elseif (in_array($tab, ['proizvodi','usluge','poslovnice'], true)): ?>
-<?= AdminCatalog::render(
+<?= \Brendigo\Bazna\AdminCatalog::render(
     $tab,
     $draft,
     $core->link('bazna/admin?tab=' . $tab),
