@@ -81,9 +81,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/package_platforms.py --output-dir artifacts/multiplatform
-          (cd artifacts/multiplatform && sha256sum -c BAZNA-Web-1.0.0.zip.sha256)
-          (cd artifacts/multiplatform && sha256sum -c BAZNA-Joomla-Plugin-1.0.0.zip.sha256)
-          (cd artifacts/multiplatform && sha256sum -c BAZNA-Shopify-Adapter-1.0.0.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Web-1.1.0.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Joomla-Plugin-1.1.0.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Shopify-Adapter-1.1.0.zip.sha256)
           python3 tools/package_platforms.py --output-dir /tmp/bazna-repeat
           for file in artifacts/multiplatform/*.zip; do
             cmp "$file" "/tmp/bazna-repeat/$(basename "$file")"
@@ -93,7 +93,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/bazna-joomla
-          unzip -q artifacts/multiplatform/BAZNA-Joomla-Plugin-1.0.0.zip -d /tmp/bazna-joomla
+          unzip -q artifacts/multiplatform/BAZNA-Joomla-Plugin-1.1.0.zip -d /tmp/bazna-joomla
           test -s /tmp/bazna-joomla/bazna.xml
           test -s /tmp/bazna-joomla/vendor/Core.php
           test -s /tmp/bazna-joomla/vendor/LicenseClient.php
@@ -113,7 +113,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/bazna-shopify
-          unzip -q artifacts/multiplatform/BAZNA-Shopify-Adapter-1.0.0.zip -d /tmp/bazna-shopify
+          unzip -q artifacts/multiplatform/BAZNA-Shopify-Adapter-1.1.0.zip -d /tmp/bazna-shopify
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/index.php
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/webhooks.php
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/WebhookHandler.php
