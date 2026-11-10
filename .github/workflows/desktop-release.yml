@@ -201,7 +201,7 @@ jobs:
           ]
           (folder / "SIDRENA-Desktop-win-x64-SHA256SUMS.txt").unlink()
           (folder / "BAZNA-Desktop-win-x64-SHA256SUMS.txt").write_text(
-              "\\n".join(checks) + "\\n", encoding="utf-8"
+              "\n".join(checks) + "\n", encoding="utf-8"
           )
           old_manifest = folder / "SIDRENA-Desktop-release-info.json"
           info = json.loads(old_manifest.read_text(encoding="utf-8-sig"))
@@ -212,7 +212,7 @@ jobs:
               .replace("SIDRENA-Desktop", "BAZNA-Desktop")
           )
           (folder / "BAZNA-Desktop-release-info.json").write_text(
-              json.dumps(info, ensure_ascii=False, indent=2) + "\\n",
+              json.dumps(info, ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8",
           )
           old_manifest.unlink()
