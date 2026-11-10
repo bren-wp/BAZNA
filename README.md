@@ -4,21 +4,35 @@
 
 ### Cijene pod kontrolom. Poslovanje s povjerenjem.
 
-**BAZNA** povezuje evidenciju proizvoda, usluga, sidrenih cijena, javnih cjenika i arhiviranih objava. Rješenja za **Android, Windows i WordPress** dizajnirana su oko preglednih podataka, tamnoplave palete i prepoznatljivih narančastih detalja.
+**BAZNA** povezuje evidenciju proizvoda, usluga, baznih cijena, javnih cjenika i arhiviranih objava. Postojeće platforme **Android, Windows i WordPress** nadopunjuju razvojne integracije za **samostalne PHP stranice, Joomlu i Shopify**, uz zajednički javni API v1 i domensko licenciranje.
 
 [Preuzmi BAZNA](https://github.com/bren-wp/BAZNA/releases) · [Web-stranica](https://brendigo.com/sidrene-cijene/) · [Podrška](mailto:sidrena@brendigo.com)
 
-## Tri platforme. Jedan BAZNA identitet.
+## Više platformi. Jedan BAZNA identitet.
 
 | Platforma | Namjena | Izdanje |
 |---|---|---|
-| **Android** | Pregled javnih proizvoda, usluga, sidrenih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.13** |
+| **Android** | Pregled javnih proizvoda, usluga, baznih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.13** |
 | **Windows** | Lokalno upravljanje katalozima, poviješću cijena, lokacijama, CSV/XML datotekama i sigurnosnim kopijama | **0.10.6** |
-| **WordPress** | Službeni dodatak za javne cjenike, sidrene cijene i arhivu | **1.5.13**, nadopunjen pravni profil |
+| **WordPress** | Službeni dodatak za javne cjenike, bazne cijene i arhivu | **1.5.13**, nadopunjen pravni profil |
+
+### Novi BAZNA adapteri — PHP, Joomla, Shopify
+
+Ove integracije trenutačno su **prva funkcionalna razvojna inačica 1.0.0**, ne odobreni produkcijski dodaci za svaku platformu. Kod i instalacijske upute nalaze se u `/web`, `/joomla` i `/shopify`.
+
+| Integracija | Osnovne funkcije | Produkcijski status |
+|---|---|---|
+| **Web PHP** | Admin, lokalni JSON katalog, poslovnice, domenska licenca, CSV/XML, arhiva i javni API v1 | Offline CI provjeren; potreban hosting E2E |
+| **Joomla** | System plugin, Joomla administratorska prava/CSRF, isti PHP katalog i javni API v1 | Kandidat ZIP-a; potreban test na stvarnoj Joomla instalaciji |
+| **Shopify** | Potpisani app-proxy, izolirane trgovine, ručni uvoz varijanti u EUR, javni API i theme blok | Custom-store adapter; OAuth i App Store objava nisu dovršeni |
+
+Android automatski prepoznaje javne BAZNA putanje bez CMS lozinki; pritom zadržava izvorne WordPress REST putanje i sigurnosno ograničenje na istu HTTPS domenu. Pravilo povijesne bazne cijene ostaje ručna potvrda uz dokaz. Shopify `compareAtPrice` ne koristi se za izračun bazne cijene.
+
+[Arhitektura svih platformi](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [PHP upute](web/README.md) · [Joomla upute](joomla/README.md) · [Shopify upute](shopify/README.md)
 
 ### BAZNA Android
 
-Povežite WordPress stranicu, pregledajte proizvode i usluge, filtrirajte sidrene cijene, odaberite poslovnicu i otvorite objavljene cjenike ili arhivirane CSV/XML dokumente. Izgled aplikacije razvija se prema referentnim prikazima BAZNA. Za potvrdu 1:1 potrebno je usporediti stvarne snimke zaslona s izvornim referencama na jednakim dimenzijama.
+Povežite BAZNA stranicu na podržanoj platformi, pregledajte proizvode i usluge, filtrirajte sidrene cijene, odaberite poslovnicu i otvorite objavljene cjenike ili arhivirane CSV/XML dokumente. Izgled aplikacije razvija se prema referentnim prikazima BAZNA. Za potvrdu 1:1 potrebno je usporediti stvarne snimke zaslona s izvornim referencama na jednakim dimenzijama.
 
 ![BAZNA vizualni identitet](desktop/branding/sidrena-banner.svg)
 
@@ -26,7 +40,7 @@ Povežite WordPress stranicu, pregledajte proizvode i usluge, filtrirajte sidren
 
 Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android aplikaciju upišite adresu WordPress instalacije (npr. `https://primjer.hr/` ili `https://primjer.hr/trgovina/`). Za prikaz javnih cjenika nije potrebna WordPress prijava. Android podržava WordPress REST i u načinu lijepih poveznica (`/wp-json/`) i u načinu običnih poveznica (`?rest_route=`); prihvaća samo javne HTTPS adrese iste domene.
 
-**Napomena:** podaci se prikazuju tek nakon što WordPress objavi javni CSV; prva aktivacija može zahtijevati dovršetak WP-Cron objave. Provjerite BAZNA administracijski status objave i posjetite javni REST endpoint bez prijave. Podaci o sidrenoj cijeni nisu automatski procijenjeni i ovo nije potvrda zakonske sukladnosti cijena.
+**Napomena:** podaci se prikazuju tek nakon što WordPress objavi javni CSV; prva aktivacija može zahtijevati dovršetak WP-Cron objave. Provjerite BAZNA administracijski status objave i posjetite javni REST endpoint bez prijave. Podaci o baznoj cijeni nisu automatski procijenjeni i ovo nije potvrda zakonske sukladnosti cijena.
 
 [Upute za instalaciju, povezivanje, sigurnosne provjere i pravni audit](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md)
 
