@@ -12,12 +12,6 @@ on:
       - '.github/workflows/multiplatform-ci.yml'
   push:
     branches: [main]
-    paths:
-      - 'web/**'
-      - 'joomla/**'
-      - 'shopify/**'
-      - 'licenca/**'
-      - 'tools/package_platforms.py'
       - 'tools/test_platform_responsive.mjs'
   workflow_dispatch:
 
