@@ -8,6 +8,7 @@ defined('_JEXEC') or die;
 
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\LicenseClient;
+use Brendigo\Bazna\AdminCatalog;
 use Joomla\CMS\Event\Application\AfterInitialiseEvent;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Uri\Uri;
@@ -40,6 +41,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
         }
         require_once dirname(__DIR__, 2) . '/vendor/Core.php';
         require_once dirname(__DIR__, 2) . '/vendor/LicenseClient.php';
+        require_once dirname(__DIR__, 2) . '/vendor/AdminCatalog.php';
         try {
             $storage = (string) getenv('BAZNA_JOOMLA_PRIVATE_DIR');
             $base = (string) getenv('BAZNA_JOOMLA_PUBLIC_URL');
@@ -114,7 +116,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 $status = (string) (($license?->refresh() ?? [])['code'] ?? 'missing_license');
             } elseif ($action === 'deactivate') {
                 $status = (string) (($license?->deactivate() ?? [])['code'] ?? 'missing_license');
-            } elseif (in_array($action, ['save', 'publish'], true)) {
+            } elseif (in_array($action, ['save', 'publish', 'save_item', 'delete_item'], true)) {
                 if (!$license?->active()) {
                     http_response_code(403);
                     $status = 'Za uređivanje je potrebna aktivna BAZNA licenca.';
@@ -125,9 +127,21 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                     if (!is_array($catalog)) throw new \InvalidArgumentException('Neispravan JSON.');
                     $core->saveDraft($catalog);
                     $status = 'Nacrt je spremljen.';
-                } else {
+                } elseif ($action === 'publish') {
                     $core->publish();
                     $status = 'Cjenik je objavljen.';
+                } else {
+                    if ($action === 'delete_item' &&
+                        (string) ($_POST['delete_confirm'] ?? '') !== '1') {
+                        throw new \InvalidArgumentException('Potvrdite uklanjanje stavke.');
+                    }
+                    $index = AdminCatalog::indexFromPost($_POST);
+                    $row = $action === 'save_item' ? AdminCatalog::fromPost($_POST) : null;
+                    $core->modifyRow(
+                        $app->input->post->getCmd('collection', ''),
+                        $index, $row, (string) ($_POST['expected_hash'] ?? '')
+                    );
+                    $status = $action === 'save_item' ? 'Stavka je spremljena.' : 'Stavka je uklonjena.';
                 }
             }
         }
@@ -149,10 +163,17 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
         echo '</nav><main class="bazna-main"><h1>' . Core::esc($links[$tab]) . '</h1>';
         if ($status !== '') echo '<p role="status" class="bazna-message">' . Core::esc($status) . '</p>';
         echo '<div class="bazna-panel">';
-        if (in_array($tab, ['proizvodi', 'usluge', 'poslovnice', 'uvoz-izvoz'], true)) {
+        if (in_array($tab, ['proizvodi', 'usluge', 'poslovnice'], true)) {
+            echo AdminCatalog::render(
+                $tab, $draft, '?bazna=dashboard&tab=' . $tab,
+                \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
+                $license?->active() ?? false,
+                $app->input->getInt('page', 1)
+            );
+        } elseif ($tab === 'uvoz-izvoz') {
             $json = json_encode(array_intersect_key($draft, array_flip(['products','services','outlets'])),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            echo '<h2>Uređivanje kataloga</h2><p>Podaci se objavljuju samo nakon provjere.</p><form method="post">';
+            echo '<h2>Uvoz i izvoz JSON kataloga</h2><p>Za pojedinačne izmjene koristite kartice Proizvodi, Usluge i Poslovnice.</p><form method="post">';
             echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
             echo '<input type="hidden" name="action" value="save"><textarea class="bazna-editor" name="catalog">' . Core::esc((string) $json) . '</textarea>';
             echo '<button type="submit"' . ($license?->active() ? '' : ' disabled') . '>Spremi nacrt</button></form>';
