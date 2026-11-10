@@ -7,9 +7,11 @@
 declare(strict_types=1);
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\LicenseClient;
+use Brendigo\Bazna\AdminCatalog;
 
 require_once dirname(__DIR__) . '/src/Core.php';
 require_once dirname(__DIR__) . '/src/LicenseClient.php';
+require_once dirname(__DIR__) . '/src/AdminCatalog.php';
 
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: no-referrer');
@@ -127,7 +129,8 @@ try {
             } elseif (($_SESSION['admin'] ?? false) && $action === 'deactivate') {
                 $result = $license?->deactivate() ?? ['code' => 'missing_app_key'];
                 $message = 'Licenca: ' . (string) ($result['code'] ?? 'error');
-            } elseif (($_SESSION['admin'] ?? false) && in_array($action, ['save', 'publish'], true)) {
+            } elseif (($_SESSION['admin'] ?? false) &&
+                in_array($action, ['save', 'publish', 'save_item', 'delete_item'], true)) {
                 if (!$license?->active()) bazna_fail(403, 'Za izmjene je potrebna aktivna BAZNA licenca.');
                 if ($action === 'save') {
                     $raw = (string) ($_POST['catalog'] ?? '');
@@ -136,9 +139,21 @@ try {
                     if (!is_array($payload)) bazna_fail(400, 'Neispravan JSON katalog.');
                     $core->saveDraft($payload);
                     $message = 'Nacrt kataloga je spremljen.';
-                } else {
+                } elseif ($action === 'publish') {
                     $core->publish();
                     $message = 'Javni cjenici i arhiva su ažurirani.';
+                } else {
+                    $collection = (string) ($_POST['collection'] ?? '');
+                    $index = AdminCatalog::indexFromPost($_POST);
+                    $expected = (string) ($_POST['expected_hash'] ?? '');
+                    if ($action === 'delete_item' &&
+                        (string) ($_POST['delete_confirm'] ?? '') !== '1') {
+                        bazna_fail(400, 'Potvrdite uklanjanje stavke.');
+                    }
+                    $row = $action === 'save_item' ? AdminCatalog::fromPost($_POST) : null;
+                    $core->modifyRow($collection, $index, $row, $expected);
+                    $message = $action === 'save_item' ? 'Stavka je spremljena u nacrt.' :
+                        'Stavka je uklonjena iz nacrta.';
                 }
             }
         }
