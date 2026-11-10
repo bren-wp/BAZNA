@@ -25,7 +25,8 @@ jobs:
       GH_REPO: ${{ github.repository }}
       CI_SHA: ${{ github.event.workflow_run.head_sha }}
       ANDROID_RUN_ID: ${{ github.event.workflow_run.id }}
-      RELEASE_VERSION: '1.5.13'
+      RELEASE_VERSION: '1.5.14'
+      WEB_JOOMLA_SHOPIFY_VERSION: '1.1.0'
       ANDROID_VERSION: '1.5.13'
       WINDOWS_VERSION: '0.10.6'
       WORDPRESS_VERSION: '1.5.13'
@@ -76,7 +77,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for workflow in official-plugin-ci.yml repository-audit.yml; do
+          for workflow in official-plugin-ci.yml repository-audit.yml multiplatform-ci.yml; do
             endpoint="repos/$GH_REPO/actions/workflows/$workflow/runs?head_sha=$CI_SHA&per_page=20"
             found=0
             for attempt in $(seq 1 90); do
@@ -104,6 +105,23 @@ jobs:
           gh run download "$WIN_RUN_ID" --repo "$GH_REPO" \
             --name 'SIDRENA-Desktop-release-binaries' --dir release
           # New WordPress ZIP is packaged from this exact release commit.
+      - name: Download verified BAZNA Web, Joomla and Shopify artifacts
+        if: env.ALREADY_EXISTS != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint="repos/$GH_REPO/actions/workflows/multiplatform-ci.yml/runs?head_sha=$CI_SHA&per_page=30"
+          platform_run=$(gh api "$endpoint" --jq '.workflow_runs | map(select(.event=="push" and .head_branch=="main" and .status=="completed" and .conclusion=="success")) | sort_by(.created_at) | last | .id')
+          [[ "$platform_run" =~ ^[0-9]+$ ]] || { echo "Verified Web/Joomla/Shopify workflow missing"; exit 1; }
+          gh run download "$platform_run" --repo "$GH_REPO" \
+            --name 'BAZNA-web-joomla-shopify-candidate' --dir release
+          for name in \
+            "BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip" \
+            "BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip" \
+            "BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip"; do
+            test -s "release/$name" && test -s "release/$name.sha256"
+            (cd release && sha256sum -c "$name.sha256")
+          done
       - name: Package WordPress from verified source
         if: env.ALREADY_EXISTS != '1'
         shell: bash
@@ -120,6 +138,12 @@ jobs:
           php licenca/tests/test.php
           python3 tools/package_license.py --version "$RELEASE_VERSION" --output "release/BAZNA-Licenca-Server-$RELEASE_VERSION.zip"
           (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
+          for name in \
+            "BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip" \
+            "BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip" \
+            "BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip"; do
+            (cd release && sha256sum -c "$name.sha256")
+          done
       - name: Verify all platforms and SHA-256 hashes
         if: env.ALREADY_EXISTS != '1'
         shell: bash
@@ -131,7 +155,10 @@ jobs:
             SIDRENA-Desktop-win-x64-Portable.exe SIDRENA-Desktop-win-x64-Setup.exe \
             SIDRENA-Desktop-win-x64-SHA256SUMS.txt SIDRENA-Desktop-release-info.json \
             brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256 \
-            BAZNA-Licenca-Server-$RELEASE_VERSION.zip BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256; do
+            BAZNA-Licenca-Server-$RELEASE_VERSION.zip BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256 \
+            BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256 \
+            BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256 \
+            BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256; do
             test -s "release/$file" || { echo "Missing release/$file"; exit 1; }
           done
           (cd release && sha256sum -c SIDRENA-Android-SHA256SUMS.txt)
@@ -166,6 +193,10 @@ jobs:
           ## WordPress
           **BAZNA — Bazne cijene $WORDPRESS_VERSION** — zajednički REST v1 katalog s provjerom objave CSV cjenika, opcionalnim slikama proizvoda i usklađenim BAZNA brendingom. Pravni profil NN 101/2026 i NN 110/2026 ostaje sačuvan. SHA-256: $wp_sha.
 
+          ## Web, Joomla i Shopify $WEB_JOOMLA_SHOPIFY_VERSION (razvojni kandidati)
+          Tri nova ZIP paketa: samostalni BAZNA PHP Web, instalacijski Joomla dodatak i Shopify adapter. Web i Joomla dijele responzivne kataloge proizvoda, usluga i poslovnica, uz provjere povijesnih cijena, atomsko uređivanje i arhivu. Shopify dodaje HMAC autentikaciju proxyja, autorizirane kataloge i GDPR privacy webhooks.
+          **Shopify adapter nije odobrena App Store aplikacija**: puni OAuth, Billing, embedded UI i trgovinski integracijski testovi još su obvezni. Joomla također zahtijeva test na stvarnoj CMS instalaciji. Uspješne Chrome snimke dokazuju responzivnost, ne 0% pixel-diff prema izvornim referencama.
+
           ## Licencni servis
           ZIP **BAZNA-Licenca-Server-$RELEASE_VERSION.zip** sadrži sav PHP/JSON kod, Apache/Nginx pravila, testove i upute za https://licenca.brendigo.com/licenca/api.php.
           **Zbog sigurnosti ne sadrži privatni master secret.** Prije prve aktivacije treba dodati isti privatni config.php kojim je izdano postojećih 10.000 ključeva. API vraća 503 dok konfiguracija nije valjana. Ne objavljivati master ključ niti privatni popis ključeva u GitHub izdanju.
@@ -183,5 +214,5 @@ jobs:
             --title "BAZNA" \
             --notes-file notes.md --prerelease
           count=$(gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json assets --jq '.assets | length')
-          [[ "$count" -eq 11 ]] || { echo "Expected 11 assets, got $count"; exit 1; }
+          [[ "$count" -eq 17 ]] || { echo "Expected 17 assets, got $count"; exit 1; }
           echo "Published $RELEASE_TAG with $count verified assets."
