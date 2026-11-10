@@ -9,10 +9,12 @@ declare(strict_types=1);
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\Shopify\ProxySignature;
+use Brendigo\Bazna\Shopify\WebhookHandler;
 
 require_once dirname(__DIR__, 2) . '/web/src/Core.php';
 require_once dirname(__DIR__, 2) . '/web/src/LicenseClient.php';
 require_once __DIR__ . '/ProxySignature.php';
+require_once __DIR__ . '/WebhookHandler.php';
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store, max-age=0, must-revalidate');
 header('Referrer-Policy: no-referrer');
@@ -40,6 +42,11 @@ try {
     $folder = (string) getenv('BAZNA_SHOPIFY_PRIVATE_DIR');
     if (!str_starts_with($folder, '/') || str_contains($folder, '..')) {
         throw new RuntimeException('Privatni direktorij Shopify podataka nije konfiguriran.');
+    }
+    // App uninstall and shop redaction tombstones override even a stale
+    // operator allowlist. Installation again requires an explicit owner action.
+    if (WebhookHandler::isRevoked($folder, $shop)) {
+        bazna_shop_response(403, ['error' => 'shop_installation_revoked']);
     }
     // No user-provided directory name: derive a fixed per-tenant identifier
     // from the validated, signed and locally authorized shop identity.
