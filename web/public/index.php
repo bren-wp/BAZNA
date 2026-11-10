@@ -37,6 +37,11 @@ try {
     $publicUrl = (string) getenv('BAZNA_PUBLIC_URL');
     $core = new Core($storage, $publicUrl);
     $core->ensurePrivate();
+    // The discovery endpoint is public, but its license status must be read
+    // from the same configured site client BEFORE any route returns.
+    $secret = (string) getenv('BAZNA_APP_KEY');
+    $license = preg_match('/^[a-f0-9]{64}$/i', $secret)
+        ? new LicenseClient($core, $secret) : null;
     $prefix = rtrim((string) parse_url($publicUrl, PHP_URL_PATH), '/');
     $path = rawurldecode((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH));
     if ($prefix !== '' && $prefix !== '/' && str_starts_with($path, $prefix . '/')) {
@@ -75,8 +80,6 @@ try {
         header('Content-Type: text/csv; charset=utf-8');
         echo $core->archiveCsv($parts[1], $parts[2], (string) ($_GET['oznaka'] ?? '')); exit;
     }
-    $secret = (string) getenv('BAZNA_APP_KEY');
-    $license = preg_match('/^[a-f0-9]{64}$/i', $secret) ? new LicenseClient($core, $secret) : null;
     if ($method === 'GET' && $path === '/bazna/v1/license-proof') {
         $proof = $license?->proof();
         if ($proof === null) bazna_fail(404, 'Provjera licence nije aktivna.');
