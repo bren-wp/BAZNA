@@ -103,8 +103,11 @@ try {
 $core->modifyRow('products', 1, null, rowHash($updated['products'][1]));
 verifyEditor(count($core->read('draft.json')['products']) === 1, 'delete only selected row');
 $core->publish();
-verifyEditor(str_contains($core->csv('proizvodi'), '12,59'), 'edited catalog is published');
-verifyEditor(!str_contains($core->csv('proizvodi'), 'Novi artikl'),
+verifyEditor(str_contains($core->csv('proizvodi', 'RI-01'), '12,59'),
+    'edited branch catalog is published with actual RI-01 price');
+verifyEditor(!str_contains($core->csv('proizvodi'), '12,59'),
+    'branch product is not mixed into webshop-only publication');
+verifyEditor(!str_contains($core->csv('proizvodi', 'RI-01'), 'Novi artikl'),
     'deleted row does not leak into published CSV');
 $core->modifyRow('services', -1, ['naziv'=>'Nova usluga','maloprodajna_cijena'=>'50,00']);
 $core->publish();
