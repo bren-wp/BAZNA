@@ -12,7 +12,7 @@
 
 | Platforma | Namjena | Izdanje |
 |---|---|---|
-| **Android** | Pregled javnih proizvoda, usluga, baznih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.13** |
+| **Android** | Pregled javnih proizvoda, usluga, baznih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.14** |
 | **Windows** | Lokalno upravljanje katalozima, poviješću cijena, lokacijama, CSV/XML datotekama i sigurnosnim kopijama | **0.10.6** |
 | **WordPress** | Službeni dodatak za javne cjenike, bazne cijene i arhivu | **1.5.14**, nadopunjen pravni profil |
 
@@ -36,7 +36,7 @@ Povežite BAZNA stranicu na podržanoj platformi, pregledajte proizvode i usluge
 
 ![BAZNA vizualni identitet](desktop/branding/sidrena-banner.svg)
 
-### Android ↔ WordPress povezivanje (BAZNA 1.5.13)
+### Android ↔ WordPress povezivanje (BAZNA 1.5.14)
 
 Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android aplikaciju upišite adresu WordPress instalacije (npr. `https://primjer.hr/` ili `https://primjer.hr/trgovina/`). Za prikaz javnih cjenika nije potrebna WordPress prijava. Android podržava WordPress REST i u načinu lijepih poveznica (`/wp-json/`) i u načinu običnih poveznica (`?rest_route=`); prihvaća samo javne HTTPS adrese iste domene.
 
@@ -46,7 +46,7 @@ Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android 
 
 ### Android i WordPress — zajednički javni katalog
 
-Android 1.5.13 i WordPress 1.5.14 donose objavljene korekcije mobilnog sučelja i javnog kataloga. U WordPressu otvorite **BAZNA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **BAZNA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
+Android 1.5.14 i WordPress 1.5.14 donose objavljene korekcije mobilnog sučelja i javnog kataloga. U WordPressu otvorite **BAZNA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **BAZNA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
 
 Android ostaje samo za čitanje: prihvaća REST v1, učitava stvarne proizvode/usluge i poslovnice, poštuje status objave, te prikazuje stvarne WooCommerce slike samo s iste javne HTTPS domene. Bez objavljenih CSV cjenika prikazuje jasnu obavijest i omogućuje naknadno osvježavanje; stari dodaci bez statusnih polja i dalje su kompatibilni. Produkcijska objava provodi se zasebno nakon spajanja i uspješnih provjera izdanja.
 
@@ -74,7 +74,7 @@ Android APK namijenjen je instalaciji i provjeri. Android AAB treba odgovarajuć
 
 ## Pravna revizija — listopad 2026.
 
-WordPress **1.5.13**, Android **1.5.13** i Windows **0.10.6** koriste zajednički javni profil propisa NN 101/2026 i izmjena NN 110/2026. Datum proširene primjene je **17. studenoga 2026.** Nacrt novih pravilnika još nije konačni propis. Povijesne sidrene cijene ne izračunavaju se automatski iz sadašnje cijene.
+WordPress **1.5.14**, Android **1.5.14** i Windows **0.10.6** koriste zajednički javni profil propisa NN 101/2026 i izmjena NN 110/2026. Datum proširene primjene je **17. studenoga 2026.** Nacrt novih pravilnika još nije konačni propis. Povijesne sidrene cijene ne izračunavaju se automatski iz sadašnje cijene.
 
 [Pravna revizija 29. 10. 2026.](docs/LEGAL-REVIEW-2026-10-29.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 

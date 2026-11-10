@@ -2,11 +2,11 @@
 
 | Komponenta | Verzija |
 |---|---|
-| Android | **1.5.13 (izdanje za CI validaciju)** |
+| Android | **1.5.14 (izdanje za CI validaciju)** |
 | Windows Desktop | **0.10.6** |
 | WordPress dodatak | **1.5.14 (izdanje za CI validaciju)** |
 
-Verzije su **odvojene**. Android 1.5.13 i WordPress 1.5.14 sadrže stvarne, međusobno usklađene promjene u PR-u za izdanje 1.5.13. Izdanje se objavljuje tek nakon uspješnog Android, WordPress, Windows i sigurnosnog CI-ja; debug APK i nepotpisani AAB nisu produkcijski potpisani. WordPress dodatak 1.5.14 potrebno je zasebno instalirati ili ažurirati da bi novi statusi objave CSV-a bili dostupni Androidu.
+Verzije su **odvojene**. Android 1.5.14 i WordPress 1.5.14 sadrže stvarne, međusobno usklađene promjene u PR-u za izdanje 1.5.14. Izdanje se objavljuje tek nakon uspješnog Android, WordPress, Windows i sigurnosnog CI-ja; debug APK i nepotpisani AAB nisu produkcijski potpisani. WordPress dodatak 1.5.14 potrebno je zasebno instalirati ili ažurirati da bi novi statusi objave CSV-a bili dostupni Androidu.
 
 ## Provjere i artefakti
 
