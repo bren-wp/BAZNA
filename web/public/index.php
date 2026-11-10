@@ -7,9 +7,11 @@
 declare(strict_types=1);
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\LicenseClient;
+use Brendigo\Bazna\AdminCatalog;
 
 require_once dirname(__DIR__) . '/src/Core.php';
 require_once dirname(__DIR__) . '/src/LicenseClient.php';
+require_once dirname(__DIR__) . '/src/AdminCatalog.php';
 
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: no-referrer');
@@ -35,6 +37,11 @@ try {
     $publicUrl = (string) getenv('BAZNA_PUBLIC_URL');
     $core = new Core($storage, $publicUrl);
     $core->ensurePrivate();
+    // The discovery endpoint is public, but its license status must be read
+    // from the same configured site client BEFORE any route returns.
+    $secret = (string) getenv('BAZNA_APP_KEY');
+    $license = preg_match('/^[a-f0-9]{64}$/i', $secret)
+        ? new LicenseClient($core, $secret) : null;
     $prefix = rtrim((string) parse_url($publicUrl, PHP_URL_PATH), '/');
     $path = rawurldecode((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH));
     if ($prefix !== '' && $prefix !== '/' && str_starts_with($path, $prefix . '/')) {
@@ -46,7 +53,8 @@ try {
     // This module is embedded by the Joomla adapter as well as standalone.
     $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
     if ($method === 'GET' && $path === '/bazna/v1/cjenici') {
-        bazna_json(200, $core->discovery('web'));
+        $active = $license?->active();
+        bazna_json(200, $core->discovery('web', null, $active));
     }
     if ($method === 'GET' && $path === '/bazna/v1/arhiva') {
         $entries = $core->archives();
@@ -72,8 +80,6 @@ try {
         header('Content-Type: text/csv; charset=utf-8');
         echo $core->archiveCsv($parts[1], $parts[2], (string) ($_GET['oznaka'] ?? '')); exit;
     }
-    $secret = (string) getenv('BAZNA_APP_KEY');
-    $license = preg_match('/^[a-f0-9]{64}$/i', $secret) ? new LicenseClient($core, $secret) : null;
     if ($method === 'GET' && $path === '/bazna/v1/license-proof') {
         $proof = $license?->proof();
         if ($proof === null) bazna_fail(404, 'Provjera licence nije aktivna.');
@@ -127,7 +133,8 @@ try {
             } elseif (($_SESSION['admin'] ?? false) && $action === 'deactivate') {
                 $result = $license?->deactivate() ?? ['code' => 'missing_app_key'];
                 $message = 'Licenca: ' . (string) ($result['code'] ?? 'error');
-            } elseif (($_SESSION['admin'] ?? false) && in_array($action, ['save', 'publish'], true)) {
+            } elseif (($_SESSION['admin'] ?? false) &&
+                in_array($action, ['save', 'publish', 'save_item', 'delete_item'], true)) {
                 if (!$license?->active()) bazna_fail(403, 'Za izmjene je potrebna aktivna BAZNA licenca.');
                 if ($action === 'save') {
                     $raw = (string) ($_POST['catalog'] ?? '');
@@ -136,9 +143,21 @@ try {
                     if (!is_array($payload)) bazna_fail(400, 'Neispravan JSON katalog.');
                     $core->saveDraft($payload);
                     $message = 'Nacrt kataloga je spremljen.';
-                } else {
+                } elseif ($action === 'publish') {
                     $core->publish();
                     $message = 'Javni cjenici i arhiva su ažurirani.';
+                } else {
+                    $collection = (string) ($_POST['collection'] ?? '');
+                    $index = AdminCatalog::indexFromPost($_POST);
+                    $expected = (string) ($_POST['expected_hash'] ?? '');
+                    if ($action === 'delete_item' &&
+                        (string) ($_POST['delete_confirm'] ?? '') !== '1') {
+                        bazna_fail(400, 'Potvrdite uklanjanje stavke.');
+                    }
+                    $row = $action === 'save_item' ? AdminCatalog::fromPost($_POST) : null;
+                    $core->modifyRow($collection, $index, $row, $expected);
+                    $message = $action === 'save_item' ? 'Stavka je spremljena u nacrt.' :
+                        'Stavka je uklonjena iz nacrta.';
                 }
             }
         }

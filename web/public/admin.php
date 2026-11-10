@@ -55,9 +55,18 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <p>Početak primjene objavljenih odluka: <strong>17. 11. 2026.</strong></p>
 <p>Povijesni referentni datumi: <strong>2. 5. 2025.</strong> i <strong>10. 9. 2026.</strong>, prema klasifikaciji.</p>
 <p>Bazna cijena nije isto što i najniža cijena u 30 dana prije sniženja. Ne unosite povijesni iznos bez dokaza.</p></section>
-<?php elseif (in_array($tab, ['proizvodi','usluge','poslovnice','uvoz-izvoz'], true)): ?>
-<section class="bazna-panel"><h2>Uređivanje kataloga — <?= bazna_html($tabs[$tab]) ?></h2>
-<p>Koristite strukturirani JSON kako biste sigurno uredili cijeli katalog, poslovnice, proizvode i usluge. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog licencnom servisu.</p>
+<?php elseif (in_array($tab, ['proizvodi','usluge','poslovnice'], true)): ?>
+<?= \Brendigo\Bazna\AdminCatalog::render(
+    $tab,
+    $draft,
+    $core->link('bazna/admin?tab=' . $tab),
+    '<input type="hidden" name="_csrf" value="' . bazna_html($csrf) . '">',
+    $licenseActive,
+    (int) ($_GET['page'] ?? 1)
+) ?>
+<?php elseif ($tab === 'uvoz-izvoz'): ?>
+<section class="bazna-panel"><h2>Uvoz i izvoz cjelokupnog kataloga</h2>
+<p>Za napredni uvoz ili izvoz možete provjeriti i uređivati strukturirani JSON cijelog kataloga. Pojedinačne stavke uredite na karticama Proizvodi, Usluge i Poslovnice. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog licencnom servisu.</p>
 <form method="post" action="<?= bazna_html($core->link('bazna/admin?tab=' . $tab)) ?>">
 <input type="hidden" name="action" value="save"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
 <label>JSON nacrt kataloga

@@ -13,7 +13,7 @@ use RuntimeException;
 
 final class Core
 {
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.1.0';
     public const FIELDS = [
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
@@ -187,34 +187,124 @@ final class Core
         }
     }
 
-    public function saveDraft(array $document): void { $this->write('draft.json', self::validateCatalog($document)); }
+    /**
+     * One cross-process lock serializes the WHOLE catalog transaction.
+     * Per-file atomic renames alone do not protect concurrent read/modify/write
+     * operations or preserve previous prices while two admins publish.
+     */
+    private function catalogTransaction(callable $action): mixed
+    {
+        $this->ensurePrivate();
+        $handle = fopen(rtrim($this->storage, '/') . '/catalog-transaction.lock', 'c');
+        if ($handle === false || !flock($handle, LOCK_EX)) {
+            throw new RuntimeException('Nije moguće zaključati BAZNA katalog.');
+        }
+        try {
+            return $action();
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
+    public function saveDraft(array $document): void
+    {
+        $validated = self::validateCatalog($document);
+        $this->catalogTransaction(function () use ($validated): void {
+            $this->write('draft.json', $validated);
+        });
+    }
+
+    /**
+     * Update a single item from the same UI used by standalone PHP and Joomla.
+     * Reject a stale form rather than overwriting another admin's changes.
+     * $index is -1 for a new row; otherwise a zero-based draft row index.
+     */
+    public function modifyRow(string $collection, int $index, ?array $row, string $expectedHash = ''): void
+    {
+        if (!in_array($collection, ['products', 'services', 'outlets'], true) ||
+            $index < -1 || $index > 10000) {
+            throw new InvalidArgumentException('Nevaljana zbirka ili indeks retka.');
+        }
+        $this->catalogTransaction(function () use ($collection, $index, $row, $expectedHash): void {
+            $draft = $this->read('draft.json');
+            $rows = $draft[$collection] ?? [];
+            if (!is_array($rows) || !array_is_list($rows)) {
+                throw new RuntimeException('Neispravan zapis kataloga.');
+            }
+            if ($index === -1) {
+                if ($row === null) throw new InvalidArgumentException('Nema retka za brisanje.');
+                if ($expectedHash !== '') throw new InvalidArgumentException('Nevaljan novi redak.');
+                if ($collection !== 'outlets' && trim((string) ($row['id'] ?? '')) === '') {
+                    $row['id'] = 'bazna-' . bin2hex(random_bytes(8));
+                }
+                $rows[] = $row;
+            } else {
+                if (!isset($rows[$index]) || !is_array($rows[$index]) ||
+                    !preg_match('/^[a-f0-9]{64}$/D', $expectedHash)) {
+                    throw new InvalidArgumentException('Redak više ne postoji ili zahtjev nema verziju.');
+                }
+                $actualHash = hash('sha256', json_encode($rows[$index],
+                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+                if (!hash_equals($actualHash, $expectedHash)) {
+                    throw new InvalidArgumentException('Podaci su izmijenjeni u drugoj sesiji. Osvježite stranicu.');
+                }
+                if ($row === null) {
+                    array_splice($rows, $index, 1);
+                } else {
+                    // IDs and outlet codes are stable references. Renaming an
+                    // outlet requires an explicit migration, not an implicit
+                    // deletion of its assigned products and archived links.
+                    $identity = $collection === 'outlets' ? 'code' : 'id';
+                    if ((string) ($rows[$index][$identity] ?? '') !==
+                        (string) ($row[$identity] ?? '')) {
+                        throw new InvalidArgumentException('Identifikator postojećeg retka nije moguće mijenjati.');
+                    }
+                    $rows[$index] = $row;
+                }
+            }
+            $draft[$collection] = $rows;
+            $validated = self::validateCatalog($draft);
+            if ($collection !== 'outlets') {
+                $seen = [];
+                foreach ($validated[$collection] as $item) {
+                    $id = (string) ($item['id'] ?? '');
+                    if ($id === '' || isset($seen[$id])) {
+                        throw new InvalidArgumentException('Šifra stavke mora biti jedinstvena.');
+                    }
+                    $seen[$id] = true;
+                }
+            }
+            $this->write('draft.json', $validated);
+        });
+    }
 
     public function publish(): array
     {
-        $catalog = self::validateCatalog($this->read('draft.json'));
-        $existing = $this->read('published.json');
-        $timestamp = gmdate('c');
-        // Retain archives indefinitely until explicitly managed by merchant;
-        // never silently delete published evidence before minimum 30 days.
-        if (isset($existing['published_at'])) {
-            $history = $this->read('archive.json');
-            $versions = $history['versions'] ?? [];
-            // Immutable archive snapshots get stable IDs; URL numbering would
-            // shift with each publication. Never silently discard versions
-            // before the statutory retention period, even during rapid edits.
-            $archiveId = gmdate('YmdHis') . '-' . bin2hex(random_bytes(6));
-            $archiveFile = 'archive-' . $archiveId . '.json';
-            $this->write($archiveFile, $existing);
-            array_unshift($versions, [
-                'id' => $archiveId, 'file' => $archiveFile,
-                'published_at' => $existing['published_at'],
-            ]);
-            $history['versions'] = $versions;
-            $this->write('archive.json', $history);
-        }
-        $catalog['published_at'] = $timestamp;
-        $this->write('published.json', $catalog);
-        return $catalog;
+        return $this->catalogTransaction(function (): array {
+            $catalog = self::validateCatalog($this->read('draft.json'));
+            $existing = $this->read('published.json');
+            $timestamp = gmdate('c');
+            // Retain archives indefinitely until merchant-supervised legal
+            // retention review. Prevent two concurrent publishes from losing
+            // one archive-index update.
+            if (isset($existing['published_at'])) {
+                $history = $this->read('archive.json');
+                $versions = $history['versions'] ?? [];
+                $archiveId = gmdate('YmdHis') . '-' . bin2hex(random_bytes(6));
+                $archiveFile = 'archive-' . $archiveId . '.json';
+                $this->write($archiveFile, $existing);
+                array_unshift($versions, [
+                    'id' => $archiveId, 'file' => $archiveFile,
+                    'published_at' => $existing['published_at'],
+                ]);
+                $history['versions'] = $versions;
+                $this->write('archive.json', $history);
+            }
+            $catalog['published_at'] = $timestamp;
+            $this->write('published.json', $catalog);
+            return $catalog;
+        });
     }
 
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
@@ -270,20 +360,31 @@ final class Core
         return (string) $doc->saveXML();
     }
 
+    /**
+     * Cross-platform legal metadata aligned with the existing WordPress v1
+     * contract. This is NOT certification of the merchant's historical data.
+     * Proposed rulebooks may change before final publication.
+     */
     public function legal(): array
     {
         return [
-            'schema' => 1, 'jurisdiction' => 'HR',
+            'schema' => 1,
+            'reviewed_on' => '2026-11-10',
+            'jurisdiction' => 'HR',
             'rules_revision' => 'NN-101-2026-NN-110-2026',
-            'effective_from' => '2026-11-17',
-            'reference_dates' => self::REFERENCE_DATES,
-            'archive_min_days' => 30,
-            'product_publication_deadline' => '08:00',
+            'consumer_law_revision' => 'NN-59-2026',
+            'unit_price_rule_revision' => 'NN-105-2026',
+            'unit_price_rule_effective_from' => '2026-09-26',
+            'price_reduction_lookback_days' => 30,
+            'discount_baseline_is_anchor_price' => false,
             'base_price_regulation_status' => 'draft_consultation',
+            'base_price_rule_effective_from' => '2026-11-17',
+            'base_price_is_automatically_derived' => false,
             'historical_price_verification_required' => true,
             'legal_compliance_certified' => false,
-            'discount_baseline_is_anchor_price' => false,
+            'consumer_30_day_low_is_anchor_price' => false,
             'consumer_30_day_low_is_base_price' => false,
+            'draft_rulebooks_consultation_until' => '2026-11-13',
             'implementation' => [
                 'published_decisions_ready_from' => '2026-11-17',
                 'reference_price_data_entry' => 'verified_manual',
@@ -293,10 +394,40 @@ final class Core
                 'discount_30_day_low_independent' => true,
                 'automatic_historical_inference' => false,
             ],
+            'effective_from' => '2026-11-17',
+            'reference_dates' => self::REFERENCE_DATES,
+            'legacy_categories' => [
+                'hrana', 'pice', 'kozmetika', 'sredstva_za_ciscenje',
+                'toaletne_potrepstine', 'proizvodi_za_kucanstvo',
+            ],
+            'product_publication_deadline' => '08:00',
+            'service_change_deadline' => '08:00',
+            'timezone' => 'Europe/Zagreb',
+            'archive_min_days' => 30,
+            'formats' => ['csv', 'xml'],
+            'products_required_fields' => [
+                'naziv', 'sku', 'marka', 'jedinica_mjere',
+                'cijena_jedinice_mjere', 'maloprodajna_cijena',
+                'naziv_posebnog_oblika', 'sidrena_cijena', 'barkod', 'dostupnost',
+            ],
+            'services_required_fields' => [
+                'naziv', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena',
+            ],
+            'classification' => 'manual_verified',
+            'historical_prices' => 'not_inferred',
+            'source_urls' => [
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2025_05_75_979.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1212.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1213.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1309.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1310.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_06_59_728.html',
+                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_105_1270.html',
+            ],
         ];
     }
 
-    public function discovery(string $platform = 'web', ?string $publicRoot = null): array
+    public function discovery(string $platform = 'web', ?string $publicRoot = null, ?bool $licenseActive = null): array
     {
         $base = rtrim($publicRoot ?? $this->base(), '/');
         $published = $this->read('published.json');
@@ -320,7 +451,10 @@ final class Core
             }
             $outlets[] = $o;
         }
-        return [
+        $license = $licenseActive === null ? [] : [
+            'licensing' => ['required' => true, 'active' => $licenseActive],
+        ];
+        return array_merge([
             'api_version' => 1, 'plugin_version' => self::VERSION,
             'branding' => ['name' => 'BAZNA', 'description' => 'Bazne cijene'],
             'platform' => $platform,
@@ -340,7 +474,7 @@ final class Core
                 'pending_changes' => $draft !== [] && $draft !== array_intersect_key($published, $draft),
                 'compliance_certified' => false,
             ],
-        ];
+        ], $license);
     }
 
     public function archives(): array

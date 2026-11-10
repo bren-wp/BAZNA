@@ -15,6 +15,27 @@ url = "https://your-bazna-app.example/shopify/proxy"
 prefix = "apps"
 subpath = "bazna"
 
+# Shopify App Store privacy compliance requests: all must be available over
+# HTTPS. Point all routes to shopify/server/webhooks.php in your web server.
+[webhooks]
+api_version = "2026-10"
+
+[[webhooks.subscriptions]]
+topics = ["app/uninstalled"]
+uri = "/shopify/webhooks/app/uninstalled"
+
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/data_request"]
+uri = "/shopify/webhooks/customers/data_request"
+
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/redact"]
+uri = "/shopify/webhooks/customers/redact"
+
+[[webhooks.subscriptions]]
+compliance_topics = ["shop/redact"]
+uri = "/shopify/webhooks/shop/redact"
+
 # IMPORTANT: this source bundle does not implement the embedded merchant OAuth
 # lifecycle. For custom stores use Dev Dashboard's authorized installation
 # and client credentials, or complete official Shopify CLI app authentication

@@ -50,6 +50,23 @@ class CatalogDiscoveryTest {
         }
     }
 
+    @Test fun allBAZNAPlatformsShareReadOnlyLicenseContract() {
+        for (platform in listOf("wordpress", "web", "joomla", "shopify")) {
+            val payload = payload()
+                .put("platform", platform)
+                .put("licensing", JSONObject()
+                    .put("required", true)
+                    .put("active", false))
+            val result = CatalogDiscovery.parse(payload, site)
+            assertEquals(platform, result.platform)
+            assertEquals(false, result.wordpressLicenseActive)
+            assertEquals("RI-01", result.outlets.single().code)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            CatalogDiscovery.parse(payload().put("platform", "unknown"), site)
+        }
+    }
+
     @Test fun supportsLegacyPluginWithoutOptionalLegalProfile() {
         val index = CatalogDiscovery.parse(payload().apply { remove("plugin_version") }, site)
         assertEquals(null, index.legal)

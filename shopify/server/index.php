@@ -9,10 +9,12 @@ declare(strict_types=1);
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\Shopify\ProxySignature;
+use Brendigo\Bazna\Shopify\WebhookHandler;
 
 require_once dirname(__DIR__, 2) . '/web/src/Core.php';
 require_once dirname(__DIR__, 2) . '/web/src/LicenseClient.php';
 require_once __DIR__ . '/ProxySignature.php';
+require_once __DIR__ . '/WebhookHandler.php';
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store, max-age=0, must-revalidate');
 header('Referrer-Policy: no-referrer');
@@ -41,6 +43,11 @@ try {
     if (!str_starts_with($folder, '/') || str_contains($folder, '..')) {
         throw new RuntimeException('Privatni direktorij Shopify podataka nije konfiguriran.');
     }
+    // App uninstall and shop redaction tombstones override even a stale
+    // operator allowlist. Installation again requires an explicit owner action.
+    if (WebhookHandler::isRevoked($folder, $shop)) {
+        bazna_shop_response(403, ['error' => 'shop_installation_revoked']);
+    }
     // No user-provided directory name: derive a fixed per-tenant identifier
     // from the validated, signed and locally authorized shop identity.
     $core = new Core(rtrim($folder, '/') . '/shop-' . hash('sha256', $shop), 'https://' . $shop . '/apps');
@@ -54,7 +61,7 @@ try {
     }
     $tail = substr($path, strlen(rtrim($prefix, '/')));
     if ($tail === '/v1/cjenici') {
-        bazna_shop_response(200, $core->discovery('shopify'));
+        bazna_shop_response(200, $core->discovery('shopify', null, $license?->active()));
     }
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());

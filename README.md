@@ -6,25 +6,25 @@
 
 **BAZNA** povezuje evidenciju proizvoda, usluga, baznih cijena, javnih cjenika i arhiviranih objava. Postojeće platforme **Android, Windows i WordPress** nadopunjuju razvojne integracije za **samostalne PHP stranice, Joomlu i Shopify**, uz zajednički javni API v1 i domensko licenciranje.
 
-[Preuzmi BAZNA](https://github.com/bren-wp/BAZNA/releases) · [Web-stranica](https://brendigo.com/sidrene-cijene/) · [Podrška](mailto:sidrena@brendigo.com)
+[Preuzmi BAZNA](https://github.com/bren-wp/BAZNA/releases) · [Web-stranica](https://brendigo.com/) · [Podrška](https://brendigo.com/)
 
 ## Više platformi. Jedan BAZNA identitet.
 
 | Platforma | Namjena | Izdanje |
 |---|---|---|
-| **Android** | Pregled javnih proizvoda, usluga, baznih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.13** |
+| **Android** | Pregled javnih proizvoda, usluga, baznih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.14** |
 | **Windows** | Lokalno upravljanje katalozima, poviješću cijena, lokacijama, CSV/XML datotekama i sigurnosnim kopijama | **0.10.6** |
-| **WordPress** | Službeni dodatak za javne cjenike, bazne cijene i arhivu | **1.5.13**, nadopunjen pravni profil |
+| **WordPress** | Službeni dodatak za javne cjenike, bazne cijene i arhivu | **1.5.14**, nadopunjen pravni profil |
 
 ### Novi BAZNA adapteri — PHP, Joomla, Shopify
 
-Ove integracije trenutačno su **prva funkcionalna razvojna inačica 1.0.0**, ne odobreni produkcijski dodaci za svaku platformu. Kod i instalacijske upute nalaze se u `/web`, `/joomla` i `/shopify`.
+Ove integracije trenutačno su **razvojni kandidati 1.1.0**, ne odobreni produkcijski dodaci za svaku platformu. Kod i instalacijske upute nalaze se u `/web`, `/joomla` i `/shopify`.
 
 | Integracija | Osnovne funkcije | Produkcijski status |
 |---|---|---|
-| **Web PHP** | Admin, lokalni JSON katalog, poslovnice, domenska licenca, CSV/XML, arhiva i javni API v1 | Offline CI provjeren; potreban hosting E2E |
-| **Joomla** | System plugin, Joomla administratorska prava/CSRF, isti PHP katalog i javni API v1 | Kandidat ZIP-a; potreban test na stvarnoj Joomla instalaciji |
-| **Shopify** | Potpisani app-proxy, izolirane trgovine, ručni uvoz varijanti u EUR, javni API i theme blok | Custom-store adapter; OAuth i App Store objava nisu dovršeni |
+| **Web PHP** | Devet kartica, grafički editor, lokalni JSON, domenska licenca, CSV/XML, arhiva i javni API v1 | 182-snimka Chrome QA; potreban hosting E2E |
+| **Joomla** | System plugin, Joomla ACL/CSRF, dijeljeni grafički editor i javni API v1 | Kandidat ZIP-a; potreban test na stvarnoj Joomla instalaciji |
+| **Shopify** | Potpisani app-proxy, izolirane trgovine, uvoz EUR varijanti, privacy webhooks i theme blok | Custom-store adapter; OAuth i App Store objava nisu dovršeni |
 
 Android automatski prepoznaje javne BAZNA putanje bez CMS lozinki; pritom zadržava izvorne WordPress REST putanje i sigurnosno ograničenje na istu HTTPS domenu. Pravilo povijesne bazne cijene ostaje ručna potvrda uz dokaz. Shopify `compareAtPrice` ne koristi se za izračun bazne cijene.
 
@@ -32,11 +32,11 @@ Android automatski prepoznaje javne BAZNA putanje bez CMS lozinki; pritom zadrž
 
 ### BAZNA Android
 
-Povežite BAZNA stranicu na podržanoj platformi, pregledajte proizvode i usluge, filtrirajte sidrene cijene, odaberite poslovnicu i otvorite objavljene cjenike ili arhivirane CSV/XML dokumente. Izgled aplikacije razvija se prema referentnim prikazima BAZNA. Za potvrdu 1:1 potrebno je usporediti stvarne snimke zaslona s izvornim referencama na jednakim dimenzijama.
+Povežite BAZNA stranicu na podržanoj platformi, pregledajte proizvode i usluge, filtrirajte bazne cijene, odaberite poslovnicu i otvorite objavljene cjenike ili arhivirane CSV/XML dokumente. Izgled aplikacije razvija se prema referentnim prikazima BAZNA. Za potvrdu 1:1 potrebno je usporediti stvarne snimke zaslona s izvornim referencama na jednakim dimenzijama.
 
 ![BAZNA vizualni identitet](desktop/branding/sidrena-banner.svg)
 
-### Android ↔ WordPress povezivanje (BAZNA 1.5.13)
+### Android ↔ WordPress povezivanje (BAZNA 1.5.14)
 
 Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android aplikaciju upišite adresu WordPress instalacije (npr. `https://primjer.hr/` ili `https://primjer.hr/trgovina/`). Za prikaz javnih cjenika nije potrebna WordPress prijava. Android podržava WordPress REST i u načinu lijepih poveznica (`/wp-json/`) i u načinu običnih poveznica (`?rest_route=`); prihvaća samo javne HTTPS adrese iste domene.
 
@@ -46,7 +46,7 @@ Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android 
 
 ### Android i WordPress — zajednički javni katalog
 
-Android 1.5.13 i WordPress 1.5.13 donose objavljene korekcije mobilnog sučelja i javnog kataloga. U WordPressu otvorite **BAZNA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **BAZNA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
+Android 1.5.14 i WordPress 1.5.14 donose objavljene korekcije mobilnog sučelja i javnog kataloga. U WordPressu otvorite **BAZNA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **BAZNA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
 
 Android ostaje samo za čitanje: prihvaća REST v1, učitava stvarne proizvode/usluge i poslovnice, poštuje status objave, te prikazuje stvarne WooCommerce slike samo s iste javne HTTPS domene. Bez objavljenih CSV cjenika prikazuje jasnu obavijest i omogućuje naknadno osvježavanje; stari dodaci bez statusnih polja i dalje su kompatibilni. Produkcijska objava provodi se zasebno nakon spajanja i uspješnih provjera izdanja.
 
@@ -56,7 +56,7 @@ Nativno Windows sučelje za lokalno vođenje aktualnih i povijesnih cijena, kata
 
 ### BAZNA za WordPress
 
-Službeni dodatak **BAZNA – Bazne cijene 1.5.13** osigurava javne cjenike i arhiviranje. Promjene dodatka izdaju se zasebno od Android i Windows aplikacije.
+Službeni dodatak **BAZNA – Bazne cijene 1.5.14** osigurava javne cjenike i arhiviranje. Promjene dodatka izdaju se zasebno od Android i Windows aplikacije.
 
 ## Preuzimanja
 
@@ -74,7 +74,7 @@ Android APK namijenjen je instalaciji i provjeri. Android AAB treba odgovarajuć
 
 ## Pravna revizija — listopad 2026.
 
-WordPress **1.5.13**, Android **1.5.13** i Windows **0.10.6** koriste zajednički javni profil propisa NN 101/2026 i izmjena NN 110/2026. Datum proširene primjene je **17. studenoga 2026.** Nacrt novih pravilnika još nije konačni propis. Povijesne sidrene cijene ne izračunavaju se automatski iz sadašnje cijene.
+WordPress **1.5.14**, Android **1.5.14** i Windows **0.10.6** koriste zajednički javni profil propisa NN 101/2026 i izmjena NN 110/2026. Datum proširene primjene je **17. studenoga 2026.** Nacrt novih pravilnika još nije konačni propis. Povijesne sidrene cijene ne izračunavaju se automatski iz sadašnje cijene.
 
 [Pravna revizija 29. 10. 2026.](docs/LEGAL-REVIEW-2026-10-29.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 

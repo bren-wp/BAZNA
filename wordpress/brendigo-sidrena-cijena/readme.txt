@@ -4,13 +4,20 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.13
+Stable tag: 1.5.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva za WordPress i WooCommerce.
 
 == Changelog ==
+
+= 1.5.14 =
+* Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
+* Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
+* Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
+* WordPress.org review candidate continues to ship with local features unlocked; the private licensed distribution remains separate.
+
 
 = 1.5.13 =
 * Keep already published WooCommerce reference prices visible in theme/builder layouts and cart/checkout blocks even when the admin license is inactive.
@@ -249,6 +256,13 @@ Adds observed price history, publication alerts, separate product/service feeds,
 Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf placeholders that could append internal text to publication, pending-change, and pagination labels.
 
 == Changelog ==
+
+= 1.5.14 =
+* Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
+* Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
+* Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
+* WordPress.org review candidate continues to ship with local features unlocked; the private licensed distribution remains separate.
+
 
 = 1.5.5 =
 * Improve mobile pricelist card wrapping and visual consistency with BAZNA Android.
