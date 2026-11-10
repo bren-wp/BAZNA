@@ -53,7 +53,7 @@ require(web_version == joomla_manifest.findtext("version"),
         "Shared Web core and Joomla manifest versions differ")
 require(f"WEB_JOOMLA_SHOPIFY_VERSION: '{web_version}'" in release_ci,
         "Cross-platform release version does not match the shared Core")
-require(all(f"BAZNA-{platform}-{web_version}.zip" in release_ci
+require(all(f"BAZNA-{platform}-$WEB_JOOMLA_SHOPIFY_VERSION.zip" in release_ci
             for platform in ("Web", "Joomla-Plugin", "Shopify-Adapter")),
         "The release must list all three adapters using their exact version")
 require(all(f"BAZNA-{platform}-{web_version}.zip" in packager
