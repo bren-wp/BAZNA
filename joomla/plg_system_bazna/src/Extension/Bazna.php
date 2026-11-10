@@ -62,7 +62,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             header('X-Content-Type-Options: nosniff');
             header('Cache-Control: no-store');
             if ($path === '/bazna/v1/cjenici') {
-                $this->json($core->discovery('joomla'));
+                $this->json($core->discovery('joomla', null, $license?->active()));
             } elseif ($path === '/bazna/v1/arhiva') {
                 $this->json($core->archives());
             } elseif ($path === '/bazna/v1/license-proof') {
