@@ -150,7 +150,7 @@ fun ServiceCatalogScreen(
         if (publication == false && data.services.isEmpty()) {
             ServiceEmptyState(
                 title = "CSV cjenik usluga još nije objavljen.",
-                description = "Objavite cjenik u WordPress dodatku BAZNA, a zatim osvježite podatke.",
+                description = "Objavite cjenik usluga u BAZNA administraciji, a zatim osvježite podatke.",
             )
         } else if (visible.isEmpty()) {
             ServiceEmptyState(
@@ -158,7 +158,7 @@ fun ServiceCatalogScreen(
                     else "Nema usluga za odabranu pretragu.",
                 description = if (query.isNotBlank() || anchorFilter != 0)
                     "Promijenite pretragu ili u izborniku odaberite Sve usluge."
-                else "Provjerite javnu objavu usluga na povezanoj WordPress stranici.",
+                else "Provjerite javnu objavu usluga na povezanoj BAZNA stranici.",
             )
         } else {
             LazyColumn(

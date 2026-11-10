@@ -58,7 +58,7 @@ fun BrandHeader(onNotifications: () -> Unit = {}) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_sidrena_mark),
+            painter = painterResource(R.drawable.ic_bazna_mark),
             contentDescription = null,
             modifier = Modifier.size(44.dp),
         )

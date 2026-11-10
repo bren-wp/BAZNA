@@ -38,7 +38,24 @@ class AboutScreenPresentationTest {
         val info = aboutMetadata(snapshot(), "0.3.3")
         assertEquals("0.3.3", info.androidVersion)
         assertEquals("1.5.3", info.pluginVersion)
+        assertEquals("WordPress", info.platformName)
         assertFalse(info.androidVersion == info.pluginVersion)
+    }
+
+    @Test
+    fun aboutUsesActualBAZNAPlatformInsteadOfHardcodedWordPress() {
+        val names = mapOf(
+            "wordpress" to "WordPress",
+            "web" to "Web PHP",
+            "joomla" to "Joomla",
+            "shopify" to "Shopify",
+        )
+        for ((platform, expected) in names) {
+            val data = snapshot()
+            val connected = data.copy(index = data.index.copy(platform = platform))
+            assertEquals(expected, aboutMetadata(connected, "1.5.15").platformName)
+        }
+        assertEquals("BAZNA", baznaPlatformName("unknown"))
     }
 
     @Test
