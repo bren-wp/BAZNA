@@ -42,6 +42,8 @@ jobs:
           find web joomla shopify licenca -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
       - name: Offline public contract, historical price and archive tests
         run: php web/tests/test.php
+      - name: Shared PHP and Joomla catalog UI, CRUD and stale-write protection
+        run: php web/tests/test_editor.php
       - name: Shopify HMAC, replay and tenant isolation tests
         run: php shopify/tests/test_proxy.php
       - name: Shopify signed privacy compliance and erasure tests
