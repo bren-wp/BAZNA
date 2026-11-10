@@ -37,7 +37,13 @@ $oil = [
 ];
 $catalog = [
     'outlets' => [['code' => 'RI-01', 'name' => 'Rijeka', 'address' => 'Korzo 12, Rijeka']],
-    'products' => [$oil],
+    'products' => [
+        $oil,
+        array_merge($oil, [
+            'id' => 'SKU-2', 'naziv' => 'Riječka sol',
+            'outlet' => 'RI-01', 'maloprodajna_cijena' => '2,49',
+        ]),
+    ],
     'services' => [[
         'id' => 'S-01', 'naziv' => 'Servis uređaja',
         'maloprodajna_cijena' => '45,00',
@@ -88,11 +94,23 @@ $core->saveDraft([
 ]);
 $core->publish();
 $archive = $core->archives();
-check(count($archive) === 2 && $archive[0]['kind'] === 'proizvodi', 'two archived formats');
+check(count($archive) === 4 && $archive[0]['kind'] === 'proizvodi',
+    'webshop plus branch-specific archived CSV formats');
+$branchArchive = array_values(array_filter($archive, static fn($entry) =>
+    $entry['kind'] === 'proizvodi' && $entry['outlet'] === 'RI-01'));
+check(count($branchArchive) === 1 &&
+    str_contains($branchArchive[0]['url'], '?oznaka=RI-01'),
+    'archived branch link retains its own public business code');
 preg_match('#/arhiva/([0-9]{14}-[a-f0-9]{12})/proizvodi/csv$#', $archive[0]['url'], $matches);
 check(isset($matches[1]) && str_contains($core->archiveCsv($matches[1], 'proizvodi'), '5,99'),
     'immutable previous published price');
 check(str_contains($core->csv('proizvodi'), '6,19'), 'current publication newer');
+check(str_contains($core->archiveCsv($matches[1], 'proizvodi', 'RI-01'), 'Riječka sol'),
+    'published branch prices preserved in immutable archive even after removal');
+try {
+    $core->archiveCsv($matches[1], 'proizvodi', 'NOT-AN-OUTLET');
+    throw new RuntimeException('Foreign branch archive accepted.');
+} catch (InvalidArgumentException $ignored) {}
 $core->publish();
 check(str_contains($core->archiveCsv($matches[1], 'proizvodi'), '5,99'),
     'archive link remains stable after another publication');
