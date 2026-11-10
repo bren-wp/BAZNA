@@ -59,8 +59,13 @@ final class Brendigo_Sidrena_Cijena_Price_History {
 		add_action( self::MANUAL_SEED_HOOK, array( $this, 'seed_manual_batch' ) );
 		add_action( 'admin_init', array( $this, 'seed_without_cron' ), 25 );
 		add_shortcode( 'sidrena_povijest_cijena', array( $this, 'shortcode' ) );
+		add_shortcode( 'bazna_povijest_cijena', array( $this, 'shortcode' ) );
+		add_shortcode( 'bazna-povijest-cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'sidrena_najniza_prije_snizenja', array( $this, 'shortcode_before_sale' ) );
+		add_shortcode( 'bazna_najniza_prije_snizenja', array( $this, 'shortcode_before_sale' ) );
 		add_shortcode( 'sidrena_graf_cijena', array( $this, 'shortcode_chart' ) );
+		add_shortcode( 'bazna_graf_cijena', array( $this, 'shortcode_chart' ) );
+		add_shortcode( 'bazna-graf-cijena', array( $this, 'shortcode_chart' ) );
 		if ( ! Brendigo_Sidrena_Cijena_Plugin::woocommerce_active() ) {
 			return;
 		}

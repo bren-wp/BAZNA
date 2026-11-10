@@ -162,6 +162,7 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 
 		if ( Brendigo_Sidrena_Cijena_License::valid() && defined( 'WP_CLI' ) && WP_CLI ) {
 			WP_CLI::add_command( 'sidrena-cijena', 'Brendigo_Sidrena_Cijena_CLI' );
+			WP_CLI::add_command( 'bazna', 'Brendigo_Sidrena_Cijena_CLI' );
 		}
 
 		if ( ! Brendigo_Sidrena_Cijena_License::valid() || ! self::woocommerce_active() ) {

@@ -161,7 +161,7 @@ class Brendigo_Sidrena_Cijena_Settings {
 
 		if ( isset( $stored['i18n']['prefix'] ) && is_array( $stored['i18n']['prefix'] ) ) {
 			foreach ( $stored['i18n']['prefix'] as $lang => $value ) {
-				if ( is_string( $value ) && self::LEGACY_PREFIX === trim( $value ) ) {
+				if ( is_string( $value ) && in_array( trim( $value ), array( self::LEGACY_PREFIX, self::PREVIOUS_BRAND_PREFIX ), true ) ) {
 					$stored['i18n']['prefix'][ $lang ] = self::DEFAULT_PREFIX;
 					$dirty                             = true;
 				}
@@ -175,7 +175,7 @@ class Brendigo_Sidrena_Cijena_Settings {
 
 		if ( isset( $stored['i18n']['tooltip'] ) && is_array( $stored['i18n']['tooltip'] ) ) {
 			foreach ( $stored['i18n']['tooltip'] as $lang => $value ) {
-				if ( is_string( $value ) && self::LEGACY_TOOLTIP_HASH === hash( 'sha256', trim( $value ) ) ) {
+				if ( is_string( $value ) && in_array( hash( 'sha256', trim( $value ) ), array( self::LEGACY_TOOLTIP_HASH, self::PREVIOUS_TOOLTIP_HASH ), true ) ) {
 					$stored['i18n']['tooltip'][ $lang ] = self::DEFAULT_TOOLTIP;
 					$dirty                              = true;
 				}

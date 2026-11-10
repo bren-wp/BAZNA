@@ -37,7 +37,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 			</div>
 			<div class="brendigo-setting-row">
 				<div><strong><?php echo esc_html__( 'Povijesna cijena unosi se uz dokaz', 'brendigo-sidrena-cijena' ); ?></strong>
-				<small><?php echo esc_html__( 'Automatsko preslikavanje današnje redovne cijene u sidrenu ili baznu cijenu isključeno je. Upišite stvarnu povijesnu cijenu i odgovarajući datum za svaku stavku; sačuvajte izvorne dokaze.', 'brendigo-sidrena-cijena' ); ?></small></div>
+				<small><?php echo esc_html__( 'Automatsko preslikavanje današnje redovne cijene u baznu cijenu isključeno je. Upišite stvarnu povijesnu cijenu i odgovarajući datum za svaku stavku; sačuvajte izvorne dokaze.', 'brendigo-sidrena-cijena' ); ?></small></div>
 				<span class="sidrena-android-bridge__status is-pending"><?php echo esc_html__( 'Povijesni unos: ručna provjera', 'brendigo-sidrena-cijena' ); ?></span>
 			</div>
 			<?php endif; ?>
