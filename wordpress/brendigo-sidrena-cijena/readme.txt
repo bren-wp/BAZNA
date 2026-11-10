@@ -185,6 +185,12 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
 * WordPress.org review candidate continues to ship with local features unlocked; the private licensed distribution remains separate.
 
+= 1.5.14 =
+* Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving existing WordPress REST v1 endpoints and historical price records.
+* Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
+* Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
+* Keep the WordPress.org review candidate with local features unlocked and the private licensed distribution separate.
+
 = 1.5.13 =
 * Keep already published WooCommerce reference prices visible in theme/builder layouts and cart/checkout blocks even when the admin license is inactive.
 * Preserve the bounded offline license grace during HTTP 429, temporary service failure or malformed network response; revoke only an explicit invalid-key/domain decision.
