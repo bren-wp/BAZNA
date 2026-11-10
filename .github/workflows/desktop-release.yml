@@ -1,4 +1,4 @@
-# Build a new cross-platform SIDRENA release from verified same-commit CI artifacts.
+# Build a new cross-platform BAZNA release from verified same-commit CI artifacts.
 # WordPress version changes only with source changes; preserve the original 1.5.0 release.
 name: Publish BAZNA Android Windows and WordPress package
 
@@ -12,7 +12,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: sidrena-cross-platform-release
+  group: bazna-cross-platform-release
   cancel-in-progress: false
 
 jobs:
@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           mkdir -p release
           gh run download "$ANDROID_RUN_ID" --repo "$GH_REPO" \
-            --name 'SIDRENA-Android-unsigned-build' --dir release
+            --name 'BAZNA-Android-unsigned-build' --dir release
           gh run download "$WIN_RUN_ID" --repo "$GH_REPO" \
             --name 'SIDRENA-Desktop-release-binaries' --dir release
           # New WordPress ZIP is packaged from this exact release commit.
@@ -150,8 +150,8 @@ jobs:
         run: |
           set -euo pipefail
           for file in \
-            SIDRENA-Android-debug.apk SIDRENA-Android-unsigned.aab \
-            SIDRENA-Android-SHA256SUMS.txt \
+            BAZNA-Android-debug.apk BAZNA-Android-unsigned.aab \
+            BAZNA-Android-SHA256SUMS.txt \
             SIDRENA-Desktop-win-x64-Portable.exe SIDRENA-Desktop-win-x64-Setup.exe \
             SIDRENA-Desktop-win-x64-SHA256SUMS.txt SIDRENA-Desktop-release-info.json \
             brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256 \
@@ -161,7 +161,7 @@ jobs:
             BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256; do
             test -s "release/$file" || { echo "Missing release/$file"; exit 1; }
           done
-          (cd release && sha256sum -c SIDRENA-Android-SHA256SUMS.txt)
+          (cd release && sha256sum -c BAZNA-Android-SHA256SUMS.txt)
           (cd release && sha256sum -c SIDRENA-Desktop-win-x64-SHA256SUMS.txt)
           (cd release && sha256sum -c "brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256")
           (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
