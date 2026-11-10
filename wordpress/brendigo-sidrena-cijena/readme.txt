@@ -4,13 +4,19 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.15
+Stable tag: 1.5.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva za WordPress i WooCommerce.
 
 == Changelog ==
+
+= 1.5.16 =
+* Audit public BAZNA graphics and all user-visible brand labels on Android, WordPress, Web PHP, Joomla and Shopify.
+* Correct the WordPress version history and legacy package names in public release documentation.
+* Keep existing WordPress database keys and REST aliases and the Android application identity for uninterrupted upgrades.
+* Strengthen all-platform production-readiness checks without inferring historical prices or changing stored evidence.
 
 = 1.5.15 =
 * Show the actual connected BAZNA platform throughout the Android application, including About, Home, Services and public price lists.
@@ -20,7 +26,7 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 * Preserve historical price evidence, public read-only Android API, versioned archives, licensing and existing Android package IDs.
 
 
-= 1.5.15 =
+= 1.5.14 =
 * Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
 * Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
 * Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
@@ -265,6 +271,12 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 
 == Changelog ==
 
+= 1.5.16 =
+* Audit public BAZNA graphics and all user-visible brand labels on Android, WordPress, Web PHP, Joomla and Shopify.
+* Correct the WordPress version history and legacy package names in public release documentation.
+* Keep existing WordPress database keys and REST aliases and the Android application identity for uninterrupted upgrades.
+* Strengthen all-platform production-readiness checks without inferring historical prices or changing stored evidence.
+
 = 1.5.15 =
 * Show the actual connected BAZNA platform throughout the Android application, including About, Home, Services and public price lists.
 * Use BAZNA-only graphics in public assets and update public help text, WordPress shortcodes, copied codes and price previews.
@@ -273,7 +285,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Preserve historical price evidence, public read-only Android API, versioned archives, licensing and existing Android package IDs.
 
 
-= 1.5.15 =
+= 1.5.14 =
 * Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
 * Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
 * Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.

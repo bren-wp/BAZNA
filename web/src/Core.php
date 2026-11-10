@@ -13,7 +13,7 @@ use RuntimeException;
 
 final class Core
 {
-    public const VERSION = '1.1.1';
+    public const VERSION = '1.1.2';
     public const FIELDS = [
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
