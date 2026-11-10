@@ -3,7 +3,7 @@
 declare(strict_types=1);
 $isArchive = $path === '/bazna/arhiva';
 $kind = (string) ($_GET['kind'] ?? 'proizvodi');
-if (!in_array($kind, Core::KINDS, true)) $kind = 'proizvodi';
+if (!in_array($kind, \Brendigo\Bazna\Core::KINDS, true)) $kind = 'proizvodi';
 $outlet = (string) ($_GET['oznaka'] ?? '');
 $items = $records[$kind === 'proizvodi' ? 'products' : 'services'] ?? [];
 header("Content-Security-Policy: default-src 'none'; style-src 'self'; base-uri 'none'; frame-ancestors 'none'");
