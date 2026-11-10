@@ -10,10 +10,12 @@ declare(strict_types=1);
 use Brendigo\Bazna\Core;
 use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\Shopify\ProxySignature;
+use Brendigo\Bazna\Shopify\WebhookHandler;
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once dirname(__DIR__, 2) . '/web/src/Core.php';
 require_once dirname(__DIR__, 2) . '/web/src/LicenseClient.php';
 require_once dirname(__DIR__) . '/server/ProxySignature.php';
+require_once dirname(__DIR__) . '/server/WebhookHandler.php';
 
 try {
     if (count($argv) !== 3) throw new InvalidArgumentException('Usage: php manage.php SHOP status|activate|refresh|deactivate|sync|publish');
@@ -22,6 +24,9 @@ try {
     $storage = (string) getenv('BAZNA_SHOPIFY_PRIVATE_DIR');
     if (!str_starts_with($storage, '/') || str_contains($storage, '..')) {
         throw new RuntimeException('BAZNA_SHOPIFY_PRIVATE_DIR nije konfiguriran.');
+    }
+    if (WebhookHandler::isRevoked($storage, $shop)) {
+        throw new RuntimeException('Instalacija Shopify trgovine je opozvana. Potrebna je nova odobrena instalacija.');
     }
     $core = new Core(rtrim($storage, '/') . '/shop-' . hash('sha256', $shop),
         'https://' . $shop . '/apps');
