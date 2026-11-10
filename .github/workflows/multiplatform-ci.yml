@@ -68,6 +68,7 @@ jobs:
           test -s /tmp/bazna-joomla/bazna.xml
           test -s /tmp/bazna-joomla/vendor/Core.php
           test -s /tmp/bazna-joomla/vendor/LicenseClient.php
+          test -s /tmp/bazna-joomla/vendor/AdminCatalog.php
           test -s /tmp/bazna-joomla/services/provider.php
           find /tmp/bazna-joomla -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
           python3 - <<'PY'
