@@ -386,7 +386,7 @@ final class Core
         ];
     }
 
-    public function discovery(string $platform = 'web', ?string $publicRoot = null): array
+    public function discovery(string $platform = 'web', ?string $publicRoot = null, ?bool $licenseActive = null): array
     {
         $base = rtrim($publicRoot ?? $this->base(), '/');
         $published = $this->read('published.json');
@@ -410,7 +410,10 @@ final class Core
             }
             $outlets[] = $o;
         }
-        return [
+        $license = $licenseActive === null ? [] : [
+            'licensing' => ['required' => true, 'active' => $licenseActive],
+        ];
+        return array_merge([
             'api_version' => 1, 'plugin_version' => self::VERSION,
             'branding' => ['name' => 'BAZNA', 'description' => 'Bazne cijene'],
             'platform' => $platform,
@@ -430,7 +433,7 @@ final class Core
                 'pending_changes' => $draft !== [] && $draft !== array_intersect_key($published, $draft),
                 'compliance_certified' => false,
             ],
-        ];
+        ], $license);
     }
 
     public function archives(): array
