@@ -63,6 +63,12 @@ try {
 } catch (InvalidArgumentException $ignored) {}
 $core->saveDraft($catalog);
 $before = $core->discovery('web');
+$licenseActive = $core->discovery('web', null, true);
+$licenseInactive = $core->discovery('joomla', null, false);
+check($licenseActive['licensing'] === ['required' => true, 'active' => true] &&
+    $licenseInactive['licensing'] === ['required' => true, 'active' => false] &&
+    !isset($before['licensing']),
+    'same read-only Android license status as WordPress, backwards-compatible omission');
 check($before['api_version'] === 1 && $before['feeds']['proizvodi']['available_csv'] === false,
     'unpublished catalog not claimed as public');
 $published = $core->publish();
