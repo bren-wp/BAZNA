@@ -13,10 +13,10 @@ Verzije su **odvojene**. Android 1.5.15 i WordPress 1.5.15 sadrže stvarne, međ
 Automatski GitHub Actions postupci izvode Android Kotlin/JUnit/lint provjere i grade APK i AAB, a Windows postupak pokreće .NET testove, WPF navigacijske provjere, izrađuje prijenosnu aplikaciju i Inno Setup instalaciju. Poseban audit pokriva WordPress PHP sintaksu i integritet službenog paketa, Windows i Android statičke provjere.
 
 Novo objedinjeno izdanje sadrži:
-- `SIDRENA-Android-debug.apk` — Android instalacijski APK za provjeru.
-- `SIDRENA-Android-unsigned.aab` — AAB bez produkcijskog potpisa.
-- `SIDRENA-Desktop-win-x64-Portable.exe` — Windows prijenosna aplikacija.
-- `SIDRENA-Desktop-win-x64-Setup.exe` — Windows instalacijski program.
+- `BAZNA-Android-debug.apk` — Android instalacijski APK za provjeru.
+- `BAZNA-Android-unsigned.aab` — AAB bez produkcijskog potpisa.
+- `BAZNA-Desktop-win-x64-Portable.exe` — Windows prijenosna aplikacija.
+- `BAZNA-Desktop-win-x64-Setup.exe` — Windows instalacijski program.
 - `brendigo-sidrena-cijena-1.5.15.zip` — predviđeni ažurirani WordPress paket nakon uspješnog CI-ja i izdavanja.
 - Kontrolne SHA-256 datoteke i Windows izvještaj o porijeklu binarnih datoteka.
 

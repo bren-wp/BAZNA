@@ -1,6 +1,6 @@
 # BAZNA Desktop za Windows
 
-![SIDRENA](branding/sidrena-banner.svg)
+![BAZNA](branding/bazna-banner.svg)
 
 **Vaše cijene. Vaša evidencija. Vaša kontrola.**
 
@@ -18,7 +18,7 @@ BAZNA Desktop **0.10.6** je Windows aplikacija Brendigo LTD za upravljanje proiz
 
 ## Preuzimanje
 
-[**Windows Setup.exe**](https://github.com/bren-wp/SIDRENA/releases) · [**Windows Portable.exe**](https://github.com/bren-wp/SIDRENA/releases)
+[**Windows Setup.exe**](https://github.com/bren-wp/BAZNA/releases) · [**Windows Portable.exe**](https://github.com/bren-wp/BAZNA/releases)
 
 Obje verzije koriste isti direktorij korisničkih podataka u sustavu Windows. Pri ažuriranju ili deinstalaciji lokalna evidencija ne briše se automatski.
 
@@ -28,9 +28,9 @@ Windows pregled koristi **javne objave** WordPress dodatka **Brendigo Sidrena Ci
 
 ## Upute i dokumentacija
 
-[Izdanja](https://github.com/bren-wp/SIDRENA/releases) · [Instalacija](installer/README.md) · [Pomoć](mailto:sidrena@brendigo.com) · [Licencija](legal/EULA-HR.txt)
+[Izdanja](https://github.com/bren-wp/BAZNA/releases) · [Instalacija](installer/README.md) · [Pomoć](mailto:info@brendigo.com) · [Licencija](legal/EULA-HR.txt)
 
-**SIDRENA by Brendigo**
+**BAZNA by Brendigo**
 
 ## Sinkronizacija javnih pravnih pravila
 
@@ -40,7 +40,7 @@ Windows 0.10.6 prepoznaje `plugin_version` i javni `legal` profil WordPress doda
 
 ## Ručna razmjena cjenika s WordPressom
 
-U izborniku **Cjenici** opcija **CSV za uvoz u WordPress** izrađuje datoteku s 15 stupaca i nazivima koje prepoznaje službeni WordPress SIDRENA uvoznik. Uvoz se zatim izvodi samo u WordPress administraciji (**SIDRENA → Uvoz cjenika**), uz pregled mapiranja i izričitu potvrdu. Dodatna polja koja ne postoje u Windows lokalnoj bazi ostaju prazna; nijedna povijesna cijena, barkod ili dostupnost ne izmišljaju se.
+U izborniku **Cjenici** opcija **CSV za uvoz u WordPress** izrađuje datoteku s 15 stupaca i nazivima koje prepoznaje službeni WordPress BAZNA uvoznik. Uvoz se zatim izvodi samo u WordPress administraciji (**BAZNA → Uvoz cjenika**), uz pregled mapiranja i izričitu potvrdu. Dodatna polja koja ne postoje u Windows lokalnoj bazi ostaju prazna; nijedna povijesna cijena, barkod ili dostupnost ne izmišljaju se.
 
 **Oprez:** pri potvrđivanju u WordPressu postojeće stavke mogu biti ažurirane prema SKU-u i pravilima uvoznika. Prije uvoza provjerite sigurnosnu kopiju, obuhvat i podatke. Ovo nije automatska sinkronizacija ili automatska javna objava.
 

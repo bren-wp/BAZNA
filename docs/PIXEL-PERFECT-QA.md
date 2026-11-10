@@ -1,4 +1,4 @@
-# SIDRENA — vizualni QA Android + WordPress
+# BAZNA — vizualni QA Android + WordPress
 
 ## Što znači 1:1
 

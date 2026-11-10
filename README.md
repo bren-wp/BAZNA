@@ -2,7 +2,7 @@
 
 ### Bazne cijene
 
-![BAZNA — Bazne cijene by Brendigo](wordpress/brendigo-sidrena-cijena/assets/banner-1544x500.png)
+![BAZNA — Bazne cijene by Brendigo](branding/bazna-banner.png)
 
 <div align="center">
 
@@ -24,7 +24,7 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 
 **BAZNA** pomaže poslovanju javno prikazivati cijene i jednostavno upravljati njihovim promjenama: od jedne poslovnice do kataloga s tisućama proizvoda i usluga. Cjenik nastaje iz provjerene evidencije, objavljuje se izričitom radnjom i zadržava povijest prethodnih objava.
 
-<img src="wordpress/brendigo-sidrena-cijena/assets/icon-256x256.png" width="80" alt="BAZNA — ikona dodatka" />
+<img src="branding/bazna-icon.png" width="80" alt="BAZNA — ikona dodatka" />
 
 - **Proizvodi i usluge** — aktualne cijene, jedinice mjere, SKU, barkod i dostupnost.
 - **Bazne cijene** — povijesni iznos i datum povezani s izvornom evidencijom.

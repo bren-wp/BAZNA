@@ -1,8 +1,8 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.15** · `com.brendigo.sidrena`
+**BAZNA by Brendigo** · **1.5.15**
 
-![BAZNA](../desktop/branding/sidrena-banner.svg)
+![BAZNA](../branding/bazna-banner.png)
 
 Pregledajte objavljene cjenike, proizvode, usluge i poslovnice sa svoje WordPress stranice, uz prepoznatljiv tamnoplavi izgled i narančaste kontrole.
 
@@ -27,10 +27,10 @@ Izgled je usklađen s [Android dizajnerskim standardom](../docs/ANDROID-UI-REFER
 
 Aplikacija koristi javno dostupne rute postojećeg WordPress dodatka:
 
-- `GET /wp-json/brendigo-sidrena/v1/cjenici`
-- `GET /wp-json/brendigo-sidrena/v1/cjenici/proizvodi/csv`
-- `GET /wp-json/brendigo-sidrena/v1/cjenici/usluge/csv`
-- `GET /wp-json/brendigo-sidrena/v1/arhiva`
+- `GET /wp-json/brendigo-bazna/v1/cjenici`
+- `GET /wp-json/brendigo-bazna/v1/cjenici/proizvodi/csv`
+- `GET /wp-json/brendigo-bazna/v1/cjenici/usluge/csv`
+- `GET /wp-json/brendigo-bazna/v1/arhiva`
 
 Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS domeni. WordPress 1.5.15 dodaje opcionalni status `feeds.proizvodi.available_csv` i `feeds.usluge.available_csv` za webshop i svaku poslovnicu: `false` znači da datoteka još nije objavljena. Stari dodaci bez statusnih polja ostaju podržani. Proizvodi mogu neobavezno sadržavati stvarni `slika_url` s iste HTTPS domene, uz lokalnu ikonu kada ga nema. Prije povezivanja na WordPressu generirajte javni CSV cjenik, zatim u aplikaciji po potrebi odaberite Osvježi. Sadržaj poslovnica i arhive ovisi o stvarno objavljenim podacima na stranici. Aplikacija ne prikazuje izmišljene podatke kada javno sučelje ne nudi povijest promjena ili druge informacije.
 
@@ -44,7 +44,7 @@ Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS dom
 
 Izvorni kod koristi Kotlin, Jetpack Compose i Material 3. Za izgradnju otvorite mapu `android/` u Android Studiju (JDK 17, Android SDK 36, Gradle 8.13). Provjere kompilacije, lint i JUnit nalaze se u GitHub Actions postupku.
 
-[Izdanja](RELEASE.md) · [Audit](../docs/CODE-AUDIT-2026-10-21.md) · [Podrška](mailto:sidrena@brendigo.com)
+[Izdanja](RELEASE.md) · [Audit](../docs/CODE-AUDIT-2026-10-21.md) · [Podrška](mailto:info@brendigo.com)
 
 ## Pravni profil (NN 101/2026 i NN 110/2026)
 
@@ -57,4 +57,4 @@ Pravni profil dopunjen je informativnim identifikatorima NN 59/2026 i NN 105/202
 
 ### Pravna dopuna 29. 10. 2026.
 
-Javni profil razlikuje sidrenu cijenu od najniže prethodne cijene za sniženja u pravilu 30 dana, bilježi pravila NN 105/2026 od 26. 9. 2026. i ostaje kompatibilan sa starijim WordPress profilima. Aplikacija je read-only i ne potvrđuje pravnu usklađenost trgovca.
+Javni profil razlikuje baznu cijenu od najniže prethodne cijene za sniženja u pravilu 30 dana, bilježi pravila NN 105/2026 od 26. 9. 2026. i ostaje kompatibilan sa starijim WordPress profilima. Aplikacija je read-only i ne potvrđuje pravnu usklađenost trgovca.
