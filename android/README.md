@@ -1,6 +1,6 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.14** · `com.brendigo.sidrena`
+**BAZNA by Brendigo** · **1.5.15** · `com.brendigo.sidrena`
 
 ![BAZNA](../desktop/branding/sidrena-banner.svg)
 
@@ -32,7 +32,7 @@ Aplikacija koristi javno dostupne rute postojećeg WordPress dodatka:
 - `GET /wp-json/brendigo-sidrena/v1/cjenici/usluge/csv`
 - `GET /wp-json/brendigo-sidrena/v1/arhiva`
 
-Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS domeni. WordPress 1.5.14 dodaje opcionalni status `feeds.proizvodi.available_csv` i `feeds.usluge.available_csv` za webshop i svaku poslovnicu: `false` znači da datoteka još nije objavljena. Stari dodaci bez statusnih polja ostaju podržani. Proizvodi mogu neobavezno sadržavati stvarni `slika_url` s iste HTTPS domene, uz lokalnu ikonu kada ga nema. Prije povezivanja na WordPressu generirajte javni CSV cjenik, zatim u aplikaciji po potrebi odaberite Osvježi. Sadržaj poslovnica i arhive ovisi o stvarno objavljenim podacima na stranici. Aplikacija ne prikazuje izmišljene podatke kada javno sučelje ne nudi povijest promjena ili druge informacije.
+Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS domeni. WordPress 1.5.15 dodaje opcionalni status `feeds.proizvodi.available_csv` i `feeds.usluge.available_csv` za webshop i svaku poslovnicu: `false` znači da datoteka još nije objavljena. Stari dodaci bez statusnih polja ostaju podržani. Proizvodi mogu neobavezno sadržavati stvarni `slika_url` s iste HTTPS domene, uz lokalnu ikonu kada ga nema. Prije povezivanja na WordPressu generirajte javni CSV cjenik, zatim u aplikaciji po potrebi odaberite Osvježi. Sadržaj poslovnica i arhive ovisi o stvarno objavljenim podacima na stranici. Aplikacija ne prikazuje izmišljene podatke kada javno sučelje ne nudi povijest promjena ili druge informacije.
 
 **Uređivanje cijena ostaje u WordPressu ili Windows aplikaciji** dok ne postoji autorizirani REST API za mobilno uređivanje.
 
@@ -48,7 +48,7 @@ Izvorni kod koristi Kotlin, Jetpack Compose i Material 3. Za izgradnju otvorite 
 
 ## Pravni profil (NN 101/2026 i NN 110/2026)
 
-Aplikacija čita isti javni pravni profil kao Windows aplikacija iz WordPress dodatka 1.5.14. Prikazuje datum početka proširenih obveza **17. 11. 2026.**, oba referentna datuma **2. 5. 2025.** i **10. 9. 2026.**, minimalnu arhivu 30 dana te vrijeme dnevne objave do 8:00. Ne mijenja i ne izmišlja povijesne cijene.
+Aplikacija čita isti javni pravni profil kao Windows aplikacija iz WordPress dodatka 1.5.15. Prikazuje datum početka proširenih obveza **17. 11. 2026.**, oba referentna datuma **2. 5. 2025.** i **10. 9. 2026.**, minimalnu arhivu 30 dana te vrijeme dnevne objave do 8:00. Ne mijenja i ne izmišlja povijesne cijene.
 
 [Pravni izvori i kontrolni popis](../docs/LEGAL-2026-INTEROPERABILITY.md) · [Sigurnosni audit](../docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 

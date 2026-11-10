@@ -7,7 +7,7 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
-define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.14' );
+define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.15' );
 
 function sidrena_contract_assert( $condition, $label ) {
 	if ( ! $condition ) {

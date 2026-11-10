@@ -31,7 +31,7 @@ Shopify **ne izvodi PHP u temi/trgovini**. Ovdje je zaseban PHP backend s Shopif
 
 ## Granice / produkcijska provjera
 
-Ovo je **custom-store adapter kandidat 1.1.0**, ne gotov Shopify embedded/OAuth marketplace app. Obvezni privacy webhook endpointi i pretplate sada su implementirani, s provjerom HMAC potpisa, izolacijom trgovina, revokacijom nakon deinstalacije i brisanjem podataka trgovine na potpisani zahtjev. **Još nisu implementirani** puni OAuth za više trgovaca, automatska sigurna pohrana i rotacija tokena, Shopify Billing API, puni embedded merchant UI, sinkronizacija u stvarnom vremenu ili App Store odobrenje. Ne distribuirati u Shopify App Store bez toga i odgovarajuće autorizacije.
+Ovo je **custom-store adapter kandidat 1.1.1**, ne gotov Shopify embedded/OAuth marketplace app. Obvezni privacy webhook endpointi i pretplate sada su implementirani, s provjerom HMAC potpisa, izolacijom trgovina, revokacijom nakon deinstalacije i brisanjem podataka trgovine na potpisani zahtjev. **Još nisu implementirani** puni OAuth za više trgovaca, automatska sigurna pohrana i rotacija tokena, Shopify Billing API, puni embedded merchant UI, sinkronizacija u stvarnom vremenu ili App Store odobrenje. Ne distribuirati u Shopify App Store bez toga i odgovarajuće autorizacije.
 
 Shopify može omogućiti trgovcu promjenu URL-a app proxyja; u tom slučaju mora se uskladiti javni URL u konfiguraciji i Androidu. Podržana tvornička putanja je \`/apps/bazna\`. Ne otkrivajte \`BAZNA_SHOPIFY_CLIENT_SECRET\` niti ključ licence frontend skriptama.
 
