@@ -136,7 +136,7 @@ fun PublicPriceListsScreen(
         }
         if (data.index.pendingPublication == true) {
             Text(
-                "WordPress ima neobjavljene izmjene. Cjenici mogu biti zastarjeli.",
+                "Povezana BAZNA stranica ima neobjavljene izmjene. Cjenici mogu biti zastarjeli.",
                 color = Color(0xFFFFC997),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(bottom = 12.dp),
@@ -164,7 +164,7 @@ fun PublicPriceListsScreen(
                 )
                 Text(
                     if (documents.isEmpty())
-                        "Provjerite objavu CSV/XML cjenika u WordPress dodatku."
+                        "Provjerite objavu CSV/XML cjenika u BAZNA administraciji."
                     else "U izborniku odaberite Sve ili promijenite pretragu.",
                     color = TextMuted,
                     fontSize = 12.sp,

@@ -9,6 +9,8 @@ import java.net.URI
  * Never add third-party fallback hosts or tokens.
  */
 internal fun platformDiscoveryCandidates(site: SiteUrl): List<URI> = listOf(
+    site.endpoint("wp-json/brendigo-bazna/v1/cjenici"),
+    site.queryRestEndpoint("brendigo-bazna/v1/cjenici"),
     site.endpoint("wp-json/brendigo-sidrena/v1/cjenici"),
     site.queryRestEndpoint("brendigo-sidrena/v1/cjenici"),
     site.endpoint("bazna/v1/cjenici"),           // standalone PHP / Joomla

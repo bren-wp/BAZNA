@@ -39,14 +39,17 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		add_shortcode( 'sidrena-cijena', array( $this, 'shortcode' ) );
 		// BAZNA aliases; the historical names remain valid for existing pages.
 		add_shortcode( 'bazna_cijena', array( $this, 'shortcode' ) );
+		add_shortcode( 'bazna-cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'sidrena_cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-cijena', array( $this, 'shortcode' ) );
 		add_shortcode( 'sidrena-cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'bazna_cjenik', array( $this, 'cjenik_shortcode' ) );
+		add_shortcode( 'bazna-cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'sidrena_cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-cjenik', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'sidrena-arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'bazna_arhiva', array( $this, 'arhiva_shortcode' ) );
+		add_shortcode( 'bazna-arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'sidrena_arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-arhiva', array( $this, 'arhiva_shortcode' ) );
 
@@ -61,6 +64,10 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		add_shortcode( 'sidrena_usluge', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'sidrena_proizvodi', array( $this, 'cjenik_shortcode' ) );
 		add_shortcode( 'sidrena_stavka', array( $this, 'standalone_item_shortcode' ) );
+		add_shortcode( 'bazna_stavka', array( $this, 'standalone_item_shortcode' ) );
+		add_shortcode( 'bazna-stavka', array( $this, 'standalone_item_shortcode' ) );
+		add_shortcode( 'bazna_usluge', array( $this, 'cjenik_shortcode' ) );
+		add_shortcode( 'bazna_proizvodi', array( $this, 'cjenik_shortcode' ) );
 
 		if ( ! Brendigo_Sidrena_Cijena_Plugin::woocommerce_active() ) {
 			return;
@@ -368,9 +375,9 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		$this->enqueue_cjenik_embed_style();
 		$kind = sanitize_key( (string) $atts['vrsta'] );
 		// Earlier sidrena_usluge incorrectly showed products and services together.
-		if ( 'sidrena_usluge' === $shortcode_tag ) {
+		if ( in_array( $shortcode_tag, array( 'sidrena_usluge', 'bazna_usluge' ), true ) ) {
 			$kind = 'usluge';
-		} elseif ( 'sidrena_proizvodi' === $shortcode_tag ) {
+		} elseif ( in_array( $shortcode_tag, array( 'sidrena_proizvodi', 'bazna_proizvodi' ), true ) ) {
 			$kind = 'proizvodi';
 		}
 		if ( in_array( $kind, array( 'proizvodi', 'usluge' ), true ) ) {
@@ -512,6 +519,11 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		}
 
 		return has_shortcode( $post->post_content, 'bazna_cijena' )
+				|| has_shortcode( $post->post_content, 'bazna-cijena' )
+				|| has_shortcode( $post->post_content, 'bazna_stavka' )
+				|| has_shortcode( $post->post_content, 'bazna-stavka' )
+				|| has_shortcode( $post->post_content, 'bazna_povijest_cijena' )
+				|| has_shortcode( $post->post_content, 'bazna-graf-cijena' )
 			|| has_shortcode( $post->post_content, 'sidrena_graf_cijena' )
 			|| has_shortcode( $post->post_content, 'sidrena_povijest_cijena' )
 			|| has_shortcode( $post->post_content, 'sidrena_najniza_prije_snizenja' )
@@ -533,6 +545,9 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		}
 
 		return has_shortcode( $post->post_content, 'bazna_cjenik' )
+				|| has_shortcode( $post->post_content, 'bazna-cjenik' )
+				|| has_shortcode( $post->post_content, 'bazna_proizvodi' )
+				|| has_shortcode( $post->post_content, 'bazna_usluge' )
 			|| has_shortcode( $post->post_content, 'sidrena-cjenik' )
 			|| has_shortcode( $post->post_content, 'sidrena_cjenik' )
 			|| has_shortcode( $post->post_content, 'sidrena_objava_cjenika' )

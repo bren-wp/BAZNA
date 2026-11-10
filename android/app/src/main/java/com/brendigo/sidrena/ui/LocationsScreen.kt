@@ -201,7 +201,7 @@ fun LocationsPage(
             }
             item {
                 Text(
-                    text = "Adrese se prikazuju samo kada su objavljene u WordPressu. Radno vrijeme i koordinate nisu dio javnog BAZNA API-ja.",
+                    text = "Adrese se prikazuju samo kada ih objavi povezana BAZNA platforma. Radno vrijeme i koordinate nisu dio javnog BAZNA API-ja.",
                     color = TextMuted,
                     fontSize = 12.sp,
                     lineHeight = 18.sp,

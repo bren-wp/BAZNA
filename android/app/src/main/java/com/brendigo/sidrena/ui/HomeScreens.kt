@@ -312,7 +312,7 @@ private fun HomeTopBar(onSearch: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_sidrena_mark),
+            painter = painterResource(R.drawable.ic_bazna_mark),
             contentDescription = null,
             modifier = Modifier.size(35.dp),
         )
@@ -428,9 +428,9 @@ private fun HomeConnectedCard(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = if (changesPending)
-                    "Objavljeni CSV može biti zastario. Objavite promjene u WordPressu i osvježite."
+                    "Objavljeni cjenik može biti zastario. Objavite izmjene na povezanoj BAZNA stranici i osvježite."
                 else if (publicationPending)
-                    "Najprije objavite CSV cjenike u WordPress dodatku."
+                    "Najprije objavite cjenike u povezanoj BAZNA administraciji."
                 else "Zadnje ažuriranje: " +
                     (publishedAt?.takeIf { it.isNotBlank() } ?: "Datum nije dostupan"),
                 color = Color(0xFFD8E4F0),

@@ -25,11 +25,11 @@ jobs:
       GH_REPO: ${{ github.repository }}
       CI_SHA: ${{ github.event.workflow_run.head_sha }}
       ANDROID_RUN_ID: ${{ github.event.workflow_run.id }}
-      RELEASE_VERSION: '1.5.14'
-      WEB_JOOMLA_SHOPIFY_VERSION: '1.1.0'
-      ANDROID_VERSION: '1.5.14'
+      RELEASE_VERSION: '1.5.15'
+      WEB_JOOMLA_SHOPIFY_VERSION: '1.1.1'
+      ANDROID_VERSION: '1.5.15'
       WINDOWS_VERSION: '0.10.6'
-      WORDPRESS_VERSION: '1.5.14'
+      WORDPRESS_VERSION: '1.5.15'
       ORIGINAL_PLUGIN_SHA: '58e9b44b8054ef0076a329aa7a8a3ec663947d33bfa375c4203bc109925409f8'
     steps:
       - name: Verify target commit and original WordPress release
@@ -131,8 +131,8 @@ jobs:
             xargs -0 -n 1 php -l > /tmp/sidrena-lint.log
           php tools/test_legal_contract.php
           python3 tools/audit_repository.py
-          python3 tools/package_plugin.py --version "$WORDPRESS_VERSION" --output "release/brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip"
-          (cd release && sha256sum -c "brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256")
+          python3 tools/package_plugin.py --version "$WORDPRESS_VERSION" --output "release/BAZNA-WordPress-$WORDPRESS_VERSION.zip"
+          (cd release && sha256sum -c "BAZNA-WordPress-$WORDPRESS_VERSION.zip.sha256")
           # Public source only; the previously issued 10000 keys require the
           # separate private config.php bundled directly with the customer.
           php licenca/tests/test.php
@@ -154,7 +154,7 @@ jobs:
             BAZNA-Android-SHA256SUMS.txt \
             SIDRENA-Desktop-win-x64-Portable.exe SIDRENA-Desktop-win-x64-Setup.exe \
             SIDRENA-Desktop-win-x64-SHA256SUMS.txt SIDRENA-Desktop-release-info.json \
-            brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256 \
+            BAZNA-WordPress-$WORDPRESS_VERSION.zip BAZNA-WordPress-$WORDPRESS_VERSION.zip.sha256 \
             BAZNA-Licenca-Server-$RELEASE_VERSION.zip BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256 \
             BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256 \
             BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256 \
@@ -163,7 +163,7 @@ jobs:
           done
           (cd release && sha256sum -c BAZNA-Android-SHA256SUMS.txt)
           (cd release && sha256sum -c SIDRENA-Desktop-win-x64-SHA256SUMS.txt)
-          (cd release && sha256sum -c "brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip.sha256")
+          (cd release && sha256sum -c "BAZNA-WordPress-$WORDPRESS_VERSION.zip.sha256")
           (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
           src_sha=$(python3 -c 'import json;print(json.load(open("release/SIDRENA-Desktop-release-info.json"))["source_commit"])')
           [[ "$src_sha" == "$CI_SHA" ]] || { echo "Windows provenance mismatch"; exit 1; }
@@ -173,12 +173,60 @@ jobs:
           [[ "$wp_version" == "$WORDPRESS_VERSION" ]] || { echo "WordPress version mismatch"; exit 1; }
           current=$(gh api "repos/$GH_REPO/git/ref/heads/main" --jq '.object.sha')
           [[ "$current" == "$CI_SHA" ]] || { echo "Main changed during verification"; exit 1; }
+      - name: Publish user-facing BAZNA filenames for verified Windows binaries
+        if: env.ALREADY_EXISTS != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # CI provenance and original SHA-256s were checked in the previous step.
+          # Rename only the delivery artifacts; never alter executable bytes.
+          python3 - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          folder = Path("release")
+          filenames = {
+              "SIDRENA-Desktop-win-x64-Portable.exe": "BAZNA-Desktop-win-x64-Portable.exe",
+              "SIDRENA-Desktop-win-x64-Setup.exe": "BAZNA-Desktop-win-x64-Setup.exe",
+          }
+          for old, new in filenames.items():
+              original, branded = folder / old, folder / new
+              assert original.is_file() and original.stat().st_size > 100_000
+              assert not branded.exists(), new
+              original.rename(branded)
+          checks = [
+              f"{hashlib.sha256((folder / name).read_bytes()).hexdigest()}  {name}"
+              for name in filenames.values()
+          ]
+          (folder / "SIDRENA-Desktop-win-x64-SHA256SUMS.txt").unlink()
+          (folder / "BAZNA-Desktop-win-x64-SHA256SUMS.txt").write_text(
+              "\n".join(checks) + "\n", encoding="utf-8"
+          )
+          old_manifest = folder / "SIDRENA-Desktop-release-info.json"
+          info = json.loads(old_manifest.read_text(encoding="utf-8-sig"))
+          assert info["source_commit"] and info["desktop_version"]
+          info["product"] = "BAZNA Desktop"
+          info["files"] = json.loads(
+              json.dumps(info.get("files", []), ensure_ascii=False)
+              .replace("SIDRENA-Desktop", "BAZNA-Desktop")
+          )
+          (folder / "BAZNA-Desktop-release-info.json").write_text(
+              json.dumps(info, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          old_manifest.unlink()
+          assert len(list(folder.iterdir())) == 17, "Expected 17 BAZNA release files"
+          assert all(not path.name.startswith("SIDRENA-") for path in folder.iterdir())
+          print("PASS: BAZNA public Windows executable filenames, original binary hashes retained")
+          PY
+          (cd release && sha256sum -c BAZNA-Desktop-win-x64-SHA256SUMS.txt)
       - name: Create new BAZNA GitHub release
         if: env.ALREADY_EXISTS != '1'
         shell: bash
         run: |
           set -euo pipefail
-          wp_sha=$(sha256sum "release/brendigo-sidrena-cijena-$WORDPRESS_VERSION.zip" | cut -d' ' -f1)
+          wp_sha=$(sha256sum "release/BAZNA-WordPress-$WORDPRESS_VERSION.zip" | cut -d' ' -f1)
           cat > notes.md <<EOF
           # BAZNA $RELEASE_VERSION
 

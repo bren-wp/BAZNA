@@ -60,7 +60,17 @@ internal data class AboutMetadata(
     val site: String,
     val rulesRevision: String?,
     val rulesEffectiveFrom: String?,
+    val platformName: String,
 )
+
+/** Display only real, reported publisher identity, not a hard-coded CMS. */
+internal fun baznaPlatformName(platform: String): String = when (platform) {
+    "wordpress" -> "WordPress"
+    "web" -> "Web PHP"
+    "joomla" -> "Joomla"
+    "shopify" -> "Shopify"
+    else -> "BAZNA"
+}
 
 internal fun aboutMetadata(data: CatalogSnapshot, androidVersion: String): AboutMetadata =
     AboutMetadata(
@@ -74,6 +84,7 @@ internal fun aboutMetadata(data: CatalogSnapshot, androidVersion: String): About
             ?.takeIf { it.isNotBlank() },
         rulesEffectiveFrom = data.index.legal?.effectiveFrom
             ?.takeIf { it.isNotBlank() },
+        platformName = baznaPlatformName(data.index.platform),
     )
 
 /** Return the public price-list link only when it passes the same HTTPS-origin rule. */
@@ -86,7 +97,7 @@ internal fun aboutPublicPriceListUrl(data: CatalogSnapshot): String? =
  * BAZNA Android — screen 12/12, "O aplikaciji".
  *
  * All assets are local. The logo is the same drawable as the splash screen.
- * Content uses real build metadata and the published WordPress public API.
+ * Content uses real build metadata and the published platform-neutral BAZNA public API.
  */
 @Composable
 fun AboutPage(
@@ -144,7 +155,7 @@ fun AboutPage(
             )
             AboutVersionCard(
                 iconIsAndroid = false,
-                title = "WordPress dodatak",
+                title = "BAZNA · ${info.platformName}",
                 version = info.pluginVersion,
                 modifier = Modifier.weight(1f),
             )
@@ -180,8 +191,14 @@ fun AboutPage(
         AboutGroup {
             AboutReadOnlyRow(
                 icon = Icons.Outlined.Public,
-                title = "WordPress stranica",
+                title = "BAZNA stranica",
                 value = info.site,
+            )
+            AboutDivider()
+            AboutReadOnlyRow(
+                icon = Icons.Outlined.Info,
+                title = "Platforma",
+                value = info.platformName,
             )
             AboutDivider()
             AboutReadOnlyRow(
@@ -213,12 +230,12 @@ fun AboutPage(
         }
 
         if (data.index.legal?.basePriceRegulationStatus == "draft_consultation") {
-            AboutSectionTitle("ZAKONSKI STATUS NA 2. 11. 2026.")
+            AboutSectionTitle("PRAVNI STATUS POVEZANE PLATFORME")
             AboutGroup {
                 AboutReadOnlyRow(
                     icon = Icons.Outlined.Info,
                     title = "Bazna cijena",
-                    value = "Pravilnik je još u savjetovanju do 13. 11. 2026.",
+                    value = "Objavljeni profil označava pravilnik kao nacrt. Provjerite konačni propis.",
                 )
                 AboutDivider()
                 AboutReadOnlyRow(
@@ -247,7 +264,7 @@ fun AboutPage(
 
         Text(
             text = "BAZNA samo prikazuje javno objavljene podatke " +
-                "povezane WordPress stranice. Cijene i datume " +
+                "povezane BAZNA stranice. Cijene i datume " +
                 "provjerite u izvornim cjenicima.",
             color = TextMuted,
             fontSize = 12.sp,
@@ -293,7 +310,7 @@ private fun AboutHero() {
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.ic_sidrena_mark),
+                        painter = painterResource(R.drawable.ic_bazna_mark),
                         contentDescription = "Logotip BAZNA – Bazne cijene",
                         modifier = Modifier.size(67.dp),
                     )

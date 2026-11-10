@@ -66,7 +66,7 @@
 				return "";
 			}
 			var prefix = typeof sidrenaCijenaAdmin !== "undefined" && sidrenaCijenaAdmin.catalogIdPrefix ? sidrenaCijenaAdmin.catalogIdPrefix : "";
-			return '[sidrena-cijena id="' + prefix + id + '"]';
+			return '[bazna-cijena id="' + prefix + id + '"]';
 		}
 
 		function shortcodeCell(id) {
@@ -687,7 +687,7 @@
 				missing.push("regular");
 			}
 			if (!$.trim(row.sidrena_cijena || "")) {
-				missing.push("sidrena");
+				missing.push("bazna_cijena");
 			}
 			return missing;
 		}
@@ -737,7 +737,7 @@
 				$row.find(selectors[key]).addClass("has-error").attr("aria-invalid", "true");
 			});
 
-			var message = i18n.catalogRequired || "Naziv, redovna cijena i sidrena cijena obavezni su za svaki popunjeni redak.";
+			var message = i18n.catalogRequired || "Naziv, aktualna cijena i bazna cijena obvezni su za svaki popunjeni redak.";
 			var $notice = $form.find(".brendigo-catalog-validation");
 			if (!$notice.length) {
 				$notice = $('<div class="notice notice-error inline brendigo-catalog-validation" role="alert"><p></p></div>');

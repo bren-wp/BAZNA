@@ -74,7 +74,7 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 				$this->render_url_box( $sidrena_kind_label . ' – ' . strtoupper( $sidrena_extension ), $sidrena_url, $sidrena_url, __( 'Otvori', 'brendigo-sidrena-cijena' ) );
 			}
 		}
-		$this->render_url_box( __( 'Javni REST API', 'brendigo-sidrena-cijena' ), rest_url( 'brendigo-sidrena/v1/cjenici' ), rest_url( 'brendigo-sidrena/v1/cjenici' ), __( 'Otvori API', 'brendigo-sidrena-cijena' ) );
+		$this->render_url_box( __( 'Javni REST API', 'brendigo-sidrena-cijena' ), rest_url( 'brendigo-bazna/v1/cjenici' ), rest_url( 'brendigo-bazna/v1/cjenici' ), __( 'Otvori API', 'brendigo-sidrena-cijena' ) );
 
 		if ( $sidrena_settings->is_multi_poslovnica() ) {
 			foreach ( Brendigo_Sidrena_Cijena_Poslovnice::instance()->all() as $sidrena_outlet ) {

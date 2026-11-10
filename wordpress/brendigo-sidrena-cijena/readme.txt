@@ -4,7 +4,7 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.14
+Stable tag: 1.5.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,15 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 
 == Changelog ==
 
-= 1.5.14 =
+= 1.5.15 =
+* Show the actual connected BAZNA platform throughout the Android application, including About, Home, Services and public price lists.
+* Use BAZNA-only graphics in public assets and update public help text, WordPress shortcodes, copied codes and price previews.
+* Provide BAZNA product, service, archive and price-history aliases while retaining compatibility with existing content and stored WordPress metadata.
+* Update the shared Web, Joomla and Shopify catalog adapter; strengthen branded UI regression and source-checking rules.
+* Preserve historical price evidence, public read-only Android API, versioned archives, licensing and existing Android package IDs.
+
+
+= 1.5.15 =
 * Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
 * Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
 * Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
@@ -146,7 +154,7 @@ Documentation: https://brendigo.com/
 After activation, open the **Upute** (Guide) tab inside Brendigo Bazne cijene for a step-by-step onboarding guide in Croatian: separate instructions for standalone WordPress and WooCommerce, publishing, imports, public shortcodes, and troubleshooting.
 
 
-1. Install the ZIP from WordPress Plugins > Add New, or upload the `brendigo-sidrena-cijena` folder to `/wp-content/plugins/`.
+1. Install the ZIP from WordPress Plugins > Add New, or upload the unmodified BAZNA plugin folder through your hosting file manager.
 2. Activate **BAZNA**.
 3. Open WooCommerce > BAZNA. Without WooCommerce, use the standalone BAZNA menu.
 4. Open **Products** to enter reference prices and dates.
@@ -162,7 +170,7 @@ Large catalogs are paginated, and variations are grouped with their parent produ
 
 WooCommerce is optional. Activate the plugin in a standard WordPress installation and use the **Brendigo Bazne cijene** menu. Add manual products and services in the Products tab, provide the current price, reference price and date, then publish the HTML/XML/CSV pricelist. No checkout or online payment module is added to WordPress by this plugin.
 
-Use `[sidrena_stavka id="123"]` for a named card showing the current and reference price, `[sidrena-cijena id="123"]` for the reference price, `[sidrena_povijest_cijena id="123"]` for observed price history, and `[sidrena-cjenik]` for the entire pricelist. When WooCommerce is also active, prefix the manual row ID with `d` for shortcodes that may otherwise resolve to a WooCommerce product: `id="d123"`. Individual manual item cards always use the manual catalog.
+Use `[bazna-stavka id="123"]` for a named card showing the current and reference price, `[bazna-cijena id="123"]` for the reference price, `[bazna-povijest-cijena id="123"]` for observed price history, and `[bazna-cjenik]` for the entire pricelist. When WooCommerce is also active, prefix the manual row ID with `d` for shortcodes that may otherwise resolve to a WooCommerce product: `id="d123"`. Individual manual item cards always use the manual catalog.
 
 Price history starts when tracking is installed or a product is first seen; it does not backdate or establish the legally required historical reference price. Daily publishing uses the WordPress event scheduler and an on-visit recovery fallback; for predictable timing even on low-traffic sites configure a server-side cron.
 
@@ -174,22 +182,22 @@ WordPress WP-Cron is traffic-driven. If publication must run very close to an ex
 
 == Shortcodes ==
 
-`[brendigo-sidrena-cijena]` - reference price for the current product.
-`[brendigo-sidrena-cijena id="123"]` - reference price for a selected product or manual catalog row.
-`[brendigo-sidrena-cjenik]` - public pricelist table.
-`[brendigo-sidrena-arhiva]` - public pricelist archive.
-`[sidrena_stavka id="123"]` - standalone product or service card, no WooCommerce needed.
-`[sidrena_povijest_cijena id="123"]` - observed price history in standalone mode; with WooCommerce use `d123` for a manual row.
+`[bazna-cijena]` - reference price for the current product.
+`[bazna-cijena id="123"]` - reference price for a selected product or manual catalog row.
+`[bazna-cjenik]` - public pricelist table.
+`[bazna-arhiva]` - public pricelist archive.
+`[bazna-stavka id="123"]` - standalone product or service card, no WooCommerce needed.
+`[bazna-povijest-cijena id="123"]` - observed price history in standalone mode; with WooCommerce use `d123` for a manual row.
 
 Legacy shortcode aliases remain available for backward compatibility.
 
 == WP-CLI ==
 
-`wp sidrena-cijena regenerate` regenerates and archives the public pricelist.
+`wp bazna regenerate` regenerates and archives the public pricelist.
 
-`wp sidrena-cijena health` reports publication schedule and automation state.
+`wp bazna health` reports publication schedule and automation state.
 
-`wp sidrena-cijena fill` can fill empty reference-price fields from regular prices when an administrator intentionally chooses that workflow.
+`wp bazna fill` can fill empty reference-price fields from regular prices when an administrator intentionally chooses that workflow.
 
 == Frequently Asked Questions ==
 
@@ -257,7 +265,15 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 
 == Changelog ==
 
-= 1.5.14 =
+= 1.5.15 =
+* Show the actual connected BAZNA platform throughout the Android application, including About, Home, Services and public price lists.
+* Use BAZNA-only graphics in public assets and update public help text, WordPress shortcodes, copied codes and price previews.
+* Provide BAZNA product, service, archive and price-history aliases while retaining compatibility with existing content and stored WordPress metadata.
+* Update the shared Web, Joomla and Shopify catalog adapter; strengthen branded UI regression and source-checking rules.
+* Preserve historical price evidence, public read-only Android API, versioned archives, licensing and existing Android package IDs.
+
+
+= 1.5.15 =
 * Improve BAZNA integration parity across standalone PHP, Joomla, Shopify and Android while preserving the original public WordPress REST v1 endpoints and published price history.
 * Align legal metadata, reference dates and public licensing status checks across supported BAZNA platforms.
 * Preserve compatibility with existing WordPress installations, WooCommerce product metadata, shortcodes and published CSV/XML feeds.
@@ -308,7 +324,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 
 = 1.3.1 =
 * Fully support observing manual product/service price changes without WooCommerce; protect history from WooCommerce ID collisions.
-* Add `[sidrena_stavka id="123"]` for a lightweight named manual product/service card.
+* Add `[bazna-stavka id="123"]` for a lightweight named manual product/service card.
 * Prevent malformed or truncated catalog JSON from wiping stored data, strictly validate item IDs, and avoid reusing automatic row IDs after deletion.
 * Improve manual-row lookup with an in-request index and prevent accidental repeated unslashing of stored text.
 * Disable automatic historical reference-price autofill on new installs only; keep existing saved preferences unchanged.

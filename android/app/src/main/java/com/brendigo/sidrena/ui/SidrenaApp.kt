@@ -81,7 +81,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
 
     fun supportEmail() {
         try {
-            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:sidrena@brendigo.com")))
+            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:info@brendigo.com")))
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(context, "Nije pronađena aplikacija za e-poštu.", Toast.LENGTH_SHORT).show()
         }
@@ -100,7 +100,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
         AlertDialog(
             onDismissRequest = { askDisconnect = false },
             title = { Text("Odspojiti stranicu?") },
-            text = { Text("Adresa će se ukloniti iz aplikacije. Podaci na WordPress stranici neće se mijenjati.") },
+            text = { Text("Adresa će se ukloniti iz aplikacije. Podaci na povezanoj BAZNA stranici neće se mijenjati.") },
             confirmButton = {
                 TextButton(onClick = {
                     model.disconnect()
@@ -304,8 +304,8 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     "about" -> AboutPage(
                         data = snapshot,
                         onBack = { navigate("settings") },
-                        onConnectHelp = { alert = "Unesite HTTPS adresu svoje WordPress stranice s aktivnim dodatkom BAZNA. Nakon povezivanja odaberite poslovnicu i pregledajte objavljene cjenike." },
-                        onAnchorHelp = { alert = "Bazna cijena je dokumentirana referentna vrijednost uz pripadajući datum. Uvijek provjerite podatke na izvornoj WordPress stranici." },
+                        onConnectHelp = { alert = "Unesite HTTPS adresu stranice koja objavljuje BAZNA cjenike (WordPress, Web PHP, Joomla ili Shopify). Nakon povezivanja odaberite poslovnicu i pregledajte objavljene podatke." },
+                        onAnchorHelp = { alert = "Bazna cijena je dokumentirana referentna vrijednost uz datum. Uvijek je provjerite na izvornoj povezanoj BAZNA stranici." },
                         onSupport = ::supportEmail,
                         onOpenPublic = ::openPublic,
                     )

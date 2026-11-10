@@ -1,6 +1,6 @@
-# SIDRENA Android — vizualni standard
+# BAZNA Android — vizualni standard
 
-Android zasloni koriste jedinstveni SIDRENA dizajn usklađen s dostavljenih dvanaest referentnih prikaza.
+Android zasloni koriste jedinstveni BAZNA dizajn usklađen s dostavljenih dvanaest referentnih prikaza.
 
 ## Dizajnerski sustav
 
@@ -49,7 +49,7 @@ Referentni četvrti telefon: zaglavlje s povratkom i izbornikom, polje pretrage,
 | Cijena | 17 sp bold, `#FF852C`; referenca 11 sp `#A9BAD1` |
 | Podaci | Stvarni `CatalogSnapshot.products`, `CatalogSearch.items()`, `PriceDisplay.euro()` |
 
-**API ograničenja:** Javne WordPress rute ne pružaju slike proizvoda, kategorije, oznake `Novo` niti promocije. Zato prikaz koristi neutralan lokalni piktogram, a filteri su **Svi**, **Sidrena** i **Bez sidrene**; gumb **Usluge** otvara postojeći zaslon usluga. Ne smije se označiti sidrena cijena kao popust ili stvoriti lažni podatak.
+**API ograničenja:** Javne WordPress rute ne pružaju slike proizvoda, kategorije, oznake `Novo` niti promocije. Zato prikaz koristi neutralan lokalni piktogram, a filteri su **Svi**, **Sidrena** i **Bez sidrene**; gumb **Usluge** otvara postojeći zaslon usluga. Ne smije se označiti bazna cijena kao popust ili stvoriti lažni podatak.
 
 **QA:** Android CI (assembleDebug, bundleRelease, testDebugUnitTest, lintDebug, sigurnosni audit), test otvaranja detalja, povratka, učitavanja, tipkovnice i rubnih podataka (prazna lista, dugačka imena, bez cijene).
 
@@ -58,7 +58,7 @@ Referentni četvrti telefon: zaglavlje s povratkom i izbornikom, polje pretrage,
 
 ## Zaslon 05 — Usluge (PR #201)
 
-**Glavna referenca:** peti telefon na korisnički potvrđenom marketing/branding prikazu SIDRENA. Rezervna referenca `05_usluge.png` iz paketa brendinga prikazuje jednostavniji popis i služi samo za usporedbu boja, proporcija i elemenata. Oznake `DEMO` i `KONCEPT` nisu dio stvarnog sučelja.
+**Glavna referenca:** peti telefon na korisnički potvrđenom marketing/branding prikazu BAZNA. Rezervna referenca `05_usluge.png` iz paketa brendinga prikazuje jednostavniji popis i služi samo za usporedbu boja, proporcija i elemenata. Oznake `DEMO` i `KONCEPT` nisu dio stvarnog sučelja.
 
 Implementirano u `ui/ServiceCatalogScreen.kt`, integrirano kroz `SidrenaApp.kt`, s testovima u `ui/ServiceCatalogPresentationTest.kt`.
 
@@ -85,7 +85,7 @@ Implementirano u `ui/ServiceCatalogScreen.kt`, integrirano kroz `SidrenaApp.kt`,
 
 ## Zaslon 06 — Detalj artikla (Compose)
 
-**Vizualna referenca:** šesti telefon izvornog SIDRENA boarda. Redoslijed: zaglavlje s povratkom, veliki hero prostor za artikl, naziv i jedinica, istaknuta narančasta trenutačna cijena, bijela sidrena cijena i datum, informacije o artiklu te javni cjenik.
+**Vizualna referenca:** šesti telefon izvornog BAZNA boarda. Redoslijed: zaglavlje s povratkom, veliki hero prostor za artikl, naziv i jedinica, istaknuta narančasta trenutačna cijena, bijela bazna cijena i datum, informacije o artiklu te javni cjenik.
 
 Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.kt`, testovi `ui/ItemDetailPresentationTest.kt`.
 
@@ -95,7 +95,7 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 | Hero | 213 dp, navy gradient, radius 17 dp, narančasti lokalni simbol (nema izmišljenih fotografija) |
 | Naziv | 23 sp ExtraBold, razmak 4 dp prema jedinici |
 | Trenutačna cijena | 29 sp ExtraBold, #FF852C, samo ako je dostupna |
-| Sidrena cijena | 18 sp SemiBold, bijela; datum prikazati samo ako postoji sidrena cijena |
+| Bazna cijena | 18 sp SemiBold, bijela; datum prikazati samo ako postoji bazna cijena |
 | Sekundarni tekst | 12–13 sp, #A9BAD1 |
 | Detalji | tamnoplava kartica #10263D, border #28455F, radius 15 dp |
 | Raspored | vertikalni LazyColumn, radi na kompaktnim zaslonima i pri promjeni veličine fonta |
@@ -110,7 +110,7 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 ### UI prolaz 1.5.8 — detalji proizvoda i usluga
 
-- Redoslijed: zaglavlje (57 dp), hero prikaz (213 dp) s navy gradijentom i kutovima 17 dp, naslov stavke, trenutačna i sidrena cijena, objavljeni referentni datum, dodatni podaci i pouzdan javni HTTPS izvor.
+- Redoslijed: zaglavlje (57 dp), hero prikaz (213 dp) s navy gradijentom i kutovima 17 dp, naslov stavke, trenutačna i bazna cijena, objavljeni referentni datum, dodatni podaci i pouzdan javni HTTPS izvor.
 - Navigacijska tipka i izbornik javnog cjenika imaju dodirnu površinu od 48 dp. Naziv stavke je 23 sp, trenutačna cijena 29 sp, referentna 18 sp kada postoji.
 - Hero prikazuje stvarnu fotografiju isključivo ako je URL sigurno objavljen na istoj HTTPS domeni. U ostalim slučajevima koristi lokalni vektorski piktogram, bez izmišljene slike.
 - Status "Nedostupno" ne može dobiti zeleno značenje: zeleno se koristi samo za eksplicitne pozitivne statuse "Dostupno", "Na zalihi", "in stock"/"instock".
@@ -119,7 +119,7 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 ## Zaslon 07 — Cjenici (PR #202)
 
-**Vizualna referenca:** sedmi telefon korisnikove SIDRENA ploče. Posebno zaglavlje s povratkom i izbornikom, tražilica, filtri `Svi / Proizvodi / Usluge / Ostalo`, kompaktni redovi dokumenata s formatom i radnjom otvaranja. Zadržane su tamnoplava i narančasta paleta, bijeli naslovi i suptilni obrubi.
+**Vizualna referenca:** sedmi telefon korisnikove BAZNA ploče. Posebno zaglavlje s povratkom i izbornikom, tražilica, filtri `Svi / Proizvodi / Usluge / Ostalo`, kompaktni redovi dokumenata s formatom i radnjom otvaranja. Zadržane su tamnoplava i narančasta paleta, bijeli naslovi i suptilni obrubi.
 
 | Element | Vizualni cilj |
 |---|---|
@@ -142,7 +142,7 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 ## Zaslon 08 — Arhiva (isti PR #202)
 
-**Glavna referenca:** osmi telefon izvornog SIDRENA brendinga. Raspored u Kotlin/Jetpack Composeu: zaglavlje s povratkom i kontekstnim izbornikom, pretraživanje, čipovi godina, status filtra te lista arhivskih dokumenata sa zasebnim zelenim CSV i narančastim XML ikonama.
+**Glavna referenca:** osmi telefon izvornog BAZNA brendinga. Raspored u Kotlin/Jetpack Composeu: zaglavlje s povratkom i kontekstnim izbornikom, pretraživanje, čipovi godina, status filtra te lista arhivskih dokumenata sa zasebnim zelenim CSV i narančastim XML ikonama.
 
 | Element | Mjera / pravilo |
 |---|---|
@@ -176,7 +176,7 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 ## Zaslon 09 — Poslovnice (isti PR #202)
 
-**Referenca:** deveti telefon SIDRENA branding boarda. Zaslon slijedi kompoziciju: zaglavlje 61 dp, pretraga 52 dp, tamnoplavi informativni blok 168 dp u prostoru karte, lista poslovnica i jasna akcija za pregled pripadajućih cjenika.
+**Referenca:** deveti telefon BAZNA branding boarda. Zaslon slijedi kompoziciju: zaglavlje 61 dp, pretraga 52 dp, tamnoplavi informativni blok 168 dp u prostoru karte, lista poslovnica i jasna akcija za pregled pripadajućih cjenika.
 
 | Dio | Pravilo |
 |---|---|
@@ -199,7 +199,7 @@ Implementacija: `ui/CatalogScreens.kt` (`DetailPage`), integracija `SidrenaApp.k
 
 ## Zaslon 10 — Pretraživanje (isti PR #202)
 
-Nativni `ui/SearchScreen.kt` zamjenjuje zastarjeli `ArchiveAndSearch.kt`. Koristi iste zajedničke UI komponente kao Proizvodi, Usluge i Cjenici: tamnoplava SIDRENA podloga, vlastiti toolbar, pretraga, narančasti aktivni filtar, kartice stavki i donja navigacija.
+Nativni `ui/SearchScreen.kt` zamjenjuje zastarjeli `ArchiveAndSearch.kt`. Koristi iste zajedničke UI komponente kao Proizvodi, Usluge i Cjenici: tamnoplava BAZNA podloga, vlastiti toolbar, pretraga, narančasti aktivni filtar, kartice stavki i donja navigacija.
 
 | Element | Mjera i ponašanje |
 |---|---|
@@ -229,7 +229,7 @@ Provjeriti `assembleDebug`, `testDebugUnitTest`, `lintDebug`, `bundleRelease`, a
 
 ## Zaslon 11 — Postavke (isti PR #202)
 
-**Dizajnerska referenca:** SIDRENA zaslon postavki, s tamnoplavom pozadinom, narančastim akcijama, grupiranim karticama i donjom navigacijom. Implementacija `ui/SettingsScreen.kt`; zadržan `AboutPage` u `ui/SettingsScreens.kt`.
+**Dizajnerska referenca:** BAZNA zaslon postavki, s tamnoplavom pozadinom, narančastim akcijama, grupiranim karticama i donjom navigacijom. Implementacija `ui/SettingsScreen.kt`; zadržan `AboutPage` u `ui/SettingsScreens.kt`.
 
 | Dio | Vizualni cilj |
 |---|---|
@@ -268,13 +268,13 @@ Android CI mora proći Kotlin kompilaciju, `testDebugUnitTest`, `lintDebug`, `as
 |---|---|
 | Pozadina | tamna `#07182D` uz `#10263D` kartice i `#28455F` obrub |
 | Zaglavlje | 61 dp, naslov 22 sp Bold, povratak 48 dp |
-| Brendirani hero | radius 18 dp, lokalni SIDRENA znak 67 dp na navy pločici 83 dp, naziv 27 sp ExtraBold |
+| Brendirani hero | radius 18 dp, lokalni BAZNA znak 67 dp na navy pločici 83 dp, naziv 27 sp ExtraBold |
 | Slogan | `Cijene pod kontrolom. Poslovanje s povjerenjem.`, 12 sp, centrirano |
 | Verzije | dvije fleksibilne kartice min. 107 dp, radius 15 dp, Android nasuprot WordPress dodatku |
 | Upute | redovi najmanje 76 dp, lokalna ikona 43 dp, tekst 14/12 sp, strelica samo na radnji |
 | Podaci | URL povezane stranice i datum posljednje objave s odgovarajućom oznakom kada nedostaju |
 | Podrška | funkcionalno otvaranje sistemske aplikacije za e-poštu, bez vanjskih SDK-ova |
-| Podnožje | neutralno objašnjenje read-only podataka i `SIDRENA by Brendigo` |
+| Podnožje | neutralno objašnjenje read-only podataka i `BAZNA by Brendigo` |
 | Responsive | `verticalScroll`, flexible `Row.weight`, prelomi i skraćivanje dugačkih URL-ova |
 
 ### Podaci i funkcije
@@ -296,7 +296,7 @@ Android CI mora proći Kotlin kompilaciju, `testDebugUnitTest`, `lintDebug`, `as
 
 ## Završni vizualni audit — zaslon 01 Splash
 
-Izvorni preglednik: `SIDRENA-Android-Kompletan-Brending.zip` → `screens_concept/01_splash.png` (1080 × 1920). Datoteka `logos/sidrena-splash-1080x1920.png` ima iste piksele. Autoritativni vektor: `logos/sidrena-splash.svg`. Implementacija je `ui/SidrenaSplashScreen.kt`, s izvornim vektorskim `Path` koordinatama umjesto lokalnog launcher simbola koji nije istovjetan izvornom znaku.
+Izvorni preglednik: `BAZNA-Android-Kompletan-Brending.zip` → `screens_concept/01_splash.png` (1080 × 1920). Datoteka `logos/sidrena-splash-1080x1920.png` ima iste piksele. Autoritativni vektor: `logos/sidrena-splash.svg`. Implementacija je `ui/SidrenaSplashScreen.kt`, s izvornim vektorskim `Path` koordinatama umjesto lokalnog launcher simbola koji nije istovjetan izvornom znaku.
 
 **Odstupanja otklonjena:** prethodni prikaz koristio je mali S u uokvirenoj kartici, kutne dekoracije, plavu pomoćnu boju slogana i indikator učitavanja. Referenca ima velik samostalan narančasti znak S, dvije suptilne kružnice, odgovarajući plavi dijagonalni gradijent, bijeli veliki naziv i odvojeni narančasti potpis. Korisnik nije tražio dodatne slike — implementacija crta vektorski sadržaj lokalno, bez slikovnih ili mrežnih resursa.
 
@@ -308,7 +308,7 @@ Izvorni preglednik: `SIDRENA-Android-Kompletan-Brending.zip` → `screens_concep
 | Donja lijeva kružnica | centar (120, 1650), radijus 450, `#5C8EBB` s 5,5% prozirnosti |
 | Glavni simbol | izvorna `Path` geometrija, translacija (16, 188), skaliranje ×4 |
 | Gradijent simbola | `#FFAA55` → `#FF852C` |
-| Naslov SIDRENA | središnja x=540, baseline y=1160, 119 jedinica, Bold, tracking 10 |
+| Naslov BAZNA | središnja x=540, baseline y=1160, 119 jedinica, Bold, tracking 10 |
 | Slogan – redak 1 | baseline 1248, font 42, `#A9BAD1` |
 | Slogan – redak 2 | baseline 1310, font 42, `#A9BAD1` |
 | Potpis by Brendigo | baseline 1720, font 36, `#FF852C` |
@@ -323,7 +323,7 @@ Izvorni preglednik: `SIDRENA-Android-Kompletan-Brending.zip` → `screens_concep
 
 Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostavljenog brending paketa. Nije potrebno generirati dodatne slike.
 
-**Odstupanja ispravljena:** prethodni ekran imao je veliki kružni simbol poveznice, drugačiji naslov, centrirani uvod, običan `OutlinedTextField` s lijevom ikonom i drugačije tekstove gumba i sigurnosne kartice. Na referenci tih elemenata nema. Novi `ui/SidrenaConnectionScreen.kt` koristi naslov **Poveži WordPress stranicu**, lijevo poravnati uvod, tamnu adresnu karticu, širok narančasti gumb **Poveži stranicu**, istaknuti naslov **Sigurna veza** i mali potpis SIDRENA u podnožju.
+**Odstupanja ispravljena:** prethodni ekran imao je veliki kružni simbol poveznice, drugačiji naslov, centrirani uvod, običan `OutlinedTextField` s lijevom ikonom i drugačije tekstove gumba i sigurnosne kartice. Na referenci tih elemenata nema. Novi `ui/SidrenaConnectionScreen.kt` koristi naslov **Poveži WordPress stranicu**, lijevo poravnati uvod, tamnu adresnu karticu, širok narančasti gumb **Poveži stranicu**, istaknuti naslov **Sigurna veza** i mali potpis BAZNA u podnožju.
 
 | Element | Izvorna geometrija / provedba |
 |---|---|
@@ -335,7 +335,7 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 | Placeholder | `https://primjer-trgovina.hr` prikazuje se **samo kao primjer**, nikada nije stvarni unos |
 | Primarna akcija | narančasta, min. 52 dp, `Poveži stranicu`; validacija u `SiteUrl.parse()` |
 | Informacija | `Sigurna veza`, zeleni `#52D9A3` i tekst o javno dostupnom WordPress sadržaju |
-| Podnožje | `SIDRENA • by Brendigo`, bez demo/koncept oznaka |
+| Podnožje | `BAZNA • by Brendigo`, bez demo/koncept oznaka |
 | Responsivnost | razmaci za 360×640 i 393×852 dp, vertikalni scroll i `imePadding` |
 
 **Funkcionalnost ostaje stvarna:** `BasicTextField` prihvaća samo jednu liniju do 2048 znakova, tipkovnica za URL i potvrda pozivaju `SidrenaViewModel.connect()`; `SiteUrl.parse()` odbija nesigurne/nevaljane URL-ove. Prazna adresa stvara stvarnu validacijsku poruku umjesto povezivanja na primjer iz dizajna. Gumb i tipkovnica prikazuju stanje učitavanja i mrežnu pogrešku. Povratak ostaje aktivan prema dosadašnjoj logici.
@@ -345,12 +345,12 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 ## Završni vizualni audit — zaslon 03 Početna
 
-**Primarna referenca** je ranije potvrđeni treći telefon s glavnog SIDRENA marketing/brending boarda (`sidrena_ref_screen03_crop.png`); `screens_concept/03_pocetna.png` prikazuje **drugu, pojednostavljenu kompoziciju** i koristi se samo kao sekundarna provjera palete/teksta. Vizualni elementi iz ta dva različita izgleda **ne smiju se miješati**. Svi podaci u stvarnoj Android aplikaciji su iz javno povezanog WordPress kataloga, a ne iz primjerâ na referenci.
+**Primarna referenca** je ranije potvrđeni treći telefon s glavnog BAZNA marketing/brending boarda (`sidrena_ref_screen03_crop.png`); `screens_concept/03_pocetna.png` prikazuje **drugu, pojednostavljenu kompoziciju** i koristi se samo kao sekundarna provjera palete/teksta. Vizualni elementi iz ta dva različita izgleda **ne smiju se miješati**. Svi podaci u stvarnoj Android aplikaciji su iz javno povezanog WordPress kataloga, a ne iz primjerâ na referenci.
 
 | Dio | Primarna referenca i izvedba |
 |---|---|
-| Gornje zaglavlje | `SIDRENA` s narančastim izvornim S logotipom i ikoncom pretrage; 62 dp |
-| Lokalna ikona | `res/drawable/ic_sidrena_mark.xml` sada s točnom geometrijom i gradijentom izvornog `logos/sidrena-symbol.svg` |
+| Gornje zaglavlje | `BAZNA` s narančastim izvornim B logotipom i ikoncom pretrage; 62 dp |
+| Lokalna ikona | `res/drawable/ic_bazna_mark.xml` sada s točnom geometrijom i gradijentom izvornog `logos/sidrena-symbol.svg` |
 | Povezana stranica | zasebna kartica s zelenom ikonom stanja, domenom i **stvarnim** datumom posljednje objave; pristup osvježavanju/promjeni weba |
 | Statistike | **2×2** kartice, 132 dp svaka; lokalni piktogram gore, naziv i realna brojčana vrijednost dolje; proizvodi, usluge, cjenici i arhiva |
 | Poslovnice | samostalna kartica 78 dp, stvarni broj javnih poslovnica; otvara zaseban zaslon Poslovnice |
@@ -372,7 +372,7 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 ## Zaslon 04 — Proizvodi i zajednički WordPress/Android API ugovor
 
-**Primarna vizualna referenca:** četvrti telefon glavne SIDRENA marketinške ploče; `screens_concept/04_proizvodi.png` dodatno opisuje tražilicu, sidrenu cijenu i stanja. U produkciji su sve fotografije, nazivi i cijene stvarni podaci WordPress/WooCommerce trgovine, nikad kopije demo artikala s referentne slike.
+**Primarna vizualna referenca:** četvrti telefon glavne BAZNA marketinške ploče; `screens_concept/04_proizvodi.png` dodatno opisuje tražilicu, baznu cijenu i stanja. U produkciji su sve fotografije, nazivi i cijene stvarni podaci WordPress/WooCommerce trgovine, nikad kopije demo artikala s referentne slike.
 
 ### Android UI
 
@@ -387,8 +387,8 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 - Ove vrijednosti su samo informacija o spremnosti; API ostaje javan i read-only. Nema administratorske autentikacije, korisničkih podataka, lozinki ili privatnih kataloga u odgovoru.
 - Android `CatalogDiscovery.kt` čita opcionalne booleane i odbija vrijednosti pogrešnog tipa. Ako polje nedostaje (stariji dodatak), nastavlja staro ponašanje učitavanja CSV-a; ako je `false`, prikazuje korisnu poruku umjesto nepotrebnog pokušaja nedostupnog endpointa.
 - Zasebne poslovnice imaju zasebne readiness oznake, i njihov status nikada nije zamijenjen statusom webshopa. Nakon objave korisnik može osvježiti Android podatke.
-- WooCommerce javni feed proizvoda `includes/class-feed-rows.php` i `includes/class-feed-files.php` sada sadrži **neobavezan** stupac `slika_url` iz izvorne objavljene fotografije artikla. Usluge i stare CSV datoteke ostaju kompatibilne; sidrena cijena, datum, dostupnost, SKU i jedinica mjere ostaju nepromijenjeni.
-- `includes/admin/tab-javni-xml.php` sada prikazuje panel **SIDRENA Android · Povezivanje**, kopiranje javne HTTPS adrese, status pojedinačnih objavljenih CSV datoteka i upute za Android osvježavanje. UI je usklađen s Android paletom u `assets/css/admin.css`, `cjenik.css` i `archive.css`.
+- WooCommerce javni feed proizvoda `includes/class-feed-rows.php` i `includes/class-feed-files.php` sada sadrži **neobavezan** stupac `slika_url` iz izvorne objavljene fotografije artikla. Usluge i stare CSV datoteke ostaju kompatibilne; bazna cijena, datum, dostupnost, SKU i jedinica mjere ostaju nepromijenjeni.
+- `includes/admin/tab-javni-xml.php` sada prikazuje panel **BAZNA Android · Povezivanje**, kopiranje javne HTTPS adrese, status pojedinačnih objavljenih CSV datoteka i upute za Android osvježavanje. UI je usklađen s Android paletom u `assets/css/admin.css`, `cjenik.css` i `archive.css`.
 - Kod promjena kataloga **obavezna je objava/regeneracija CSV cjenika** u WordPress administraciji; javni REST endpoint namjerno ne regenerira katalog tijekom anonimnog zahtjeva, kako se ne bi dopuštala zlouporaba.
 
 ### Regresijski testovi i QA
@@ -404,27 +404,27 @@ Izvorna referenca: `screens_concept/02_povezivanje.png` (1080 × 1920) iz dostav
 
 ## Zaslon 05/12 — Usluge i WordPress prikaz cjenika
 
-**Referenca:** dostavljena visoka slika \`SIDRENA-05-reference.png\` (Usluge, tamnoplava pozadina, narančasta strelica, široka tražilica i četiri kompaktne kartice). Prikaz je izrađen kao stvarni Compose UI, bez generiranja slike u chatu. Primjeri cijena/naziva na dizajnerskoj slici koriste se samo za razvojni preview i nikad se ne ubrizgavaju u produkcijski katalog.
+**Referenca:** dostavljena visoka slika \`BAZNA-05-reference.png\` (Usluge, tamnoplava pozadina, narančasta strelica, široka tražilica i četiri kompaktne kartice). Prikaz je izrađen kao stvarni Compose UI, bez generiranja slike u chatu. Primjeri cijena/naziva na dizajnerskoj slici koriste se samo za razvojni preview i nikad se ne ubrizgavaju u produkcijski katalog.
 
 ### Android
 
 - Kompozicija \`ServiceCatalogScreen.kt\` koristi \`#07182D\` pozadinu, naslov 23 sp, visinu zaglavlja 61 dp, tražilicu visine 40 dp (radijus 9 dp) odmah ispod zaglavlja, odmak 21 dp do prve kartice od liste i kartice \`#10263D\` visine barem 76 dp, radijusa 12 dp i obruba \`#28455F\`. Narančasta je \`#FF852C\`; siva \`#A9BAD1\`.
 - Strelica i izbornik su funkcionalni. Izbornik sadrži filtre **Sve usluge / Sa sidrenom cijenom / Bez sidrene cijene**, **Osvježi usluge** i **Prikaži proizvode**. Filtri namjerno nisu stalno u dodatnom redu: tako glavni zaslon prati konkretnu dostavljenu referencu.
 - Pretraga izravno filtrira stvarne javno objavljene usluge preko \`CatalogSearch.items\`. \`LazyColumn\` prikazuje stvarna imena i podatke; odabir kartice otvara detalj stavke.
-- Jedna objavljena cijena **nije automatski „cijena od”**: prikazuje se **Cijena** i izvorna vrijednost. Sidrena cijena prikazuje se samo kad postoji, uz **objavljeni datum**. Nema lažnih promocija, nasumičnih cijena, slika ili izvora.
+- Jedna objavljena cijena **nije automatski „cijena od”**: prikazuje se **Cijena** i izvorna vrijednost. Bazna cijena prikazuje se samo kad postoji, uz **objavljeni datum**. Nema lažnih promocija, nasumičnih cijena, slika ili izvora.
 - Ako WordPress v1 prijavi \`available_csv=false\`, korisnik dobiva jasnu poruku da cjenik usluga nije objavljen. Kada API nema to novo polje (starija verzija), aplikacija ostaje kompatibilna i pokušava standardno CSV učitavanje.
 - Stanje objave odabrane poslovnice provjerava se **isključivo na njezinu feedu**. Nema tihog prelaska na webshop kad poslovnica nije pronađena.
 
 ### WordPress
 
-- U \`SIDRENA → Javni cjenik → SIDRENA Android · Povezivanje\` prikazani su objavljeni CSV proizvoda/usluga za glavni cjenik i zasebno prvih 12 poslovnica. Sve se poslovnice mogu provjeriti kroz postojeći javni \`GET /wp-json/brendigo-sidrena/v1/cjenici\`. Oznaka statusa računa se isključivo iz objavljenih čitljivih datoteka; **prazna, ali ispravno objavljena CSV datoteka** smatra se objavljenom.
-- \`class-feed-files.php\` u javni HTML dodaje stabilne, HTML-escapeane \`data-kind\` (\`usluga\`/\`proizvod\`) i \`data-field\` atribute uz postojeće lokalizirane oznake. Javne mobilne kartice u \`assets/css/cjenik.css\` preuzimaju Android paletu, prikazuju stvarnu trenutačnu cijenu narančasto i sidrenu cijenu tamnije, bez skrivanja datuma ili izvornog sadržaja.
+- U \`BAZNA → Javni cjenik → BAZNA Android · Povezivanje\` prikazani su objavljeni CSV proizvoda/usluga za glavni cjenik i zasebno prvih 12 poslovnica. Sve se poslovnice mogu provjeriti kroz postojeći javni \`GET /wp-json/brendigo-sidrena/v1/cjenici\`. Oznaka statusa računa se isključivo iz objavljenih čitljivih datoteka; **prazna, ali ispravno objavljena CSV datoteka** smatra se objavljenom.
+- \`class-feed-files.php\` u javni HTML dodaje stabilne, HTML-escapeane \`data-kind\` (\`usluga\`/\`proizvod\`) i \`data-field\` atribute uz postojeće lokalizirane oznake. Javne mobilne kartice u \`assets/css/cjenik.css\` preuzimaju Android paletu, prikazuju stvarnu trenutačnu cijenu narančasto i baznu cijenu tamnije, bez skrivanja datuma ili izvornog sadržaja.
 - Ništa se ne mijenja u WooCommerce cijeni, datumima, korisničkim računima, administratorskim lozinkama ili privatnom API-ju. Android je **read-only**, koristi HTTPS i podatke javne objave.
 
 ### Provjere prije spajanja
 
-- Android: \`ServiceCatalogPresentationTest.kt\` uključuje pretraživanje, filtar, točnu trenutnu cijenu, nedostajuću sidrenu cijenu, sidreni datum i zaseban status poslovnice. CI mora proći compile, lint, unit tests te APK/AAB.
-- WordPress: \`tools/test_public_catalog_markup.php\` poziva stvarni PHP builder s izoliranim WordPress stubovima; provjerava \`data-kind\`, \`data-field\`, escapeanje naziva, izvornu cijenu, sidrenu cijenu i datum. Uz to se izvode ostali REST/CSV testovi i reproducibilno pakiranje.
+- Android: \`ServiceCatalogPresentationTest.kt\` uključuje pretraživanje, filtar, točnu trenutnu cijenu, nedostajuću baznu cijenu, sidreni datum i zaseban status poslovnice. CI mora proći compile, lint, unit tests te APK/AAB.
+- WordPress: \`tools/test_public_catalog_markup.php\` poziva stvarni PHP builder s izoliranim WordPress stubovima; provjerava \`data-kind\`, \`data-field\`, escapeanje naziva, izvornu cijenu, baznu cijenu i datum. Uz to se izvode ostali REST/CSV testovi i reproducibilno pakiranje.
 - Za stvarnu **pixel-po-pixel potvrdu** još treba usporediti emulator screenshot i referencu na jednakom DP/DPI okruženju, Android 360/393/411 dp širine te WordPress 360/768/desktop prikaz. Nije moguće tvrditi potvrđen 1:1 bez te usporedbe.
 - Za stvarnu provjeru povezivanja: na testnom WordPressu objaviti cjenik, preko preglednika otvoriti \`/wp-json/brendigo-sidrena/v1/cjenici\`, provjeriti \`feeds.usluge.available_csv=true\`, otvoriti \`feeds.usluge.csv\`, provjeriti 302 odredište iste HTTPS domene, povezati Android, odabrati poslovnicu, osvježiti i otvoriti uslugu. Hosting/CDN/WAF mogu uzrokovati greške koje lokalni testovi ne oponašaju.
 
@@ -436,7 +436,7 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 - Uklonjen je prethodni veliki generički hero/piktogram koji se ne pojavljuje na konceptnom PNG-u. Autentične fotografije proizvoda i dalje su podržane u zaslonu popisa Proizvodi (04), ali detalj (06) prvenstveno odgovara podatkovnim karticama i ne dodaje sliku koja nije na referenci.
 - `PriceItem` i `CsvParser` osim stvarne trenutne i sidrene cijene sada čuvaju `cijena_jedinice_mjere`, `naziv_posebnog_oblika`, `sidrena_datum`, `barkod` i `marka`. Nijedno polje nije generirano iz dizajnerske slike.
 - Detalj prikazuje izvornu jediničnu cijenu, naziv posebnog oblika prodaje, marku i barkod kada postoje. **Bazna cijena nije poistovjećena sa sidrenom**, a najniža cijena tijekom 30 dana prije sniženja mora imati neovisni i potpuni dokaz.
-- Ako sidrena cijena postoji, ali datum **nije javno objavljen**, zaslon eksplicitno upozorava na neprovjeren povijesni datum. Ako cijene uopće nema, ona se ne računa iz današnje cijene.
+- Ako bazna cijena postoji, ali datum **nije javno objavljen**, zaslon eksplicitno upozorava na neprovjeren povijesni datum. Ako cijene uopće nema, ona se ne računa iz današnje cijene.
 - Spremanje odabira preko rotacije ekrana sada prenosi 14 public polja, ali vraća i stare zapise od 9/10 polja, bez administratorskih podataka.
 - `LegalContract` i `AboutPage` dodatno čitaju informativni pravni profil provjeren 2. 11. 2026. i označavaju pravilnik o baznoj cijeni kao nacrt u savjetovanju. Ne prikazuje se potvrda da je konkretni trgovac zakonski usklađen.
 - `CatalogRepository` i Početna iz WordPress API-ja čitaju `publication.pending_changes`. Stara objavljena CSV datoteka uz kasnije promjene proizvoda prikazuje se kao potencijalno zastarjela, čak i kad su datoteke fizički dostupne.
@@ -450,7 +450,7 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 - Odabrana poslovnica sprema se uz HTTPS stranicu tek nakon uspješnog učitavanja. Nakon gašenja procesa aplikacija ponovno učitava isti katalog; ako je poslovnica u međuvremenu uklonjena, prikazuje se glavni webshop katalog, a odabir se briše. Odspajanje briše i stranicu i poslovnicu.
 - `DetailSelection.kt` pri obnovi detalja provjerava **domenu, poslovnicu, vrstu, ID i po potrebi SKU** te podatke ponovno pronalazi u svježe učitanom javnom CSV-u. Prethodno spremljena cijena nikada nije autoritativna nakon obnove.
 - `DetailSelectionTest.kt` pokriva različite poslovnice, domene, tip proizvoda/usluge, promjenu cijene, uklonjene stavke i SKU. Povećani font i uski zasloni ne smiju trajno odrezati statističke kartice.
-- `.github/workflows/android-ci.yml` pokreće `tools/run_android_responsive.sh`: devet stvarnih konfiguracija emulatora od 240 dp do 1280 dp, uključujući 393×852, tablet, landscape i povećani font. Instrumentacijski test `ResponsiveScreensInstrumentedTest.kt` prikazuje svih 12 Compose zaslona i snima ukupno **108 PNG datoteka** u GitHub Actions artefakt `SIDRENA-Android-responsive-screenshots`.
+- `.github/workflows/android-ci.yml` pokreće `tools/run_android_responsive.sh`: devet stvarnih konfiguracija emulatora od 240 dp do 1280 dp, uključujući 393×852, tablet, landscape i povećani font. Instrumentacijski test `ResponsiveScreensInstrumentedTest.kt` prikazuje svih 12 Compose zaslona i snima ukupno **108 PNG datoteka** u GitHub Actions artefakt `BAZNA-Android-responsive-screenshots`.
 - To su testovi stvarnog renderiranja i veličine snimke, **ne** dokaz nepostojanja svakog overlapa niti 1:1 odstupanja prema izvornom dizajnu. Pixel-perfect odobrenje zahtijeva usporedbu svakog PNG-a s izvornom referencom pri istom DPI-ju, font scaleu, status/navigacijskim trakama i slijed provjere klikova.
 - WordPress plugin ima CSS prilagodbe za 320/375/600/782 px: povezivanje Androida, URL, statusi objave, popis poslovnica i pomoć uz cijenu ostaju dostupni na uskim zaslonima. Za prihvat je potreban još stvarni pregled na WordPress mobilnoj administraciji i webshopu (uključujući 200% zum i tipkovnicu), ne samo PHP i CSS statičke provjere.
 
@@ -464,19 +464,19 @@ Nativni zaslon `ui/CatalogScreens.kt` povezan je s javnim WordPress CSV poljima.
 - Dodir na karticu ili ikonu otvara **provjerenu HTTPS poveznicu iste WordPress domene**. Nije dodan lažni PDF jer WordPress API takve dokumente ne jamči. Datumi dolaze isključivo iz stvarnih metapodataka objave.
 - Pretraživanje, filtri, osvježavanje i arhiva funkcionalni su u izborniku; dodatni stalni redovi nisu prisutni na osnovnoj referenci. `available_csv=false` skriva neobjavljen dokument, a `null` čuva kompatibilnost sa starijim pluginom. Odabrana poslovnica nikada ne preuzima status webshopa.
 - `AppNavigation` na zaslonima užim od 360 dp daje četiri dostupačna ikonografska odredišta s govornim opisima; 360 dp i više zadržava izvorne oznake. Na tabletima/panoramskim zaslonima sadržaj je centriran u maksimalno 840 dp, obrazac povezivanja u 560 dp.
-- **Proizvodi 04/12:** na karticama užim od 310 dp proizvodna fotografija, puni naslov i jedinica mjere ostaju u gornjem retku, a aktualna i sidrena cijena prelaze ispod. Na klasičnim 360–411 dp uređajima originalna vodoravna referentna kartica ostaje nepromijenjena; referentne cijene se ne izmišljaju.
+- **Proizvodi 04/12:** na karticama užim od 310 dp proizvodna fotografija, puni naslov i jedinica mjere ostaju u gornjem retku, a aktualna i bazna cijena prelaze ispod. Na klasičnim 360–411 dp uređajima originalna vodoravna referentna kartica ostaje nepromijenjena; referentne cijene se ne izmišljaju.
 
 ### Automatizirani Android testovi
 
 - JUnit: `AdaptiveSizingTest.kt` mjeri 13 karakterističnih širina **240 / 280 / 320 / 360 / 393 / 411 / 480 / 600 / 720 / 840 / 1024 / 1280 / 1920 dp**, uključujući granične uvjete za navigaciju.
 - Stvarni emulator: `ResponsiveScreensInstrumentedTest.kt` i `tools/run_android_responsive.sh` pokušavaju prikazati **svih 12 Compose zaslona** pri devet konfiguracija: **240×480, 320×568, 360×780, 393×852, 411×891, 600×960, 840×1120, 1280×800, 320×640 s fontom 1.4×** (160 dpi, Android API 35). Uz provjeru granica dodirnih elemenata prikuplja se 108 snimki ako test prođe.
-- GitHub Actions objavljuje rezultat i screenshot artefakt `SIDRENA-Android-responsive-screenshots`. Samo uspješan izvršeni workflow dokazuje da je pojedina konfiguracija stvarno testirana. Dodatna vizualna screenshot razlika u odnosu na 1080×1920 referencu i stvarni uređaji i dalje su nužni za potvrđeno 1:1.
+- GitHub Actions objavljuje rezultat i screenshot artefakt `BAZNA-Android-responsive-screenshots`. Samo uspješan izvršeni workflow dokazuje da je pojedina konfiguracija stvarno testirana. Dodatna vizualna screenshot razlika u odnosu na 1080×1920 referencu i stvarni uređaji i dalje su nužni za potvrđeno 1:1.
 
 ### WordPress responzivnost
 
 - Public plugin `cjenik.css`: mobilne tablične ćelije prelaze u tamnoplave kartice do 720 px, dugi nazivi/URL-ovi se prelamaju bez vodoravnog pomaka cijele stranice; cijene i sidreni datumi ostaju vidljivi.
 - Admin `admin.css`: široki uređivač s 15 stupaca ima **vlastiti vodoravni scroll**, dok navigacija, kartice, WooCommerce filtri, statusi poslovnica i gumbi ostaju unutar mobilnog zaslona. Zastarjeli gumbi za masovno kopiranje trenutačnih cijena/datumâ uklonjeni su zbog prethodno utvrđene pravne opasnosti.
-- Browser test `tools/test_responsive_browser.mjs` pokreće stvarni Chrome na **13 širina 240–1920 px** za javni PHP renderirani cjenik i reprezentativni WordPress admin: **26 snimki + JSON mjerenja** u artefaktu `SIDRENA-WordPress-responsive-Chrome`. Tablični scroll dopušten je unutar tablice, ne preko cijelog dokumenta.
+- Browser test `tools/test_responsive_browser.mjs` pokreće stvarni Chrome na **13 širina 240–1920 px** za javni PHP renderirani cjenik i reprezentativni WordPress admin: **26 snimki + JSON mjerenja** u artefaktu `BAZNA-WordPress-responsive-Chrome`. Tablični scroll dopušten je unutar tablice, ne preko cijelog dokumenta.
 - WordPress je klijentov javni **read-only** izvor; Android ne preuzima administratorske lozinke i ne mijenja katalog. Niti automatizirana responsivnost niti zeleni CI sami po sebi ne predstavljaju pravni certifikat.
 
 **Ograničenje:** "sve moguće" kombinacije rezolucija, DPI-ja, omjera stranica, pristupačnosti, verzija Androida i tema nisu konačan skup. Matrica iznad pokriva definiran skup graničnih i tipičnih profila, a ne sve uređaje. Za produkcijsko označavanje 1:1 preporučuje se screenshot-diff referenci po svakoj klasi uređaja te barem jedan stvarni fizički telefon i tablet.

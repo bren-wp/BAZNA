@@ -40,7 +40,7 @@
 			var style = $('input[name="sidrena_cijena_date_style"]:checked').val();
 
 			if (!prefix && style !== "plain") {
-				prefix = "Sidrena cijena";
+				prefix = "Bazna cijena";
 			}
 
 			var label = prefix;
