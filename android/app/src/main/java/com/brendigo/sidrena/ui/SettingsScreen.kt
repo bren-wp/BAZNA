@@ -149,7 +149,7 @@ fun SettingsPage(
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         Text(
-                            "WordPress stranica",
+                            "BAZNA stranica",
                             color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
@@ -305,7 +305,7 @@ fun SettingsPage(
         SettingsGroup {
             SettingsEntry(
                 icon = Icons.Outlined.Description,
-                title = "WordPress dodatak",
+                title = "BAZNA integracija",
                 subtitle = "Verzija: " + summary.pluginVersion,
                 onClick = null,
             )
@@ -339,7 +339,7 @@ fun SettingsPage(
         }
         Text(
             text = "Odspajanje uklanja spremljenu adresu samo na ovom uređaju. " +
-                "Podaci na WordPress stranici ostaju nepromijenjeni.",
+                "Objavljeni podaci na povezanoj platformi ostaju nepromijenjeni.",
             color = TextMuted,
             fontSize = 11.sp,
             lineHeight = 16.sp,

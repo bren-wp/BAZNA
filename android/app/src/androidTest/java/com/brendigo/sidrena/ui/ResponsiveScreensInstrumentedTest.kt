@@ -210,7 +210,7 @@ class ResponsiveScreensInstrumentedTest {
         // The reference-facing title is used as a second independent screen
         // identity check, in addition to the screen root testTag.
         val titles = listOf(
-            "", "Poveži WordPress stranicu", "BAZNA", "Proizvodi",
+            "", "Poveži BAZNA stranicu", "BAZNA", "Proizvodi",
             "Usluge", "Detalji proizvoda", "Javni cjenici", "Arhiva",
             "Poslovnice", "Pretraživanje", "Postavke", "O aplikaciji",
         )

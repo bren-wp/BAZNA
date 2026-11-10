@@ -4,7 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Single validated reader for the official public WordPress discovery contract.
+ * Single validated reader for the official public BAZNA discovery contract.
  * No catalogue or legal profile is accepted from an unsupported or ambiguous API.
  */
 object CatalogDiscovery {
@@ -14,6 +14,11 @@ object CatalogDiscovery {
     fun parse(json: JSONObject, site: SiteUrl): CatalogIndex {
         require(json.optInt("api_version", -1) == 1) {
             "Ova verzija javnog BAZNA API-ja nije podržana."
+        }
+        // Optional for legacy WordPress; BAZNA platform adapters declare this.
+        val platform = json.optString("platform", "wordpress").ifBlank { "wordpress" }
+        require(platform in setOf("wordpress", "web", "joomla", "shopify")) {
+            "Nepoznata BAZNA platforma."
         }
         // Optional for older plugins, mandatory to validate when supplied:
         // Android can display public prices but must never negotiate an admin
@@ -25,7 +30,7 @@ object CatalogDiscovery {
                     "BAZNA dopušta samo javno čitanje cjenika."
                 }
                 require(connection.opt("authentication_required") == false) {
-                    "BAZNA ne podržava prijavu u WordPress administraciju."
+                    "BAZNA ne prihvaća prijavu u udaljeni administratorski sustav."
                 }
                 require(connection.opt("csv_publication_required") == true) {
                     "Poslužitelj ne potvrđuje sigurnu objavu CSV cjenika."
@@ -158,6 +163,7 @@ object CatalogDiscovery {
             servicesCsvReady = ready(sources, "usluge"),
             pendingPublication = pending,
             wordpressLicenseActive = licenseActive,
+            platform = platform,
         )
     }
 }

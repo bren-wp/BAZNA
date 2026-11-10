@@ -2,7 +2,7 @@ package com.brendigo.sidrena.data
 
 import java.net.URI
 
-/** Conservative public WordPress same-origin URL guard. */
+/** Conservative public BAZNA same-origin URL guard across CMS platforms. */
 class SiteUrl private constructor(val base: URI) {
     val display: String get() = base.toASCIIString().removeSuffix("/")
 
@@ -15,7 +15,7 @@ class SiteUrl private constructor(val base: URI) {
             val bareHost = Regex("^[A-Za-z0-9][A-Za-z0-9.-]*(?:/[A-Za-z0-9._~-]+)*/?$")
             val candidate = if (bareHost.matches(raw)) "https://$raw" else raw
             val uri = try { URI(candidate) } catch (_: Exception) {
-                throw IllegalArgumentException("Unesite valjanu HTTPS adresu WordPress stranice.")
+                throw IllegalArgumentException("Unesite valjanu HTTPS adresu BAZNA stranice.")
             }
             val host = uri.host?.lowercase().orEmpty()
             val labels = host.split('.')
