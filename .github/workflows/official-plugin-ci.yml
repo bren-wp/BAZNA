@@ -16,26 +16,10 @@ on:
       - 'tools/test_responsive_browser.mjs'
       - 'tools/fixtures/**'
       - '.github/workflows/official-plugin-ci.yml'
+  # Unified releases need a WordPress verdict for the SAME commit, even when
+  # only README, Android, licensing or release workflows changed.
   push:
     branches: [main]
-    paths:
-      # Re-validate WordPress v1 contract when another BAZNA backend changes:
-      - 'web/**'
-      - 'joomla/**'
-      - 'shopify/**'
-      - 'wordpress/brendigo-sidrena-cijena/**'
-      - 'licenca/**'
-      - 'tools/test_bazna_license_domain.php'
-      - 'tools/package_plugin.py'
-      - 'tools/package_wporg.py'
-      - 'tools/package_license.py'
-      - 'tools/test_legal_contract.php'
-      - 'tools/test_public_api_contract.php'
-      - 'tools/test_public_feed_columns.php'
-      - 'tools/test_public_catalog_markup.php'
-      - 'tools/test_legal_price_safety.php'
-      - 'tools/test_responsive_browser.mjs'
-      - 'tools/fixtures/**'
 permissions:
   contents: read
 jobs:
