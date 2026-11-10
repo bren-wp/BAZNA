@@ -14,7 +14,7 @@
 |---|---|---|
 | **Android** | Pregled javnih proizvoda, usluga, baznih cijena, poslovnica i arhive iz povezanog WordPressa | **1.5.13** |
 | **Windows** | Lokalno upravljanje katalozima, poviješću cijena, lokacijama, CSV/XML datotekama i sigurnosnim kopijama | **0.10.6** |
-| **WordPress** | Službeni dodatak za javne cjenike, bazne cijene i arhivu | **1.5.13**, nadopunjen pravni profil |
+| **WordPress** | Službeni dodatak za javne cjenike, bazne cijene i arhivu | **1.5.14**, nadopunjen pravni profil |
 
 ### Novi BAZNA adapteri — PHP, Joomla, Shopify
 
@@ -46,7 +46,7 @@ Instalirajte službeni WordPress dodatak na javnu **HTTPS** domenu te u Android 
 
 ### Android i WordPress — zajednički javni katalog
 
-Android 1.5.13 i WordPress 1.5.13 donose objavljene korekcije mobilnog sučelja i javnog kataloga. U WordPressu otvorite **BAZNA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **BAZNA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
+Android 1.5.13 i WordPress 1.5.14 donose objavljene korekcije mobilnog sučelja i javnog kataloga. U WordPressu otvorite **BAZNA → Javni cjenik** i generirajte javne CSV cjenike prije povezivanja. Panel **BAZNA Android · Povezivanje** prikazuje jesu li CSV proizvodi i usluge objavljeni te omogućuje kopiranje HTTPS adrese stranice.
 
 Android ostaje samo za čitanje: prihvaća REST v1, učitava stvarne proizvode/usluge i poslovnice, poštuje status objave, te prikazuje stvarne WooCommerce slike samo s iste javne HTTPS domene. Bez objavljenih CSV cjenika prikazuje jasnu obavijest i omogućuje naknadno osvježavanje; stari dodaci bez statusnih polja i dalje su kompatibilni. Produkcijska objava provodi se zasebno nakon spajanja i uspješnih provjera izdanja.
 
@@ -56,7 +56,7 @@ Nativno Windows sučelje za lokalno vođenje aktualnih i povijesnih cijena, kata
 
 ### BAZNA za WordPress
 
-Službeni dodatak **BAZNA – Bazne cijene 1.5.13** osigurava javne cjenike i arhiviranje. Promjene dodatka izdaju se zasebno od Android i Windows aplikacije.
+Službeni dodatak **BAZNA – Bazne cijene 1.5.14** osigurava javne cjenike i arhiviranje. Promjene dodatka izdaju se zasebno od Android i Windows aplikacije.
 
 ## Preuzimanja
 
