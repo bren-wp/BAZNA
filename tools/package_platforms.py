@@ -60,6 +60,7 @@ def build(target: Path) -> None:
     }
     joomla["vendor/Core.php"] = (web_root / "src/Core.php").read_bytes()
     joomla["vendor/LicenseClient.php"] = (web_root / "src/LicenseClient.php").read_bytes()
+    joomla["vendor/AdminCatalog.php"] = (web_root / "src/AdminCatalog.php").read_bytes()
     joomla["assets/bazna.css"] = (web_root / "public/assets/bazna.css").read_bytes()
     assert "bazna.xml" in joomla and "services/provider.php" in joomla
     archive(target / "BAZNA-Joomla-Plugin-1.0.0.zip", joomla)
