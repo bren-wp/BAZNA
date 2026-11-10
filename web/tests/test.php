@@ -74,6 +74,37 @@ check($before['api_version'] === 1 && $before['feeds']['proizvodi']['available_c
 $published = $core->publish();
 check(isset($published['published_at']), 'publication timestamp');
 $index = $core->discovery('joomla');
+// This is a source-level contract check; no WP bootstrap, database or live
+// website is needed. It must fail whenever one platform drifts legally.
+if (!defined('ABSPATH')) define('ABSPATH', '/offline-contract-test/');
+require_once dirname(__DIR__, 2) . '/wordpress/brendigo-sidrena-cijena/includes/class-legal.php';
+$wpLegal = Brendigo_Sidrena_Cijena_Legal::public_contract();
+$commonLegal = $core->legal();
+foreach ([
+    'schema', 'jurisdiction', 'rules_revision', 'consumer_law_revision',
+    'unit_price_rule_revision', 'unit_price_rule_effective_from',
+    'price_reduction_lookback_days', 'discount_baseline_is_anchor_price',
+    'base_price_regulation_status', 'base_price_rule_effective_from',
+    'base_price_is_automatically_derived', 'historical_price_verification_required',
+    'legal_compliance_certified', 'consumer_30_day_low_is_anchor_price',
+    'consumer_30_day_low_is_base_price', 'draft_rulebooks_consultation_until',
+    'effective_from', 'reference_dates', 'legacy_categories',
+    'product_publication_deadline', 'service_change_deadline',
+    'archive_min_days', 'formats', 'products_required_fields',
+    'services_required_fields', 'classification', 'historical_prices',
+] as $field) {
+    check(($commonLegal[$field] ?? null) === ($wpLegal[$field] ?? null),
+        'WordPress/PHP/Joomla/Shopify legal contract drift on ' . $field);
+}
+foreach ([
+    'published_decisions_ready_from', 'reference_price_data_entry',
+    'product_service_publication', 'unpublished_draft_features',
+    'discount_30_day_low_independent', 'automatic_historical_inference',
+] as $field) {
+    check(($commonLegal['implementation'][$field] ?? null) ===
+        ($wpLegal['implementation'][$field] ?? null),
+        'platform legal implementation drift on ' . $field);
+}
 check($index['feeds']['proizvodi']['available_csv'] === true &&
     $index['outlets'][0]['address'] === 'Korzo 12, Rijeka', 'public outlet discovery');
 check($index['platform'] === 'joomla', 'platform name');
