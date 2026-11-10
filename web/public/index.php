@@ -70,7 +70,7 @@ try {
     }
     if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $parts)) {
         header('Content-Type: text/csv; charset=utf-8');
-        echo $core->archiveCsv($parts[1], $parts[2]); exit;
+        echo $core->archiveCsv($parts[1], $parts[2], (string) ($_GET['oznaka'] ?? '')); exit;
     }
     $secret = (string) getenv('BAZNA_APP_KEY');
     $license = preg_match('/^[a-f0-9]{64}$/i', $secret) ? new LicenseClient($core, $secret) : null;
