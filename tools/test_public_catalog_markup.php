@@ -92,11 +92,11 @@ if ( isset( $argv ) && in_array( '--fixture', $argv, true ) ) {
     echo '<!doctype html><html lang="hr"><head><meta charset="utf-8">';
     echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<link rel="stylesheet" href="' . esc_attr( $css_url ) . '">';
-    echo '</head><body><main><section class="cjenik-hero"><p class="cjenik-kicker">SIDRENA</p>';
+    echo '</head><body><main><section class="cjenik-hero"><p class="cjenik-kicker">BAZNA</p>';
     echo '<h1>Javni cjenici</h1><p>Objavljeni proizvodi i usluge</p></section>';
     echo $html;
     echo '</main></body></html>';
     exit( 0 );
 }
 
-fwrite( STDOUT, "PASS: SIDRENA public service/product HTML, dates and safe mobile card fields\n" );
+fwrite( STDOUT, "PASS: BAZNA public service/product HTML, dates and safe mobile card fields\n" );

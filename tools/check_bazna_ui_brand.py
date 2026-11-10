@@ -89,6 +89,73 @@ for path, old_names in checks.items():
         if old_name in content:
             errors.append(f"Legacy public label in {path}: {old_name}")
 
+
+# Public media file names and drawable resource IDs must not expose the
+# former brand. Internal Java/Kotlin namespaces, WP option keys and REST v1
+# routes intentionally stay stable for update and data compatibility.
+required_media = (
+    "android/app/src/main/res/drawable/ic_bazna_mark.xml",
+    "desktop/branding/bazna-banner.svg",
+    "desktop/branding/bazna-feature.svg",
+    "wordpress/brendigo-sidrena-cijena/assets/images/bazna-logo.png",
+    "wordpress/brendigo-sidrena-cijena/assets/images/bazna-brand-mark.png",
+)
+for media in required_media:
+    if not (ROOT / media).is_file():
+        errors.append(f"Missing BAZNA public media: {media}")
+obsolete_media = (
+    "android/app/src/main/res/drawable/ic_sidrena_mark.xml",
+    "desktop/branding/sidrena-banner.svg",
+    "desktop/branding/sidrena-feature.svg",
+    "wordpress/brendigo-sidrena-cijena/assets/images/sidrena-logo.png",
+    "wordpress/brendigo-sidrena-cijena/assets/images/sidrena-brand-mark.png",
+)
+for media in obsolete_media:
+    if (ROOT / media).exists():
+        errors.append(f"Obsolete public media still packaged: {media}")
+
+visible_copies = {
+    "android/app/src/main/java/com/brendigo/sidrena/ui/AboutScreen.kt": [
+        '"WordPress dodatak"', '"WordPress stranica"',
+        "ZAKONSKI STATUS NA 2. 11. 2026.",
+        "Pravilnik je još u savjetovanju do 13.",
+        "ic_sidrena_mark",
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/HomeScreens.kt": [
+        "Objavite promjene u WordPressu", "u WordPress dodatku", "ic_sidrena_mark",
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/Components.kt": ["ic_sidrena_mark"],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/SidrenaApp.kt": [
+        "mailto:sidrena@", "Podaci na WordPress stranici",
+        "svoje WordPress stranice s aktivnim dodatkom",
+        "izvornoj WordPress stranici",
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/ServiceCatalogScreen.kt": [
+        '"Objavite cjenik u WordPress', "na povezanoj WordPress stranici",
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/LocationsScreen.kt": [
+        "Adrese se prikazuju samo kada su objavljene u WordPressu",
+    ],
+    "android/app/src/main/java/com/brendigo/sidrena/ui/PublicPriceListsScreen.kt": [
+        "WordPress ima neobjavljene izmjene",
+        "CSV/XML cjenika u WordPress dodatku",
+    ],
+    "wordpress/brendigo-sidrena-cijena/assets/js/admin.js": [
+        'prefix = "Sidrena cijena"',
+    ],
+    "wordpress/brendigo-sidrena-cijena/assets/js/admin-catalog.js": [
+        "[sidrena-cijena id=", "redovna cijena i sidrena cijena",
+    ],
+    "wordpress/brendigo-sidrena-cijena/includes/admin/tab-postavke.php": [
+        "u sidrenu ili baznu",
+    ],
+}
+for path, tokens in visible_copies.items():
+    content = read(path)
+    for token in tokens:
+        if token in content:
+            errors.append(f"Visible legacy UI or stale platform copy: {path}: {token}")
+
 if errors:
     for issue in errors:
         print("FAIL:", issue)

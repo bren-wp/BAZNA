@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministically assemble the official SIDRENA WordPress plugin ZIP.
+"""Deterministically assemble the official BAZNA WordPress plugin ZIP.
 
 Build only from tracked plugin source, with a stable entry ordering and timestamp.
 Never follow symlinks. Generated package is independently verified by CI.

@@ -98,6 +98,16 @@ for name in (
     require(name in (android_ci if name.startswith("BAZNA-Android") else windows_ci),
             f"Producer does not stage required asset: {name}")
 
+require("BAZNA-WordPress-$WORDPRESS_VERSION.zip" in release_ci,
+        "WordPress public download ZIP must carry only the BAZNA name")
+require("BAZNA-Desktop-win-x64-Portable.exe" in release_ci and
+        "BAZNA-Desktop-win-x64-Setup.exe" in release_ci and
+        "BAZNA-Desktop-win-x64-SHA256SUMS.txt" in release_ci,
+        "Windows public artifacts must be BAZNA-branded")
+require("BAZNA-Desktop-release-info.json" in release_ci,
+        "Windows release manifest must be BAZNA-branded")
+require("assert all(not path.name.startswith" in release_ci,
+        "Release must reject legacy display filenames after packaging")
 for workflow in ("official-plugin-ci.yml", "repository-audit.yml",
                  "multiplatform-ci.yml"):
     require(workflow in release_ci,
