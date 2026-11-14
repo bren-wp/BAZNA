@@ -23,7 +23,7 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 - The app reads public prices directly from a site chosen by the user, over HTTPS. The site can see the client's network metadata, including its IP address, when serving data/images.
 - The app stores the chosen site URL and outlet selection in local preferences; no admin credentials are required or collected by the Android app.
 - A visible in-app link opens the existing [Brendigo privacy policy](https://brendigo.com/politika-privatnosti/).
-- **Before release**, add BAZNA-Android-specific disclosures to that public HTML privacy policy; the current generic website policy alone has not been confirmed sufficient.
+- **Before release**, publish BAZNA-specific disclosures on the live HTML privacy policy (the current website-wide policy is not sufficient evidence of Android-specific disclosures). See `docs/BAZNA-ANDROID-PRIVACY-DRAFT.md`.
 - Complete Play Console **Data safety** accurately based on an SDK, network and server-side data flow review. Do not claim "no data collected" without auditing the remote publisher and SDKs.
 - Provide store description, icon, feature graphic, real phone screenshots, contact details, content rating, app-access information, ads declaration, country availability and applicable declarations.
 - The app is public-catalog **read-only**; do not advertise mobile price editing or automatic bidirectional sync.

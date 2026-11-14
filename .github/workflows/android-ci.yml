@@ -52,6 +52,16 @@ jobs:
           python3 ../tools/check_android_play_readiness.py
       - name: Unit tests, lint, installable debug APK, release AAB
         run: gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:bundleRelease
+      - name: Verify generated app identity and release version
+        run: |
+          set -euo pipefail
+          aapt="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          test -x "$aapt"
+          package_line=$("$aapt" dump badging app/build/outputs/apk/debug/app-debug.apk | head -n 1)
+          echo "$package_line"
+          [[ "$package_line" == *"name='com.brendigo.bazna'"* ]]
+          [[ "$package_line" == *"versionCode='20'"* ]]
+          [[ "$package_line" == *"versionName='1.5.17'"* ]]
       - name: Verify built artifacts and hash
         run: |
           set -euo pipefail

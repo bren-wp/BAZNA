@@ -41,7 +41,7 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 | **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.2** | Funkcionalni paket; potreban test na stvarnom hostingu |
 | **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i licencama | **1.1.2** | Kandidat; potreban instalacijski test u Joomli |
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.2** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Siguran javni pregled proizvoda, usluga, poslovnica i arhive s podržanih BAZNA stranica | **1.5.17** | Testni APK; AAB bez produkcijskog potpisa |
+| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.17** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
 | **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.6** | Windows CI i stvarne provjere sučelja |
 | **Licencni servis** | Provjera licence vezane uz javnu HTTPS domenu, odvojeno od podataka kataloga | **1.5.17** | Za instalaciju potrebna vlastita privatna konfiguracija |
 
@@ -107,7 +107,7 @@ Za objavu su potrebni registrirana trgovina, Shopify vjerodajnice, privatna pohr
 
 Android se povezuje sa stvarnim javnim katalogom preko HTTPS-a. APK služi za instalaciju i testiranje; **nepotpisani AAB nije spreman za Google Play** bez odgovarajućeg produkcijskog potpisa. Windows izdanje sadrži Portable.exe i Setup.exe iz stvarnog Windows builda.
 
-[Android upute](android/README.md) · [Windows upute](desktop/README.md)
+[Android upute](android/README.md) · [Google Play i migracija](docs/BAZNA-ANDROID-PACKAGE-MIGRATION.md) · [Windows upute](desktop/README.md)
 
 ## Stvarni ekrani i provjere sučelja
 
