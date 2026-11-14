@@ -32,7 +32,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.20' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.21' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -89,19 +89,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.20 --output artifacts/brendigo-sidrena-cijena-1.5.20.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.20.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.20 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.20.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.20.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.20.zip
+          python3 tools/package_plugin.py --version 1.5.21 --output artifacts/brendigo-sidrena-cijena-1.5.21.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.21.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.21 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.21.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.21.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.21.zip
       - name: Verify WordPress.org package is a direct in-place update
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_wporg.py --version 1.5.20 --output artifacts/BAZNA-WordPress-org-1.5.20.zip
-          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.20.zip.sha256)
-          cmp artifacts/brendigo-sidrena-cijena-1.5.20.zip artifacts/BAZNA-WordPress-org-1.5.20.zip
+          python3 tools/package_wporg.py --version 1.5.21 --output artifacts/BAZNA-WordPress-org-1.5.21.zip
+          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.21.zip.sha256)
+          cmp artifacts/brendigo-sidrena-cijena-1.5.21.zip artifacts/BAZNA-WordPress-org-1.5.21.zip
           mkdir -p /tmp/bazna-wporg/extracted
-          unzip -q artifacts/BAZNA-WordPress-org-1.5.20.zip -d /tmp/bazna-wporg/extracted
+          unzip -q artifacts/BAZNA-WordPress-org-1.5.21.zip -d /tmp/bazna-wporg/extracted
           find /tmp/bazna-wporg/extracted/brendigo-sidrena-cijena -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-wporg-lint.log
           grep -q 'Text Domain: brendigo-sidrena-cijena' /tmp/bazna-wporg/extracted/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test ! -e /tmp/bazna-wporg/extracted/brendigo-sidrena-cijena/includes/class-license.php
@@ -115,7 +115,7 @@ jobs:
         with:
           name: BAZNA-WordPress-org-candidate
           path: |
-            artifacts/BAZNA-WordPress-org-1.5.20.zip
-            artifacts/BAZNA-WordPress-org-1.5.20.zip.sha256
+            artifacts/BAZNA-WordPress-org-1.5.21.zip
+            artifacts/BAZNA-WordPress-org-1.5.21.zip.sha256
           retention-days: 7
           if-no-files-found: error
