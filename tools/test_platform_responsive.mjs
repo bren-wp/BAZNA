@@ -127,7 +127,7 @@ try {
       if(result.offenders.length)failed.push("clipped "+JSON.stringify(result.offenders.slice(0,5)));
       if(result.undersized.length)failed.push("small controls "+JSON.stringify(result.undersized.slice(0,5)));
       if(result.hasLegacyBrand)failed.push("visible legacy branding");
-      if(!fixture.includes("public-")&&result.nav!==9)failed.push("missing BAZNA admin tabs");
+      if(!fixture.includes("public-")&&result.nav!==10)failed.push("missing BAZNA admin tabs");
       if(/^(web|joomla)-(proizvodi|usluge|poslovnice)\.html$/.test(fixture)&&result.forms<2)
         failed.push("missing create/edit forms");
       const screenshot=await cdp("Page.captureScreenshot",{
