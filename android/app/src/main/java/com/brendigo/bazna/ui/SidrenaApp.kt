@@ -46,7 +46,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     var askDisconnect by remember { mutableStateOf(false) }
 
     fun navigate(destination: String) {
-        if (destination == "search" && page != "search" && page != "detail") {
+        if (shouldRecordSearchReturn(page, destination)) {
             searchReturnPage = page
         }
         page = destination
@@ -62,12 +62,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
     fun supportEmail() = openBaznaSupport(context)
 
     BackHandler(enabled = page != "home" && !state.isEditingSite) {
-        navigate(when (page) {
-            "detail" -> detailReturnPage
-            "about" -> "settings"
-            "search" -> searchReturnPage
-            else -> "home"
-        })
+        navigate(backDestination(page, detailReturnPage, searchReturnPage))
     }
 
     if (askDisconnect) {
@@ -103,21 +98,8 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
         bottomBar = {
             if (snapshot != null && !state.isEditingSite) {
                 AppNavigation(
-                    active = when (page) {
-                        "home", "locations" -> 0
-                        "search" -> if (searchReturnPage == "home") 0 else 1
-                        "archive" -> 2
-                        "settings", "about" -> 3
-                        else -> 1
-                    },
-                    onSelect = { index ->
-                        navigate(when (index) {
-                            0 -> "home"
-                            1 -> "cjenici"
-                            2 -> "archive"
-                            else -> "settings"
-                        })
-                    },
+                    active = bottomTabForPage(page, searchReturnPage),
+                    onSelect = { index -> navigate(pageForBottomTab(index)) },
                 )
             }
         },
