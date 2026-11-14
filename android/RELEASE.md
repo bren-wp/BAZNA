@@ -1,11 +1,17 @@
-# BAZNA 1.5.20 — službeni izvorni paketi i Google Play provjere
+# BAZNA 1.5.21 — službeni izvorni paketi i Google Play provjere
 
 | Komponenta | Verzija | Napomena |
 |---|---|---|
-| Android | **1.5.20**, code **23** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
-| WordPress / WooCommerce | **1.5.20** | Zadržani svi postojeći podaci i REST v1 |
+| Android | **1.5.21**, code **24** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
+| WordPress / WooCommerce | **1.5.21** | Zadržani svi postojeći podaci i REST v1 |
 | Web PHP, Joomla, Shopify | **1.1.4** | Zajednički Core, javni HTML i filtrirani REST |
 | Windows | **0.10.7** | Isporučuje se u istom releaseu nakon smoke testova |
+
+## Novo: ažuriranja postojećeg WordPress.org dodatka
+
+GitHub izdanje priprema provjereni BAZNA WordPress ZIP s nepromijenjenim identitetom `brendigo-sidrena-cijena`. WordPress.org SVN nadogradnja zahtijeva valjane committer vjerodajnice i GitHub Actions objavu, zasebno od GitHub Release paketa. Postojeće postavke, cjenici, arhiva i REST v1 ostaju netaknuti.
+
+[Upute za objavu na WordPress.org](../docs/WORDPRESS-ORG-AZURIRANJE.md)
 
 ## Novo: isti javni prikaz na svim platformama
 
