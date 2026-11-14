@@ -7,7 +7,7 @@
 - \`joomla/\`: Joomla 5/6 system plugin koji uz sigurnosne Joomla ACL/CSRF kontrole ugrađuje isti Web Core i nudi javni API + admin kartice.
 - \`shopify/\`: izolirani autorizirani shop app-proxy, HMAC, GraphQL varijante, CLI publikacija i Shopify Theme App Extension. Shopify trgovina ne izvršava PHP; PHP radi na BAZNA app serveru.
 - \`android/\`: read-only aplikacija, automatski pokušava postojeći WordPress pretty/plain endpoint, zatim novu PHP/Joomla rutu i Shopify app-proxy rutu. Nikad se ne prijavljuje na CMS i ne traži licencne ključeve.
-- \`licenca/\`: jedan centralni BAZNA servis s kanonskim domenskim vezivanjem, HTTPS provjerom izazova, DNS-pin/tls SSRF zaštitom, lokalnim AES-GCM klijentom i grace periodom od 72 sata.
+- **Bez licencnog servisa:** prethodna mapa `licenca/`, domensko vezivanje, aktivacijski ključevi i periodična provjera uklonjeni su u 1.5.20. Sigurnosne kontrole za pristup uređivanju i potpisani Shopify zahtjevi nisu uklonjeni.
 
 ## Javna podatkovna shema i kompatibilnost
 
