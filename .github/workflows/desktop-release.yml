@@ -47,7 +47,7 @@ jobs:
             echo "Release $tag already exists"
             echo "ALREADY_EXISTS=1" >> "$GITHUB_ENV"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: env.ALREADY_EXISTS != '1'
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
