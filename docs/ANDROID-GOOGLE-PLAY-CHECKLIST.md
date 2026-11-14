@@ -5,7 +5,7 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 ## Build prerequisites
 - Android package ID: `com.brendigo.sidrena` (DO NOT change for an existing Play listing).
 - `minSdk = 26`, `targetSdk = 36` (Google Play minimum for new apps and updates after 31 August 2026).
-- Java 17 / Gradle 9.6 / AGP 9.4; Android SDK 36 for compilation, target remains Android 16.
+- Java 17 / Gradle 9.6 / AGP 9.4; Android SDK 37.0 for compilation (use `sdkmanager "platforms;android-37.0"`, not the invalid `android-37` package name), target remains Android 16.
 - Stable Compose BOM, AndroidX Activity/Lifecycle, Kotlin Compose compiler, coroutines and OkHttp.
 - Keep R8/shrinking on. Verify API 26–37 execution and large-screen/large-font behavior.
 - Build with `cd android && gradle --no-daemon :app:testDebugUnitTest :app:lintDebug :app:bundleRelease`.
