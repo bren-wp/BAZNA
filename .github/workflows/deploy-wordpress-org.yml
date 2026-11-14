@@ -32,8 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      GH_TOKEN: \${{ github.token }}
-      REQUESTED_VERSION: \${{ inputs.version || '' }}
+      GH_TOKEN: ${{ github.token }}
+      REQUESTED_VERSION: ${{ inputs.version || '' }}
     steps:
       - name: Checkout trusted main and fetch release tags
         uses: actions/checkout@v7
@@ -75,7 +75,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/test_wporg_update_contract.py
-          python3 tools/package_plugin.py --version "\${{ steps.verify.outputs.version }}" \
+          python3 tools/package_plugin.py --version "${{ steps.verify.outputs.version }}" \
             --output /tmp/brendigo-sidrena-cijena.zip
           (cd /tmp && sha256sum -c brendigo-sidrena-cijena.zip.sha256)
           find wordpress/brendigo-sidrena-cijena -type f -name '*.php' -print0 | xargs -0 -n 1 php -l >/tmp/wporg-php-lint.log
@@ -83,8 +83,8 @@ jobs:
       - name: Require configured WordPress.org SVN credentials
         shell: bash
         env:
-          SVN_USERNAME: \${{ secrets.SVN_USERNAME }}
-          SVN_PASSWORD: \${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         run: |
           if [[ -z "$SVN_USERNAME" || -z "$SVN_PASSWORD" ]]; then
             echo "::error::Set SVN_USERNAME and SVN_PASSWORD in GitHub Actions repository secrets"
@@ -94,8 +94,8 @@ jobs:
       - name: Deploy to existing brendigo-sidrena-cijena SVN trunk and version tag
         uses: 10up/action-wordpress-plugin-deploy@2.3.0
         env:
-          SVN_USERNAME: \${{ secrets.SVN_USERNAME }}
-          SVN_PASSWORD: \${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: brendigo-sidrena-cijena
           BUILD_DIR: wordpress/brendigo-sidrena-cijena
-          VERSION: \${{ steps.verify.outputs.version }}
+          VERSION: ${{ steps.verify.outputs.version }}
