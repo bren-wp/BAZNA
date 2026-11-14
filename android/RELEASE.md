@@ -1,14 +1,14 @@
-# BAZNA 1.5.17 — izdanja i Google Play
+# BAZNA 1.5.18 — izdanja i Google Play
 
 ## Izdanje
 | Platforma | Verzija |
 |---|---|
-| Android | **1.5.17**, `versionCode 20`, `com.brendigo.bazna` |
-| WordPress | **1.5.17**, bez promjena baze i javnog REST API-ja |
+| Android | **1.5.18**, `versionCode 21`, `com.brendigo.bazna` |
+| WordPress | **1.5.18**, bez promjena baze i javnog REST API-ja |
 | Windows | **0.10.6** |
 | Web / Joomla / Shopify | **1.1.2** |
 
-BAZNA 1.5.17 donosi moderniziran Android build, provjere sigurnosti i
+BAZNA 1.5.18 donosi moderniziran Android build, provjere sigurnosti i
 responzivnosti te izdvajanje navigacijske logike u zasebni modul.
 Android je i dalje nativna aplikacija samo za čitanje javnih HTTPS cjenika.
 

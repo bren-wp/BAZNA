@@ -57,6 +57,19 @@ class PublicCatalogCompatibilityTest {
         assertEquals("rijeka", index.outlets.single().code)
     }
 
+    @Test fun globalPublicationReadinessCannotHideMissingOutletFeed() {
+        val payload = discovery()
+        payload.getJSONObject("publication").put("csv_ready_all_outlets", false)
+        val index = CatalogDiscovery.parse(payload, site)
+        assertEquals(false, index.allOutletsCsvReady)
+        assertEquals(true, index.productsCsvReady)
+        assertEquals(false, index.outlets.single().servicesCsvReady)
+        payload.getJSONObject("publication").put("csv_ready_all_outlets", "yes")
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            CatalogDiscovery.parse(payload, site)
+        }
+    }
+
     @Test fun olderPluginWithoutReadinessFlagsStillConnects() {
         val payload = discovery()
         payload.getJSONObject("feeds").getJSONObject("proizvodi").remove("available_csv")
@@ -67,6 +80,7 @@ class PublicCatalogCompatibilityTest {
         payload.remove("publication")
         val index = CatalogDiscovery.parse(payload, site)
         assertNull(index.productsCsvReady)
+        assertNull(index.allOutletsCsvReady)
         assertNull(index.servicesCsvReady)
         assertNull(index.outlets.single().productsCsvReady)
         assertNull(index.outlets.single().servicesCsvReady)

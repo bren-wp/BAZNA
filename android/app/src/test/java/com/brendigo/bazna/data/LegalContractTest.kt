@@ -48,6 +48,22 @@ class LegalContractTest {
             "2026-11-17",
             LegalContract.parseOptional(prepared)?.implementationReadyFrom,
         )
+        val closed = JSONObject(json.toString())
+            .put("base_price_regulation_status", "consultation_closed_pending_final_text")
+            .put("final_rulebooks_verified", false)
+        assertEquals(
+            "consultation_closed_pending_final_text",
+            LegalContract.parseOptional(closed)?.basePriceRegulationStatus,
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            LegalContract.parseOptional(closed.put("final_rulebooks_verified", true))
+        }
+        assertEquals(
+            "draft_consultation",
+            LegalContract.parseOptional(JSONObject(json.toString())
+                .put("base_price_regulation_status", "draft_consultation"))
+                ?.basePriceRegulationStatus,
+        )
         prepared.getJSONObject("implementation")
             .put("discount_30_day_low_independent", false)
         assertThrows(IllegalArgumentException::class.java) {

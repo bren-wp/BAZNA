@@ -38,6 +38,9 @@ class CatalogRepository {
         if (index.pendingPublication == true) {
             warnings.add("Povezana BAZNA platforma ima neobjavljene promjene. Cijene u javnom CSV-u mogu biti zastarjele.")
         }
+        if (selectedOutlet.isBlank() && index.allOutletsCsvReady == false) {
+            warnings.add("Neki CSV cjenici poslovnica nisu javno objavljeni. Provjerite svaku poslovnicu u WordPressu.")
+        }
         if (index.legal == null) warnings.add("Povezana BAZNA platforma ne objavljuje pravni profil.")
         fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
             if (ready == false) {

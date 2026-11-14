@@ -145,6 +145,11 @@ object CatalogDiscovery {
             is Boolean -> flag
             else -> throw IllegalArgumentException("Nevaljan status neobjavljenih promjena.")
         }
+        val allOutletsReady = when (val flag = publication?.opt("csv_ready_all_outlets")) {
+            null, JSONObject.NULL -> null // Older WP/API v1 servers.
+            is Boolean -> flag
+            else -> throw IllegalArgumentException("Nevaljan status objave svih poslovnica.")
+        }
         val certified = publication?.opt("compliance_certified")
         require(certified == null || certified == JSONObject.NULL ||
             (certified is Boolean && !certified)
@@ -162,6 +167,7 @@ object CatalogDiscovery {
             productsCsvReady = ready(sources, "proizvodi"),
             servicesCsvReady = ready(sources, "usluge"),
             pendingPublication = pending,
+            allOutletsCsvReady = allOutletsReady,
             wordpressLicenseActive = licenseActive,
             platform = platform,
         )

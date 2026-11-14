@@ -1,7 +1,6 @@
 package com.brendigo.bazna.ui
 
 import com.brendigo.bazna.data.CatalogSnapshot
-import com.brendigo.bazna.data.SiteUrl
 import java.net.URI
 import java.text.NumberFormat
 import java.util.Locale
@@ -20,17 +19,11 @@ internal fun homeMetrics(
     selectedOutlet: String = "",
 ): List<HomeMetric> {
     val number = NumberFormat.getIntegerInstance(Locale.forLanguageTag("hr-HR"))
-    val site = runCatching { SiteUrl.parse(data.site) }.getOrNull()
-    val outlet = data.index.outlets.firstOrNull { it.code == selectedOutlet }
-    val currentFeeds = if (selectedOutlet.isNotBlank() && outlet == null) {
-        emptyList()
-    } else {
-        listOf(
-            outlet?.productCsv ?: data.index.productsCsv,
-            outlet?.serviceCsv ?: data.index.servicesCsv,
-        )
-    }
-    val actualCsvCount = currentFeeds.mapNotNull { site?.publicLink(it) }.distinct().size
+    // The REST API advertises URLs even before the backing CSV is published.
+    // Count only actionable, same-origin, published documents, using the
+    // identical rule as the public-price-list screen (also per outlet).
+    val actualCsvCount = publicPriceListDocuments(data, selectedOutlet)
+        .count { !it.archived && it.format == "CSV" }
     val actualArchiveCount = publishedArchiveEntries(data).size
     return listOf(
         HomeMetric("Proizvodi", number.format(data.products.size), "products"),
@@ -47,6 +40,7 @@ internal fun homeCatalogPending(data: CatalogSnapshot, selectedOutlet: String = 
     }
     if (selectedOutlet.isNotBlank() && outlet == null) return true
     if (data.index.pendingPublication == true) return true
+    if (selectedOutlet.isBlank() && data.index.allOutletsCsvReady == false) return true
     val productReady = if (outlet == null) data.index.productsCsvReady else outlet.productsCsvReady
     val serviceReady = if (outlet == null) data.index.servicesCsvReady else outlet.servicesCsvReady
     return productReady == false || serviceReady == false

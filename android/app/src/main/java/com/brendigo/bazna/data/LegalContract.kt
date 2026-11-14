@@ -92,11 +92,14 @@ data class LegalContract(
             }
             val baseStatus = if (json.has("base_price_regulation_status")) {
                 json.getString("base_price_regulation_status").also {
-                    require(it == "draft_consultation") {
+                    require(it in setOf("draft_consultation", "consultation_closed_pending_final_text")) {
                         "Nepoznat status pravilnika o baznoj cijeni."
                     }
                 }
             } else null
+            // Optional: new WordPress versions explicitly report when final
+            // rulebook texts have not yet been verified in Narodne novine.
+            optionalFalse("final_rulebooks_verified")
             val baseEffective = if (json.has("base_price_rule_effective_from")) {
                 iso(json.getString("base_price_rule_effective_from"))
             } else null

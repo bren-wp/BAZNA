@@ -1,3 +1,10 @@
+== BAZNA 1.5.18 ==
+- WordPress i Android: zajednički javni REST v1 zadržava povratnu kompatibilnost i razlikuje stanje objave po poslovnicama.
+- Android početna ploča broji samo stvarno objavljene CSV cjenike; neobjavljene datoteke i promjene ne predstavljaju se kao ažurne.
+- Pravna revizija 14. 11. 2026.: savjetovanje završeno, konačni pravilnici nisu proglašeni objavljenima bez provjere Narodnih novina; datumi i arhiva ostaju usklađeni s objavljenim odlukama.
+- Google Play: app ID ostaje com.brendigo.bazna; dodane napomene za Data safety, pravila privatnosti i sigurnosne provjere.
+- Ne mijenjaju se računi, licencni ključevi, povijesne cijene, postojeći javni API ili spremljene postavke.
+
 == BAZNA 1.5.17 ==
 - Android: paket je preimenovan u com.brendigo.bazna i pripremljen kao nova Google Play aplikacija.
 - Android: nadograđene ovisnosti, dodatne provjere sigurnosti i responzivnosti, izdvajanje navigacijskog koda.

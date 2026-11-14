@@ -285,7 +285,10 @@ fun HomePage(
                             color = TextMuted, fontSize = 13.sp,
                         )
                         Text(
-                            "Najniža cijena u prethodnih 30 dana zasebna je od bazne cijene. Pravilnici iz savjetovanja nisu automatski potvrđeni propisi.",
+                            "Najniža cijena u prethodnih 30 dana zasebna je od bazne cijene. " +
+                                if (legal.basePriceRegulationStatus == "consultation_closed_pending_final_text")
+                                    "Savjetovanje je završilo 13. 11. 2026.; konačni tekst pravilnika nije potvrđen."
+                                else "Nacrti pravilnika nisu automatski potvrđeni propisi.",
                             color = TextMuted,
                             fontSize = 12.sp,
                         )
