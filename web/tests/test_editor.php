@@ -53,7 +53,8 @@ verifyEditor(!str_contains($render, '<script>alert(1)</script>') &&
 foreach (['usluge', 'poslovnice', 'na-upit'] as $tab) {
     $html = AdminCatalog::render($tab, $original, '?bazna=dashboard&tab='.$tab,
         '<input name="csrf" value="joomla">', true);
-    verifyEditor(str_contains($html, 'Spremi izmjene'), 'same UI reused on '.$tab);
+    verifyEditor(str_contains($html, $tab === 'na-upit' ? 'Spremi novu stavku' : 'Spremi izmjene'),
+        'same UI reused on '.$tab);
 }
 $inquiryView = AdminCatalog::render(
     'na-upit', $original, 'https://primjer.hr/bazna/admin?tab=na-upit',
