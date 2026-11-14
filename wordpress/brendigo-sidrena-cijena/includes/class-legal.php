@@ -3,8 +3,8 @@
  * Public legal metadata shared by BAZNA WordPress, Android and Desktop.
  *
  * Source: NN 101/2026 (1212 and 1213), amended by NN 110/2026
- * (1309 and 1310). The proposed base-price and public-price-list rulebooks were still in
- * e-consultation on 2026-11-09 (until 2026-11-13), not enacted law.
+ * (1309 and 1310). As reviewed on 2026-11-14, consultations closed on 2026-11-13; final
+ * rulebooks are not treated as published without verified NN text.
  *
  * @package Brendigo_Sidrena_Cijena
  */
@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Brendigo_Sidrena_Cijena_Legal {
     const RULES_REVISION = 'NN-101-2026-NN-110-2026';
-    const REGULATION_STATUS = 'draft_consultation';
+    const REGULATION_STATUS = 'consultation_closed_pending_final_text';
     const CONSULTATION_END = '2026-11-13';
     const EFFECTIVE_DATE = '2026-11-17';
     const REFERENCE_FMCG = '2025-05-02';
@@ -35,7 +35,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
     public static function public_contract() {
         return array(
             'schema' => 1,
-            'reviewed_on' => '2026-11-09',
+            'reviewed_on' => '2026-11-14',
             'jurisdiction' => 'HR',
             'rules_revision' => self::RULES_REVISION,
             'consumer_law_revision' => self::CONSUMER_LAW_REVISION,
@@ -44,7 +44,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
             'price_reduction_lookback_days' => self::PRICE_REDUCTION_LOOKBACK_DAYS,
             'discount_baseline_is_anchor_price' => false,
             // Informational only: the new NN 59/2026 price-display provisions
-            // begin 17 Nov; final base-price method is still in consultation.
+            // begin 17 Nov; final base-price method has not been independently verified as enacted.
             'base_price_regulation_status' => self::REGULATION_STATUS,
             'base_price_rule_effective_from' => self::EFFECTIVE_DATE,
             'base_price_is_automatically_derived' => false,
@@ -53,6 +53,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
             'consumer_30_day_low_is_anchor_price' => false,
             'consumer_30_day_low_is_base_price' => false,
             'draft_rulebooks_consultation_until' => self::CONSULTATION_END,
+            'final_rulebooks_verified' => false,
             // This prepares the published 17 November 2026 transition;
             // it does NOT declare drafts legally enacted or data compliant.
             'implementation' => array(
@@ -75,7 +76,7 @@ final class Brendigo_Sidrena_Cijena_Legal {
             ),
             'product_publication_deadline' => self::PUBLICATION_DEADLINE,
             'service_change_deadline' => self::PUBLICATION_DEADLINE,
-            'timezone' => function_exists( 'wp_timezone_string' ) ? wp_timezone_string() : 'Europe/Zagreb',
+            'timezone' => 'Europe/Zagreb', // Croatian regulatory deadline, regardless of WordPress site timezone.
             'archive_min_days' => self::ARCHIVE_MIN_DAYS,
             'formats' => array( 'csv', 'xml' ),
             'products_required_fields' => array(

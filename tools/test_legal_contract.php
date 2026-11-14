@@ -21,12 +21,14 @@ sidrena_expect( false === $contract['discount_baseline_is_anchor_price'], 'Ancho
 sidrena_expect( '2026-09-26' === $contract['unit_price_rule_effective_from'], 'NN105 effective date' );
 sidrena_expect( '2026-11-13' === $contract['draft_rulebooks_consultation_until'], 'Drafts pending' );
 sidrena_expect( '08:00' === $contract['product_publication_deadline'], 'Daily deadline' );
+sidrena_expect( 'Europe/Zagreb' === $contract['timezone'], 'Publication time uses Croatian local timezone' );
+sidrena_expect( false === $contract['final_rulebooks_verified'], 'No unverified final rulebook certification' );
 sidrena_expect( '' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'unknown' ), 'No inferred category' );
 sidrena_expect( '2025-05-02' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'legacy_fmcg' ), 'Verified legacy date' );
 sidrena_expect( '2026-09-10' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'general_goods_services' ), 'Verified new date' );
 sidrena_expect( 'NN-59-2026' === $contract['consumer_law_revision'], 'Consumer law revision' );
-sidrena_expect( '2026-11-09' === $contract['reviewed_on'], 'Reviewed published decisions on 9 Nov 2026' );
-sidrena_expect( 'draft_consultation' === $contract['base_price_regulation_status'], 'Draft base-price regulation is not enacted' );
+sidrena_expect( '2026-11-14' === $contract['reviewed_on'], 'Legal profile reviewed on 14 Nov 2026' );
+sidrena_expect( 'consultation_closed_pending_final_text' === $contract['base_price_regulation_status'], 'Consultation closed but final text not verified' );
 sidrena_expect( 'verified_manual' === $contract['implementation']['reference_price_data_entry'], 'Never infer a historical price' );
 sidrena_expect( 'not_automatically_enabled' === $contract['implementation']['unpublished_draft_features'], 'Draft functionality not binding' );
 sidrena_expect( true === $contract['implementation']['discount_30_day_low_independent'], '30-day baseline separate' );
