@@ -211,6 +211,27 @@ $inquiry = $api->on_request_services();
 sidrena_contract_assert( 1 === $inquiry['schema'] && 1 === count( $inquiry['items'] ), 'Only sanitized published inquiries returned' );
 sidrena_contract_assert( 'Ovisno o opsegu' === $inquiry['items'][0]['criteria'], 'Publication criteria preserved' );
 sidrena_contract_assert( 'no-store, max-age=0, must-revalidate' === $inquiry->get_headers()['Cache-Control'], 'Do not cache publication snapshots' );
+$validPublicRequest = new class {
+    public function get_param( $key ) {
+        return array( 'outlet' => 'ri-01', 'q' => 'OPSEGU' )[ $key ] ?? null;
+    }
+};
+sidrena_contract_assert( 1 === count( $api->on_request_services( $validPublicRequest )['items'] ),
+    'REST outlet and multi-word query operate on published snapshots only' );
+$unknownPublicRequest = new class {
+    public function get_param( $key ) {
+        return array( 'outlet' => 'no-other-branch', 'q' => 'OPSEGU' )[ $key ] ?? null;
+    }
+};
+sidrena_contract_assert( array() === $api->on_request_services( $unknownPublicRequest )['items'],
+    'REST public inquiry does not mix branch results' );
+$badPublicRequest = new class {
+    public function get_param( $key ) {
+        return 'q' === $key ? array( 'x' ) : '';
+    }
+};
+sidrena_contract_assert( array() === $api->on_request_services( $badPublicRequest )['items'],
+    'REST inquiry rejects array-valued search pollution' );
 
 sidrena_contract_assert( true === $json['feeds']['proizvodi']['available_csv'], 'Product feed ready' );
 sidrena_contract_assert( true === $json['feeds']['usluge']['available_csv'], 'Service feed ready' );

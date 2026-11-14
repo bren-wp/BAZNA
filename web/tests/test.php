@@ -97,6 +97,18 @@ check($requests['schema'] === 1 && count($requests['items']) === 2,
 check($requests['items'][0]['name'] === 'Izrada po mjeri' &&
     $requests['items'][1]['outlet'] === 'RI-01',
     'name, criteria and outlet remain available without a fabricated price');
+check(count($core->onRequestServices('', 'MATERIJALU dimenzijama')['items']) === 1,
+    'inquiry REST supports multi-term criteria filtering');
+check(count($core->onRequestServices('RI-01', 'dostava')['items']) === 1 &&
+    $core->onRequestServices('RI-01', 'dostava')['items'][0]['name'] === 'Dostava prema dogovoru',
+    'inquiry REST filters by business code');
+check($core->onRequestServices('RI-01', 'materijalu')['items'] === [],
+    'inquiry REST prevents cross-branch mixing');
+try {
+    $core->onRequestServices('', str_repeat('X', 200));
+    throw new RuntimeException('Excessively long inquiry REST search was accepted.');
+} catch (InvalidArgumentException $ignored) {}
+
 check(!str_contains($core->csv('usluge'), 'Ovisno o materijalu'),
     'inquiry-only services are excluded from numeric CSV');
 check(!str_contains($core->xml('usluge'), 'Izrada po mjeri'),
