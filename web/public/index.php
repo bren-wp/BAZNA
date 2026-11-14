@@ -57,7 +57,10 @@ try {
         bazna_json(200, $core->discovery('web', null, $active));
     }
     if ($method === 'GET' && $path === '/bazna/v1/usluge-na-upit') {
-        bazna_json(200, $core->onRequestServices());
+        bazna_json(200, $core->onRequestServices(
+            isset($_GET['outlet']) && is_string($_GET['outlet']) ? $_GET['outlet'] : '',
+            isset($_GET['q']) && is_string($_GET['q']) ? $_GET['q'] : ''
+        ));
     }
     if ($method === 'GET' && $path === '/bazna/v1/arhiva') {
         $entries = $core->archives();

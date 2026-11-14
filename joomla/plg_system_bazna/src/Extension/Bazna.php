@@ -64,7 +64,10 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             if ($path === '/bazna/v1/cjenici') {
                 $this->json($core->discovery('joomla', null, $license?->active()));
             } elseif ($path === '/bazna/v1/usluge-na-upit') {
-                $this->json($core->onRequestServices());
+                $this->json($core->onRequestServices(
+                    (string) $app->input->getString('outlet', ''),
+                    (string) $app->input->getString('q', '')
+                ));
             } elseif ($path === '/bazna/v1/arhiva') {
                 $this->json($core->archives());
             } elseif ($path === '/bazna/v1/license-proof') {

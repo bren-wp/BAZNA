@@ -346,11 +346,30 @@ final class Core
     }
 
     /** Published snapshot only. Never serves draft inquiry criteria. */
-    public function onRequestServices(): array
+    public function onRequestServices(string $outlet = '', string $query = ''): array
     {
+        if (!preg_match('/^[a-zA-Z0-9-]{0,64}$/D', $outlet) ||
+            strlen($query) > 100 || preg_match('/[\\x00-\\x1F]/', $query)) {
+            throw new InvalidArgumentException('Neispravan javni upit usluge.');
+        }
+        $terms = preg_split('/\\s+/u', trim($query), -1, PREG_SPLIT_NO_EMPTY);
+        if ($terms === false) throw new InvalidArgumentException('Neispravna pretraga.');
         $published = $this->read('published.json');
         $items = [];
         foreach ($published['on_request'] ?? [] as $row) {
+            if ($outlet !== '' && ($row['outlet'] ?? '') !== $outlet) continue;
+            $haystack = (string) ($row['naziv'] ?? '') . ' ' .
+                (string) ($row['kriteriji'] ?? '');
+            $matches = true;
+            foreach ($terms as $term) {
+                if (function_exists('mb_stripos')
+                    ? mb_stripos($haystack, $term, 0, 'UTF-8') === false
+                    : stripos($haystack, $term) === false) {
+                    $matches = false;
+                    break;
+                }
+            }
+            if (!$matches) continue;
             $items[] = [
                 'id' => $row['id'], 'name' => $row['naziv'],
                 'criteria' => $row['kriteriji'], 'outlet' => $row['outlet'],

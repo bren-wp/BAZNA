@@ -64,7 +64,10 @@ try {
         bazna_shop_response(200, $core->discovery('shopify', null, $license?->active()));
     }
     if ($tail === '/v1/usluge-na-upit') {
-        bazna_shop_response(200, $core->onRequestServices());
+        bazna_shop_response(200, $core->onRequestServices(
+            isset($_GET['outlet']) && is_string($_GET['outlet']) ? $_GET['outlet'] : '',
+            isset($_GET['q']) && is_string($_GET['q']) ? $_GET['q'] : ''
+        ));
     }
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
