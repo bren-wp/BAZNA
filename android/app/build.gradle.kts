@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.brendigo.sidrena"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.brendigo.sidrena"
