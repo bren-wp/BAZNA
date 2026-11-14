@@ -4,7 +4,7 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.19
+Stable tag: 1.5.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -172,6 +172,12 @@ Adds observed price history, publication alerts, separate product/service feeds,
 Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf placeholders that could append internal text to publication, pending-change, and pagination labels.
 
 == Changelog ==
+
+= 1.5.20 =
+* REST v1 on-request search supports optional outlet and criteria query; public results never include unapproved drafts.
+* Same published HTML price-list semantics across PHP/Joomla/Shopify and Android's global catalog search.
+* Preserve existing accounts, prices, history, WC compatibility, and previous REST v1 endpoints.
+
 
 = 1.5.19 =
 * Public WordPress REST v1 publishes only previously published services priced on request, with name, criteria and outlet; drafts stay private.
