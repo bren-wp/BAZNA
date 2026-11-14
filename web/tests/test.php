@@ -77,6 +77,8 @@ try {
 } catch (InvalidArgumentException $ignored) {}
 $core->saveDraft($catalog);
 $before = $core->discovery('web');
+check(str_contains($core->publicCatalogHtml('proizvodi'), 'još nije objavljen'),
+    'unpublished data cannot be rendered on public HTML');
 check($core->onRequestServices()['items'] === [], 'draft inquiries never visible to public');
 check(str_contains($before['on_request'], '/bazna/v1/usluge-na-upit'),
     'same-origin published inquiries discovery link');
@@ -100,6 +102,29 @@ check(!str_contains($core->csv('usluge'), 'Ovisno o materijalu'),
 check(!str_contains($core->xml('usluge'), 'Izrada po mjeri'),
     'inquiry-only services are excluded from numeric XML');
 check(isset($published['published_at']), 'publication timestamp');
+$htmlGoods = $core->publicCatalogHtml('proizvodi', '', 'maslinovo MU-1');
+check(str_contains($htmlGoods, 'Maslinovo ulje') &&
+    !str_contains($htmlGoods, 'Riječka sol'), 'only published webshop goods in multi-term search');
+$htmlBranch = $core->publicCatalogHtml('proizvodi', 'RI-01', 'sol');
+check(str_contains($htmlBranch, 'Riječka sol') &&
+    !str_contains($htmlBranch, 'Maslinovo ulje'),
+    'branch pricing never mixed with webshop');
+$htmlServices = $core->publicCatalogHtml('usluge', '', 'materijalu');
+check(str_contains($htmlServices, 'Izrada po mjeri') &&
+    str_contains($htmlServices, 'Na upit') &&
+    !str_contains($htmlServices, 'Dostava prema dogovoru'),
+    'inquiry criteria searchable separately without fake numeric prices');
+check(!str_contains($htmlServices, 'Servis uređaja'),
+    'numeric services obey the same published query');
+try {
+    $core->publicCatalogHtml('usluge', '../../etc', '');
+    throw new RuntimeException('Unsafe public outlet accepted.');
+} catch (InvalidArgumentException $ignored) {}
+try {
+    $core->publicCatalogHtml('usluge', '', str_repeat('Q', 300));
+    throw new RuntimeException('Oversized search accepted.');
+} catch (InvalidArgumentException $ignored) {}
+
 $index = $core->discovery('joomla');
 // This is a source-level contract check; no WP bootstrap, database or live
 // website is needed. It must fail whenever one platform drifts legally.
