@@ -1,3 +1,8 @@
+== BAZNA 1.5.17 ==
+- Android: paket je preimenovan u com.brendigo.bazna i pripremljen kao nova Google Play aplikacija.
+- Android: nadograđene ovisnosti, dodatne provjere sigurnosti i responzivnosti, izdvajanje navigacijskog koda.
+- WordPress: verzijska oznaka bez migracije baze, promjene korisničkih računa ili izmjena javnog REST API-ja.
+
 == BAZNA 1.5.11 ==
 - Novi javni brend BAZNA — Bazne cijene (Android, WordPress i Windows).
 - Stari podaci, WordPress ID i REST v1 ostaju kompatibilni.

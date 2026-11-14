@@ -37,13 +37,13 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 
 | Platforma | Namjena | Verzija | Status |
 |---|---|---|---|
-| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.16** | CI provjeren; kandidat WordPress.org paketa |
+| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.17** | CI provjeren; kandidat WordPress.org paketa |
 | **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.2** | Funkcionalni paket; potreban test na stvarnom hostingu |
 | **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i licencama | **1.1.2** | Kandidat; potreban instalacijski test u Joomli |
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.2** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Siguran javni pregled proizvoda, usluga, poslovnica i arhive s podržanih BAZNA stranica | **1.5.16** | Testni APK; AAB bez produkcijskog potpisa |
+| **Android** | Siguran javni pregled proizvoda, usluga, poslovnica i arhive s podržanih BAZNA stranica | **1.5.17** | Testni APK; AAB bez produkcijskog potpisa |
 | **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.6** | Windows CI i stvarne provjere sučelja |
-| **Licencni servis** | Provjera licence vezane uz javnu HTTPS domenu, odvojeno od podataka kataloga | **1.5.16** | Za instalaciju potrebna vlastita privatna konfiguracija |
+| **Licencni servis** | Provjera licence vezane uz javnu HTTPS domenu, odvojeno od podataka kataloga | **1.5.17** | Za instalaciju potrebna vlastita privatna konfiguracija |
 
 ## Jedinstveni podaci na svim platformama
 
