@@ -85,6 +85,7 @@ foreach ([
     'unit_price_rule_revision', 'unit_price_rule_effective_from',
     'price_reduction_lookback_days', 'discount_baseline_is_anchor_price',
     'base_price_regulation_status', 'base_price_rule_effective_from',
+    'final_rulebooks_verified', 'reviewed_on', 'timezone',
     'base_price_is_automatically_derived', 'historical_price_verification_required',
     'legal_compliance_certified', 'consumer_30_day_low_is_anchor_price',
     'consumer_30_day_low_is_base_price', 'draft_rulebooks_consultation_until',
