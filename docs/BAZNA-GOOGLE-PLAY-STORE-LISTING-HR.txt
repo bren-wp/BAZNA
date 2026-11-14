@@ -1,0 +1,26 @@
+NASLOV (maksimalno 30 znakova)
+BAZNA – Bazne cijene
+
+KRATKI OPIS (maksimalno 80 znakova)
+Pregledajte javne cjenike, proizvode, usluge i arhivu cijena.
+
+PUNI OPIS (maksimalno 4000 znakova)
+BAZNA povezuje vaš Android uređaj s javno objavljenim cjenicima na vašoj WordPress stranici. Pregledajte proizvode, usluge, poslovnice i arhivu cjenika u preglednoj aplikaciji s tamnim sučeljem.
+
+PREGLED JAVNIH CJENIKA
+• Pogledajte objavljene cjenike proizvoda i usluga.
+• Pristupite dostupnim CSV i XML datotekama.
+• Pregledajte arhivu prethodno objavljenih cjenika.
+
+PROIZVODI I USLUGE
+• Pretražujte objavljene proizvode i usluge.
+• Provjerite trenutačne cijene i, kada su dostupne, bazne cijene s datumima.
+• Odaberite poslovnicu ili webshop koji želite pregledavati.
+
+POVEZIVANJE SA STRANICOM
+Unesite HTTPS adresu svoje web-stranice koja koristi podržani BAZNA WordPress dodatak. Aplikacija čita javno objavljene podatke i ne zahtijeva administratorsku prijavu. Podaci dostupni u aplikaciji ovise o cjenicima objavljenima na povezanoj stranici.
+
+BAZNA za Android služi za pregled. Uređivanje cijena i objavljivanje cjenika obavljaju se u povezanom sustavu. Aplikacija ne jamči zakonsku usklađenost pojedinačnih cijena.
+
+BAZNA by BRENDIGO
+brendigo.com
