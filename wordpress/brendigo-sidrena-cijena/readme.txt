@@ -108,7 +108,7 @@ Legacy shortcode aliases remain available for backward compatibility.
 
 `wp bazna health` reports publication schedule and automation state.
 
-`wp bazna fill` can fill empty reference-price fields from regular prices when an administrator intentionally chooses that workflow.
+`wp bazna fill` is a legacy, administrator-initiated convenience command. It must not be used as evidence of a historical reference price: verify and enter the actual historical amount and date before publication.
 
 == Frequently Asked Questions ==
 
@@ -126,11 +126,11 @@ Yes. The daily publication time is configurable in the Public pricelist tab.
 
 = Does the plugin send catalog data to an external service? =
 
-No. Catalog processing, exports and the administrator guide run on your WordPress site. The private distribution uses a separate licensing endpoint only for license activation and periodic verification, not for processing catalog prices.
+No. Catalog processing, exports, scheduled publishing and the administrator guide run on your WordPress site. BAZNA does not transmit product records, prices, history, license keys or the site's domain to a BAZNA activation service.
 
-= What information does the private license service receive? =
+= Do I need a BAZNA license key or an account? =
 
-When the administrator explicitly activates a license, the private distribution sends the entered license key and the site's canonical domain over HTTPS to https://licenca.brendigo.com for one-domain registration and verification. Periodic license checks follow. Product records, price histories and catalog contents are not sent to this service. The independent WordPress.org candidate distribution does not include this license client and does not require a key.
+No. All built-in WordPress and WooCommerce functionality is available without an activation key, trial period, hosted BAZNA account or license-server verification. WordPress user permissions and normal security checks still apply.
 
 == Upgrade Notice ==
 
