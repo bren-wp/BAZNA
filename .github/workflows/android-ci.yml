@@ -60,8 +60,8 @@ jobs:
           package_line=$("$aapt" dump badging app/build/outputs/apk/debug/app-debug.apk | head -n 1)
           echo "$package_line"
           [[ "$package_line" == *"name='com.brendigo.bazna'"* ]]
-          [[ "$package_line" == *"versionCode='21'"* ]]
-          [[ "$package_line" == *"versionName='1.5.18'"* ]]
+          [[ "$package_line" == *"versionCode='22'"* ]]
+          [[ "$package_line" == *"versionName='1.5.19'"* ]]
       - name: Verify built artifacts and hash
         run: |
           set -euo pipefail

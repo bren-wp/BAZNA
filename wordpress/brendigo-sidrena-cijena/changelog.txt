@@ -1,3 +1,10 @@
+== BAZNA 1.5.19 ==
+- WordPress: „Cijena na upit” dostupna u REST v1 samo iz uspješno objavljenog snapshota, bez administracijskih nacrta.
+- Web PHP, Joomla, Shopify i Android: zajednički javni REST ugovor s nazivom, kriterijima i poslovnicom.
+- Iznosi za usluge na upit ne izmišljaju se i ne objavljuju u CSV/XML numeričkim cjenicima.
+- Zadržane su postojeće cijene, korisnici, arhive i REST v1 rute. Android targetSdk ostaje 36.
+- Dodani testovi i matrica kompatibilnosti s referentnim GPL dodatkom 1.26.0.
+
 == BAZNA 1.5.18 ==
 - WordPress i Android: zajednički javni REST v1 zadržava povratnu kompatibilnost i razlikuje stanje objave po poslovnicama.
 - Android početna ploča broji samo stvarno objavljene CSV cjenike; neobjavljene datoteke i promjene ne predstavljaju se kao ažurne.

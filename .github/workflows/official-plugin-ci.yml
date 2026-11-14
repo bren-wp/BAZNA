@@ -33,7 +33,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.18' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.19' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -104,20 +104,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.18 --output artifacts/brendigo-sidrena-cijena-1.5.18.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.18.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.18 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.18.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.18.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.18.zip
+          python3 tools/package_plugin.py --version 1.5.19 --output artifacts/brendigo-sidrena-cijena-1.5.19.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.19.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.19 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.19.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.19.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.19.zip
       - name: Verify separate fully unlocked WordPress.org candidate package
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_wporg.py --version 1.5.18 --output artifacts/BAZNA-WordPress-org-1.5.18.zip
-          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.18.zip.sha256)
-          python3 tools/package_wporg.py --version 1.5.18 --output /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.18.zip
-          cmp artifacts/BAZNA-WordPress-org-1.5.18.zip /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.18.zip
+          python3 tools/package_wporg.py --version 1.5.19 --output artifacts/BAZNA-WordPress-org-1.5.19.zip
+          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.19.zip.sha256)
+          python3 tools/package_wporg.py --version 1.5.19 --output /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.19.zip
+          cmp artifacts/BAZNA-WordPress-org-1.5.19.zip /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.19.zip
           mkdir -p /tmp/bazna-wporg/extracted
-          unzip -q artifacts/BAZNA-WordPress-org-1.5.18.zip -d /tmp/bazna-wporg/extracted
+          unzip -q artifacts/BAZNA-WordPress-org-1.5.19.zip -d /tmp/bazna-wporg/extracted
           find /tmp/bazna-wporg/extracted/bazna-cjenici -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-wporg-lint.log
           grep -q 'Text Domain: bazna-cjenici' /tmp/bazna-wporg/extracted/bazna-cjenici/bazna-cjenici.php
           grep -q 'return true;' /tmp/bazna-wporg/extracted/bazna-cjenici/includes/class-license.php
@@ -131,21 +131,21 @@ jobs:
         with:
           name: BAZNA-WordPress-org-candidate
           path: |
-            artifacts/BAZNA-WordPress-org-1.5.18.zip
-            artifacts/BAZNA-WordPress-org-1.5.18.zip.sha256
+            artifacts/BAZNA-WordPress-org-1.5.19.zip
+            artifacts/BAZNA-WordPress-org-1.5.19.zip.sha256
           retention-days: 7
           if-no-files-found: error
       - name: Package standalone BAZNA JSON license server reproducibly without secrets
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_license.py --version 1.5.18 --output artifacts/BAZNA-Licenca-Server-1.5.18.zip
-          python3 tools/package_license.py --version 1.5.18 --output /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.18.zip
-          cmp artifacts/BAZNA-Licenca-Server-1.5.18.zip /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.18.zip
-          (cd artifacts && sha256sum -c BAZNA-Licenca-Server-1.5.18.zip.sha256)
+          python3 tools/package_license.py --version 1.5.19 --output artifacts/BAZNA-Licenca-Server-1.5.19.zip
+          python3 tools/package_license.py --version 1.5.19 --output /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.19.zip
+          cmp artifacts/BAZNA-Licenca-Server-1.5.19.zip /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.19.zip
+          (cd artifacts && sha256sum -c BAZNA-Licenca-Server-1.5.19.zip.sha256)
           python3 - <<'PY'
           import zipfile
-          path = 'artifacts/BAZNA-Licenca-Server-1.5.18.zip'
+          path = 'artifacts/BAZNA-Licenca-Server-1.5.19.zip'
           with zipfile.ZipFile(path) as archive:
               files = archive.namelist()
               assert 'licenca/api.php' in files and 'licenca/lib.php' in files
