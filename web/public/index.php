@@ -56,6 +56,9 @@ try {
         $active = $license?->active();
         bazna_json(200, $core->discovery('web', null, $active));
     }
+    if ($method === 'GET' && $path === '/bazna/v1/usluge-na-upit') {
+        bazna_json(200, $core->onRequestServices());
+    }
     if ($method === 'GET' && $path === '/bazna/v1/arhiva') {
         $entries = $core->archives();
         $kind = (string) ($_GET['kind'] ?? '');

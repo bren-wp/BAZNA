@@ -63,6 +63,9 @@ try {
     if ($tail === '/v1/cjenici') {
         bazna_shop_response(200, $core->discovery('shopify', null, $license?->active()));
     }
+    if ($tail === '/v1/usluge-na-upit') {
+        bazna_shop_response(200, $core->onRequestServices());
+    }
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
     }
@@ -95,7 +98,13 @@ try {
                 Core::esc($kind) . '</h2><p><a style="color:#ffb860" href="' .
                 Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) . '">CSV cjenik</a></p></section>';
         }
-        echo '</main></body></html>';
+        echo '<section style="background:#102237;padding:20px;margin:12px 0;border-radius:12px"><h2>Cijena na upit</h2>';
+        foreach ($core->onRequestServices()['items'] as $service) {
+            if ($service['outlet'] !== (string) ($_GET['oznaka'] ?? '')) continue;
+            echo '<article><strong>' . Core::esc($service['name']) . '</strong><p>' .
+                Core::esc($service['criteria']) . '</p><small>Cijena na upit</small></article>';
+        }
+        echo '</section></main></body></html>';
         exit;
     }
     bazna_shop_response(404, ['error' => 'not_found']);

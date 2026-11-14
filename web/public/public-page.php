@@ -31,6 +31,28 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; base-uri 
 <td data-label="Referentni datum"><?= bazna_html($item['sidrena_datum']) ?></td>
 <td data-label="Dostupnost"><?= bazna_html($item['dostupnost']) ?></td></tr>
 <?php endforeach; ?></tbody></table></div>
+<?php if ($kind === 'usluge'):
+$requests = $core->onRequestServices()['items'];
+$search = trim((string) ($_GET['q'] ?? ''));
+if (strlen($search) > 100) $search = substr($search, 0, 100);
+?>
+<section class="bazna-panel"><h2>Cijena na upit</h2>
+<p class="bazna-muted">Za ove usluge cijena se određuje prema navedenim kriterijima; nema izmišljenog iznosa u javnim CSV/XML datotekama.</p>
+<form method="get"><input type="hidden" name="kind" value="usluge">
+<?php if ($outlet !== ''): ?><input type="hidden" name="oznaka" value="<?= bazna_html($outlet) ?>"><?php endif; ?>
+<label>Pretraži usluge na upit <input type="search" name="q" maxlength="100" value="<?= bazna_html($search) ?>"></label>
+<button type="submit">Pretraži</button></form>
+<div class="bazna-table-scroll"><table><thead><tr><th>Naziv usluge</th><th>Kriteriji</th><th>Cijena</th></tr></thead><tbody>
+<?php foreach ($requests as $item):
+if ($item['outlet'] !== $outlet) continue;
+if ($search !== '' && (function_exists('mb_stripos')
+    ? mb_stripos($item['name'] . ' ' . $item['criteria'], $search, 0, 'UTF-8') === false
+    : stripos($item['name'] . ' ' . $item['criteria'], $search) === false)) continue; ?>
+<tr><td data-label="Naziv"><?= bazna_html($item['name']) ?></td>
+<td data-label="Kriteriji"><?= bazna_html($item['criteria']) ?></td>
+<td data-label="Cijena">Na upit</td></tr>
+<?php endforeach; ?></tbody></table></div></section>
+<?php endif; ?>
 <?php endif; ?>
 <p class="bazna-small">Bazna cijena nije automatski jednaka najnižoj cijeni tijekom 30 dana prije sniženja. <a href="<?= bazna_html($core->link('bazna/v1/cjenici')) ?>">Javni BAZNA API</a></p>
 </main><footer class="bazna-footer">BAZNA · Brendigo · brendigo.com</footer></body></html>

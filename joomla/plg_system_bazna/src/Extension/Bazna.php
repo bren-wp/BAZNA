@@ -63,6 +63,8 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             header('Cache-Control: no-store');
             if ($path === '/bazna/v1/cjenici') {
                 $this->json($core->discovery('joomla', null, $license?->active()));
+            } elseif ($path === '/bazna/v1/usluge-na-upit') {
+                $this->json($core->onRequestServices());
             } elseif ($path === '/bazna/v1/arhiva') {
                 $this->json($core->archives());
             } elseif ($path === '/bazna/v1/license-proof') {
@@ -148,7 +150,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
         $draft = $core->read('draft.json');
         $tab = $app->input->getCmd('tab', 'pregled');
         $links = ['pregled' => 'Pregled', 'proizvodi' => 'Proizvodi',
-            'usluge' => 'Usluge', 'poslovnice' => 'Poslovnice',
+            'usluge' => 'Usluge', 'na-upit' => 'Cijena na upit', 'poslovnice' => 'Poslovnice',
             'uvoz-izvoz' => 'Uvoz/Izvoz', 'javni-cjenici' => 'Javni cjenici',
             'arhiva' => 'Arhiva', 'postavke' => 'Postavke', 'licenca' => 'Licenca'];
         if (!isset($links[$tab])) $tab = 'pregled';
@@ -163,7 +165,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
         echo '</nav><main class="bazna-main"><h1>' . Core::esc($links[$tab]) . '</h1>';
         if ($status !== '') echo '<p role="status" class="bazna-message">' . Core::esc($status) . '</p>';
         echo '<div class="bazna-panel">';
-        if (in_array($tab, ['proizvodi', 'usluge', 'poslovnice'], true)) {
+        if (in_array($tab, ['proizvodi', 'usluge', 'poslovnice', 'na-upit'], true)) {
             echo AdminCatalog::render(
                 $tab, $draft, '?bazna=dashboard&tab=' . $tab,
                 \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
@@ -171,7 +173,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 $app->input->getInt('page', 1)
             );
         } elseif ($tab === 'uvoz-izvoz') {
-            $json = json_encode(array_intersect_key($draft, array_flip(['products','services','outlets'])),
+            $json = json_encode(array_intersect_key($draft, array_flip(['products','services','outlets','on_request'])),
                 JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             echo '<h2>Uvoz i izvoz JSON kataloga</h2><p>Za pojedinačne izmjene koristite kartice Proizvodi, Usluge i Poslovnice.</p><form method="post">';
             echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
@@ -189,7 +191,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             foreach ($core->archives() as $a) echo '<p><a href="' . Core::esc($a['url']) . '">' . Core::esc($a['date'].' '.$a['kind']) . '</a></p>';
         } else {
             echo '<p>Proizvodi: ' . count($draft['products'] ?? []) . ' · Usluge: ' .
-                count($draft['services'] ?? []) . ' · Poslovnice: ' . count($draft['outlets'] ?? []) . '</p>';
+                count($draft['services'] ?? []) . ' · Poslovnice: ' . count($draft['outlets'] ?? []) . ' · Na upit: ' . count($draft['on_request'] ?? []) . '</p>';
             echo '<p>Datum početka primjene objavljenih odluka: 17. 11. 2026. Bazna cijena mora biti potvrđena povijesnom evidencijom.</p>';
         }
         echo '</div></main></div></body></html>';
@@ -209,6 +211,14 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 echo '<section class="bazna-panel"><h2>' . Core::esc($kind) . '</h2><p>';
                 echo '<a href="' . Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) . '">CSV cjenik</a></p></section>';
             }
+            $outlet = (string) $this->getApplication()->input->getString('oznaka', '');
+            echo '<section class="bazna-panel"><h2>Cijena na upit</h2><p>Usluge čija cijena ovisi o navedenim kriterijima. Bez izmišljenih iznosa u CSV/XML-u.</p>';
+            foreach ($core->onRequestServices()['items'] as $service) {
+                if ($service['outlet'] !== $outlet) continue;
+                echo '<article><strong>' . Core::esc($service['name']) . '</strong><p>' .
+                    Core::esc($service['criteria']) . '</p><small>Cijena na upit</small></article>';
+            }
+            echo '</section>';
         }
         echo '</main></body></html>';
     }
