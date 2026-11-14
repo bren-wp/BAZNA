@@ -1,10 +1,6 @@
 package com.brendigo.sidrena.ui
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -32,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.brendigo.sidrena.SidrenaViewModel
 import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.SiteUrl
 
 @Composable
 fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
@@ -62,30 +57,9 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
         }
     }
 
-    fun openPublic(url: String) {
-        val verified = runCatching {
-            snapshot?.let { SiteUrl.parse(it.site).publicLink(url) }
-        }.getOrNull()
-        if (verified == null) {
-            Toast.makeText(context, "Poveznica nije dostupna.", Toast.LENGTH_SHORT).show()
-            return
-        }
-        try {
-            context.startActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse(verified)).addCategory(Intent.CATEGORY_BROWSABLE)
-            )
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, "Nema aplikacije za otvaranje poveznice.", Toast.LENGTH_SHORT).show()
-        }
-    }
+    fun openPublic(url: String) = openBaznaPublicLink(context, snapshot, url)
 
-    fun supportEmail() {
-        try {
-            context.startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:info@brendigo.com")))
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(context, "Nije pronađena aplikacija za e-poštu.", Toast.LENGTH_SHORT).show()
-        }
-    }
+    fun supportEmail() = openBaznaSupport(context)
 
     BackHandler(enabled = page != "home" && !state.isEditingSite) {
         navigate(when (page) {
@@ -307,6 +281,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                         onConnectHelp = { alert = "Unesite HTTPS adresu stranice koja objavljuje BAZNA cjenike (WordPress, Web PHP, Joomla ili Shopify). Nakon povezivanja odaberite poslovnicu i pregledajte objavljene podatke." },
                         onAnchorHelp = { alert = "Bazna cijena je dokumentirana referentna vrijednost uz datum. Uvijek je provjerite na izvornoj povezanoj BAZNA stranici." },
                         onSupport = ::supportEmail,
+                        onPrivacy = { openBaznaPrivacy(context) },
                         onOpenPublic = ::openPublic,
                     )
                     else -> HomePage(

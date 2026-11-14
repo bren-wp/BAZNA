@@ -104,7 +104,10 @@ if "'permission_callback' => '__return_true'" not in api_php and "'permission_ca
     issues.append("Missing explicit anonymous read-only public REST registration")
 if "queryRestEndpoint(" not in android_site or "shouldFallbackToPlainRest(" not in android_repo:
     issues.append("Missing guarded WordPress plain-permalink fallback")
-if "followRedirects(false)" not in android_repo or "PublicNetworkGuard::isPublic" not in android_repo:
+android_dns = (android / 'app/src/main/java/com/brendigo/sidrena/data/PublicDns.kt').read_text(encoding='utf-8')
+if not all(token in android_repo for token in ("followRedirects(false)", ".dns(PublicDns)")) or not all(
+    token in android_dns for token in ("Dns.SYSTEM.lookup(hostname)", "PublicNetworkGuard::isPublic")
+):
     issues.append("Android public-feed network guard changed unexpectedly")
 legacy_section = snapshot_php.split('public static function process_batch(', 1)
 if len(legacy_section) < 2 or 'blocked\' => true' not in legacy_section[1].split('private static function', 1)[0]:

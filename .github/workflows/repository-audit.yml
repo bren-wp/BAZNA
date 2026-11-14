@@ -45,4 +45,6 @@ jobs:
       - name: Desktop source and obvious dead-code audit
         run: python3 tools/audit_desktop.py
       - name: Android source and obvious dead-code audit
-        run: python3 tools/audit_android.py
+        run: |
+          python3 tools/audit_android.py
+          python3 tools/check_android_play_readiness.py

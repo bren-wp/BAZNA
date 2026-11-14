@@ -24,16 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.brendigo.sidrena.data.PublicNetworkGuard
+import com.brendigo.sidrena.data.PublicDns
 import com.brendigo.sidrena.data.SiteUrl
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.ByteArrayOutputStream
-import java.net.InetAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
@@ -55,15 +53,7 @@ internal object PublicProductImages {
         .followRedirects(false)
         .followSslRedirects(false)
         .proxy(Proxy.NO_PROXY)
-        .dns(object : Dns {
-            override fun lookup(hostname: String): List<InetAddress> {
-                val addresses = Dns.SYSTEM.lookup(hostname)
-                require(addresses.isNotEmpty() && addresses.all(PublicNetworkGuard::isPublic)) {
-                    "Slike se učitavaju samo s javnih mrežnih adresa."
-                }
-                return addresses
-            }
-        })
+        .dns(PublicDns)
         .connectTimeout(5, TimeUnit.SECONDS)
         .readTimeout(8, TimeUnit.SECONDS)
         .callTimeout(12, TimeUnit.SECONDS)

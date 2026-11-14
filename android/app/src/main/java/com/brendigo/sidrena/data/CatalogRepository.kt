@@ -1,5 +1,6 @@
 package com.brendigo.sidrena.data
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -7,10 +8,8 @@ import org.json.JSONObject
 import org.json.JSONException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.net.InetAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
 import java.net.URI
@@ -51,6 +50,8 @@ class CatalogRepository {
             }
             return try {
                 CsvParser.items(read(site, site.approved(url), 6 * 1024 * 1024))
+            } catch (cancel: CancellationException) {
+                throw cancel
             } catch (exception: Exception) {
                 warnings.add("Nije moguće učitati " + label + ". Provjerite objavu CSV cjenika.")
                 emptyList()
@@ -67,13 +68,13 @@ class CatalogRepository {
             "usluge",
             if (selected == null) index.servicesCsvReady else selected.servicesCsvReady,
         )
-        val archive = try {
+        val archive: List<ArchiveEntry> = try {
             val discoveryUrl = indexJson.optString("type_archive")
             val remote = if (discoveryUrl.isBlank())
                 site.endpoint("wp-json/brendigo-sidrena/v1/arhiva")
             else site.approved(discoveryUrl)
             val list = JSONArray(read(site, remote, 512 * 1024))
-            buildList {
+            buildList<ArchiveEntry> {
                 for (i in 0 until minOf(list.length(), 1000)) {
                     val item = list.optJSONObject(i) ?: continue
                     val outlet = item.optString("outlet")
@@ -85,6 +86,8 @@ class CatalogRepository {
                     add(ArchiveEntry(item.optString("date"), item.optString("kind"), outlet, format, url))
                 }
             }
+        } catch (cancel: CancellationException) {
+            throw cancel
         } catch (exception: Exception) {
             warnings.add("Arhiva trenutačno nije dostupna.")
             emptyList()
@@ -115,15 +118,7 @@ class CatalogRepository {
         .followRedirects(false)
         .followSslRedirects(false)
         .proxy(Proxy.NO_PROXY)
-        .dns(object : Dns {
-            override fun lookup(hostname: String): List<InetAddress> {
-                val addresses = Dns.SYSTEM.lookup(hostname)
-                require(addresses.isNotEmpty() && addresses.all(PublicNetworkGuard::isPublic)) {
-                    "Povezana stranica mora imati isključivo javne mrežne adrese."
-                }
-                return addresses
-            }
-        })
+        .dns(PublicDns)
         .connectTimeout(8, TimeUnit.SECONDS)
         .readTimeout(12, TimeUnit.SECONDS)
         .callTimeout(25, TimeUnit.SECONDS)
