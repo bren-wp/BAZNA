@@ -163,11 +163,11 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             echo '<h2>Uvoz i izvoz JSON kataloga</h2><p>Za pojedinačne izmjene koristite kartice Proizvodi, Usluge i Poslovnice.</p><form method="post">';
             echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
             echo '<input type="hidden" name="action" value="save"><textarea class="bazna-editor" name="catalog">' . Core::esc((string) $json) . '</textarea>';
-            echo '<button type="submit"' .'>Spremi nacrt</button></form>';
+            echo '<button type="submit">Spremi nacrt</button></form>';
         } elseif ($tab === 'javni-cjenici') {
             echo '<p>Android REST: <code>' . Core::esc($core->link('bazna/v1/cjenici')) . '</code></p><form method="post">';
             echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
-            echo '<button name="action" value="publish"' .'>Objavi cjenike</button></form>';
+            echo '<button name="action" value="publish">Objavi cjenike</button></form>';
         } elseif ($tab === 'arhiva') {
             foreach ($core->archives() as $a) echo '<p><a href="' . Core::esc($a['url']) . '">' . Core::esc($a['date'].' '.$a['kind']) . '</a></p>';
         } else {

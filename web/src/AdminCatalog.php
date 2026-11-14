@@ -137,7 +137,7 @@ final class AdminCatalog
             '<input type="hidden" name="collection" value="' . Core::esc($collection) . '">' .
             '<input type="hidden" name="index" value="-1">' .
             self::fields($collection, [], $outlets, false) .
-            '<button type="submit"'>Spremi novu stavku</button></form></details>';
+            '<button type="submit">Spremi novu stavku</button></form></details>';
 
         $html .= '<div class="bazna-entry-count" role="status">Ukupno: <strong>' .
             count($rows) . '</strong> · Prikaz: ' . (count($rows) ? ($start + 1) : 0) .
@@ -159,13 +159,13 @@ final class AdminCatalog
             $html .= '<form method="post" action="' . Core::esc($url) . '">' . $csrfHtml .
                 $identity . '<input type="hidden" name="action" value="save_item">' .
                 self::fields($collection, $row, $outlets, true) .
-                '<button type="submit"'>Spremi izmjene</button></form>';
+                '<button type="submit">Spremi izmjene</button></form>';
             $html .= '<form class="bazna-remove-form" method="post" action="' . Core::esc($url) . '">' .
                 $csrfHtml . $identity .
                 '<input type="hidden" name="action" value="delete_item">' .
                 '<label class="bazna-check"><input type="checkbox" name="delete_confirm" value="1" required>' .
                 ' Potvrđujem uklanjanje ove stavke iz nacrta.</label>' .
-                '<button class="bazna-danger" type="submit"'>Ukloni iz nacrta</button></form></details>';
+                '<button class="bazna-danger" type="submit">Ukloni iz nacrta</button></form></details>';
         }
         $totalPages = (int) ceil(count($rows) / 60);
         if ($totalPages > 1) {
