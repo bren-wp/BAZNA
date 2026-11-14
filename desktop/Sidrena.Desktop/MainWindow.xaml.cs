@@ -822,11 +822,10 @@ public partial class MainWindow : Window
             U.Notice("Vaše poslovne podatke možete dodatno zaštititi izradom redovitih sigurnosnih kopija.")));
         outer.Children.Add(U.Card("Informacije o izdanju",
             U.Text("BAZNA Desktop "+GetDesktopVersion(),18,true),
-            U.Muted("Windows 10/11 · Brendigo · Komercijalna licencija"),
-            U.Notice("WordPress dodatak BAZNA 1.5.3 dijeli javni pravni profil s Androidom i Windowsom."),
+            U.Muted("Windows 10/11 · Brendigo · Bez aktivacijskog ključa"),
+            U.Notice("WordPress BAZNA 1.5.20 dijeli javni pravni profil s Androidom i Windowsom."),
             U.Action("Preuzmi najnoviju Windows aplikaciju",()=>
-                OpenUrl("https://github.com/bren-wp/SIDRENA/releases"),true),
-            U.Action("Uvjeti komercijalne licence",ShowCommercialLicense),
+                OpenUrl("https://github.com/bren-wp/BAZNA/releases"),true),
             U.Action("Informacije o programu",()=>OpenUrl("https://brendigo.com/"))));
         return outer;
     }
@@ -844,47 +843,11 @@ public partial class MainWindow : Window
             U.Muted("Ctrl + N — otvori artikle  ·  F1 — pomoć"),
             U.Text("Preuzimanje i ažuriranja",18,true),
             U.Muted("Setup instalira aplikaciju, a prijenosna inačica radi bez instalacije. Vaši podaci ostaju sačuvani pri ažuriranju."),
-            U.Action("Otvori Windows preuzimanja",()=>OpenUrl("https://github.com/bren-wp/SIDRENA/releases")),
+            U.Action("Otvori Windows preuzimanja",()=>OpenUrl("https://github.com/bren-wp/BAZNA/releases")),
             U.Text("Pravne informacije",18,true),
             U.Muted("Nositelj prava na Windows aplikaciju: Brendigo LTD."),
-            U.Action("Pročitaj licencu",ShowCommercialLicense),
             U.Text("Podrška",18,true),
             U.Action("Pošalji e-poštu podršci",()=>OpenUrl("mailto:sidrena@brendigo.com")));
-    }
-
-    private void ShowCommercialLicense()
-    {
-        const string resource="Sidrena.Desktop.Licensing.EULA-HR.txt";
-        using var stream=typeof(MainWindow).Assembly.GetManifestResourceStream(resource);
-        if(stream is null)
-        {
-            MessageBox.Show(this,"Uvjeti licence trenutačno nisu dostupni. Obratite se podršci.",
-                "BAZNA — licencija",MessageBoxButton.OK,MessageBoxImage.Warning);
-            return;
-        }
-        using var reader=new StreamReader(stream,Encoding.UTF8);
-        var window=new Window
-        {
-            Title="BAZNA — komercijalna licencija",Owner=this,
-            WindowStartupLocation=WindowStartupLocation.CenterOwner,
-            Width=Math.Min(800,SystemParameters.WorkArea.Width*0.86),
-            Height=Math.Min(670,SystemParameters.WorkArea.Height*0.86),
-            MinWidth=420,MinHeight=300,ShowInTaskbar=false,
-            Background=Brush("BackgroundBrush"),FontFamily=FontFamily
-        };
-        var root=new DockPanel{Margin=new Thickness(22)};
-        var close=U.Action("Zatvori",()=>window.Close(),true);
-        DockPanel.SetDock(close,Dock.Bottom);
-        root.Children.Add(close);
-        root.Children.Add(new TextBox{
-            Text=reader.ReadToEnd(),IsReadOnly=true,AcceptsReturn=true,
-            TextWrapping=TextWrapping.Wrap,
-            VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
-            HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
-            Padding=new Thickness(18),Margin=new Thickness(0,0,0,16)
-        });
-        window.Content=root;
-        window.ShowDialog();
     }
 
     private void OpenLocal(string path)

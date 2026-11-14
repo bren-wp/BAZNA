@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>SIDRENA</AssemblyName>
-    <Version>0.10.6</Version>
+    <Version>0.10.7</Version>
     <Company>Brendigo LTD</Company>
     <Authors>Brendigo LTD</Authors>
     <Product>BAZNA Desktop</Product>
@@ -16,6 +16,5 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Sidrena.Core/Sidrena.Core.csproj" />
-    <EmbeddedResource Include="../legal/EULA-HR.txt" LogicalName="Sidrena.Desktop.Licensing.EULA-HR.txt" />
   </ItemGroup>
 </Project>
