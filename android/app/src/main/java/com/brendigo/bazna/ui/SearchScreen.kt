@@ -58,6 +58,7 @@ import com.brendigo.bazna.data.CatalogIndex
 import com.brendigo.bazna.data.CatalogSearch
 import com.brendigo.bazna.data.CatalogSnapshot
 import com.brendigo.bazna.data.PriceItem
+import com.brendigo.bazna.data.OnRequestService
 
 /** Search category is determined by the actual product/service feed, not a guessed label. */
 internal data class SearchCatalogEntry(
@@ -87,6 +88,24 @@ internal fun searchCatalogEntries(
     return productEntries + serviceEntries
 }
 
+/** Match descriptive, published inquiry services in the global search. */
+internal fun searchOnRequestEntries(
+    records: List<OnRequestService>,
+    query: String,
+    kind: Int,
+    selectedOutlet: String,
+): List<OnRequestService> {
+    require(kind in 0..2)
+    if (kind == 1) return emptyList()
+    val terms = query.trim().take(256).split(Regex("\\s+")).filter(String::isNotBlank)
+    return records.filter { row ->
+        row.outlet == selectedOutlet && terms.all { term ->
+            row.name.contains(term, ignoreCase = true) ||
+                row.criteria.contains(term, ignoreCase = true)
+        }
+    }
+}
+
 internal fun searchResultPrice(item: PriceItem): String =
     if (item.currentPrice.isBlank()) "Cijena nije objavljena"
     else formatPrice(item.currentPrice)
@@ -114,11 +133,16 @@ fun SearchPage(
     onBack: () -> Unit,
     onArchive: () -> Unit,
     onRefresh: () -> Unit,
+    selectedOutlet: String = "",
 ) {
     val results = remember(data.products, data.services, query, kind) {
         searchCatalogEntries(data.products, data.services, query, kind)
     }
-    val total = data.products.size + data.services.size
+    val inquiries = remember(data.onRequestServices, selectedOutlet, query, kind) {
+        searchOnRequestEntries(data.onRequestServices, query, kind, selectedOutlet)
+    }
+    val total = data.products.size + data.services.size +
+        data.onRequestServices.count { it.outlet == selectedOutlet }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -166,7 +190,7 @@ fun SearchPage(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = "Pronađeno " + results.size + " rezultata",
+                text = "Pronađeno " + (results.size + inquiries.size) + " rezultata",
                 color = Color.White,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -194,7 +218,7 @@ fun SearchPage(
                 fontSize = 13.sp,
             )
         }
-        if (results.isEmpty()) {
+        if (results.isEmpty() && inquiries.isEmpty()) {
             SearchEmptyState(
                 catalogEmpty = total == 0,
                 hasQuery = query.isNotBlank(),
@@ -208,6 +232,42 @@ fun SearchPage(
                 items(results) { result ->
                     SearchResultCard(result, onClick = { onDetails(result.item) })
                 }
+                items(inquiries) { requested ->
+                    SearchOnRequestCard(requested)
+                }
+            }
+        }
+    }
+}
+
+/** Inquiry rows have no numeric price and cannot open a fake price detail. */
+@Composable
+private fun SearchOnRequestCard(item: OnRequestService) {
+    Card(
+        modifier = Modifier.fillMaxWidth().semantics {
+            contentDescription = "Usluga ${item.name}, cijena na upit. ${item.criteria}"
+        },
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, Border),
+        colors = CardDefaults.cardColors(containerColor = Surface),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .heightIn(min = 91.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Outlined.Build, contentDescription = null,
+                tint = SoftBlue, modifier = Modifier.size(29.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Text(item.name, color = Color.White, fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold, maxLines = 2,
+                    overflow = TextOverflow.Ellipsis)
+                Text(item.criteria, color = TextMuted, fontSize = 12.sp,
+                    maxLines = 3, overflow = TextOverflow.Ellipsis)
+                Text("Cijena na upit", color = Accent, fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold)
             }
         }
     }

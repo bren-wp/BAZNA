@@ -215,6 +215,7 @@ fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
                     )
                     "search" -> SearchPage(
                         data = snapshot,
+                        selectedOutlet = state.outlet,
                         busy = state.isLoading,
                         error = state.error,
                         query = searchQuery,
