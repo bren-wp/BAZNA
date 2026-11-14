@@ -1,0 +1,101 @@
+# Publish ONLY the already-registered WordPress.org plugin slug.
+# A GitHub release alone does not update WordPress.org installations.
+name: Deploy BAZNA to existing WordPress.org plugin
+
+on:
+  workflow_run:
+    workflows: ["Publish BAZNA Android Windows and WordPress package"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Optional safety check: must match current plugin version"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: wordpress-org-brendigo-sidrena-cijena
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'workflow_run' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: \${{ github.token }}
+      REQUESTED_VERSION: \${{ inputs.version || '' }}
+    steps:
+      - name: Checkout trusted main and fetch release tags
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate plugin identity, published release and unchanged release source
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          plugin=wordpress/brendigo-sidrena-cijena
+          version=$(sed -nE 's/^ \* Version: ([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*$/\1/p' "$plugin/brendigo-sidrena-cijena.php")
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Invalid plugin version"; exit 1; }
+          [[ -z "$REQUESTED_VERSION" || "$REQUESTED_VERSION" == "$version" ]] || { echo "::error::Version does not match current main"; exit 1; }
+          grep -Fqx "Stable tag: $version" "$plugin/readme.txt"
+          grep -Fq "BRENDIGO_SIDRENA_CIJENA_VERSION', '$version'" "$plugin/brendigo-sidrena-cijena.php"
+          git rev-parse --verify "refs/tags/$version^{commit}" >/dev/null
+          gh release view "$version" --repo "$GITHUB_REPOSITORY" >/dev/null
+          # The cross-platform release may already exist before this workflow
+          # is merged. Deploy its unchanged plugin files, NOT unpublished edits.
+          if ! git diff --quiet "$version" HEAD -- "$plugin"; then
+            echo "::error::WordPress code differs from release $version; create a new version and GitHub release before deploying"
+            exit 1
+          fi
+          tag_sha=$(git rev-parse "refs/tags/$version^{commit}")
+          for workflow in official-plugin-ci.yml repository-audit.yml; do
+            result=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/runs?head_sha=$tag_sha&per_page=100" \
+              --jq '.workflow_runs | any(.event == "push" and .conclusion == "success")')
+            [[ "$result" == "true" ]] || { echo "::error::No successful $workflow for release commit $tag_sha"; exit 1; }
+          done
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Deploying verified existing WordPress.org slug at release $version"
+
+      - name: Recheck WordPress.org update identity and reproducible distribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/test_wporg_update_contract.py
+          python3 tools/package_plugin.py --version "\${{ steps.verify.outputs.version }}" \
+            --output /tmp/brendigo-sidrena-cijena.zip
+          (cd /tmp && sha256sum -c brendigo-sidrena-cijena.zip.sha256)
+          find wordpress/brendigo-sidrena-cijena -type f -name '*.php' -print0 | xargs -0 -n 1 php -l >/tmp/wporg-php-lint.log
+
+      - name: Require configured WordPress.org SVN credentials
+        shell: bash
+        env:
+          SVN_USERNAME: \${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: \${{ secrets.SVN_PASSWORD }}
+        run: |
+          if [[ -z "$SVN_USERNAME" || -z "$SVN_PASSWORD" ]]; then
+            echo "::error::Set SVN_USERNAME and SVN_PASSWORD in GitHub Actions repository secrets"
+            exit 1
+          fi
+
+      - name: Deploy to existing brendigo-sidrena-cijena SVN trunk and version tag
+        uses: 10up/action-wordpress-plugin-deploy@2.3.0
+        env:
+          SVN_USERNAME: \${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: \${{ secrets.SVN_PASSWORD }}
+          SLUG: brendigo-sidrena-cijena
+          BUILD_DIR: wordpress/brendigo-sidrena-cijena
+          VERSION: \${{ steps.verify.outputs.version }}
