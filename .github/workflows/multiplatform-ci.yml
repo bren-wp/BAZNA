@@ -64,7 +64,7 @@ jobs:
           done
       - name: Upload per-screen visual QA evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BAZNA-PHP-Joomla-responsive-Chrome
           path: artifacts/platform-visual/
@@ -116,7 +116,7 @@ jobs:
             exit 1
           fi
       - name: Publish review artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BAZNA-web-joomla-shopify-candidate
           path: artifacts/multiplatform/
