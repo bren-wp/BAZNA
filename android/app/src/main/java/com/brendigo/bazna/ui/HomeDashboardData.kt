@@ -27,7 +27,8 @@ internal fun homeMetrics(
     val actualArchiveCount = publishedArchiveEntries(data).size
     return listOf(
         HomeMetric("Proizvodi", number.format(data.products.size), "products"),
-        HomeMetric("Usluge", number.format(data.services.size), "services"),
+        HomeMetric("Usluge", number.format(data.services.size +
+            data.onRequestServices.count { it.outlet == selectedOutlet }), "services"),
         HomeMetric("Cjenici", number.format(actualCsvCount), "cjenici"),
         HomeMetric("Arhiva", number.format(actualArchiveCount), "archive"),
     )
