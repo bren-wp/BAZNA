@@ -3,11 +3,11 @@
 **Autor:** Brendigo · https://brendigo.com/  
 **Status:** prva funkcionalna inačica; nije objavljena niti testirana na stvarnom produkcijskom hostingu.
 
-BAZNA Web 1.1.2 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, zasebnu domensku licencu, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
+BAZNA Web 1.1.3 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, zasebnu domensku licencu, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
 
 ## Instalacija (Apache / PHP 8.1+)
 
-1. Raspakirajte \`BAZNA-Web-1.1.2.zip\` tako da imate \`src/\` i \`public/\`.
+1. Raspakirajte \`BAZNA-Web-1.1.3.zip\` tako da imate \`src/\` i \`public/\`.
 2. Postavite virtualni host DocumentRoot na **samo** \`/your-path/bazna-web/public\` (nikada na korijen paketa). Potrebni su PHP \`openssl\`, \`curl\`, \`dom\`, \`json\` i \`mbstring\` po potrebi.
 3. Postavite server-side environment variables (nginx fastcgi_param / PHP-FPM environment / Apache SetEnv, ne klijentski JavaScript):
 
@@ -48,3 +48,13 @@ Objave su eksplicitne, stare objave ostaju u arhivi bez automatskog brisanja. Za
 ## Brzi test
 
 \`php web/tests/test.php\` iz korijena repozitorija. Pokrenite i \`php web/tests/test_editor.php\`. Testovi koriste lokalnu privremenu mapu i nemaju mrežne pozive. Chrome CI snima 14 Web/Joomla prikaza na 13 veličina (182 snimke), a to nije dokaz podudaranja piksela s izvornim dizajnom.
+
+## Usluge s cijenom na upit (v1.1.3)
+
+Nova javna REST v1 ruta `/bazna/v1/usluge-na-upit` vraća samo
+objavljene `id`, `name`, `criteria` i `outlet`, bez iznosa i
+bez administratorskih identiteta. Izmjene u nacrtu nisu javne dok
+se katalog ne objavi. Zahtjevi su odvojeni od brojčanih CSV/XML
+cjenika. Na javnoj HTML stranici prikazuju se naziv, kriteriji
+i oznaka „Cijena na upit”. Shopify koristi isključivo potpisani
+app-proxy: zahtjev upućen izvan valjanog proxy potpisa nije podržan.

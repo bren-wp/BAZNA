@@ -31,10 +31,20 @@ Shopify **ne izvodi PHP u temi/trgovini**. Ovdje je zaseban PHP backend s Shopif
 
 ## Granice / produkcijska provjera
 
-Ovo je **custom-store adapter kandidat 1.1.2**, ne gotov Shopify embedded/OAuth marketplace app. Obvezni privacy webhook endpointi i pretplate sada su implementirani, s provjerom HMAC potpisa, izolacijom trgovina, revokacijom nakon deinstalacije i brisanjem podataka trgovine na potpisani zahtjev. **Još nisu implementirani** puni OAuth za više trgovaca, automatska sigurna pohrana i rotacija tokena, Shopify Billing API, puni embedded merchant UI, sinkronizacija u stvarnom vremenu ili App Store odobrenje. Ne distribuirati u Shopify App Store bez toga i odgovarajuće autorizacije.
+Ovo je **custom-store adapter kandidat 1.1.3**, ne gotov Shopify embedded/OAuth marketplace app. Obvezni privacy webhook endpointi i pretplate sada su implementirani, s provjerom HMAC potpisa, izolacijom trgovina, revokacijom nakon deinstalacije i brisanjem podataka trgovine na potpisani zahtjev. **Još nisu implementirani** puni OAuth za više trgovaca, automatska sigurna pohrana i rotacija tokena, Shopify Billing API, puni embedded merchant UI, sinkronizacija u stvarnom vremenu ili App Store odobrenje. Ne distribuirati u Shopify App Store bez toga i odgovarajuće autorizacije.
 
 Shopify može omogućiti trgovcu promjenu URL-a app proxyja; u tom slučaju mora se uskladiti javni URL u konfiguraciji i Androidu. Podržana tvornička putanja je \`/apps/bazna\`. Ne otkrivajte \`BAZNA_SHOPIFY_CLIENT_SECRET\` niti ključ licence frontend skriptama.
 
 Testovi: \`php shopify/tests/test_proxy.php\` i \`php shopify/tests/test_webhooks.php\`.
 
 **Privacy webhooks:** Shopify primjer TOML sada registrira \`customers/data_request\`, \`customers/redact\`, \`shop/redact\` i \`app/uninstalled\`. Sve HTTPS putanje \`/shopify/webhooks/*\` moraju na vašem poslužitelju voditi na \`shopify/server/webhooks.php\`; nemojte ih usmjeriti na app proxy. BAZNA ne pohranjuje korisničke Shopify račune. Nakon opoziva trgovina ne smije nastaviti javno čitati podatke preko starog popisa dopuštenih instalacija. Na potvrđen \`shop/redact\` uklanja se privatna mapa samo te trgovine. Trgovac mora zasebno riješiti zakonsku obvezu čuvanja cjenika prije brisanja, ako je primjenjiva.
+
+## Usluge s cijenom na upit (v1.1.3)
+
+Nova javna REST v1 ruta `/bazna/v1/usluge-na-upit` vraća samo
+objavljene `id`, `name`, `criteria` i `outlet`, bez iznosa i
+bez administratorskih identiteta. Izmjene u nacrtu nisu javne dok
+se katalog ne objavi. Zahtjevi su odvojeni od brojčanih CSV/XML
+cjenika. Na javnoj HTML stranici prikazuju se naziv, kriteriji
+i oznaka „Cijena na upit”. Shopify koristi isključivo potpisani
+app-proxy: zahtjev upućen izvan valjanog proxy potpisa nije podržan.

@@ -33,17 +33,33 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 - **Arhiva** — dostupne nepromjenjive verzije već objavljenih cjenika.
 - **Licence** — zaštita administrativnih funkcija domenskim licencnim sustavom.
 
+## Usluge s cijenom na upit — sve javne platforme
+
+Usluge kojima se iznos određuje prema opsegu, materijalu ili drugim
+objavljenim kriterijima sada imaju zaseban, konzistentan prikaz.
+Korisnik vidi **naziv, kriterije i poslovnicu**, bez izmišljene cijene.
+WordPress, Web PHP, Joomla i Shopify objavljuju ih tek nakon potvrde
+kataloga; Android ih prikazuje iz sigurnog javnog REST API-ja.
+Ti zapisi ne ulaze u numeričke CSV/XML cjenike.
+
+Zadržani su postojeći WooCommerce podaci, cjenici, arhive, računi i
+kompatibilni REST v1 URL-ovi. Android ne traži administratorsku lozinku
+i služi za pregled, a ne upravljanje WordPressom.
+
+[Usporedba s referentnim dodatkom 1.26.0](docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
+ · [Android upute](android/README.md)
+
 ## Jedan BAZNA ekosustav
 
 | Platforma | Namjena | Verzija | Status |
 |---|---|---|---|
-| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.18** | CI provjeren; kandidat WordPress.org paketa |
-| **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.2** | Funkcionalni paket; potreban test na stvarnom hostingu |
-| **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i licencama | **1.1.2** | Kandidat; potreban instalacijski test u Joomli |
-| **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.2** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.18** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
+| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.19** | CI provjeren; kandidat WordPress.org paketa |
+| **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.3** | Funkcionalni paket; potreban test na stvarnom hostingu |
+| **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i licencama | **1.1.3** | Kandidat; potreban instalacijski test u Joomli |
+| **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.3** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
+| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.19** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
 | **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.6** | Windows CI i stvarne provjere sučelja |
-| **Licencni servis** | Provjera licence vezane uz javnu HTTPS domenu, odvojeno od podataka kataloga | **1.5.18** | Za instalaciju potrebna vlastita privatna konfiguracija |
+| **Licencni servis** | Provjera licence vezane uz javnu HTTPS domenu, odvojeno od podataka kataloga | **1.5.19** | Za instalaciju potrebna vlastita privatna konfiguracija |
 
 ## Jedinstveni podaci na svim platformama
 
@@ -79,7 +95,7 @@ BAZNA licencni servis ──> provjera instalacije i domene (zasebno)
 
 ### Samostalni PHP web — `/web`
 
-1. Preuzmite **BAZNA-Web-1.1.2.zip**. Ne treba WordPress.
+1. Preuzmite **BAZNA-Web-1.1.3.zip**. Ne treba WordPress.
 2. Potrebni su PHP 8.1+, HTTPS, pravila preusmjeravanja na `public/index.php` i **privatna mapa izvan webroota**.
 3. Na serveru konfigurirajte `BAZNA_PUBLIC_URL`, `BAZNA_PRIVATE_DIR`, `BAZNA_ADMIN_PASSWORD_HASH` i `BAZNA_APP_KEY`. Ključeve nemojte unositi u JavaScript ni u Git.
 4. Otvorite `/bazna/admin`, aktivirajte licencu i preko kartica **Proizvodi**, **Usluge** i **Poslovnice** unesite podatke. Objavite ih kroz **Javni cjenici**.
@@ -88,7 +104,7 @@ BAZNA licencni servis ──> provjera instalacije i domene (zasebno)
 
 ### Joomla — `/joomla`
 
-1. Preuzmite **BAZNA-Joomla-Plugin-1.1.2.zip** i instalirajte ga kroz **System → Install → Extensions**.
+1. Preuzmite **BAZNA-Joomla-Plugin-1.1.3.zip** i instalirajte ga kroz **System → Install → Extensions**.
 2. Omogućite *System – BAZNA*, konfigurirajte privatnu pohranu i licencni servis.
 3. Otvorite BAZNA administratorski prikaz i koristite iste osnovne forme kao u samostalnom PHP sustavu.
 4. Objavite katalog i povežite Android javnom HTTPS domenom.

@@ -1,6 +1,6 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.18**
+**BAZNA by Brendigo** · **1.5.19**
 
 ![BAZNA](../branding/bazna-banner.png)
 
@@ -38,7 +38,7 @@ Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS dom
 
 ## Google Play — novi identifikator
 
-Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.18 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
+Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.19 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
 
 ## Instalacija
 
@@ -62,3 +62,12 @@ Pravni profil dopunjen je informativnim identifikatorima NN 59/2026 i NN 105/202
 ### Pravna dopuna 29. 10. 2026.
 
 Javni profil razlikuje baznu cijenu od najniže prethodne cijene za sniženja u pravilu 30 dana, bilježi pravila NN 105/2026 od 26. 9. 2026. i ostaje kompatibilan sa starijim WordPress profilima. Aplikacija je read-only i ne potvrđuje pravnu usklađenost trgovca.
+
+## Usluge s cijenom na upit (1.5.19)
+
+Na zaslonu **Usluge** prikazuju se i odvojeno objavljene usluge
+bez unaprijed određene cijene. Svaka prikazuje naziv i kriterije,
+uz poštovanje odabrane poslovnice. Te stavke se ne pretvaraju u
+numerički CSV/XML i nisu automatski sniženja ili bazne cijene.
+Ako poslužitelj ne podržava opcionalnu rutu, osnovni cjenici
+i arhiva nastavljaju normalno raditi.
