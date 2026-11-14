@@ -21,9 +21,11 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; base-uri 
 <?php foreach ($core->archives() as $entry): ?><p><a href="<?= bazna_html($entry['url']) ?>"><?= bazna_html($entry['date'] . ' · ' . $entry['kind'] . ' · CSV') ?></a></p><?php endforeach; ?>
 </div>
 <?php else: ?>
-<div class="bazna-switch"><a href="<?= bazna_html($core->link('bazna/cjenik?kind=proizvodi')) ?>">Proizvodi</a>
-<a href="<?= bazna_html($core->link('bazna/cjenik?kind=usluge')) ?>">Usluge</a>
-<a href="<?= bazna_html($core->link('bazna/v1/cjenici/' . $kind . '/csv')) ?>">Preuzmi CSV</a></div>
+<?php $outletPart = $outlet === '' ? '' : '&oznaka=' . rawurlencode($outlet);
+$downloadPart = $outlet === '' ? '' : '?oznaka=' . rawurlencode($outlet); ?>
+<div class="bazna-switch"><a href="<?= bazna_html($core->link('bazna/cjenik?kind=proizvodi' . $outletPart)) ?>">Proizvodi</a>
+<a href="<?= bazna_html($core->link('bazna/cjenik?kind=usluge' . $outletPart)) ?>">Usluge</a>
+<a href="<?= bazna_html($core->link('bazna/v1/cjenici/' . $kind . '/csv' . $downloadPart)) ?>">Preuzmi CSV</a></div>
 <form method="get" class="bazna-panel">
 <input type="hidden" name="kind" value="<?= bazna_html($kind) ?>">
 <label>Pretraži cijeli cjenik <input type="search" name="q" maxlength="100" value="<?= bazna_html($search) ?>"></label>

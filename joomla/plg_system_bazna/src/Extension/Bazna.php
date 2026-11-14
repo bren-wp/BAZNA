@@ -218,7 +218,8 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 echo '<section class="bazna-panel"><h2>' . Core::esc(
                     $kind === 'proizvodi' ? 'Proizvodi' : 'Usluge'
                 ) . '</h2><a href="' .
-                    Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) .
+                    Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv' .
+                        ($outlet === '' ? '' : '?oznaka=' . rawurlencode($outlet)))) .
                     '">Preuzmi CSV</a></section>';
                 echo $core->publicCatalogHtml($kind, $outlet, $query);
             }
