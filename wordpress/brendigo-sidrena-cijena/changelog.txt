@@ -1,3 +1,9 @@
+== BAZNA 1.5.21 ==
+- Usklađen sustav objave postojećeg WordPress.org dodatka brendigo-sidrena-cijena sa GitHub izdanjima i SVN tags.
+- Dodan CI gate za isti slug, ime glavne PHP datoteke, tekstualnu domenu i neizmijenjen, deterministički ZIP.
+- Sva prethodna podešenja, WooCommerce proizvodi, lokalni katalozi, cjenici, arhiva, REST v1 i shortcodeovi ostaju sačuvani.
+- Objava ažuriranja na WordPress.org zahtijeva valjane SVN ovlasti i prolaz automatiziranih provjera; GitHub ZIP sam nije SVN izdanje.
+
 == BAZNA 1.5.20 ==
 - Uklonjeni BAZNA licencni ključevi, aktivacijske provjere, ograničenja uvoza/objave i licencni servis iz WordPressa, Weba, Joomle, Shopifyja i Androida. Windows 0.10.7 više ne traži komercijalni EULA ni aktivaciju.
 - Službeni WordPress ZIP i WordPress.org kandidat koriste jedinstveni otključani izvorni kod. Objedinjeno izdanje ne distribuira stari licencni servis.
