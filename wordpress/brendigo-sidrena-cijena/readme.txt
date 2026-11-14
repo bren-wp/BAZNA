@@ -12,6 +12,9 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 
 == Description ==
 
+**Svi alati bez aktivacije:** BAZNA 1.5.20 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
+
+
 **BAZNA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
 
 = Publish with clarity =
@@ -174,6 +177,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 == Changelog ==
 
 = 1.5.20 =
+* Uklonjena aktivacijska provjera i zaključavanje uvoza, uređivanja i objave. Službeni ZIP i WordPress.org kandidat koriste istu otključanu jezgru.
 * REST v1 on-request search supports optional outlet and criteria query; public results never include unapproved drafts.
 * Same published HTML price-list semantics across PHP/Joomla/Shopify and Android's global catalog search.
 * Preserve existing accounts, prices, history, WC compatibility, and previous REST v1 endpoints.

@@ -5,7 +5,7 @@
 | Android | **1.5.20**, code **23** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
 | WordPress / WooCommerce | **1.5.20** | Zadržani svi postojeći podaci i REST v1 |
 | Web PHP, Joomla, Shopify | **1.1.4** | Zajednički Core, javni HTML i filtrirani REST |
-| Windows | zasebna desktop verzija | Isporučuje se u istom releaseu nakon smoke testova |
+| Windows | **0.10.7** | Isporučuje se u istom releaseu nakon smoke testova |
 
 ## Novo: isti javni prikaz na svim platformama
 
@@ -42,3 +42,7 @@ certifikat.
 [Podudarnost s MJDD 1.26.0](../docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
  · [Play Checklist](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
  · [Sva izdanja](https://github.com/bren-wp/BAZNA/releases)
+
+## Bez licenciranja i bez pozivanja aktivacijskog servera
+
+BAZNA WordPress, Web PHP, Joomla i Shopify sada ne zahtijevaju BAZNA licencni ključ. Android ne učitava ni prikazuje status licence; stare REST v1 objave s poljem `licensing` sigurno ignorira. Windows Setup/Portable 0.10.7 ne traže aktivaciju. Ovlasti administratora, CSRF, Shopify HMAC i Android HTTPS ostaju sigurnosne kontrole. Distribucijska GPL licenca izvornog koda ostaje valjana.
