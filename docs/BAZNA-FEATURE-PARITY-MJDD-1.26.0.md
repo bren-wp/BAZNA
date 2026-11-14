@@ -42,7 +42,7 @@ Nema brojčanog iznosa. Usluga se **ne** umeće u CSV/XML.
 WordPress nakon uspješnog generiranja kataloga pohranjuje poseban
 javno objavljeni snapshot; nikad ne čita uređivački nacrt na REST
 zahtjev. PHP/Joomla/Shopify čitaju samo objavljeni katalog.
-Android ograničava odgovor na 500 stavki i 256 KiB, provjerava tipove,
+Android ograničava odgovor na 500 stavki i 2 MiB, provjerava tipove,
 identifikatore, poslovnice i isti HTTPS izvor. Stari REST v1 ostaje
 kompatibilan bez novog polja.
 

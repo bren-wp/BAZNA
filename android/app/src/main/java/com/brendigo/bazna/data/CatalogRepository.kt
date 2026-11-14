@@ -99,7 +99,7 @@ class CatalogRepository {
         val onRequest = index.onRequestUrl?.let { url ->
             try {
                 OnRequestServices.parse(
-                    JSONObject(read(site, site.approved(url), 256 * 1024)),
+                    JSONObject(read(site, site.approved(url), 2 * 1024 * 1024)),
                     index.outlets,
                 )
             } catch (cancel: CancellationException) {
