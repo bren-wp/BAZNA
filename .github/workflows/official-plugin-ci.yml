@@ -94,7 +94,7 @@ jobs:
           done
       - name: Upload browser viewport evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BAZNA-WordPress-responsive-Chrome
           path: artifacts/browser-responsive/
@@ -127,7 +127,7 @@ jobs:
           fi
           echo "PASS: separately packaged GPL WordPress.org candidate, no license lock"
       - name: Upload WordPress.org review candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BAZNA-WordPress-org-candidate
           path: |

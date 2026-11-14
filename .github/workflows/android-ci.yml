@@ -62,7 +62,7 @@ jobs:
           cp app/build/outputs/bundle/release/app-release.aab ../artifacts/android/BAZNA-Android-unsigned.aab
           cd ../artifacts/android
           sha256sum BAZNA-Android-debug.apk BAZNA-Android-unsigned.aab > BAZNA-Android-SHA256SUMS.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: BAZNA-Android-unsigned-build
           path: artifacts/android/
@@ -110,7 +110,7 @@ jobs:
           script: bash tools/run_android_responsive.sh
       - name: Publish actual screen captures and instrumentation output
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BAZNA-Android-responsive-screenshots
           path: artifacts/android-responsive/
