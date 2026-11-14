@@ -80,3 +80,26 @@ niti pixel-diff 0 % na svim grafičkim referencama.
   za Shopify Android pristup potreban je podržan način autentikacije
   app-proxyja. Testovi ne potvrđuju Google Play odobrenje niti
   potpuni pravni ili 0% pixel-diff certifikat.
+
+## Provjera ponovno priloženog ZIP-a (14. 11. 2026.)
+
+Arhiva `mjdd-sidrena-cijena.1.26.0(2).zip` sadrži **57 datoteka**,
+izvornu GPL-2.0-or-later licencu i atribuciju **Jure Zadravec / MJDD**.
+Referenca sadrži WooCommerce jednostavne proizvode i varijacije,
+samostalni katalog, porezni prikaz, CJM, marku, barkod, dostupnost,
+poslovnice, XML/CSV, shortcodeove `[sidrena-cijena]`,
+`[sidrena-cjenik]`, `[sidrena-arhiva]`, dnevne objave, arhivu i HPOS.
+
+BAZNA zadržava kompatibilne cijene, uvoz/izvoz, shortcodeove i javne
+podatkovne rute za Android, uz zasebnu REST v1 integraciju. Izostaje
+opasno automatsko prepisivanje trenutne u navodno povijesnu cijenu,
+jer povijesni iznos mora biti dokumentiran. Službeni WordPress ZIP i
+WordPress.org kandidat sada dijele potpuno otključanu GPL jezgru;
+izvorni autor i uvjeti redistribucije navedeni su u `ORIGINAL-CREDITS.txt`.
+
+**Nije potvrđena 1:1 jednakost svih zaslona, svih builder integracija ili
+svih WooCommerce operacija na stvarnoj instalaciji WordPressa 7.1.4 i
+WooCommercea 11.3.0.** Verzija `WC tested up to` ostaje na izdanju
+koje projekt stvarno navodi kao testirano. Ovaj izvorni i CI pregled
+nije WordPress.org odobrenje; službeni Plugin Check i ručni pregled
+potrebni su za objavu u službenom direktoriju.

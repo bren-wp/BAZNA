@@ -44,6 +44,8 @@ jobs:
           php tools/test_bazna_brand.php
       - name: Test public Android/WordPress feed discovery compatibility
         run: php tools/test_public_api_contract.php
+      - name: Verify original GPL attribution and license-free review readiness
+        run: python3 tools/test_wporg_readiness.py
       - name: Test optional product imagery and CSV field compatibility
         run: php tools/test_public_feed_columns.php
       - name: Test public mobile service cards and HTML escaping

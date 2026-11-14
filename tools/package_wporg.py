@@ -39,6 +39,7 @@ BAZNA omogućuje upravljanje cijenama proizvoda i usluga, referentnim datumima, 
 * Javni REST API samo za čitanje koji koristi BAZNA Android aplikacija.
 * Bazna cijena razlikuje se od najniže cijene tijekom 30 dana prije sniženja.
 * Besplatna, funkcionalna WordPress.org distribucija: ne zahtijeva licencni ključ ni aktivaciju vanjskog servisa.
+* Izvorni GPL projekt MJDD Sidrena i bazna cijena 1.26.0 (Jure Zadravec / MJDD) naveden je u ORIGINAL-CREDITS.txt i LICENSE.
 
 == Installation ==
 

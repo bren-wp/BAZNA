@@ -124,13 +124,17 @@ The public HTML pricelist and selected XML/CSV live file are generated together,
 
 Yes. The daily publication time is configurable in the Public pricelist tab.
 
-= Does the plugin send catalog data to an external service? =
+= Does BAZNA require a license key, account, subscription or external activation service? =
 
-No. Catalog processing, exports, scheduled publishing and the administrator guide run on your WordPress site. BAZNA does not transmit product records, prices, history, license keys or the site's domain to a BAZNA activation service.
+No. All included local WordPress and WooCommerce features are available to users with the existing WordPress permissions. There are no license keys, trial periods, remote license checks or paid feature locks. WordPress administrators still sign in to protect editing and publication.
 
-= Do I need a BAZNA license key or an account? =
+= Does BAZNA send my prices to an external license service? =
 
-No. All built-in WordPress and WooCommerce functionality is available without an activation key, trial period, hosted BAZNA account or license-server verification. WordPress user permissions and normal security checks still apply.
+No. BAZNA stores catalog data and publishes only the public price lists chosen by the site owner. The former external activation service has been removed from the plugin. Android and Windows read only approved public HTTPS endpoints; they never need administrator credentials or a BAZNA license key.
+
+= Is BAZNA derived from an existing GPL project? =
+
+Yes. Components were adapted from MJDD Sidrena i bazna cijena 1.26.0 by Jure Zadravec / MJDD (GPLv2 or later). See ORIGINAL-CREDITS.txt and LICENSE in the plugin ZIP. BAZNA is separately developed and maintained by Brendigo and does not claim endorsement by MJDD.
 
 == Upgrade Notice ==
 
