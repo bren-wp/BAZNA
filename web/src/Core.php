@@ -369,7 +369,7 @@ final class Core
     {
         return [
             'schema' => 1,
-            'reviewed_on' => '2026-11-10',
+            'reviewed_on' => '2026-11-14',
             'jurisdiction' => 'HR',
             'rules_revision' => 'NN-101-2026-NN-110-2026',
             'consumer_law_revision' => 'NN-59-2026',
@@ -377,7 +377,7 @@ final class Core
             'unit_price_rule_effective_from' => '2026-09-26',
             'price_reduction_lookback_days' => 30,
             'discount_baseline_is_anchor_price' => false,
-            'base_price_regulation_status' => 'draft_consultation',
+            'base_price_regulation_status' => 'consultation_closed_pending_final_text',
             'base_price_rule_effective_from' => '2026-11-17',
             'base_price_is_automatically_derived' => false,
             'historical_price_verification_required' => true,
@@ -385,6 +385,7 @@ final class Core
             'consumer_30_day_low_is_anchor_price' => false,
             'consumer_30_day_low_is_base_price' => false,
             'draft_rulebooks_consultation_until' => '2026-11-13',
+            'final_rulebooks_verified' => false,
             'implementation' => [
                 'published_decisions_ready_from' => '2026-11-17',
                 'reference_price_data_entry' => 'verified_manual',
