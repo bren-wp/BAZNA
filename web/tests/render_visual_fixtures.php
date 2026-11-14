@@ -59,7 +59,7 @@ $core->publish();
 $stylesheet = 'file://' . realpath(dirname(__DIR__) . '/public/assets/bazna.css');
 $remoteCss = $core->link('bazna/assets/bazna.css');
 $adminTabs = [
-    'pregled','proizvodi','usluge','poslovnice','uvoz-izvoz',
+    'pregled','proizvodi','usluge','na-upit','poslovnice','uvoz-izvoz',
     'javni-cjenici','arhiva','postavke','licenca',
 ];
 foreach ($adminTabs as $tab) {
@@ -86,7 +86,7 @@ foreach (['cjenik', 'arhiva'] as $view) {
 // Joomla ADMIN page uses this exact AdminCatalog renderer and CSS file.
 // Only the Joomla CMS outer shell is a controlled stand-in here; Joomla
 // plugin installation/runtime still needs separate real-CMS verification.
-foreach (['proizvodi', 'usluge', 'poslovnice'] as $tab) {
+foreach (['proizvodi', 'usluge', 'na-upit', 'poslovnice'] as $tab) {
     $nav = '';
     foreach ($adminTabs as $item) {
         $nav .= '<a href="#"' . ($tab === $item ? ' aria-current="page"' : '') .

@@ -24,6 +24,12 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			'callback'            => array( $this, 'index' ),
 			'permission_callback' => '__return_true',
 		) );
+		// Public snapshot of services priced on request, NEVER draft rows.
+		register_rest_route( $namespace, '/usluge-na-upit', array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => array( $this, 'on_request_services' ),
+			'permission_callback' => '__return_true',
+		) );
 		register_rest_route( $namespace, '/arhiva', array(
 			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'archive_index' ),
@@ -87,6 +93,8 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			'type_archive' => esc_url_raw( rest_url( 'brendigo-bazna/v1/arhiva' ) ),
 			'combined'     => esc_url_raw( $export->get_public_url() ),
 			'feeds'        => array(),
+			// Optional additive REST v1 endpoint (MJDD-compatible HTML-only services).
+			'on_request'  => esc_url_raw( rest_url( 'brendigo-bazna/v1/usluge-na-upit' ) ),
 			'outlets'      => array(),
 		);
 		foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
@@ -150,6 +158,41 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		// Discovery includes live publication/readiness flags. Never serve a
 		// cached "not published" or "no pending changes" status to Android.
 		$response = rest_ensure_response( $out );
+		$response->header( 'Cache-Control', 'no-store, max-age=0, must-revalidate' );
+		return $response;
+	}
+
+	/**
+	 * Read ONLY the snapshot recorded after a successful public feed rebuild.
+	 * The admin's live option may contain unsent edits and must not leak here.
+	 */
+	public function on_request_services() {
+		$stored = get_option( 'brendigo_bazna_published_inquiry_v1', array() );
+		$items = array();
+		if ( is_array( $stored ) ) {
+			foreach ( array_slice( $stored, 0, 500 ) as $row ) {
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+				$name = isset( $row['name'] ) && is_string( $row['name'] ) ? $row['name'] : '';
+				$criteria = isset( $row['criteria'] ) && is_string( $row['criteria'] ) ? $row['criteria'] : '';
+				$outlet = isset( $row['outlet'] ) && is_string( $row['outlet'] ) ? $row['outlet'] : '';
+				$id = isset( $row['id'] ) && is_string( $row['id'] ) ? $row['id'] : '';
+				if ( '' === trim( $name ) || '' === trim( $criteria ) ||
+					strlen( $name ) > 240 || strlen( $criteria ) > 800 ||
+					! preg_match( '/^[a-zA-Z0-9-]{0,64}$/D', $outlet ) ||
+					! preg_match( '/^[0-9]{1,12}$/D', $id ) ) {
+					continue;
+				}
+				$items[] = array(
+					'id' => $id,
+					'name' => $name,
+					'criteria' => $criteria,
+					'outlet' => $outlet,
+				);
+			}
+		}
+		$response = rest_ensure_response( array( 'schema' => 1, 'items' => $items ) );
 		$response->header( 'Cache-Control', 'no-store, max-age=0, must-revalidate' );
 		return $response;
 	}

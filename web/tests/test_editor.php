@@ -50,11 +50,30 @@ verifyEditor(!str_contains($render, '<script>alert(1)</script>') &&
     str_contains($render, '&lt;script&gt;'),
     'stored text escaped from HTML injection');
 
-foreach (['usluge', 'poslovnice'] as $tab) {
+foreach (['usluge', 'poslovnice', 'na-upit'] as $tab) {
     $html = AdminCatalog::render($tab, $original, '?bazna=dashboard&tab='.$tab,
         '<input name="csrf" value="joomla">', true);
-    verifyEditor(str_contains($html, 'Spremi izmjene'), 'same UI reused on '.$tab);
+    verifyEditor(str_contains($html, $tab === 'na-upit' ? 'Spremi novu stavku' : 'Spremi izmjene'),
+        'same UI reused on '.$tab);
 }
+$inquiryView = AdminCatalog::render(
+    'na-upit', $original, 'https://primjer.hr/bazna/admin?tab=na-upit',
+    '<input name="_csrf" value="test">', true
+);
+verifyEditor(str_contains($inquiryView, 'Kriteriji određivanja cijene') &&
+    !str_contains($inquiryView, 'Povijesna bazna cijena za usluge na upit'),
+    'on-request editor uses a criteria field rather than a fabricated monetary amount');
+
+$inquiryPost = AdminCatalog::fromPost(['row' => [
+    'naziv' => 'Montaža', 'kriteriji' => 'Opseg radova', 'outlet' => 'RI-01',
+]]);
+verifyEditor($inquiryPost['kriteriji'] === 'Opseg radova', 'criteria survive shared admin form');
+$core->modifyRow('on_request', -1, $inquiryPost);
+$withInquiry = $core->read('draft.json');
+verifyEditor(count($withInquiry['on_request']) === 1 &&
+    $withInquiry['on_request'][0]['outlet'] === 'RI-01',
+    'on-request items are drafted but not automatically published');
+verifyEditor($core->onRequestServices()['items'] === [], 'draft inquiries remain private');
 $fields = AdminCatalog::fromPost([
     'row' => [
         'naziv' => '  Novi proizvod  ', 'maloprodajna_cijena' => '20,10',

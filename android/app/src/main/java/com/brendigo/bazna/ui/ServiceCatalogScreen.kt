@@ -88,6 +88,11 @@ fun ServiceCatalogScreen(
     val visible = remember(data.services, query, anchorFilter) {
         visiblePublicServices(data.services, query, anchorFilter)
     }
+    val inquiry = remember(data.onRequestServices, selectedOutlet, query, anchorFilter) {
+        com.brendigo.bazna.data.OnRequestServices.visible(
+            data.onRequestServices, selectedOutlet, query, anchorFilter,
+        )
+    }
     val publication = servicePublicationState(data, selectedOutlet)
 
     Column(modifier = Modifier.fillMaxSize().background(Background).imePadding()) {
@@ -147,12 +152,12 @@ fun ServiceCatalogScreen(
             )
         }
 
-        if (publication == false && data.services.isEmpty()) {
+        if (publication == false && data.services.isEmpty() && inquiry.isEmpty()) {
             ServiceEmptyState(
                 title = "CSV cjenik usluga još nije objavljen.",
                 description = "Objavite cjenik usluga u BAZNA administraciji, a zatim osvježite podatke.",
             )
-        } else if (visible.isEmpty()) {
+        } else if (visible.isEmpty() && inquiry.isEmpty()) {
             ServiceEmptyState(
                 title = if (data.services.isEmpty()) "Nema javno objavljenih usluga."
                     else "Nema usluga za odabranu pretragu.",
@@ -172,6 +177,31 @@ fun ServiceCatalogScreen(
                         site = data.site,
                         onClick = { onDetails(service) },
                     )
+                }
+                if (inquiry.isNotEmpty()) {
+                    item {
+                        Text(
+                            "Cijena na upit",
+                            modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                            color = Color.White,
+                        )
+                    }
+                    items(inquiry) { requested ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = Surface),
+                            border = BorderStroke(1.dp, Border),
+                        ) {
+                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(requested.name, color = Color.White,
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                Text(requested.criteria, color = TextMuted, fontSize = 13.sp)
+                                Text("Cijena se određuje na upit", color = Accent, fontSize = 13.sp)
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 $authenticated = ($_SESSION['admin'] ?? false) === true;
 $tabs = [
     'pregled' => 'Pregled', 'proizvodi' => 'Proizvodi', 'usluge' => 'Usluge',
+    'na-upit' => 'Cijena na upit',
     'poslovnice' => 'Poslovnice', 'uvoz-izvoz' => 'Uvoz/Izvoz',
     'javni-cjenici' => 'Javni cjenici', 'arhiva' => 'Arhiva',
     'postavke' => 'Postavke', 'licenca' => 'Licenca',
@@ -12,7 +13,7 @@ $tab = (string) ($_GET['tab'] ?? 'pregled');
 if (!isset($tabs[$tab])) $tab = 'pregled';
 $draft = $core->read('draft.json');
 $published = $core->read('published.json');
-$pretty = json_encode(array_intersect_key($draft, array_flip(['outlets','products','services'])),
+$pretty = json_encode(array_intersect_key($draft, array_flip(['outlets','products','services','on_request'])),
     JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 $licenseActive = $license?->active() ?? false;
 $csrf = (string) ($_SESSION['csrf'] ?? '');
@@ -55,7 +56,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <p>Početak primjene objavljenih odluka: <strong>17. 11. 2026.</strong></p>
 <p>Povijesni referentni datumi: <strong>2. 5. 2025.</strong> i <strong>10. 9. 2026.</strong>, prema klasifikaciji.</p>
 <p>Bazna cijena nije isto što i najniža cijena u 30 dana prije sniženja. Ne unosite povijesni iznos bez dokaza.</p></section>
-<?php elseif (in_array($tab, ['proizvodi','usluge','poslovnice'], true)): ?>
+<?php elseif (in_array($tab, ['proizvodi','usluge','poslovnice','na-upit'], true)): ?>
 <?= \Brendigo\Bazna\AdminCatalog::render(
     $tab,
     $draft,
@@ -66,7 +67,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 ) ?>
 <?php elseif ($tab === 'uvoz-izvoz'): ?>
 <section class="bazna-panel"><h2>Uvoz i izvoz cjelokupnog kataloga</h2>
-<p>Za napredni uvoz ili izvoz možete provjeriti i uređivati strukturirani JSON cijelog kataloga. Pojedinačne stavke uredite na karticama Proizvodi, Usluge i Poslovnice. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog licencnom servisu.</p>
+<p>Za napredni uvoz ili izvoz možete provjeriti i uređivati strukturirani JSON cijelog kataloga. Pojedinačne stavke uredite na karticama Proizvodi, Usluge, Cijena na upit i Poslovnice. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog licencnom servisu.</p>
 <form method="post" action="<?= bazna_html($core->link('bazna/admin?tab=' . $tab)) ?>">
 <input type="hidden" name="action" value="save"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
 <label>JSON nacrt kataloga

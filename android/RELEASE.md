@@ -1,41 +1,34 @@
-# BAZNA 1.5.18 — izdanja i Google Play
+# BAZNA 1.5.19 — Android, WordPress i adapteri
 
-## Izdanje
-| Platforma | Verzija |
-|---|---|
-| Android | **1.5.18**, `versionCode 21`, `com.brendigo.bazna` |
-| WordPress | **1.5.18**, bez promjena baze i javnog REST API-ja |
-| Windows | **0.10.6** |
-| Web / Joomla / Shopify | **1.1.2** |
+- **Android 1.5.19**: `com.brendigo.bazna`, `versionCode=22`,
+  `targetSdk=36`, `minSdk=26`, `compileSdk=37`.
+- **WordPress 1.5.19**: WooCommerce / standalone katalog, poslovnice,
+  HTML, CSV/XML, arhiva, usluge s cijenom na upit.
+- **Web PHP / Joomla / Shopify 1.1.3**: zajednička javna shema i
+  objavljivanje opisnih usluga bez unaprijed utvrđenog iznosa.
+- **Windows**: postojeća desktop verzija uključena u zajedničko izdanje.
 
-BAZNA 1.5.18 donosi moderniziran Android build, provjere sigurnosti i
-responzivnosti te izdvajanje navigacijske logike u zasebni modul.
-Android je i dalje nativna aplikacija samo za čitanje javnih HTTPS cjenika.
+## Ujednačen javni REST v1
 
-**Važno:** Android paket `com.brendigo.bazna` je NOVI identifikator.
-Google Play NE može ažurirati prethodnu aplikaciju `com.brendigo.sidrena`
-ovim AAB-om. Potreban je zaseban Play Console unos za novu aplikaciju.
-Obje aplikacije mogu koegzistirati, ali se postavke lokalno ne prenose
-automatski. Korisnik može ponovno unijeti postojeću javnu HTTPS domenu.
+Opcionalna `on_request` poveznica u katalogu vodi na javni popis
+usluga koje imaju `id`, `name`, `criteria`, `outlet`. Usluge
+ne nose brojčani iznos niti se pretvaraju u numerički CSV/XML.
+WordPress stvara neautoloadani snapshot nakon uspješne javne objave;
+PHP/Joomla/Shopify čitaju objavljeni, ne uređivački katalog.
+Android provjerava JSON tipove, poslovnice i HTTPS istog izvora.
+Stariji poslužitelji bez nove poveznice i dalje rade.
 
-## Izgradnja, provjere i isporuka
+## Google Play i ograničenja
 
-GitHub Actions kompilira Android aplikaciju, izvodi Kotlin/JUnit i lint,
-izrađuje debug APK i nepotpisani AAB te računa SHA-256. Instrumentacijski
-test provjerava 12 zaslona na 9 emulator konfiguracija. Ova mjerenja
-nisu dokaz 1:1 podudarnosti bez izvornih PNG dizajnerskih referenci.
+Unsigned AAB se mora potpisati ispravnim upload ključem.
+Potrebno je provjeriti Play Console Data safety izjave, stvarne SDK-ove,
+privatnost i dostupnost BAZNA-specifične politike privatnosti.
+CI nije Google Play odobrenje ni potvrda pravne usklađenosti.
+Android ostaje isključivo javni klijent; ne dijeli WooCommerce
+administratorske ovlasti ni korisničke lozinke s WP dodatkom.
+WooCommerce porezni obračun je specifičan za WordPress; ostali
+adapteri razmjenjuju samo objavljene konačne iznose.
 
-Objedinjeni GitHub release objavljuje:
-- `BAZNA-Android-debug.apk` — samo za instalaciju i testiranje
-- `BAZNA-Android-unsigned.aab` — potrebno potpisivanje prije Play Consolea
-- Windows Portable i Setup, WordPress ZIP, dodatne adapterske ZIP pakete
-- SHA-256 i informacije o podrijetlu builda
-
-**Niti debug APK niti nepotpisani AAB nisu Play-ready potpisani proizvodni artefakti.**
-Za Google Play potpišite AAB ispravnim novim upload ključem, objavite
-odgovarajuću politiku privatnosti, popunite Data safety i sve izjave u
-Play Consoleu. Ne unosite keystore ili lozinke u Git.
-
-[Detaljna provjera Google Playa](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
- · [Migracija identifikatora](../docs/BAZNA-ANDROID-PACKAGE-MIGRATION.md)
- · [GitHub izdanja](https://github.com/bren-wp/BAZNA/releases)
+[Usporedba značajki](../docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
+ · [Play provjere](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
+ · [Izdanja](https://github.com/bren-wp/BAZNA/releases)

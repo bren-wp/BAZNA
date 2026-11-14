@@ -664,6 +664,26 @@ class Brendigo_Sidrena_Cijena_Export {
 				}
 			}
 
+			// Snapshot the HTML-only on-request services only when published feed
+			// generation has succeeded. Public REST must never read unapproved drafts.
+			if ( ! is_wp_error( $result ) && class_exists( 'Brendigo_Sidrena_Cijena_Upit' ) ) {
+				$published_inquiry = array();
+				foreach ( Brendigo_Sidrena_Cijena_Upit::instance()->all() as $row ) {
+					if ( count( $published_inquiry ) >= 500 ) {
+						break;
+					}
+					if ( ! is_array( $row ) || empty( $row['naziv'] ) || empty( $row['kriteriji'] ) ) {
+						continue;
+					}
+					$published_inquiry[] = array(
+						'id' => (string) $row['id'],
+						'name' => (string) $row['naziv'],
+						'criteria' => (string) $row['kriteriji'],
+						'outlet' => isset( $row['poslovnica'] ) ? (string) $row['poslovnica'] : '',
+					);
+				}
+				update_option( 'brendigo_bazna_published_inquiry_v1', $published_inquiry, false );
+			}
 			if ( ! is_wp_error( $result ) && class_exists( 'Brendigo_Sidrena_Cijena_Automation' ) ) {
 				Brendigo_Sidrena_Cijena_Automation::instance()->clear_pending();
 			}

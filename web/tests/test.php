@@ -49,6 +49,20 @@ $catalog = [
         'maloprodajna_cijena' => '45,00',
     ]],
 ];
+$catalog['on_request'] = [
+    ['id' => 'Q-1', 'naziv' => 'Izrada po mjeri',
+     'kriteriji' => 'Ovisno o materijalu i dimenzijama', 'outlet' => ''],
+    ['id' => 'Q-2', 'naziv' => 'Dostava prema dogovoru',
+     'kriteriji' => 'Lokacija i količina', 'outlet' => 'RI-01'],
+];
+$badInquiry = $catalog;
+$badInquiry['on_request'][0]['outlet'] = 'OTHER';
+try {
+    Core::validateCatalog($badInquiry);
+    throw new RuntimeException('Unknown outlet was accepted in inquiry.');
+} catch (InvalidArgumentException $ignored) {}
+$badInquiry['on_request'][0]['kriteriji'] = '<script>alert(1)</script>';
+$badInquiry['on_request'][0]['outlet'] = 'OTHER';
 $bad = $catalog;
 $bad['products'][0]['historical_verified'] = false;
 try {
@@ -63,6 +77,9 @@ try {
 } catch (InvalidArgumentException $ignored) {}
 $core->saveDraft($catalog);
 $before = $core->discovery('web');
+check($core->onRequestServices()['items'] === [], 'draft inquiries never visible to public');
+check(str_contains($before['on_request'], '/bazna/v1/usluge-na-upit'),
+    'same-origin published inquiries discovery link');
 $licenseActive = $core->discovery('web', null, true);
 $licenseInactive = $core->discovery('joomla', null, false);
 check($licenseActive['licensing'] === ['required' => true, 'active' => true] &&
@@ -72,6 +89,16 @@ check($licenseActive['licensing'] === ['required' => true, 'active' => true] &&
 check($before['api_version'] === 1 && $before['feeds']['proizvodi']['available_csv'] === false,
     'unpublished catalog not claimed as public');
 $published = $core->publish();
+$requests = $core->onRequestServices();
+check($requests['schema'] === 1 && count($requests['items']) === 2,
+    'published request services available to all platform adapters');
+check($requests['items'][0]['name'] === 'Izrada po mjeri' &&
+    $requests['items'][1]['outlet'] === 'RI-01',
+    'name, criteria and outlet remain available without a fabricated price');
+check(!str_contains($core->csv('usluge'), 'Ovisno o materijalu'),
+    'inquiry-only services are excluded from numeric CSV');
+check(!str_contains($core->xml('usluge'), 'Izrada po mjeri'),
+    'inquiry-only services are excluded from numeric XML');
 check(isset($published['published_at']), 'publication timestamp');
 $index = $core->discovery('joomla');
 // This is a source-level contract check; no WP bootstrap, database or live

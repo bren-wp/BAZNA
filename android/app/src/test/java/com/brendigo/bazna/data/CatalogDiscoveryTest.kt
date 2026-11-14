@@ -33,6 +33,18 @@ class CatalogDiscoveryTest {
         assertEquals("https://primjer.hr/usluge.csv?oznaka=RI-01", index.outlets.single().serviceCsv)
     }
 
+    @Test fun publishedInquiryEndpointUsesOnlySameOriginHttps() {
+        val url = "https://primjer.hr/wp-json/brendigo-bazna/v1/usluge-na-upit"
+        assertEquals(url, CatalogDiscovery.parse(payload().put("on_request", url), site).onRequestUrl)
+        assertEquals(null, CatalogDiscovery.parse(payload(), site).onRequestUrl)
+        for (bad in listOf("http://primjer.hr/upit", "https://evil.example/upit",
+            "https://primjer.hr.evil.test/upit")) {
+            assertThrows(IllegalArgumentException::class.java) {
+                CatalogDiscovery.parse(payload().put("on_request", bad), site)
+            }
+        }
+    }
+
     @Test fun optionalPublishedOutletAddressesAreBackwardCompatible() {
         val json = payload()
         val outlet = json.getJSONArray("outlets").getJSONObject(0)

@@ -25,6 +25,7 @@ data class CatalogIndex(
     val allOutletsCsvReady: Boolean? = null,
     val wordpressLicenseActive: Boolean? = null,
     val platform: String = "wordpress",
+    val onRequestUrl: String? = null,
 )
 
 data class PriceItem(
@@ -44,6 +45,14 @@ data class PriceItem(
     val brand: String = "",
 )
 
+/** Published services with a negotiable price, never an invented numeric CSV row. */
+data class OnRequestService(
+    val id: String,
+    val name: String,
+    val criteria: String,
+    val outlet: String,
+)
+
 data class ArchiveEntry(
     val date: String,
     val kind: String,
@@ -59,4 +68,5 @@ data class CatalogSnapshot(
     val services: List<PriceItem>,
     val archive: List<ArchiveEntry>,
     val warnings: List<String>,
+    val onRequestServices: List<OnRequestService> = emptyList(),
 )
