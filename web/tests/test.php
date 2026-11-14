@@ -3,9 +3,7 @@
 declare(strict_types=1);
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once dirname(__DIR__) . '/src/Core.php';
-require_once dirname(__DIR__) . '/src/LicenseClient.php';
 use Brendigo\Bazna\Core;
-use Brendigo\Bazna\LicenseClient;
 
 function check(bool $ok, string $message): void {
     if (!$ok) throw new RuntimeException('BAZNA web test failed: ' . $message);
@@ -77,15 +75,15 @@ try {
 } catch (InvalidArgumentException $ignored) {}
 $core->saveDraft($catalog);
 $before = $core->discovery('web');
+check(str_contains($core->publicCatalogHtml('proizvodi'), 'još nije objavljen'),
+    'unpublished data cannot be rendered on public HTML');
 check($core->onRequestServices()['items'] === [], 'draft inquiries never visible to public');
 check(str_contains($before['on_request'], '/bazna/v1/usluge-na-upit'),
     'same-origin published inquiries discovery link');
-$licenseActive = $core->discovery('web', null, true);
-$licenseInactive = $core->discovery('joomla', null, false);
-check($licenseActive['licensing'] === ['required' => true, 'active' => true] &&
-    $licenseInactive['licensing'] === ['required' => true, 'active' => false] &&
-    !isset($before['licensing']),
-    'same read-only Android license status as WordPress, backwards-compatible omission');
+check(!array_key_exists('licensing', $before), 'public index has no activation field');
+check($core->discovery('joomla')['api_version'] === 1 &&
+    $core->discovery('shopify')['api_version'] === 1,
+    'All adapters provide public REST without license activation');
 check($before['api_version'] === 1 && $before['feeds']['proizvodi']['available_csv'] === false,
     'unpublished catalog not claimed as public');
 $published = $core->publish();
@@ -95,11 +93,46 @@ check($requests['schema'] === 1 && count($requests['items']) === 2,
 check($requests['items'][0]['name'] === 'Izrada po mjeri' &&
     $requests['items'][1]['outlet'] === 'RI-01',
     'name, criteria and outlet remain available without a fabricated price');
+check(count($core->onRequestServices('', 'MATERIJALU dimenzijama')['items']) === 1,
+    'inquiry REST supports multi-term criteria filtering');
+check(count($core->onRequestServices('RI-01', 'dostava')['items']) === 1 &&
+    $core->onRequestServices('RI-01', 'dostava')['items'][0]['name'] === 'Dostava prema dogovoru',
+    'inquiry REST filters by business code');
+check($core->onRequestServices('RI-01', 'materijalu')['items'] === [],
+    'inquiry REST prevents cross-branch mixing');
+try {
+    $core->onRequestServices('', str_repeat('X', 200));
+    throw new RuntimeException('Excessively long inquiry REST search was accepted.');
+} catch (InvalidArgumentException $ignored) {}
+
 check(!str_contains($core->csv('usluge'), 'Ovisno o materijalu'),
     'inquiry-only services are excluded from numeric CSV');
 check(!str_contains($core->xml('usluge'), 'Izrada po mjeri'),
     'inquiry-only services are excluded from numeric XML');
 check(isset($published['published_at']), 'publication timestamp');
+$htmlGoods = $core->publicCatalogHtml('proizvodi', '', 'maslinovo MU-1');
+check(str_contains($htmlGoods, 'Maslinovo ulje') &&
+    !str_contains($htmlGoods, 'Riječka sol'), 'only published webshop goods in multi-term search');
+$htmlBranch = $core->publicCatalogHtml('proizvodi', 'RI-01', 'sol');
+check(str_contains($htmlBranch, 'Riječka sol') &&
+    !str_contains($htmlBranch, 'Maslinovo ulje'),
+    'branch pricing never mixed with webshop');
+$htmlServices = $core->publicCatalogHtml('usluge', '', 'materijalu');
+check(str_contains($htmlServices, 'Izrada po mjeri') &&
+    str_contains($htmlServices, 'Na upit') &&
+    !str_contains($htmlServices, 'Dostava prema dogovoru'),
+    'inquiry criteria searchable separately without fake numeric prices');
+check(!str_contains($htmlServices, 'Servis uređaja'),
+    'numeric services obey the same published query');
+try {
+    $core->publicCatalogHtml('usluge', '../../etc', '');
+    throw new RuntimeException('Unsafe public outlet accepted.');
+} catch (InvalidArgumentException $ignored) {}
+try {
+    $core->publicCatalogHtml('usluge', '', str_repeat('Q', 300));
+    throw new RuntimeException('Oversized search accepted.');
+} catch (InvalidArgumentException $ignored) {}
+
 $index = $core->discovery('joomla');
 // This is a source-level contract check; no WP bootstrap, database or live
 // website is needed. It must fail whenever one platform drifts legally.
@@ -179,13 +212,6 @@ try {
 $core->publish();
 check(str_contains($core->archiveCsv($matches[1], 'proizvodi'), '5,99'),
     'archive link remains stable after another publication');
-$license = new LicenseClient($core, str_repeat('ab', 32));
-check(!$license->active() && $license->proof() === null, 'unactivated license cannot unlock local edits');
-try {
-    new LicenseClient($core, 'unsafe-key');
-    throw new RuntimeException('Invalid encryption secret accepted.');
-} catch (RuntimeException $ignored) {}
-
 $remove = static function ($dir) use (&$remove): void {
     foreach (scandir($dir) ?: [] as $part) {
         if ($part === '.' || $part === '..') continue;
@@ -195,4 +221,4 @@ $remove = static function ($dir) use (&$remove): void {
     rmdir($dir);
 };
 $remove($root);
-echo "PASS: BAZNA cross-platform catalog, historical validation, immutable archive, public v1, HTTPS and license guard\n";
+echo "PASS: BAZNA cross-platform catalog, historical validation, immutable archive, public v1, HTTPS and unrestricted authenticated editing\n";

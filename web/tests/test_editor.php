@@ -39,7 +39,7 @@ $original = $core->read('draft.json');
 verifyEditor(count($original['products']) === 1, 'existing product retained');
 $render = AdminCatalog::render(
     'proizvodi', $original, 'https://primjer.hr/bazna/admin?tab=proizvodi',
-    '<input name="_csrf" type="hidden" value="test-token">', true
+    '<input name="_csrf" type="hidden" value="test-token">'
 );
 verifyEditor(str_contains($render, 'Bazna cijena') &&
     str_contains($render, 'maloprodajna_cijena') &&
@@ -52,13 +52,13 @@ verifyEditor(!str_contains($render, '<script>alert(1)</script>') &&
 
 foreach (['usluge', 'poslovnice', 'na-upit'] as $tab) {
     $html = AdminCatalog::render($tab, $original, '?bazna=dashboard&tab='.$tab,
-        '<input name="csrf" value="joomla">', true);
+        '<input name="csrf" value="joomla">');
     verifyEditor(str_contains($html, $tab === 'na-upit' ? 'Spremi novu stavku' : 'Spremi izmjene'),
         'same UI reused on '.$tab);
 }
 $inquiryView = AdminCatalog::render(
     'na-upit', $original, 'https://primjer.hr/bazna/admin?tab=na-upit',
-    '<input name="_csrf" value="test">', true
+    '<input name="_csrf" value="test">'
 );
 verifyEditor(str_contains($inquiryView, 'Kriteriji određivanja cijene') &&
     !str_contains($inquiryView, 'Povijesna bazna cijena za usluge na upit'),
@@ -133,6 +133,26 @@ $core->publish();
 $history = $core->archives();
 verifyEditor(count($history) >= 4, 'published audit history retained with outlets');
 
+// A second publication with adversarial HTML proves all three adapters
+// escape rows at render-time; this is not an external or draft data read.
+$mutated = $core->read('draft.json');
+$mutated['on_request'] = [[
+    'id' => 'q-xss', 'naziv' => '<img src=x onerror=alert(1)>',
+    'kriteriji' => '<script>alert(2)</script>', 'outlet' => '',
+]];
+$core->saveDraft($mutated);
+verifyEditor(!str_contains($core->publicCatalogHtml('usluge'), '&lt;img') &&
+    !str_contains($core->publicCatalogHtml('usluge'), '<img'),
+    'draft query rows are not visible before publication');
+$core->publish();
+$escapedHtml = $core->publicCatalogHtml('usluge');
+verifyEditor(str_contains($escapedHtml, '&lt;img') &&
+    str_contains($escapedHtml, '&lt;script&gt;') &&
+    !str_contains($escapedHtml, '<img') &&
+    !str_contains($escapedHtml, '<script>'),
+    'published criteria are escaped for Joomla, Shopify and PHP');
+verifyEditor(!str_contains($core->csv('usluge'), '<img'),
+    'non-numeric inquiry services never leak into price CSV');
 function removeEditorTest(string $folder): void {
     foreach (scandir($folder) ?: [] as $entry) {
         if ($entry === '.' || $entry === '..') continue;

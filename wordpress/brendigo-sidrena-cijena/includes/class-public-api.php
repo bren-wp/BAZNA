@@ -73,11 +73,6 @@ final class Brendigo_Sidrena_Cijena_Public_API {
                 'name' => 'BAZNA',
                 'description' => 'Bazne cijene',
             ),
-            // No license key, admin identity or secret ever leaves the server.
-            'licensing' => array(
-                'required' => true,
-                'active' => Brendigo_Sidrena_Cijena_License::valid(),
-            ),
 			// Public-only Android integration. No credentials, session data, or
 			// unpublished WooCommerce metadata are available through this route.
 			'connection' => array(
@@ -166,7 +161,25 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 	 * Read ONLY the snapshot recorded after a successful public feed rebuild.
 	 * The admin's live option may contain unsent edits and must not leak here.
 	 */
-	public function on_request_services() {
+	public function on_request_services( $request = null ) {
+        $requested_outlet = '';
+        $requested_query = '';
+        if ( is_object( $request ) && method_exists( $request, 'get_param' ) ) {
+            $requested_outlet = $request->get_param( 'outlet' );
+            $requested_query = $request->get_param( 'q' );
+        }
+        $requested_outlet = null === $requested_outlet ? '' : $requested_outlet;
+        $requested_query  = null === $requested_query ? '' : $requested_query;
+        if ( ! is_string( $requested_outlet ) || ! is_string( $requested_query ) ||
+            ! preg_match( '/^[a-zA-Z0-9-]{0,64}$/D', $requested_outlet ) ||
+            strlen( $requested_query ) > 100 ||
+            preg_match( '/[\\x00-\\x1F]/', $requested_query ) ) {
+            return rest_ensure_response( array( 'schema' => 1, 'items' => array() ) );
+        }
+        $terms = preg_split( '/\\s+/u', trim( $requested_query ), -1, PREG_SPLIT_NO_EMPTY );
+        if ( false === $terms ) {
+            $terms = array();
+        }
 		$stored = get_option( 'brendigo_bazna_published_inquiry_v1', array() );
 		$items = array();
 		if ( is_array( $stored ) ) {
@@ -184,6 +197,22 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 					! preg_match( '/^[0-9]{1,12}$/D', $id ) ) {
 					continue;
 				}
+				if ( '' !== $requested_outlet && $outlet !== $requested_outlet ) {
+                    continue;
+                }
+                $haystack = $name . ' ' . $criteria;
+                $matches = true;
+                foreach ( $terms as $term ) {
+                    if ( function_exists( 'mb_stripos' ) ?
+                        false === mb_stripos( $haystack, $term, 0, 'UTF-8' ) :
+                        false === stripos( $haystack, $term ) ) {
+                        $matches = false;
+                        break;
+                    }
+                }
+                if ( ! $matches ) {
+                    continue;
+                }
 				$items[] = array(
 					'id' => $id,
 					'name' => $name,

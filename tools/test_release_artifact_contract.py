@@ -120,8 +120,8 @@ require("head_sha=$CI_SHA" in release_ci,
         "Release must validate source-commit provenance")
 require('sha256sum -c' in release_ci,
         "Release must validate ZIP checksums")
-require('[[' in release_ci and '"$count" -eq 17' in release_ci,
-        "Release must verify exactly 17 expected assets")
+require('[[' in release_ci and '"$count" -eq 15' in release_ci,
+        "Release must verify exactly 15 expected assets")
 require("--prerelease" in release_ci,
         "Third-party adapter candidates must not be advertised as completed store apps")
 require("SIDRENA-Android-unsigned-build" not in release_ci,
@@ -133,5 +133,5 @@ if errors:
         print("FAIL:", error)
     sys.exit(1)
 
-print("PASS: BAZNA release 17-asset handoff, actual Android/Windows/adapter producers,"
+print("PASS: BAZNA release 15-asset handoff, actual Android/Windows/adapter producers,"
       " legal versions, WordPress metadata, SHA-256 and same-commit CI gates")

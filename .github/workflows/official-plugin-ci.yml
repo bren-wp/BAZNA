@@ -3,11 +3,8 @@ on:
   pull_request:
     paths:
       - 'wordpress/brendigo-sidrena-cijena/**'
-      - 'licenca/**'
-      - 'tools/test_bazna_license_domain.php'
       - 'tools/package_plugin.py'
       - 'tools/package_wporg.py'
-      - 'tools/package_license.py'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
@@ -18,7 +15,7 @@ on:
       - 'tools/fixtures/**'
       - '.github/workflows/official-plugin-ci.yml'
   # Unified releases need a WordPress verdict for the SAME commit, even when
-  # only README, Android, licensing or release workflows changed.
+  # only README, Android or release workflows changed.
   push:
     branches: [main]
 permissions:
@@ -33,7 +30,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.19' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.20' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -47,24 +44,8 @@ jobs:
           php tools/test_bazna_brand.php
       - name: Test public Android/WordPress feed discovery compatibility
         run: php tools/test_public_api_contract.php
-      - name: Verify BAZNA licence domain binding and server JSON engine
-        shell: bash
-        run: |
-          set -euo pipefail
-          php tools/test_bazna_license_domain.php
-          php licenca/tests/test.php
-          preflight=$(php licenca/bin/preflight.php "$PWD" 2>&1) && {
-            echo "Unconfigured licensing preflight unexpectedly succeeded"; exit 1;
-          }
-          [[ "$preflight" == *"Nedostaje private/config.php"* ]] || {
-            echo "Preflight missing a clear configuration failure"; exit 1;
-          }
-          output=$(php -r '$_SERVER["HTTPS"]="on";$_SERVER["REQUEST_METHOD"]="GET";require "licenca/api.php";')
-          [[ "$output" == *'"code":"server_not_provisioned"'* ]] || {
-            echo "API without a private master key MUST reject ready status"; exit 1;
-          }
-          find licenca -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-license-lint.log
-          tail -n 4 /tmp/bazna-license-lint.log
+      - name: Verify original GPL attribution and license-free review readiness
+        run: python3 tools/test_wporg_readiness.py
       - name: Test optional product imagery and CSV field compatibility
         run: php tools/test_public_feed_columns.php
       - name: Test public mobile service cards and HTML escaping
@@ -104,23 +85,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.19 --output artifacts/brendigo-sidrena-cijena-1.5.19.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.19.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.19 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.19.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.19.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.19.zip
-      - name: Verify separate fully unlocked WordPress.org candidate package
+          python3 tools/package_plugin.py --version 1.5.20 --output artifacts/brendigo-sidrena-cijena-1.5.20.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.20.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.20 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.20.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.20.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.20.zip
+      - name: Verify WordPress.org candidate built from the same unlocked plugin
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_wporg.py --version 1.5.19 --output artifacts/BAZNA-WordPress-org-1.5.19.zip
-          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.19.zip.sha256)
-          python3 tools/package_wporg.py --version 1.5.19 --output /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.19.zip
-          cmp artifacts/BAZNA-WordPress-org-1.5.19.zip /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.19.zip
+          python3 tools/package_wporg.py --version 1.5.20 --output artifacts/BAZNA-WordPress-org-1.5.20.zip
+          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.20.zip.sha256)
+          python3 tools/package_wporg.py --version 1.5.20 --output /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.20.zip
+          cmp artifacts/BAZNA-WordPress-org-1.5.20.zip /tmp/bazna-wporg/BAZNA-WordPress-org-1.5.20.zip
           mkdir -p /tmp/bazna-wporg/extracted
-          unzip -q artifacts/BAZNA-WordPress-org-1.5.19.zip -d /tmp/bazna-wporg/extracted
+          unzip -q artifacts/BAZNA-WordPress-org-1.5.20.zip -d /tmp/bazna-wporg/extracted
           find /tmp/bazna-wporg/extracted/bazna-cjenici -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-wporg-lint.log
           grep -q 'Text Domain: bazna-cjenici' /tmp/bazna-wporg/extracted/bazna-cjenici/bazna-cjenici.php
-          grep -q 'return true;' /tmp/bazna-wporg/extracted/bazna-cjenici/includes/class-license.php
+          test ! -e /tmp/bazna-wporg/extracted/bazna-cjenici/includes/class-license.php
           if grep -R 'licenca.brendigo.com' /tmp/bazna-wporg/extracted/bazna-cjenici --include='*.php'; then
             echo "ERROR: WordPress.org distribution unexpectedly contains a license API call"
             exit 1
@@ -131,26 +112,7 @@ jobs:
         with:
           name: BAZNA-WordPress-org-candidate
           path: |
-            artifacts/BAZNA-WordPress-org-1.5.19.zip
-            artifacts/BAZNA-WordPress-org-1.5.19.zip.sha256
+            artifacts/BAZNA-WordPress-org-1.5.20.zip
+            artifacts/BAZNA-WordPress-org-1.5.20.zip.sha256
           retention-days: 7
           if-no-files-found: error
-      - name: Package standalone BAZNA JSON license server reproducibly without secrets
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 tools/package_license.py --version 1.5.19 --output artifacts/BAZNA-Licenca-Server-1.5.19.zip
-          python3 tools/package_license.py --version 1.5.19 --output /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.19.zip
-          cmp artifacts/BAZNA-Licenca-Server-1.5.19.zip /tmp/sidrena-check/BAZNA-Licenca-Server-1.5.19.zip
-          (cd artifacts && sha256sum -c BAZNA-Licenca-Server-1.5.19.zip.sha256)
-          python3 - <<'PY'
-          import zipfile
-          path = 'artifacts/BAZNA-Licenca-Server-1.5.19.zip'
-          with zipfile.ZipFile(path) as archive:
-              files = archive.namelist()
-              assert 'licenca/api.php' in files and 'licenca/lib.php' in files
-              assert 'licenca/private/config.php' not in files
-              assert not any(x.endswith(('.json', '.lock')) for x in files)
-              assert all(x.startswith('licenca/') for x in files)
-          print('PASS: portable BAZNA server ZIP and no embedded credentials')
-          PY

@@ -128,22 +128,6 @@ object CatalogDiscovery {
         val archiveApi = json.optString("type_archive")
         if (archiveApi.isNotBlank()) site.approved(archiveApi)
 
-        // Public license status is informational: a dormant administrator
-        // license must NEVER block consumers from reading published prices.
-        val licenseActive = when (val licensing = json.opt("licensing")) {
-            null, JSONObject.NULL -> null
-            is JSONObject -> {
-                require(licensing.opt("required") == true) {
-                    "Nevaljana BAZNA licencna konfiguracija."
-                }
-                when (val active = licensing.opt("active")) {
-                    is Boolean -> active
-                    else -> throw IllegalArgumentException("Nevaljan status WordPress licence.")
-                }
-            }
-            else -> throw IllegalArgumentException("Nevaljan opis WordPress licence.")
-        }
-
         val publication = json.optJSONObject("publication")
         val pending = when (val flag = publication?.opt("pending_changes")) {
             null, JSONObject.NULL -> null
@@ -173,7 +157,6 @@ object CatalogDiscovery {
             servicesCsvReady = ready(sources, "usluge"),
             pendingPublication = pending,
             allOutletsCsvReady = allOutletsReady,
-            wordpressLicenseActive = licenseActive,
             platform = platform,
             onRequestUrl = onRequestUrl,
         )

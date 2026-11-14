@@ -1,6 +1,6 @@
 ; SIDRENA Windows Setup — packages a real, CI-tested .NET self-contained app.
 ; Never touch %LOCALAPPDATA%\Brendigo\SIDRENA\sidrena.db or its backups.
-#define DesktopVersion "0.10.6"
+#define DesktopVersion "0.10.7"
 [Setup]
 AppId={{9A25D162-6FB4-4B48-BD20-5EE4D4766BA3}
 AppName=BAZNA
@@ -8,8 +8,8 @@ AppVersion={#DesktopVersion}
 AppVerName=BAZNA Desktop {#DesktopVersion}
 AppPublisher=Brendigo LTD
 AppPublisherURL=https://brendigo.com/
-AppSupportURL=https://github.com/bren-wp/SIDRENA/issues
-AppUpdatesURL=https://github.com/bren-wp/SIDRENA/releases
+AppSupportURL=https://github.com/bren-wp/BAZNA/issues
+AppUpdatesURL=https://github.com/bren-wp/BAZNA/releases
 DefaultDirName={localappdata}\Programs\Brendigo\SIDRENA
 DefaultGroupName=BAZNA
 PrivilegesRequired=lowest
@@ -24,7 +24,6 @@ WizardStyle=modern
 WizardImageFile=..\branding\generated\WizardLarge.bmp
 WizardSmallImageFile=..\branding\generated\WizardSmall.bmp
 SetupIconFile=..\branding\generated\SIDRENA.ico
-LicenseFile=..\legal\EULA-HR.txt
 ShowLanguageDialog=no
 DisableWelcomePage=no
 DisableReadyPage=no
@@ -36,7 +35,7 @@ AppMutex=Local\Brendigo.SIDRENA.Desktop
 CloseApplications=yes
 RestartApplications=no
 SetupLogging=yes
-VersionInfoVersion=0.10.6.1
+VersionInfoVersion=0.10.7.1
 VersionInfoDescription=BAZNA Desktop Installer
 VersionInfoCompany=Brendigo LTD
 VersionInfoProductName=BAZNA Desktop
@@ -47,7 +46,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "Stvori prečac na radnoj površini"; GroupDescription: "Dodatni prečaci:"; Flags: unchecked
 [Files]
 Source: "..\..\artifacts\sidrena-desktop-win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.pdb"
-Source: "..\legal\EULA-HR.txt"; DestDir: "{app}"; DestName: "SIDRENA-Licenca.txt"; Flags: ignoreversion
 [Icons]
 Name: "{autoprograms}\SIDRENA"; Filename: "{app}\SIDRENA.exe"; WorkingDir: "{app}"
 Name: "{autodesktop}\SIDRENA"; Filename: "{app}\SIDRENA.exe"; Tasks: desktopicon

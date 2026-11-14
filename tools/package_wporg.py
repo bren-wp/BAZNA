@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-"""Build a separate, fully functional BAZNA package for WordPress.org review.
-
-The privately licensed original is deliberately NOT the directory package:
-WordPress.org prohibits local-feature paywalls and a license-only service.
-This builder keeps the original plugin unchanged and removes the license
-client, gating and external license calls from a standalone GPL package.
-
-Requires an explicit manual Plugin Check and WordPress.org review before
-distribution; building a ZIP is not an approval.
+"""Build a deterministic, GPL WordPress.org review candidate from the
+SAME fully functional, license-free BAZNA source as the official WordPress ZIP.
+Only the WordPress.org plugin slug, manifest text domain and readme differ.
+Candidate is not an official WordPress.org approval.
 """
 from __future__ import annotations
 import argparse
@@ -21,27 +16,6 @@ SLUG = "bazna-cjenici"
 MAIN_FILE = "bazna-cjenici.php"
 FIXED_DATE = (2026, 1, 1, 0, 0, 0)
 TEXT_SUFFIXES = {".php", ".js", ".css", ".json", ".txt", ".html", ".md"}
-FREE_LICENSE = """<?php
-/** GPL WordPress.org distribution: all bundled local features are available. */
-defined( 'ABSPATH' ) || exit;
-/**
- * Compatibility facade for pre-existing internal integrations. No keys,
- * license checks, network calls, trials, quotas or premium feature locks.
- */
-final class Brendigo_Sidrena_Cijena_License {
-    private static $instance = null;
-    public static function instance() {
-        if ( null === self::$instance ) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-    public static function valid() { return true; }
-    public static function site_host() {
-        return strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) );
-    }
-}
-"""
 README = """=== BAZNA – Bazne cijene i cjenici ===
 Contributors: brendigo
 Tags: bazne-cijene, cijene, cjenik, csv, woocommerce
@@ -65,6 +39,7 @@ BAZNA omogućuje upravljanje cijenama proizvoda i usluga, referentnim datumima, 
 * Javni REST API samo za čitanje koji koristi BAZNA Android aplikacija.
 * Bazna cijena razlikuje se od najniže cijene tijekom 30 dana prije sniženja.
 * Besplatna, funkcionalna WordPress.org distribucija: ne zahtijeva licencni ključ ni aktivaciju vanjskog servisa.
+* Izvorni GPL projekt MJDD Sidrena i bazna cijena 1.26.0 (Jure Zadravec / MJDD) naveden je u ORIGINAL-CREDITS.txt i LICENSE.
 
 == Installation ==
 
@@ -73,7 +48,7 @@ BAZNA omogućuje upravljanje cijenama proizvoda i usluga, referentnim datumima, 
 3. Provjerite dokumentirane povijesne cijene i datume prije objave.
 4. Objavite javni cjenik i provjerite javne datoteke te arhivu.
 
-Nije potreban WooCommerce za ručni katalog. WordPress.org paket ne sadrži pozive za provjeru licencnih ključeva. Ne instalirajte paralelno s privatnom distribucijom istog dodatka; obje koriste iste kompatibilne podatke, klase i REST rute.
+Nije potreban WooCommerce za ručni katalog. WordPress.org paket ne sadrži pozive za provjeru licencnih ključeva. Ne aktivirajte oba BAZNA paketa istodobno: službeni ZIP i WordPress.org kandidat dijele kompatibilne klase, podatke i REST rute. WordPress.org distribucija zahtijeva zaseban službeni pregled.
 
 == Frequently Asked Questions ==
 
@@ -98,39 +73,6 @@ Da. Uređivanje i prikaz povezanih cijena obavlja se u lokalnom WordPressu.
 * Public read-only integration with BAZNA Android and responsive administrator tabs.
 """
 
-def update_admin(text: str) -> str:
-    start = text.find("    private function render_tab_licenca() {")
-    end = text.find("    private function get_tabs() {", start)
-    if start < 0 or end < 0:
-        raise ValueError("License UI structure changed: inspect build before release")
-    text = text[:start] + text[end:]
-    text, count = re.subn(
-        r"\n\s*\$tabs\['licenca'\] = array\(.*?\n\s*\);",
-        "", text, count=1, flags=re.S,
-    )
-    if count != 1:
-        raise ValueError("License navigation removal failed")
-    text, count = re.subn(
-        r"\n\s*if \( ! Brendigo_Sidrena_Cijena_License::valid\(\) \) \{"
-        r"\s*return \$tabs;\s*\}",
-        "", text, count=1,
-    )
-    if count != 1:
-        raise ValueError("License tab gating removal failed")
-    return text
-
-def update_api(text: str) -> str:
-    # The optional licensing object is absent: both newer and older Android
-    # clients already support a WordPress installation without that field.
-    text, count = re.subn(
-        r"\n\s*// No license key, admin identity or secret ever leaves the server\."
-        r".*?\n\s*'licensing' => array\(.*?\n\s*\),",
-        "", text, count=1, flags=re.S,
-    )
-    if count != 1:
-        raise ValueError("Public licensing field removal failed")
-    return text
-
 def package(root: Path, output: Path, version: str) -> str:
     if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         raise ValueError("Invalid WordPress version")
@@ -148,31 +90,19 @@ def package(root: Path, output: Path, version: str) -> str:
         if path.suffix in TEXT_SUFFIXES:
             text = data.decode("utf-8")
             text = text.replace(OLD_SLUG, SLUG)
-            if relative == "includes/class-license.php":
-                text = FREE_LICENSE
-            elif relative == "includes/class-admin.php":
-                text = update_admin(text)
-            elif relative == "includes/class-public-api.php":
-                text = update_api(text)
-            elif relative == "readme.txt":
+            if relative == "readme.txt":
                 text = README.format(version=version)
-            elif relative == "includes/class-plugin.php":
-                # Eliminate even the dead license-gating branches in the
-                # WordPress.org package without altering the private version.
-                text = text.replace(
-                    "Brendigo_Sidrena_Cijena_License::valid()", "true",
-                )
             data = text.encode("utf-8")
         items.append((relative, data))
     if len(items) < 120:
         raise ValueError("Unexpectedly incomplete plugin package")
     paths = {name for name, _ in items}
-    assert MAIN_FILE in paths and "includes/class-license.php" in paths
+    assert MAIN_FILE in paths and "includes/class-license.php" not in paths
     assert OLD_SLUG + ".php" not in paths
     contents = dict(items)
-    assert "license-proof" not in contents["includes/class-license.php"].decode()
-    assert "licenca.brendigo.com" not in contents["includes/class-license.php"].decode()
-    assert "class=\"bazna-license-form\"" not in contents["includes/class-admin.php"].decode()
+    assert all("licenca.brendigo.com" not in body.decode("utf-8")
+               for name, body in items if name.endswith(".php"))
+    assert "bazna-license-form" not in contents["includes/class-admin.php"].decode()
     assert "'licensing' =>" not in contents["includes/class-public-api.php"].decode()
     assert f"Text Domain: {SLUG}" in contents[MAIN_FILE].decode()
     output.parent.mkdir(parents=True, exist_ok=True)

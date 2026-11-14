@@ -56,8 +56,8 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			'type'          => 'string',
 			'show_in_rest'  => true,
 			'auth_callback' => static function ( $allowed, $meta_key, $post_id ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
-				return Brendigo_Sidrena_Cijena_License::valid()
-					&& current_user_can( 'edit_post', (int) $post_id );
+				// REST writes remain restricted to authorized product editors.
+				return current_user_can( 'edit_post', (int) $post_id );
 			},
 		);
 

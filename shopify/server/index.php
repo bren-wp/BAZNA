@@ -7,12 +7,10 @@
  */
 declare(strict_types=1);
 use Brendigo\Bazna\Core;
-use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\Shopify\ProxySignature;
 use Brendigo\Bazna\Shopify\WebhookHandler;
 
 require_once dirname(__DIR__, 2) . '/web/src/Core.php';
-require_once dirname(__DIR__, 2) . '/web/src/LicenseClient.php';
 require_once __DIR__ . '/ProxySignature.php';
 require_once __DIR__ . '/WebhookHandler.php';
 header('X-Content-Type-Options: nosniff');
@@ -52,8 +50,6 @@ try {
     // from the validated, signed and locally authorized shop identity.
     $core = new Core(rtrim($folder, '/') . '/shop-' . hash('sha256', $shop), 'https://' . $shop . '/apps');
     $core->ensurePrivate();
-    $secret = (string) getenv('BAZNA_SHOPIFY_APP_KEY');
-    $license = preg_match('/^[a-f0-9]{64}$/i', $secret) ? new LicenseClient($core, $secret) : null;
     $prefix = (string) (getenv('BAZNA_SHOPIFY_BACKEND_PATH') ?: '/shopify/proxy');
     $path = rawurldecode((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH));
     if (!str_starts_with($path, rtrim($prefix, '/') . '/')) {
@@ -61,18 +57,16 @@ try {
     }
     $tail = substr($path, strlen(rtrim($prefix, '/')));
     if ($tail === '/v1/cjenici') {
-        bazna_shop_response(200, $core->discovery('shopify', null, $license?->active()));
+        bazna_shop_response(200, $core->discovery('shopify'));
     }
     if ($tail === '/v1/usluge-na-upit') {
-        bazna_shop_response(200, $core->onRequestServices());
+        bazna_shop_response(200, $core->onRequestServices(
+            isset($_GET['outlet']) && is_string($_GET['outlet']) ? $_GET['outlet'] : '',
+            isset($_GET['q']) && is_string($_GET['q']) ? $_GET['q'] : ''
+        ));
     }
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
-    }
-    if ($tail === '/v1/license-proof') {
-        $challenge = $license?->proof();
-        if ($challenge === null) bazna_shop_response(404, ['error' => 'proof_not_ready']);
-        bazna_shop_response(200, ['challenge' => $challenge]);
     }
     if (preg_match('#^/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
         $outlet = (string) ($_GET['oznaka'] ?? '');
@@ -90,21 +84,39 @@ try {
         $catalog = $core->read('published.json');
         echo '<!doctype html><html lang="hr"><meta name="viewport" content="width=device-width, initial-scale=1">';
         echo '<meta charset="utf-8"><title>BAZNA — Shopify</title>';
+        // Shopify does not inherit the shared PHP/Joomla stylesheet.
+        // Keep the public rows usable on phones without an external asset.
+        echo '<style>*{box-sizing:border-box}body{margin:0;line-height:1.5}' .
+            'main{width:100%;max-width:900px;padding:0 8px}' .
+            '.bazna-panel{background:#102237;border:1px solid #2c4359;' .
+            'padding:16px;border-radius:12px;margin:14px 0;max-width:100%;overflow-wrap:anywhere}' .
+            '.bazna-muted{color:#a6bbd1}.bazna-table-scroll{max-width:100%;overflow-x:auto}' .
+            'table{border-collapse:collapse;width:100%;min-width:680px}' .
+            'td,th{padding:11px;border-bottom:1px solid #2c4359;text-align:left}' .
+            'th{color:#ffc47b}a{color:#ffb860}' .
+            '@media(max-width:480px){main{padding:0 2px}.bazna-panel{padding:12px}' .
+            'table{min-width:0}thead{display:none}tbody,tr,td{display:block;width:100%}' .
+            'tr{border:1px solid #2c4359;border-radius:8px;margin:10px 0;padding:6px}' .
+            'td{border:0;padding:7px;display:flex;gap:10px;justify-content:space-between;' .
+            'overflow-wrap:anywhere}td:before{content:attr(data-label);color:#a6bbd1;' .
+            'font-size:11px;flex:0 0 42%}}' .
+            '</style>';
         echo '<body style="background:#081525;color:#fff;font:16px system-ui;padding:20px">';
         echo '<main style="max-width:900px;margin:auto"><h1>BAZNA — Bazne cijene</h1>';
         echo '<p>Objavljeno: ' . Core::esc((string) ($catalog['published_at'] ?? 'nije objavljeno')) . '</p>';
+        // Display the same published rows as Web and Joomla. Shopify app proxy
+        // signatures remain mandatory; do not generate unsigned search links.
+        $outlet = isset($_GET['oznaka']) && is_string($_GET['oznaka']) ? $_GET['oznaka'] : '';
+        $query = isset($_GET['q']) && is_string($_GET['q']) ? $_GET['q'] : '';
+        if (strlen($query) > 100) $query = function_exists('mb_strcut')
+            ? mb_strcut($query, 0, 100, 'UTF-8') : substr($query, 0, 100);
         foreach (Core::KINDS as $kind) {
             echo '<section style="background:#102237;padding:20px;margin:12px 0;border-radius:12px"><h2>' .
-                Core::esc($kind) . '</h2><p><a style="color:#ffb860" href="' .
+                Core::esc($kind === 'proizvodi' ? 'Proizvodi' : 'Usluge') . '</h2><p><a style="color:#ffb860" href="' .
                 Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) . '">CSV cjenik</a></p></section>';
+            echo $core->publicCatalogHtml($kind, $outlet, $query);
         }
-        echo '<section style="background:#102237;padding:20px;margin:12px 0;border-radius:12px"><h2>Cijena na upit</h2>';
-        foreach ($core->onRequestServices()['items'] as $service) {
-            if ($service['outlet'] !== (string) ($_GET['oznaka'] ?? '')) continue;
-            echo '<article><strong>' . Core::esc($service['name']) . '</strong><p>' .
-                Core::esc($service['criteria']) . '</p><small>Cijena na upit</small></article>';
-        }
-        echo '</section></main></body></html>';
+        echo '</main></body></html>';
         exit;
     }
     bazna_shop_response(404, ['error' => 'not_found']);

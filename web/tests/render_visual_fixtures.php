@@ -60,12 +60,11 @@ $stylesheet = 'file://' . realpath(dirname(__DIR__) . '/public/assets/bazna.css'
 $remoteCss = $core->link('bazna/assets/bazna.css');
 $adminTabs = [
     'pregled','proizvodi','usluge','na-upit','poslovnice','uvoz-izvoz',
-    'javni-cjenici','arhiva','postavke','licenca',
+    'javni-cjenici','arhiva','postavke',
 ];
 foreach ($adminTabs as $tab) {
     $_GET = ['tab' => $tab, 'page' => '1'];
     $_SESSION = ['admin' => true, 'csrf' => 'ci-demo-token'];
-    $license = null;
     $message = '';
     ob_start();
     include dirname(__DIR__) . '/public/admin.php';
@@ -93,7 +92,7 @@ foreach (['proizvodi', 'usluge', 'na-upit', 'poslovnice'] as $tab) {
             '>' . Core::esc(ucfirst(str_replace('-', ' ', $item))) . '</a>';
     }
     $fragment = AdminCatalog::render($tab, $core->read('draft.json'),
-        '?bazna=dashboard&tab='.$tab, '<input name="ci-token" value="qa">', true);
+        '?bazna=dashboard&tab='.$tab, '<input name="ci-token" value="qa">');
     $html = '<!doctype html><html lang="hr"><head><meta charset="utf-8">' .
         '<meta name="viewport" content="width=device-width,initial-scale=1">' .
         '<title>BAZNA Joomla — ' . Core::esc($tab) . '</title>' .

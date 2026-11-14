@@ -1,0 +1,17 @@
+BAZNA — original GPL source attribution
+
+BAZNA includes adapted components of "MJDD Sidrena i bazna cijena",
+version 1.26.0, originally developed by Jure Zadravec / MJDD.
+Original project: https://mjdd.hr/sidrena-cijena/
+Original copyright: Copyright (C) 2026 Jure Zadravec / MJDD
+Original source license: GNU GPL-2.0-or-later.
+
+BAZNA modifications, additions, maintained implementation and branding:
+Brendigo, https://brendigo.com/. BAZNA is a separate derivative and is
+not an endorsed or official MJDD release. Original MJDD artwork, names
+and logos are not distributed as BAZNA branding.
+
+The original author's copyright and GPL obligations are preserved.
+GPL covers redistribution rights and is NOT a license activation code,
+subscription, domain lock or EULA acceptance requirement. BAZNA runtime
+works without product-license activation. See LICENSE.

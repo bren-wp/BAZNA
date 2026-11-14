@@ -1,6 +1,7 @@
 package com.brendigo.bazna.ui
 
 import com.brendigo.bazna.data.PriceItem
+import com.brendigo.bazna.data.OnRequestService
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -16,6 +17,19 @@ class SearchScreenPresentationTest {
         item("S-1", "Servis klima-uređaja", "usluga", "45,00", "60,00", "SK-01"),
         item("S-2", "Čišćenje prostora", "usluga", "", "", "CP-02"),
     )
+
+    @Test fun globalSearchIncludesPublishedInquiryCriteriaByOutletAndCategory() {
+        val requests = listOf(
+            OnRequestService("q1", "Izrada po mjeri", "Materijal i dimenzije", ""),
+            OnRequestService("q2", "Servis po dogovoru", "Rijeka i trajanje", "RI-01"),
+        )
+        assertEquals(listOf("q1"), searchOnRequestEntries(requests, "MATERIJAL dimenzije", 0, "").map { it.id })
+        assertEquals(listOf("q2"), searchOnRequestEntries(requests, "rijeka", 2, "RI-01").map { it.id })
+        assertTrue(searchOnRequestEntries(requests, "", 1, "").isEmpty())
+        assertTrue(searchOnRequestEntries(requests, "Rijeka", 0, "").isEmpty())
+        assertEquals(listOf("q1"), searchOnRequestEntries(requests, "", 2, "").map { it.id })
+        assertTrue(searchOnRequestEntries(requests, "nepostojeće", 2, "RI-01").isEmpty())
+    }
 
     @Test fun combinedSearchShowsBothRealCatalogFeedsWithoutDuplicates() {
         val results = searchCatalogEntries(products, services, "", 0)

@@ -13,7 +13,7 @@ use RuntimeException;
 
 final class Core
 {
-    public const VERSION = '1.1.3';
+    public const VERSION = '1.1.4';
     public const FIELDS = [
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
@@ -346,17 +346,125 @@ final class Core
     }
 
     /** Published snapshot only. Never serves draft inquiry criteria. */
-    public function onRequestServices(): array
+    public function onRequestServices(string $outlet = '', string $query = ''): array
     {
+        if (!preg_match('/^[a-zA-Z0-9-]{0,64}$/D', $outlet) ||
+            strlen($query) > 100 || preg_match('/[\\x00-\\x1F]/', $query)) {
+            throw new InvalidArgumentException('Neispravan javni upit usluge.');
+        }
+        $terms = preg_split('/\\s+/u', trim($query), -1, PREG_SPLIT_NO_EMPTY);
+        if ($terms === false) throw new InvalidArgumentException('Neispravna pretraga.');
         $published = $this->read('published.json');
         $items = [];
         foreach ($published['on_request'] ?? [] as $row) {
+            if ($outlet !== '' && ($row['outlet'] ?? '') !== $outlet) continue;
+            $haystack = (string) ($row['naziv'] ?? '') . ' ' .
+                (string) ($row['kriteriji'] ?? '');
+            $matches = true;
+            foreach ($terms as $term) {
+                if (function_exists('mb_stripos')
+                    ? mb_stripos($haystack, $term, 0, 'UTF-8') === false
+                    : stripos($haystack, $term) === false) {
+                    $matches = false;
+                    break;
+                }
+            }
+            if (!$matches) continue;
             $items[] = [
                 'id' => $row['id'], 'name' => $row['naziv'],
                 'criteria' => $row['kriteriji'], 'outlet' => $row['outlet'],
             ];
         }
         return ['schema' => 1, 'items' => $items];
+    }
+
+    /**
+     * Reuse one published-only HTML table on Web PHP, Joomla and Shopify.
+     * Never read draft.json, never infer an unpublished historical price.
+     * Search covers both numeric services and price-on-request criteria.
+     */
+    public function publicCatalogHtml(string $kind, string $outlet = '', string $query = ''): string
+    {
+        if (!in_array($kind, self::KINDS, true) ||
+            !preg_match('/^[A-Za-z0-9-]{0,64}$/D', $outlet) ||
+            strlen($query) > 256 || preg_match('/[\\x00-\\x1F]/', $query)) {
+            throw new InvalidArgumentException('Neispravan javni upit cjenika.');
+        }
+        $published = $this->read('published.json');
+        if (!isset($published['published_at'])) {
+            return '<p class="bazna-muted">Javni cjenik još nije objavljen.</p>';
+        }
+        $terms = preg_split('/\\s+/u', trim($query), -1, PREG_SPLIT_NO_EMPTY);
+        if ($terms === false) throw new InvalidArgumentException('Neispravna pretraga.');
+        $matches = static function (string $haystack) use ($terms): bool {
+            foreach ($terms as $term) {
+                if (function_exists('mb_stripos')) {
+                    if (mb_stripos($haystack, $term, 0, 'UTF-8') === false) return false;
+                } elseif (stripos($haystack, $term) === false) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        $rows = $published[$kind === 'proizvodi' ? 'products' : 'services'] ?? [];
+        $html = '<section class="bazna-panel bazna-table-scroll"><table><thead><tr>' .
+            '<th>Naziv</th><th>SKU</th><th>Redovna cijena</th><th>Bazna cijena</th>' .
+            '<th>Referentni datum</th><th>Jedinica mjere</th><th>Dostupnost</th>' .
+            '</tr></thead><tbody>';
+        $count = 0;
+        foreach ($rows as $row) {
+            if (!is_array($row) || ($row['outlet'] ?? '') !== $outlet ||
+                !$matches(implode(' ', [
+                    (string) ($row['naziv'] ?? ''), (string) ($row['sku'] ?? ''),
+                    (string) ($row['marka'] ?? ''), (string) ($row['barkod'] ?? ''),
+                ]))) {
+                continue;
+            }
+            $fields = ['naziv', 'sku', 'maloprodajna_cijena', 'sidrena_cijena',
+                'sidrena_datum', 'jedinica_mjere', 'dostupnost'];
+            $html .= '<tr>';
+            foreach ($fields as $field) {
+                $raw = (string) ($row[$field] ?? '');
+                $value = $raw === '' ? '—' : $raw;
+                if ($raw !== '' && in_array($field, ['maloprodajna_cijena', 'sidrena_cijena'], true)) {
+                    $value .= ' €';
+                }
+                $html .= '<td data-label="' . self::esc([
+                    'naziv' => 'Naziv', 'sku' => 'SKU', 'maloprodajna_cijena' => 'Redovna cijena',
+                    'sidrena_cijena' => 'Bazna cijena', 'sidrena_datum' => 'Referentni datum',
+                    'jedinica_mjere' => 'Jedinica mjere', 'dostupnost' => 'Dostupnost',
+                ][$field]) . '">' . self::esc($value) . '</td>';
+            }
+            $html .= '</tr>';
+            ++$count;
+        }
+        $html .= '</tbody></table>';
+        if ($count === 0) $html .= '<p class="bazna-muted">Nema stavki za odabranu pretragu i poslovnicu.</p>';
+        $html .= '</section>';
+        if ($kind === 'usluge') {
+            $html .= '<section class="bazna-panel"><h2>Cijena na upit</h2>' .
+                '<p class="bazna-muted">Iznos se određuje prema objavljenim kriterijima; ' .
+                'ne dodaje se izmišljena brojčana cijena u CSV/XML.</p>' .
+                '<div class="bazna-table-scroll"><table><thead><tr>' .
+                '<th>Usluga</th><th>Kriteriji</th><th>Cijena</th></tr></thead><tbody>';
+            $inquiryCount = 0;
+            foreach ($published['on_request'] ?? [] as $row) {
+                if (!is_array($row) || ($row['outlet'] ?? '') !== $outlet ||
+                    !$matches((string) ($row['naziv'] ?? '') . ' ' . (string) ($row['kriteriji'] ?? ''))) {
+                    continue;
+                }
+                $html .= '<tr><td data-label="Usluga">' . self::esc((string) ($row['naziv'] ?? '')) .
+                    '</td><td data-label="Kriteriji">' . self::esc((string) ($row['kriteriji'] ?? '')) .
+                    '</td><td data-label="Cijena">Na upit</td></tr>';
+                ++$inquiryCount;
+            }
+            $html .= '</tbody></table></div>';
+            if ($inquiryCount === 0) {
+                $html .= '<p class="bazna-muted">Nema objavljenih usluga na upit za odabrane uvjete.</p>';
+            }
+            $html .= '</section>';
+        }
+        return $html;
     }
 
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
@@ -480,7 +588,7 @@ final class Core
         ];
     }
 
-    public function discovery(string $platform = 'web', ?string $publicRoot = null, ?bool $licenseActive = null): array
+    public function discovery(string $platform = 'web', ?string $publicRoot = null): array
     {
         $base = rtrim($publicRoot ?? $this->base(), '/');
         $published = $this->read('published.json');
@@ -504,10 +612,7 @@ final class Core
             }
             $outlets[] = $o;
         }
-        $license = $licenseActive === null ? [] : [
-            'licensing' => ['required' => true, 'active' => $licenseActive],
-        ];
-        return array_merge([
+        return [
             'api_version' => 1, 'plugin_version' => self::VERSION,
             'branding' => ['name' => 'BAZNA', 'description' => 'Bazne cijene'],
             'platform' => $platform,
@@ -528,7 +633,7 @@ final class Core
                 'pending_changes' => $draft !== [] && $draft !== array_intersect_key($published, $draft),
                 'compliance_certified' => false,
             ],
-        ], $license);
+        ];
     }
 
     public function archives(): array

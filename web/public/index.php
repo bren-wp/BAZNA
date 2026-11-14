@@ -6,11 +6,9 @@
  */
 declare(strict_types=1);
 use Brendigo\Bazna\Core;
-use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\AdminCatalog;
 
 require_once dirname(__DIR__) . '/src/Core.php';
-require_once dirname(__DIR__) . '/src/LicenseClient.php';
 require_once dirname(__DIR__) . '/src/AdminCatalog.php';
 
 header('X-Content-Type-Options: nosniff');
@@ -37,11 +35,6 @@ try {
     $publicUrl = (string) getenv('BAZNA_PUBLIC_URL');
     $core = new Core($storage, $publicUrl);
     $core->ensurePrivate();
-    // The discovery endpoint is public, but its license status must be read
-    // from the same configured site client BEFORE any route returns.
-    $secret = (string) getenv('BAZNA_APP_KEY');
-    $license = preg_match('/^[a-f0-9]{64}$/i', $secret)
-        ? new LicenseClient($core, $secret) : null;
     $prefix = rtrim((string) parse_url($publicUrl, PHP_URL_PATH), '/');
     $path = rawurldecode((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH));
     if ($prefix !== '' && $prefix !== '/' && str_starts_with($path, $prefix . '/')) {
@@ -53,11 +46,13 @@ try {
     // This module is embedded by the Joomla adapter as well as standalone.
     $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
     if ($method === 'GET' && $path === '/bazna/v1/cjenici') {
-        $active = $license?->active();
-        bazna_json(200, $core->discovery('web', null, $active));
+        bazna_json(200, $core->discovery('web'));
     }
     if ($method === 'GET' && $path === '/bazna/v1/usluge-na-upit') {
-        bazna_json(200, $core->onRequestServices());
+        bazna_json(200, $core->onRequestServices(
+            isset($_GET['outlet']) && is_string($_GET['outlet']) ? $_GET['outlet'] : '',
+            isset($_GET['q']) && is_string($_GET['q']) ? $_GET['q'] : ''
+        ));
     }
     if ($method === 'GET' && $path === '/bazna/v1/arhiva') {
         $entries = $core->archives();
@@ -82,11 +77,6 @@ try {
     if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $parts)) {
         header('Content-Type: text/csv; charset=utf-8');
         echo $core->archiveCsv($parts[1], $parts[2], (string) ($_GET['oznaka'] ?? '')); exit;
-    }
-    if ($method === 'GET' && $path === '/bazna/v1/license-proof') {
-        $proof = $license?->proof();
-        if ($proof === null) bazna_fail(404, 'Provjera licence nije aktivna.');
-        bazna_json(200, ['challenge' => $proof]);
     }
     if ($method === 'GET' && $path === '/bazna/assets/bazna.css') {
         header('Content-Type: text/css; charset=utf-8');
@@ -126,19 +116,8 @@ try {
                 $_SESSION = [];
                 session_regenerate_id(true);
                 $message = 'Odjavljeni ste.';
-            } elseif (($_SESSION['admin'] ?? false) && $action === 'activate') {
-                if (!$license) bazna_fail(503, 'Postavite BAZNA_APP_KEY.');
-                $result = $license->activate((string) ($_POST['key'] ?? ''));
-                $message = 'Licenca: ' . (string) ($result['code'] ?? 'error');
-            } elseif (($_SESSION['admin'] ?? false) && $action === 'refresh') {
-                $result = $license?->refresh() ?? ['code' => 'missing_app_key'];
-                $message = 'Licenca: ' . (string) ($result['code'] ?? 'error');
-            } elseif (($_SESSION['admin'] ?? false) && $action === 'deactivate') {
-                $result = $license?->deactivate() ?? ['code' => 'missing_app_key'];
-                $message = 'Licenca: ' . (string) ($result['code'] ?? 'error');
             } elseif (($_SESSION['admin'] ?? false) &&
                 in_array($action, ['save', 'publish', 'save_item', 'delete_item'], true)) {
-                if (!$license?->active()) bazna_fail(403, 'Za izmjene je potrebna aktivna BAZNA licenca.');
                 if ($action === 'save') {
                     $raw = (string) ($_POST['catalog'] ?? '');
                     if (strlen($raw) > 6 * 1024 * 1024) bazna_fail(413, 'Katalog je prevelik.');

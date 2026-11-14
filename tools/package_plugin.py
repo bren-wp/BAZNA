@@ -23,6 +23,11 @@ def package(root: Path, output: Path, version: str) -> str:
         raise ValueError("Paket dodatka je neočekivano nepotpun")
     if any(p.is_symlink() for p in source.rglob("*")):
         raise ValueError("Simboličke poveznice nisu dopuštene u paketu")
+    # Reject accidental reintroduction of activation code to the official ZIP.
+    if any(p.name == "class-license.php" for p in files):
+        raise ValueError("Licencni klijent nije dopušten u BAZNA paketu")
+    if any(b"licenca.brendigo.com" in p.read_bytes() for p in files if p.suffix == ".php"):
+        raise ValueError("Poziv licencnog poslužitelja nije dopušten u BAZNA paketu")
     output.parent.mkdir(parents=True, exist_ok=True)
     with ZipFile(output, "w", ZIP_DEFLATED, compresslevel=9) as zipout:
         for path in files:

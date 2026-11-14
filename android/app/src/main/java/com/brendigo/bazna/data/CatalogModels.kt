@@ -23,7 +23,6 @@ data class CatalogIndex(
     val servicesCsvReady: Boolean? = null,
     val pendingPublication: Boolean? = null,
     val allOutletsCsvReady: Boolean? = null,
-    val wordpressLicenseActive: Boolean? = null,
     val platform: String = "wordpress",
     val onRequestUrl: String? = null,
 )

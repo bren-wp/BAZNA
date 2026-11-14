@@ -1,3 +1,13 @@
+== BAZNA 1.5.20 ==
+- Uklonjeni BAZNA licencni ključevi, aktivacijske provjere, ograničenja uvoza/objave i licencni servis iz WordPressa, Weba, Joomle, Shopifyja i Androida. Windows 0.10.7 više ne traži komercijalni EULA ni aktivaciju.
+- Službeni WordPress ZIP i WordPress.org kandidat koriste jedinstveni otključani izvorni kod. Objedinjeno izdanje ne distribuira stari licencni servis.
+- Administratorska prijava, CSRF, Shopify HMAC, javni REST API i postojeći korisnički podaci ostaju sačuvani.
+- Usklađen javni pretraživ HTML cjenik proizvoda, usluga i usluga „Cijena na upit” na PHP/Joomla/Shopify platformama; prikaz uvijek čita posljednju objavu, ne nacrt.
+- WordPress REST v1 i Web/Joomla/Shopify REST v1 podržavaju filtriranje usluga na upit po oznaci poslovnice i tekstu kriterija, bez izlaganja administracijskih podataka.
+- Androidova opća pretraga sada uključuje usluge na upit s nazivom i kriterijima, ali bez izmišljene brojčane cijene, uz odvojenu poslovnicu i filtarske kategorije.
+- Izlazni HTML escapea nazive i kriterije. Novi PHP/Android testovi štite podatke i responzivnost.
+- Prethodni računi, povijesne cijene, arhive, REST v1 URL-ovi i postojeća konfiguracija ostaju netaknuti.
+
 == BAZNA 1.5.19 ==
 - WordPress: „Cijena na upit” dostupna u REST v1 samo iz uspješno objavljenog snapshota, bez administracijskih nacrta.
 - Web PHP, Joomla, Shopify i Android: zajednički javni REST ugovor s nazivom, kriterijima i poslovnicom.

@@ -147,18 +147,12 @@ jobs:
         shell: pwsh
         run: |
           $setup=(Resolve-Path 'artifacts/desktop-release/SIDRENA-Desktop-win-x64-Setup.exe').Path
-          # Silent setup is an internal CI smoke only. Commercial interactive installation
-          # must show the license acceptance page before continuing.
+          # Silent setup validates installation without activation, preserving local user data.
           $result=Start-Process -FilePath $setup -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-') -PassThru -Wait
           if ($result.ExitCode -ne 0) { throw "Silent setup failed: $($result.ExitCode)" }
           $dir=Join-Path $env:LOCALAPPDATA 'Programs\Brendigo\SIDRENA'
           $installed=Join-Path $dir 'SIDRENA.exe'
           if (!(Test-Path $installed)) { throw 'Setup did not install SIDRENA.exe' }
-          $installedLicense = Join-Path $dir 'SIDRENA-Licenca.txt'
-          if (!(Test-Path $installedLicense)) { throw 'Setup omitted accepted commercial EULA' }
-          if (!(Select-String -Path $installedLicense -Pattern 'Brendigo LTD' -Quiet)) {
-            throw 'Setup EULA publisher mismatch'
-          }
           $app=Start-Process -FilePath $installed -PassThru
           try {
             Start-Sleep -Seconds 5

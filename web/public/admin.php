@@ -7,7 +7,7 @@ $tabs = [
     'na-upit' => 'Cijena na upit',
     'poslovnice' => 'Poslovnice', 'uvoz-izvoz' => 'Uvoz/Izvoz',
     'javni-cjenici' => 'Javni cjenici', 'arhiva' => 'Arhiva',
-    'postavke' => 'Postavke', 'licenca' => 'Licenca',
+    'postavke' => 'Postavke',
 ];
 $tab = (string) ($_GET['tab'] ?? 'pregled');
 if (!isset($tabs[$tab])) $tab = 'pregled';
@@ -15,7 +15,6 @@ $draft = $core->read('draft.json');
 $published = $core->read('published.json');
 $pretty = json_encode(array_intersect_key($draft, array_flip(['outlets','products','services','on_request'])),
     JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-$licenseActive = $license?->active() ?? false;
 $csrf = (string) ($_SESSION['csrf'] ?? '');
 $endpoint = $core->link('bazna/v1/cjenici');
 header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
@@ -44,7 +43,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <input type="hidden" name="action" value="logout"><button type="submit" class="bazna-secondary">Odjava</button></form>
 </nav><main class="bazna-main"><div class="bazna-page-title"><div>
 <p class="bazna-eyebrow">BAZNA / <?= bazna_html($tabs[$tab]) ?></p>
-<h1><?= bazna_html($tabs[$tab]) ?></h1></div><span class="bazna-pill"><?= $licenseActive ? 'Licenca aktivna' : 'Licenca nije aktivna' ?></span></div>
+<h1><?= bazna_html($tabs[$tab]) ?></h1></div><span class="bazna-pill">Uređivanje omogućeno</span></div>
 <?php if ($message !== ''): ?><p role="status" class="bazna-message"><?= bazna_html($message) ?></p><?php endif; ?>
 <?php if ($tab === 'pregled'): ?>
 <div class="bazna-stats">
@@ -62,17 +61,16 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
     $draft,
     $core->link('bazna/admin?tab=' . $tab),
     '<input type="hidden" name="_csrf" value="' . bazna_html($csrf) . '">',
-    $licenseActive,
     (int) ($_GET['page'] ?? 1)
 ) ?>
 <?php elseif ($tab === 'uvoz-izvoz'): ?>
 <section class="bazna-panel"><h2>Uvoz i izvoz cjelokupnog kataloga</h2>
-<p>Za napredni uvoz ili izvoz možete provjeriti i uređivati strukturirani JSON cijelog kataloga. Pojedinačne stavke uredite na karticama Proizvodi, Usluge, Cijena na upit i Poslovnice. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog licencnom servisu.</p>
+<p>Za napredni uvoz ili izvoz možete provjeriti i uređivati strukturirani JSON cijelog kataloga. Pojedinačne stavke uredite na karticama Proizvodi, Usluge, Cijena na upit i Poslovnice. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog vanjskim aktivacijskim servisima.</p>
 <form method="post" action="<?= bazna_html($core->link('bazna/admin?tab=' . $tab)) ?>">
 <input type="hidden" name="action" value="save"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
 <label>JSON nacrt kataloga
 <textarea class="bazna-editor" name="catalog" spellcheck="false" required><?= bazna_html((string) $pretty) ?></textarea></label>
-<button type="submit" <?= !$licenseActive ? 'disabled' : '' ?>>Spremi nacrt</button></form>
+<button type="submit">Spremi nacrt</button></form>
 <p class="bazna-small">Nepoznata poslovnica, nepravilna cijena, datum ili nepotvrđena povijesna cijena odbijaju se prilikom spremanja.</p></section>
 <?php elseif ($tab === 'javni-cjenici'): ?>
 <section class="bazna-panel"><h2>Javni cjenici i BAZNA Android</h2>
@@ -80,7 +78,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <p>Posljednja javna objava: <strong><?= bazna_html((string) ($published['published_at'] ?? 'nije objavljeno')) ?></strong></p>
 <form method="post" action="<?= bazna_html($core->link('bazna/admin?tab=javni-cjenici')) ?>">
 <input type="hidden" name="action" value="publish"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
-<button type="submit" <?= !$licenseActive ? 'disabled' : '' ?>>Objavi provjereni katalog</button></form>
+<button type="submit">Objavi provjereni katalog</button></form>
 <p>CSV: <a href="<?= bazna_html($core->link('bazna/v1/cjenici/proizvodi/csv')) ?>">Proizvodi</a> · <a href="<?= bazna_html($core->link('bazna/v1/cjenici/usluge/csv')) ?>">Usluge</a></p>
 </section>
 <?php elseif ($tab === 'arhiva'): ?>
@@ -91,16 +89,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <section class="bazna-panel"><h2>Postavke platforme</h2>
 <p>Javna domena: <code><?= bazna_html($core->base()) ?></code></p>
 <p>Podatkovni API v1: <code><?= bazna_html($endpoint) ?></code></p>
-<p>Svi javni podaci potječu isključivo iz posljednje eksplicitne objave. Administratorska lozinka i licencni ključ pohranjeni su izvan javne mape.</p></section>
-<?php elseif ($tab === 'licenca'): ?>
-<section class="bazna-panel"><h2>BAZNA licenca</h2>
-<p>Licenca vrijedi za jednu kanonsku domenu: <code><?= bazna_html($license?->domain() ?? $core->host()) ?></code>.</p>
-<p>Stanje: <strong><?= $licenseActive ? 'aktivna' : 'nije aktivna' ?></strong>.</p>
-<form method="post"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
-<label>Licencni ključ<input type="password" name="key" autocomplete="off" placeholder="BAZNA-00001-..." required></label>
-<button name="action" value="activate" type="submit" <?= !$license ? 'disabled' : '' ?>>Aktiviraj licencu</button>
-<button name="action" value="refresh" type="submit" <?= !$license ? 'disabled' : '' ?> class="bazna-secondary">Provjeri licencu</button>
-<button name="action" value="deactivate" type="submit" <?= !$license ? 'disabled' : '' ?> class="bazna-secondary">Deaktiviraj licencu</button></form></section>
+<p>Svi javni podaci potječu isključivo iz posljednje eksplicitne objave. Administratorska lozinka i privatni katalozi pohranjeni su izvan javne mape.</p></section>
 <?php endif; ?>
 </main></div><?php endif; ?>
 <footer class="bazna-footer">BAZNA · Brendigo · <a href="https://brendigo.com/">brendigo.com</a></footer></div></body></html>

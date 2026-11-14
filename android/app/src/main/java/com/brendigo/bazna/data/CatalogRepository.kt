@@ -32,9 +32,6 @@ class CatalogRepository {
         val serviceUrl = selected?.serviceCsv ?: index.servicesCsv
 
         val warnings = mutableListOf<String>()
-        if (index.wordpressLicenseActive == false) {
-            warnings.add("BAZNA licenca za uređivanje nije aktivna. Već objavljeni cjenici i arhiva ostaju javno dostupni.")
-        }
         if (index.pendingPublication == true) {
             warnings.add("Povezana BAZNA platforma ima neobjavljene promjene. Cijene u javnom CSV-u mogu biti zastarjele.")
         }

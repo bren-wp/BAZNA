@@ -24,6 +24,12 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	public static function init() {
 		Brendigo_Sidrena_Cijena_Migration::maybe_migrate();
+        // One-time cleanup for users upgrading from the licensed build.
+        // Never delete license options or customer data: only an orphaned cron.
+        if ( function_exists( 'wp_next_scheduled' ) &&
+            wp_next_scheduled( 'bazna_license_periodic_check' ) ) {
+            wp_clear_scheduled_hook( 'bazna_license_periodic_check' );
+        }
 
 		if ( self::legacy_plugin_active() ) {
 			add_action( 'admin_notices', array( __CLASS__, 'legacy_plugin_notice' ) );
@@ -133,7 +139,6 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	private function __construct() {
 		Brendigo_Sidrena_Cijena_Settings::instance();
-		Brendigo_Sidrena_Cijena_License::instance();
 		Brendigo_Sidrena_Cijena_I18n::instance();
 		Brendigo_Sidrena_Cijena_Audit_Log::instance();
 		Brendigo_Sidrena_Cijena_Catalog::instance();
@@ -144,9 +149,8 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 		Brendigo_Sidrena_Cijena_Public_API::instance();
 		Brendigo_Sidrena_Cijena_Frontend::instance();
 
-		// Public price display is a consumer-facing obligation, not a premium
-		// administration feature. Preserve storefront meta, theme compatibility
-		// and Woo Blocks even if the editing licence becomes inactive.
+		// Preserve storefront meta, theme compatibility and Woo Blocks regardless
+		// of whether WooCommerce catalog import tools are enabled.
 		if ( self::woocommerce_active() ) {
 			Brendigo_Sidrena_Cijena_Product_Meta::instance();
 			Brendigo_Sidrena_Cijena_Compat::instance();
@@ -155,23 +159,21 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 
 		if ( is_admin() ) {
 			Brendigo_Sidrena_Cijena_Admin::instance();
-			if ( Brendigo_Sidrena_Cijena_License::valid() ) {
-				Brendigo_Sidrena_Cijena_Bulk_Import::instance();
-			}
+			Brendigo_Sidrena_Cijena_Bulk_Import::instance();
 		}
 
-		if ( Brendigo_Sidrena_Cijena_License::valid() && defined( 'WP_CLI' ) && WP_CLI ) {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			WP_CLI::add_command( 'sidrena-cijena', 'Brendigo_Sidrena_Cijena_CLI' );
 			WP_CLI::add_command( 'bazna', 'Brendigo_Sidrena_Cijena_CLI' );
 		}
 
-		if ( ! Brendigo_Sidrena_Cijena_License::valid() || ! self::woocommerce_active() ) {
+		if ( ! self::woocommerce_active() ) {
 			return;
 		}
 
 		add_action( 'sidrena_cijena_snapshot_batch', array( 'Brendigo_Sidrena_Cijena_Activator', 'process_batch' ) );
 
-		// CSV import and other editing-only integrations require a licence.
+		// WooCommerce editing integration requires the actual WC plugin, not a key.
 		Brendigo_Sidrena_Cijena_Import_Export::instance();
 	}
 
@@ -204,6 +206,7 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	public static function deactivate() {
 		wp_clear_scheduled_hook( 'sidrena_cijena_snapshot_batch' );
+        wp_clear_scheduled_hook( 'bazna_license_periodic_check' );
 		wp_clear_scheduled_hook( Brendigo_Sidrena_Cijena_Price_History::SEED_HOOK );
 		wp_clear_scheduled_hook( Brendigo_Sidrena_Cijena_Price_History::MANUAL_SEED_HOOK );
 		wp_clear_scheduled_hook( Brendigo_Sidrena_Cijena_Export::DAILY_HOOK );

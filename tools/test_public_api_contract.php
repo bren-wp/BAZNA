@@ -7,7 +7,7 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
-define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.19' );
+define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.20' );
 
 function sidrena_contract_assert( $condition, $label ) {
 	if ( ! $condition ) {
@@ -87,9 +87,6 @@ class Brendigo_Sidrena_Cijena_Export {
 	public function get_public_url() {
 		return 'https://primjer.hr/sidrena-cijena.xml';
 	}
-}
-class Brendigo_Sidrena_Cijena_License {
-    public static function valid() { return true; }
 }
 class Brendigo_Sidrena_Cijena_Legal {
 	public static function public_contract() {
@@ -191,9 +188,8 @@ sidrena_contract_assert( 1 === $json['api_version'], 'Version remains v1' );
 sidrena_contract_assert( 'wordpress' === $json['platform'], 'Publisher type is accurate' );
 sidrena_contract_assert( 'BAZNA' === $json['branding']['name'], 'New product name in public Android discovery' );
 sidrena_contract_assert( 'Bazne cijene' === $json['branding']['description'], 'Human-readable brand description' );
-sidrena_contract_assert( true === $json['licensing']['required'], 'WordPress license controls are declared' );
-sidrena_contract_assert( true === $json['licensing']['active'], 'Activation is represented without key disclosure' );
-sidrena_contract_assert( false === strpos( wp_json_encode( $json ), 'BAZNA-00001-' ), 'No license keys in public REST response' );
+sidrena_contract_assert( ! isset( $json['licensing'] ), 'WordPress no longer requires or advertises activation' );
+sidrena_contract_assert( false === strpos( wp_json_encode( $json ), 'bazna_license' ), 'No license state exposed through REST' );
 sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mobile connection must never require admin account' );
 sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
 sidrena_contract_assert( true === $json['connection']['csv_publication_required'], 'CSV readiness is not fabricated on first install' );
@@ -211,6 +207,27 @@ $inquiry = $api->on_request_services();
 sidrena_contract_assert( 1 === $inquiry['schema'] && 1 === count( $inquiry['items'] ), 'Only sanitized published inquiries returned' );
 sidrena_contract_assert( 'Ovisno o opsegu' === $inquiry['items'][0]['criteria'], 'Publication criteria preserved' );
 sidrena_contract_assert( 'no-store, max-age=0, must-revalidate' === $inquiry->get_headers()['Cache-Control'], 'Do not cache publication snapshots' );
+$validPublicRequest = new class {
+    public function get_param( $key ) {
+        return array( 'outlet' => 'ri-01', 'q' => 'OPSEGU' )[ $key ] ?? null;
+    }
+};
+sidrena_contract_assert( 1 === count( $api->on_request_services( $validPublicRequest )['items'] ),
+    'REST outlet and multi-word query operate on published snapshots only' );
+$unknownPublicRequest = new class {
+    public function get_param( $key ) {
+        return array( 'outlet' => 'no-other-branch', 'q' => 'OPSEGU' )[ $key ] ?? null;
+    }
+};
+sidrena_contract_assert( array() === $api->on_request_services( $unknownPublicRequest )['items'],
+    'REST public inquiry does not mix branch results' );
+$badPublicRequest = new class {
+    public function get_param( $key ) {
+        return 'q' === $key ? array( 'x' ) : '';
+    }
+};
+sidrena_contract_assert( array() === $api->on_request_services( $badPublicRequest )['items'],
+    'REST inquiry rejects array-valued search pollution' );
 
 sidrena_contract_assert( true === $json['feeds']['proizvodi']['available_csv'], 'Product feed ready' );
 sidrena_contract_assert( true === $json['feeds']['usluge']['available_csv'], 'Service feed ready' );

@@ -4,7 +4,7 @@
 
 **Vaše cijene. Vaša evidencija. Vaša kontrola.**
 
-BAZNA Desktop **0.10.6** je Windows aplikacija Brendigo LTD za upravljanje proizvodima, uslugama, trenutačnim i sidrenim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
+BAZNA Desktop **0.10.7** je Windows aplikacija Brendigo LTD za upravljanje proizvodima, uslugama, trenutačnim i sidrenim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
 
 ## Funkcionalnosti
 
@@ -16,6 +16,10 @@ BAZNA Desktop **0.10.6** je Windows aplikacija Brendigo LTD za upravljanje proiz
 - Pregled javnih WordPress cjenika putem HTTPS-a.
 - Oporavak lokalnih podataka uz sigurnosne provjere.
 
+## Bez aktivacije
+
+Windows Setup i Portable ne traže BAZNA ključ, registraciju, aktivaciju ni komercijalno prihvaćanje EULA-e. Podaci ostaju sačuvani pri nadogradnji. Prava izvornog koda i licenci trećih strana ostaju obvezujuća.
+
 ## Preuzimanje
 
 [**Windows Setup.exe**](https://github.com/bren-wp/BAZNA/releases) · [**Windows Portable.exe**](https://github.com/bren-wp/BAZNA/releases)
@@ -24,17 +28,17 @@ Obje verzije koriste isti direktorij korisničkih podataka u sustavu Windows. Pr
 
 ## WordPress povezivanje
 
-Windows pregled koristi **javne objave** WordPress dodatka **Brendigo Sidrena Cijena 1.5.3**. Lokalni Windows katalog ne objavljuje se automatski na WordPressu.
+Windows pregled koristi **javne objave** WordPress dodatka **Brendigo Sidrena Cijena 1.5.20**. Lokalni Windows katalog ne objavljuje se automatski na WordPressu.
 
 ## Upute i dokumentacija
 
-[Izdanja](https://github.com/bren-wp/BAZNA/releases) · [Instalacija](installer/README.md) · [Pomoć](mailto:info@brendigo.com) · [Licencija](legal/EULA-HR.txt)
+[Izdanja](https://github.com/bren-wp/BAZNA/releases) · [Instalacija](installer/README.md) · [Pomoć](mailto:info@brendigo.com) · [Prava izvornog koda](../LICENSE-SCOPE.md)
 
 **BAZNA by Brendigo**
 
 ## Sinkronizacija javnih pravnih pravila
 
-Windows 0.10.6 prepoznaje `plugin_version` i javni `legal` profil WordPress dodatka 1.5.3. Datumi primjene i arhiviranja preuzimaju se iz istog ugovora kao u Android aplikaciji. Lokalni katalog ostaje odvojena baza i ne mijenja WordPress bez izričite autorizirane integracije.
+Windows 0.10.7 prepoznaje `plugin_version` i javni `legal` profil WordPress dodatka 1.5.20. Datumi primjene i arhiviranja preuzimaju se iz istog ugovora kao u Android aplikaciji. Lokalni katalog ostaje odvojena baza i ne mijenja WordPress bez izričite autorizirane integracije.
 
 [Pravni okvir i interoperabilnost](../docs/LEGAL-2026-INTEROPERABILITY.md) · [Security i dead-code audit](../docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 
@@ -47,4 +51,4 @@ U izborniku **Cjenici** opcija **CSV za uvoz u WordPress** izrađuje datoteku s 
 
 ### Pravna dopuna 29. 10. 2026.
 
-Profil WordPress 1.5.3 razlikuje pravilo najniže cijene 30 dana prije sniženja od sidrene cijene; NN 105/2026 na snazi je od 26. 9. 2026. Windows samo čita javne podatke, dok lokalne nacrte prenosi na WordPress uz ručnu potvrdu, bez automatske administrativne sinkronizacije. Detalji u `docs/LEGAL-REVIEW-2026-10-29.md` u korijenu repozitorija.
+Profil WordPress 1.5.20 razlikuje pravilo najniže cijene 30 dana prije sniženja od sidrene cijene; NN 105/2026 na snazi je od 26. 9. 2026. Windows samo čita javne podatke, dok lokalne nacrte prenosi na WordPress uz ručnu potvrdu, bez automatske administrativne sinkronizacije. Detalji u `docs/LEGAL-REVIEW-2026-10-29.md` u korijenu repozitorija.

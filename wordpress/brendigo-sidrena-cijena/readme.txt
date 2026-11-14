@@ -4,13 +4,16 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.19
+Stable tag: 1.5.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva za WordPress i WooCommerce.
 
 == Description ==
+
+**Svi alati bez aktivacije:** BAZNA 1.5.20 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
+
 
 **BAZNA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
 
@@ -105,7 +108,7 @@ Legacy shortcode aliases remain available for backward compatibility.
 
 `wp bazna health` reports publication schedule and automation state.
 
-`wp bazna fill` can fill empty reference-price fields from regular prices when an administrator intentionally chooses that workflow.
+`wp bazna fill` is a legacy, administrator-initiated convenience command. It must not be used as evidence of a historical reference price: verify and enter the actual historical amount and date before publication.
 
 == Frequently Asked Questions ==
 
@@ -121,13 +124,17 @@ The public HTML pricelist and selected XML/CSV live file are generated together,
 
 Yes. The daily publication time is configurable in the Public pricelist tab.
 
-= Does the plugin send catalog data to an external service? =
+= Does BAZNA require a license key, account, subscription or external activation service? =
 
-No. Catalog processing, exports and the administrator guide run on your WordPress site. The private distribution uses a separate licensing endpoint only for license activation and periodic verification, not for processing catalog prices.
+No. All included local WordPress and WooCommerce features are available to users with the existing WordPress permissions. There are no license keys, trial periods, remote license checks or paid feature locks. WordPress administrators still sign in to protect editing and publication.
 
-= What information does the private license service receive? =
+= Does BAZNA send my prices to an external license service? =
 
-When the administrator explicitly activates a license, the private distribution sends the entered license key and the site's canonical domain over HTTPS to https://licenca.brendigo.com for one-domain registration and verification. Periodic license checks follow. Product records, price histories and catalog contents are not sent to this service. The independent WordPress.org candidate distribution does not include this license client and does not require a key.
+No. BAZNA stores catalog data and publishes only the public price lists chosen by the site owner. The former external activation service has been removed from the plugin. Android and Windows read only approved public HTTPS endpoints; they never need administrator credentials or a BAZNA license key.
+
+= Is BAZNA derived from an existing GPL project? =
+
+Yes. Components were adapted from MJDD Sidrena i bazna cijena 1.26.0 by Jure Zadravec / MJDD (GPLv2 or later). See ORIGINAL-CREDITS.txt and LICENSE in the plugin ZIP. BAZNA is separately developed and maintained by Brendigo and does not claim endorsement by MJDD.
 
 == Upgrade Notice ==
 
@@ -172,6 +179,13 @@ Adds observed price history, publication alerts, separate product/service feeds,
 Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf placeholders that could append internal text to publication, pending-change, and pagination labels.
 
 == Changelog ==
+
+= 1.5.20 =
+* Uklonjena aktivacijska provjera i zaključavanje uvoza, uređivanja i objave. Službeni ZIP i WordPress.org kandidat koriste istu otključanu jezgru.
+* REST v1 on-request search supports optional outlet and criteria query; public results never include unapproved drafts.
+* Same published HTML price-list semantics across PHP/Joomla/Shopify and Android's global catalog search.
+* Preserve existing accounts, prices, history, WC compatibility, and previous REST v1 endpoints.
+
 
 = 1.5.19 =
 * Public WordPress REST v1 publishes only previously published services priced on request, with name, criteria and outlet; drafts stay private.
