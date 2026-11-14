@@ -108,7 +108,7 @@ Shopify app-proxy ────────┘             │
 ### WordPress / WooCommerce
 
 1. Na [GitHub izdanjima](https://github.com/bren-wp/BAZNA/releases) preuzmite BAZNA WordPress ZIP; poseban paket za WordPress.org izdan je kao kandidat.
-2. Instalirajte dodatak u WordPressu, otvorite **BAZNA**, konfigurirajte katalog i.
+2. Instalirajte i aktivirajte dodatak u WordPressu, otvorite **BAZNA** te konfigurirajte proizvode, usluge i poslovnice.
 3. Provjerite cijene, referentne datume i objavite javne CSV/XML cjenike.
 4. Android povežite HTTPS adresom svoje stranice.
 
