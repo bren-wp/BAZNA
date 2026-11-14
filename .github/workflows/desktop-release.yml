@@ -133,11 +133,6 @@ jobs:
           python3 tools/audit_repository.py
           python3 tools/package_plugin.py --version "$WORDPRESS_VERSION" --output "release/BAZNA-WordPress-$WORDPRESS_VERSION.zip"
           (cd release && sha256sum -c "BAZNA-WordPress-$WORDPRESS_VERSION.zip.sha256")
-          # Public source only; the previously issued 10000 keys require the
-          # separate private config.php bundled directly with the customer.
-          php licenca/tests/test.php
-          python3 tools/package_license.py --version "$RELEASE_VERSION" --output "release/BAZNA-Licenca-Server-$RELEASE_VERSION.zip"
-          (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
           for name in \
             "BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip" \
             "BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip" \
@@ -155,7 +150,6 @@ jobs:
             SIDRENA-Desktop-win-x64-Portable.exe SIDRENA-Desktop-win-x64-Setup.exe \
             SIDRENA-Desktop-win-x64-SHA256SUMS.txt SIDRENA-Desktop-release-info.json \
             BAZNA-WordPress-$WORDPRESS_VERSION.zip BAZNA-WordPress-$WORDPRESS_VERSION.zip.sha256 \
-            BAZNA-Licenca-Server-$RELEASE_VERSION.zip BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256 \
             BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Web-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256 \
             BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Joomla-Plugin-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256 \
             BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip BAZNA-Shopify-Adapter-$WEB_JOOMLA_SHOPIFY_VERSION.zip.sha256; do
@@ -164,7 +158,6 @@ jobs:
           (cd release && sha256sum -c BAZNA-Android-SHA256SUMS.txt)
           (cd release && sha256sum -c SIDRENA-Desktop-win-x64-SHA256SUMS.txt)
           (cd release && sha256sum -c "BAZNA-WordPress-$WORDPRESS_VERSION.zip.sha256")
-          (cd release && sha256sum -c "BAZNA-Licenca-Server-$RELEASE_VERSION.zip.sha256")
           src_sha=$(python3 -c 'import json;print(json.load(open("release/SIDRENA-Desktop-release-info.json"))["source_commit"])')
           [[ "$src_sha" == "$CI_SHA" ]] || { echo "Windows provenance mismatch"; exit 1; }
           win_version=$(python3 -c 'import json;print(json.load(open("release/SIDRENA-Desktop-release-info.json"))["desktop_version"])')
@@ -216,7 +209,7 @@ jobs:
               encoding="utf-8",
           )
           old_manifest.unlink()
-          assert len(list(folder.iterdir())) == 17, "Expected 17 BAZNA release files"
+          assert len(list(folder.iterdir())) == 15, "Expected 15 BAZNA release files"
           assert all(not path.name.startswith("SIDRENA-") for path in folder.iterdir())
           print("PASS: BAZNA public Windows executable filenames, original binary hashes retained")
           PY
@@ -245,9 +238,8 @@ jobs:
           Tri nova ZIP paketa: samostalni BAZNA PHP Web, instalacijski Joomla dodatak i Shopify adapter. Web i Joomla dijele responzivne kataloge proizvoda, usluga i poslovnica, uz provjere povijesnih cijena, atomsko uređivanje i arhivu. Shopify dodaje HMAC autentikaciju proxyja, autorizirane kataloge i GDPR privacy webhooks.
           **Shopify adapter nije odobrena App Store aplikacija**: puni OAuth, Billing, embedded UI i trgovinski integracijski testovi još su obvezni. Joomla također zahtijeva test na stvarnoj CMS instalaciji. Uspješne Chrome snimke dokazuju responzivnost, ne 0% pixel-diff prema izvornim referencama.
 
-          ## Licencni servis
-          ZIP **BAZNA-Licenca-Server-$RELEASE_VERSION.zip** sadrži sav PHP/JSON kod, Apache/Nginx pravila, testove i upute za https://licenca.brendigo.com/licenca/api.php.
-          **Zbog sigurnosti ne sadrži privatni master secret.** Prije prve aktivacije treba dodati isti privatni config.php kojim je izdano postojećih 10.000 ključeva. API vraća 503 dok konfiguracija nije valjana. Ne objavljivati master ključ niti privatni popis ključeva u GitHub izdanju.
+          ## Bez aktivacije ili licencnog ključa
+          WordPress, Web, Joomla, Shopify i Android funkcioniraju bez BAZNA aktivacijskog ključa i bez vanjskog licencnog poslužitelja. Ovlasti administratora, CSRF, HTTPS i Shopify HMAC provjera ostaju obvezne zbog sigurnosti.
 
           ## Hrvatska pravila
           Proširene obveze počinju 17. studenoga 2026.; referentni datumi su 2. svibnja 2025. i 10. rujna 2026. (NN 101/2026 i NN 110/2026).
@@ -262,5 +254,5 @@ jobs:
             --title "BAZNA" \
             --notes-file notes.md --prerelease
           count=$(gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json assets --jq '.assets | length')
-          [[ "$count" -eq 17 ]] || { echo "Expected 17 assets, got $count"; exit 1; }
+          [[ "$count" -eq 15 ]] || { echo "Expected 15 assets, got $count"; exit 1; }
           echo "Published $RELEASE_TAG with $count verified assets."

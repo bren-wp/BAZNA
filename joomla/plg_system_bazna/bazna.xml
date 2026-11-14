@@ -7,7 +7,7 @@
   <authorUrl>https://brendigo.com</authorUrl>
   <copyright>Copyright Brendigo</copyright>
   <license>GPL-2.0-or-later</license>
-  <description>BAZNA javni cjenici, provjerene povijesne cijene, poslovnice, licence i Android API.</description>
+  <description>BAZNA javni cjenici, provjerene povijesne cijene, poslovnice i Android API.</description>
   <namespace path="src">Brendigo\Plugin\System\Bazna</namespace>
   <files>
     <folder plugin="bazna">services</folder>

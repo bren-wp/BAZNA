@@ -6,7 +6,6 @@ on:
       - 'web/**'
       - 'joomla/**'
       - 'shopify/**'
-      - 'licenca/**'
       - 'tools/package_platforms.py'
       - 'tools/test_platform_responsive.mjs'
       - '.github/workflows/multiplatform-ci.yml'
@@ -31,10 +30,10 @@ jobs:
         run: |
           php -v
           php -r 'foreach(["json","openssl","dom"] as $ext){if(!extension_loaded($ext)){fwrite(STDERR, "Missing: $ext\n");exit(1);}}'
-      - name: PHP lint on all new platforms and license service
+      - name: PHP lint on all public platforms
         run: |
           set -euo pipefail
-          find web joomla shopify licenca -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
+          find web joomla shopify -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
       - name: Offline public contract, historical price and archive tests
         run: php web/tests/test.php
       - name: Shared PHP and Joomla catalog UI, CRUD and stale-write protection
@@ -43,11 +42,6 @@ jobs:
         run: php shopify/tests/test_proxy.php
       - name: Shopify signed privacy compliance and erasure tests
         run: php shopify/tests/test_webhooks.php
-      - name: Central domain-bound license server regression
-        run: php licenca/tests/test.php
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
       - name: Render PHP/Joomla shared UI and test 14 pages at 13 viewport sizes
         shell: bash
         run: |
