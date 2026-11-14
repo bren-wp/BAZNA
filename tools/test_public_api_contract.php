@@ -15,6 +15,11 @@ function sidrena_contract_assert( $condition, $label ) {
 		exit( 1 );
 	}
 }
+$sidrena_test_options = array();
+function get_option( $key, $fallback = false ) {
+	global $sidrena_test_options;
+	return array_key_exists( $key, $sidrena_test_options ) ? $sidrena_test_options[ $key ] : $fallback;
+}
 function add_action( $hook, $callback ) {
 	return true;
 }
@@ -151,6 +156,7 @@ $api = Brendigo_Sidrena_Cijena_Public_API::instance();
 $api->register();
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/cjenici'] ), 'Canonical BAZNA discovery route registered' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/arhiva'] ), 'Canonical BAZNA archive registered' );
+sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/usluge-na-upit'] ), 'Canonical public inquiry route registered' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-bazna/v1/cjenici/(?P<kind>proizvodi|usluge)/(?P<format>xml|csv)'] ), 'Canonical BAZNA CSV/XML feeds registered' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/cjenici'] ), 'Discovery route registered on plugin init' );
 sidrena_contract_assert( isset( $sidrena_registered_routes['brendigo-sidrena/v1/arhiva'] ), 'Archive route registered on plugin init' );
@@ -192,6 +198,20 @@ sidrena_contract_assert( 'public_read_only' === $json['connection']['mode'], 'Mo
 sidrena_contract_assert( false === $json['connection']['authentication_required'], 'No credentials on public price API' );
 sidrena_contract_assert( true === $json['connection']['csv_publication_required'], 'CSV readiness is not fabricated on first install' );
 sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-bazna/v1/cjenici' === $json['connection']['rest_endpoint'], 'Canonical REST connection endpoint present' );
+sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-bazna/v1/usluge-na-upit' === $json['on_request'], 'Read-only published inquiry URL exposed' );
+$not_published = $api->on_request_services();
+sidrena_contract_assert( array() === $not_published['items'], 'Unpublished on-request services do not leak' );
+$sidrena_test_options['sidrena_cijena_upit'] = array( array( 'id' => '11', 'naziv' => 'Privatni nacrt', 'kriteriji' => 'Ne objavljuj' ) );
+sidrena_contract_assert( array() === $api->on_request_services()['items'], 'Draft option is never a public source' );
+$sidrena_test_options['brendigo_bazna_published_inquiry_v1'] = array(
+    array( 'id' => '1', 'name' => 'Montaža', 'criteria' => 'Ovisno o opsegu', 'outlet' => 'ri-01' ),
+    array( 'id' => '2', 'name' => '', 'criteria' => 'Nevaljan redak', 'outlet' => '' ),
+);
+$inquiry = $api->on_request_services();
+sidrena_contract_assert( 1 === $inquiry['schema'] && 1 === count( $inquiry['items'] ), 'Only sanitized published inquiries returned' );
+sidrena_contract_assert( 'Ovisno o opsegu' === $inquiry['items'][0]['criteria'], 'Publication criteria preserved' );
+sidrena_contract_assert( 'no-store, max-age=0, must-revalidate' === $inquiry->get_headers()['Cache-Control'], 'Do not cache publication snapshots' );
+
 sidrena_contract_assert( true === $json['feeds']['proizvodi']['available_csv'], 'Product feed ready' );
 sidrena_contract_assert( true === $json['feeds']['usluge']['available_csv'], 'Service feed ready' );
 sidrena_contract_assert( true === $json['publication']['csv_ready'], 'Both main feeds published' );
