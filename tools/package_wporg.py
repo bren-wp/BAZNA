@@ -47,7 +47,7 @@ BAZNA omogućuje upravljanje cijenama proizvoda i usluga, referentnim datumima, 
 3. Provjerite dokumentirane povijesne cijene i datume prije objave.
 4. Objavite javni cjenik i provjerite javne datoteke te arhivu.
 
-Nije potreban WooCommerce za ručni katalog. WordPress.org paket ne sadrži pozive za provjeru licencnih ključeva. Ne instalirajte paralelno s privatnom distribucijom istog dodatka; obje koriste iste kompatibilne podatke, klase i REST rute.
+Nije potreban WooCommerce za ručni katalog. WordPress.org paket ne sadrži pozive za provjeru licencnih ključeva. Ne aktivirajte oba BAZNA paketa istodobno: službeni ZIP i WordPress.org kandidat dijele kompatibilne klase, podatke i REST rute. WordPress.org distribucija zahtijeva zaseban službeni pregled.
 
 == Frequently Asked Questions ==
 
