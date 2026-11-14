@@ -62,16 +62,10 @@ class CatalogDiscoveryTest {
         }
     }
 
-    @Test fun allBAZNAPlatformsShareReadOnlyLicenseContract() {
+    @Test fun everyPlatformWorksWithoutAnyActivationField() {
         for (platform in listOf("wordpress", "web", "joomla", "shopify")) {
-            val payload = payload()
-                .put("platform", platform)
-                .put("licensing", JSONObject()
-                    .put("required", true)
-                    .put("active", false))
-            val result = CatalogDiscovery.parse(payload, site)
+            val result = CatalogDiscovery.parse(payload().put("platform", platform), site)
             assertEquals(platform, result.platform)
-            assertEquals(false, result.wordpressLicenseActive)
             assertEquals("RI-01", result.outlets.single().code)
         }
         assertThrows(IllegalArgumentException::class.java) {
@@ -103,21 +97,14 @@ class CatalogDiscoveryTest {
         }
     }
 
-    @Test fun publicPricesRemainReadableWhenWordPressLicenseIsInactive() {
-        val licensing = JSONObject().put("required", true).put("active", false)
-        val index = CatalogDiscovery.parse(payload().put("licensing", licensing), site)
-        assertEquals(false, index.wordpressLicenseActive)
-        assertEquals("https://primjer.hr/usluge.csv?oznaka=RI-01", index.outlets.single().serviceCsv)
-        licensing.put("active", true)
-        assertEquals(true, CatalogDiscovery.parse(payload().put("licensing", licensing), site).wordpressLicenseActive)
-        for (invalid in listOf(
-            JSONObject().put("required", true).put("active", "active"),
-            JSONObject().put("required", false).put("active", true),
-        )) {
-            assertThrows(IllegalArgumentException::class.java) {
-                CatalogDiscovery.parse(payload().put("licensing", invalid), site)
-            }
-        }
+    @Test fun legacyLicenseMetadataIsIgnoredRatherThanBlockingCatalog() {
+        val old = payload().put("licensing", JSONObject().put("required", true).put("active", false))
+        val result = CatalogDiscovery.parse(old, site)
+        assertEquals("https://primjer.hr/usluge.csv?oznaka=RI-01",
+            result.outlets.single().serviceCsv)
+        // License status is obsolete; ignore malformed legacy metadata too.
+        old.put("licensing", JSONObject().put("required", "wrong").put("active", "no"))
+        assertEquals("wordpress", CatalogDiscovery.parse(old, site).platform)
     }
 
     @Test fun rejectsUnknownOrMissingApiVersion() {

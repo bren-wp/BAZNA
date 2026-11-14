@@ -133,7 +133,6 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	private function __construct() {
 		Brendigo_Sidrena_Cijena_Settings::instance();
-		Brendigo_Sidrena_Cijena_License::instance();
 		Brendigo_Sidrena_Cijena_I18n::instance();
 		Brendigo_Sidrena_Cijena_Audit_Log::instance();
 		Brendigo_Sidrena_Cijena_Catalog::instance();
@@ -144,9 +143,8 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 		Brendigo_Sidrena_Cijena_Public_API::instance();
 		Brendigo_Sidrena_Cijena_Frontend::instance();
 
-		// Public price display is a consumer-facing obligation, not a premium
-		// administration feature. Preserve storefront meta, theme compatibility
-		// and Woo Blocks even if the editing licence becomes inactive.
+		// Preserve storefront meta, theme compatibility and Woo Blocks regardless
+		// of whether WooCommerce catalog import tools are enabled.
 		if ( self::woocommerce_active() ) {
 			Brendigo_Sidrena_Cijena_Product_Meta::instance();
 			Brendigo_Sidrena_Cijena_Compat::instance();
@@ -155,23 +153,21 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 
 		if ( is_admin() ) {
 			Brendigo_Sidrena_Cijena_Admin::instance();
-			if ( Brendigo_Sidrena_Cijena_License::valid() ) {
-				Brendigo_Sidrena_Cijena_Bulk_Import::instance();
-			}
+			Brendigo_Sidrena_Cijena_Bulk_Import::instance();
 		}
 
-		if ( Brendigo_Sidrena_Cijena_License::valid() && defined( 'WP_CLI' ) && WP_CLI ) {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			WP_CLI::add_command( 'sidrena-cijena', 'Brendigo_Sidrena_Cijena_CLI' );
 			WP_CLI::add_command( 'bazna', 'Brendigo_Sidrena_Cijena_CLI' );
 		}
 
-		if ( ! Brendigo_Sidrena_Cijena_License::valid() || ! self::woocommerce_active() ) {
+		if ( ! self::woocommerce_active() ) {
 			return;
 		}
 
 		add_action( 'sidrena_cijena_snapshot_batch', array( 'Brendigo_Sidrena_Cijena_Activator', 'process_batch' ) );
 
-		// CSV import and other editing-only integrations require a licence.
+		// WooCommerce editing integration requires the actual WC plugin, not a key.
 		Brendigo_Sidrena_Cijena_Import_Export::instance();
 	}
 
