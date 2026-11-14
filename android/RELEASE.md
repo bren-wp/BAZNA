@@ -1,25 +1,41 @@
-# BAZNA — Bazne cijene — verzije i izdavanja
+# BAZNA 1.5.17 — izdanja i Google Play
 
-| Komponenta | Verzija |
+## Izdanje
+| Platforma | Verzija |
 |---|---|
-| Android | **1.5.16 (javno izdanje)** |
-| Windows Desktop | **0.10.6** |
-| WordPress dodatak | **1.5.16 (javno izdanje)** |
+| Android | **1.5.17**, `versionCode 20`, `com.brendigo.bazna` |
+| WordPress | **1.5.17**, bez promjena baze i javnog REST API-ja |
+| Windows | **0.10.6** |
+| Web / Joomla / Shopify | **1.1.2** |
 
-Verzije su **odvojene**. Android 1.5.16 i WordPress 1.5.16 sadrže stvarne, međusobno usklađene promjene u PR-u za izdanje 1.5.16. Izdanje se objavljuje tek nakon uspješnog Android, WordPress, Windows i sigurnosnog CI-ja; debug APK i nepotpisani AAB nisu produkcijski potpisani. WordPress dodatak 1.5.16 potrebno je zasebno instalirati ili ažurirati da bi novi statusi objave CSV-a bili dostupni Androidu.
+BAZNA 1.5.17 donosi moderniziran Android build, provjere sigurnosti i
+responzivnosti te izdvajanje navigacijske logike u zasebni modul.
+Android je i dalje nativna aplikacija samo za čitanje javnih HTTPS cjenika.
 
-## Provjere i artefakti
+**Važno:** Android paket `com.brendigo.bazna` je NOVI identifikator.
+Google Play NE može ažurirati prethodnu aplikaciju `com.brendigo.sidrena`
+ovim AAB-om. Potreban je zaseban Play Console unos za novu aplikaciju.
+Obje aplikacije mogu koegzistirati, ali se postavke lokalno ne prenose
+automatski. Korisnik može ponovno unijeti postojeću javnu HTTPS domenu.
 
-Automatski GitHub Actions postupci izvode Android Kotlin/JUnit/lint provjere i grade APK i AAB, a Windows postupak pokreće .NET testove, WPF navigacijske provjere, izrađuje prijenosnu aplikaciju i Inno Setup instalaciju. Poseban audit pokriva WordPress PHP sintaksu i integritet službenog paketa, Windows i Android statičke provjere.
+## Izgradnja, provjere i isporuka
 
-Novo objedinjeno izdanje sadrži:
-- `BAZNA-Android-debug.apk` — Android instalacijski APK za provjeru.
-- `BAZNA-Android-unsigned.aab` — AAB bez produkcijskog potpisa.
-- `BAZNA-Desktop-win-x64-Portable.exe` — Windows prijenosna aplikacija.
-- `BAZNA-Desktop-win-x64-Setup.exe` — Windows instalacijski program.
-- `BAZNA-WordPress-1.5.16.zip` — WordPress ZIP isporučen u GitHub izdanju nakon provjere izvornog koda i kontrolnih zbrojeva.
-- Kontrolne SHA-256 datoteke i Windows izvještaj o porijeklu binarnih datoteka.
+GitHub Actions kompilira Android aplikaciju, izvodi Kotlin/JUnit i lint,
+izrađuje debug APK i nepotpisani AAB te računa SHA-256. Instrumentacijski
+test provjerava 12 zaslona na 9 emulator konfiguracija. Ova mjerenja
+nisu dokaz 1:1 podudarnosti bez izvornih PNG dizajnerskih referenci.
 
-Objava paketa moguća je tek kada Android i WordPress CI uspješno završe za isti commit i svi novi reproducibilni ZIP paketi imaju potvrđene SHA-256 kontrolne zbrojeve. WordPress ZIP 1.5.16 namjerno ima novi hash zbog promjena izvornog koda. U nedostatku produkcijskog potpisnog ključa Android AAB ne treba predstavljati kao spreman za Google Play.
+Objedinjeni GitHub release objavljuje:
+- `BAZNA-Android-debug.apk` — samo za instalaciju i testiranje
+- `BAZNA-Android-unsigned.aab` — potrebno potpisivanje prije Play Consolea
+- Windows Portable i Setup, WordPress ZIP, dodatne adapterske ZIP pakete
+- SHA-256 i informacije o podrijetlu builda
 
-[GitHub izdanja](https://github.com/bren-wp/BAZNA/releases)
+**Niti debug APK niti nepotpisani AAB nisu Play-ready potpisani proizvodni artefakti.**
+Za Google Play potpišite AAB ispravnim novim upload ključem, objavite
+odgovarajuću politiku privatnosti, popunite Data safety i sve izjave u
+Play Consoleu. Ne unosite keystore ili lozinke u Git.
+
+[Detaljna provjera Google Playa](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
+ · [Migracija identifikatora](../docs/BAZNA-ANDROID-PACKAGE-MIGRATION.md)
+ · [GitHub izdanja](https://github.com/bren-wp/BAZNA/releases)

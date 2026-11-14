@@ -3,7 +3,7 @@
 This checklist covers the Android app only. **Passing CI does not imply Play approval**.
 
 ## Build prerequisites
-- Android package ID: `com.brendigo.sidrena` (DO NOT change for an existing Play listing).
+- Android package ID: `com.brendigo.bazna` (NEW Play listing; NOT an update to the former app).
 - `minSdk = 26`, `targetSdk = 36` (Google Play minimum for new apps and updates after 31 August 2026).
 - Java 17 / Gradle 9.6 / AGP 9.4; Android SDK 37.0 for compilation (use `sdkmanager "platforms;android-37.0"`, not the invalid `android-37` package name), target remains Android 16.
 - Stable Compose BOM, AndroidX Activity/Lifecycle, Kotlin Compose compiler, coroutines and OkHttp.
@@ -12,9 +12,9 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 - CI-produced `BAZNA-Android-unsigned.aab` is **not uploadable until signed** with the authorized upload key.
 
 ## Signing and store delivery
-1. Retain the existing `applicationId` and use a `versionCode` greater than the latest uploaded Play artifact.
+1. Use `applicationId=com.brendigo.bazna` and `versionCode=20`. This is **a new app**, not an update to `com.brendigo.sidrena`. The former app stays installed separately and its local preferences do not automatically transfer.
 2. In Android Studio choose **Build → Generate Signed Bundle / APK → Android App Bundle**.
-3. Select the correct **upload key** previously registered for this app; never commit a keystore or passwords.
+3. Sign using a controlled upload key for the **new** BAZNA Play listing; do not assume the former app's Play App Signing configuration transfers. Never commit a keystore or passwords.
 4. Confirm the resulting AAB is signed with the intended upload certificate.
 5. Upload the AAB to Play Console (internal test first), where **Play App Signing** manages distribution signatures.
 6. Inspect the **Android vitals**, pre-launch report, permission declarations, crash/ANR results and Play warnings.
@@ -23,7 +23,7 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 - The app reads public prices directly from a site chosen by the user, over HTTPS. The site can see the client's network metadata, including its IP address, when serving data/images.
 - The app stores the chosen site URL and outlet selection in local preferences; no admin credentials are required or collected by the Android app.
 - A visible in-app link opens the existing [Brendigo privacy policy](https://brendigo.com/politika-privatnosti/).
-- **Before release**, add BAZNA-Android-specific disclosures to that public HTML privacy policy; the current generic website policy alone has not been confirmed sufficient.
+- **Before release**, publish BAZNA-specific disclosures on the live HTML privacy policy (the current website-wide policy is not sufficient evidence of Android-specific disclosures). See `docs/BAZNA-ANDROID-PRIVACY-DRAFT.md`.
 - Complete Play Console **Data safety** accurately based on an SDK, network and server-side data flow review. Do not claim "no data collected" without auditing the remote publisher and SDKs.
 - Provide store description, icon, feature graphic, real phone screenshots, contact details, content rating, app-access information, ads declaration, country availability and applicable declarations.
 - The app is public-catalog **read-only**; do not advertise mobile price editing or automatic bidirectional sync.

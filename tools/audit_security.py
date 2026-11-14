@@ -24,9 +24,9 @@ main=read("wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php")
 readme=read("wordpress/brendigo-sidrena-cijena/readme.txt")
 api=read("wordpress/brendigo-sidrena-cijena/includes/class-public-api.php")
 legal=read("wordpress/brendigo-sidrena-cijena/includes/class-legal.php")
-android=read("android/app/src/main/java/com/brendigo/sidrena/data/LegalContract.kt")
+android=read("android/app/src/main/java/com/brendigo/bazna/data/LegalContract.kt")
 win=read("desktop/Sidrena.Core/OfficialLegalContract.cs")
-guard=read("android/app/src/main/java/com/brendigo/sidrena/data/PublicNetworkGuard.kt")
+guard=read("android/app/src/main/java/com/brendigo/bazna/data/PublicNetworkGuard.kt")
 network=read("desktop/Sidrena.Core/OfficialPluginDiscovery.cs")
 manifest=read("android/app/src/main/AndroidManifest.xml")
 release=read(".github/workflows/desktop-release.yml")
@@ -49,8 +49,8 @@ if "WP_REST_Server::CREATABLE" in api or "WP_REST_Server::EDITABLE" in api or "W
     errors.append("Unexpected writable endpoint in public REST API")
 if "usesCleartextTraffic=\"false\"" not in manifest or "allowBackup=\"false\"" not in manifest:
     errors.append("Android transport / backup policy not enforced")
-android_network=read("android/app/src/main/java/com/brendigo/sidrena/data/CatalogRepository.kt")
-android_dns=read("android/app/src/main/java/com/brendigo/sidrena/data/PublicDns.kt")
+android_network=read("android/app/src/main/java/com/brendigo/bazna/data/CatalogRepository.kt")
+android_dns=read("android/app/src/main/java/com/brendigo/bazna/data/PublicDns.kt")
 if not all(token in android_network for token in (
     ".dns(PublicDns)", ".followRedirects(false)", ".proxy(Proxy.NO_PROXY)",
 )) or not all(token in android_dns for token in (
@@ -58,7 +58,7 @@ if not all(token in android_network for token in (
 )):
     errors.append("Android socket-bound DNS filtering, redirects or proxy policy missing")
 # Require identical versioned, read-only discovery checks on both clients.
-android_discovery=read("android/app/src/main/java/com/brendigo/sidrena/data/CatalogDiscovery.kt")
+android_discovery=read("android/app/src/main/java/com/brendigo/bazna/data/CatalogDiscovery.kt")
 if not all(token in android_discovery for token in (
     'optInt("api_version", -1) == 1', "seen.add(code.lowercase())",
     "rawOutlets.length() <= MAX_OUTLETS", "site.approved(csv)",

@@ -1,6 +1,6 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.16**
+**BAZNA by Brendigo** · **1.5.17**
 
 ![BAZNA](../branding/bazna-banner.png)
 
@@ -35,6 +35,10 @@ Aplikacija koristi javno dostupne rute postojećeg WordPress dodatka:
 Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS domeni. WordPress 1.5.16 dodaje opcionalni status `feeds.proizvodi.available_csv` i `feeds.usluge.available_csv` za webshop i svaku poslovnicu: `false` znači da datoteka još nije objavljena. Stari dodaci bez statusnih polja ostaju podržani. Proizvodi mogu neobavezno sadržavati stvarni `slika_url` s iste HTTPS domene, uz lokalnu ikonu kada ga nema. Prije povezivanja na WordPressu generirajte javni CSV cjenik, zatim u aplikaciji po potrebi odaberite Osvježi. Sadržaj poslovnica i arhive ovisi o stvarno objavljenim podacima na stranici. Aplikacija ne prikazuje izmišljene podatke kada javno sučelje ne nudi povijest promjena ili druge informacije.
 
 **Uređivanje cijena ostaje u WordPressu ili Windows aplikaciji** dok ne postoji autorizirani REST API za mobilno uređivanje.
+
+## Google Play — novi identifikator
+
+Android koristi `com.brendigo.bazna`. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
 
 ## Instalacija
 
