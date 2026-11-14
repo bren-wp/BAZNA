@@ -128,9 +128,20 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			$pending = Brendigo_Sidrena_Cijena_Automation::instance()->get_pending_state();
 		}
 		$pending_changes = is_array( $pending ) && ! empty( $pending['since'] );
+		// Each outlet has independent published CSV paths. A valid webshop feed
+		// does not prove that every outlet's files were generated.
+		$all_outlets_ready = true;
+		foreach ( $out['outlets'] as $outlet ) {
+			if ( ! $outlet['feeds']['proizvodi']['available_csv'] ||
+				! $outlet['feeds']['usluge']['available_csv'] ) {
+				$all_outlets_ready = false;
+				break;
+			}
+		}
 		// Optional, backwards-compatible status: old clients still use feeds[*].csv.
 		$out['publication'] = array(
 			'csv_ready' => $out['feeds']['proizvodi']['available_csv'] && $out['feeds']['usluge']['available_csv'],
+			'csv_ready_all_outlets' => $out['feeds']['proizvodi']['available_csv'] && $out['feeds']['usluge']['available_csv'] && $all_outlets_ready,
 			'generated_at' => $out['published_at'],
 			'pending_changes' => $pending_changes,
 			// This technical status is never certification of legal price accuracy.

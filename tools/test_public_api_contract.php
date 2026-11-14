@@ -7,7 +7,7 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
-define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.16' );
+define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.18' );
 
 function sidrena_contract_assert( $condition, $label ) {
 	if ( ! $condition ) {
@@ -195,6 +195,7 @@ sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-bazna/v1/cjenici' 
 sidrena_contract_assert( true === $json['feeds']['proizvodi']['available_csv'], 'Product feed ready' );
 sidrena_contract_assert( true === $json['feeds']['usluge']['available_csv'], 'Service feed ready' );
 sidrena_contract_assert( true === $json['publication']['csv_ready'], 'Both main feeds published' );
+sidrena_contract_assert( false === $json['publication']['csv_ready_all_outlets'], 'Unpublished outlet cannot borrow webshop readiness' );
 sidrena_contract_assert( false === $json['publication']['pending_changes'], 'No unverified changes on a clean standalone installation' );
 sidrena_contract_assert( false === $json['publication']['compliance_certified'], 'Published CSV does not certify legally correct prices' );
 sidrena_contract_assert( 'https://primjer.hr/wp-json/brendigo-bazna/v1/cjenici/proizvodi/csv' === $json['feeds']['proizvodi']['csv'], 'Existing CSV URL unchanged' );
@@ -226,6 +227,7 @@ $sidrena_plain_permalinks = false;
 unlink( $services );
 $after = $api->index();
 sidrena_contract_assert( false === $after['publication']['csv_ready'], 'Deleting published CSV correctly marks pending' );
+sidrena_contract_assert( false === $after['publication']['csv_ready_all_outlets'], 'All-outlet status follows missing main CSV' );
 sidrena_contract_assert( false === $after['feeds']['usluge']['available_csv'], 'Missing main CSV does not appear ready' );
 sidrena_contract_assert( true === $after['feeds']['proizvodi']['available_csv'], 'Unaffected product CSV still available' );
 
