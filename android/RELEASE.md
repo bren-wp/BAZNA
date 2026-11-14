@@ -1,34 +1,44 @@
-# BAZNA 1.5.19 — Android, WordPress i adapteri
+# BAZNA 1.5.20 — službeni izvorni paketi i Google Play provjere
 
-- **Android 1.5.19**: `com.brendigo.bazna`, `versionCode=22`,
-  `targetSdk=36`, `minSdk=26`, `compileSdk=37`.
-- **WordPress 1.5.19**: WooCommerce / standalone katalog, poslovnice,
-  HTML, CSV/XML, arhiva, usluge s cijenom na upit.
-- **Web PHP / Joomla / Shopify 1.1.3**: zajednička javna shema i
-  objavljivanje opisnih usluga bez unaprijed utvrđenog iznosa.
-- **Windows**: postojeća desktop verzija uključena u zajedničko izdanje.
+| Komponenta | Verzija | Napomena |
+|---|---|---|
+| Android | **1.5.20**, code **23** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
+| WordPress / WooCommerce | **1.5.20** | Zadržani svi postojeći podaci i REST v1 |
+| Web PHP, Joomla, Shopify | **1.1.4** | Zajednički Core, javni HTML i filtrirani REST |
+| Windows | zasebna desktop verzija | Isporučuje se u istom releaseu nakon smoke testova |
 
-## Ujednačen javni REST v1
+## Novo: isti javni prikaz na svim platformama
 
-Opcionalna `on_request` poveznica u katalogu vodi na javni popis
-usluga koje imaju `id`, `name`, `criteria`, `outlet`. Usluge
-ne nose brojčani iznos niti se pretvaraju u numerički CSV/XML.
-WordPress stvara neautoloadani snapshot nakon uspješne javne objave;
-PHP/Joomla/Shopify čitaju objavljeni, ne uređivački katalog.
-Android provjerava JSON tipove, poslovnice i HTTPS istog izvora.
-Stariji poslužitelji bez nove poveznice i dalje rade.
+WordPress zadržava javni HTML cjenik i proširuje REST v1 pregled
+usluga „Cijena na upit” filtrima `outlet` i `q`.
+Web, Joomla i Shopify koriste istu PHP funkciju za HTML prikaz
+**posljednje objavljenih** proizvoda, numeričkih usluga i usluga
+s cijenom na upit. PHP/Web omogućuje odabir poslovnice i pretragu
+po nazivu, šifri, marki i barkodu, uz kriterije za dogovorne cijene.
+Shopify i dalje zahtijeva valjani potpisani proxy zahtjev.
 
-## Google Play i ograničenja
+Androidova opća pretraga sada prikazuje i usluge na upit kao
+zasebne kartice s kriterijima. Nikad im ne dodaje lažnu cijenu.
+Filtri „Sve / Proizvodi / Usluge” i poslovnica primjenjuju se na
+stvarno objavljene podatke.
 
-Unsigned AAB se mora potpisati ispravnim upload ključem.
-Potrebno je provjeriti Play Console Data safety izjave, stvarne SDK-ove,
-privatnost i dostupnost BAZNA-specifične politike privatnosti.
-CI nije Google Play odobrenje ni potvrda pravne usklađenosti.
-Android ostaje isključivo javni klijent; ne dijeli WooCommerce
-administratorske ovlasti ni korisničke lozinke s WP dodatkom.
-WooCommerce porezni obračun je specifičan za WordPress; ostali
-adapteri razmjenjuju samo objavljene konačne iznose.
+## Stabilnost i kompatibilnost
 
-[Usporedba značajki](../docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
- · [Play provjere](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
- · [Izdanja](https://github.com/bren-wp/BAZNA/releases)
+Ostaju netaknuti administratorski računi i hashovi, WooCommerce
+podaci, povijesni iznosi, arhive i sve prethodne REST v1 rute.
+Ova verzija ne tvrdi da Joomla ili Shopify izvode WP/WooCommerce
+funkcije: usklađena je javna semantika, a administracija ostaje
+autentificirana i platformno specifična.
+
+## Android potpisivanje i Google Play
+
+GitHub izdanje isporučuje **nepotpisani release AAB** i **debug APK**.
+Potrebno je potpisati AAB privatnim upload ključem, popuniti stvarnu
+Data safety izjavu, objaviti aplikaciji specifičnu politiku
+privatnosti i proći Play Console reviziju. CI testovi nisu
+zamjena za Googleovo odobrenje, pravno mišljenje ili pixel-perfect
+certifikat.
+
+[Podudarnost s MJDD 1.26.0](../docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
+ · [Play Checklist](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
+ · [Sva izdanja](https://github.com/bren-wp/BAZNA/releases)

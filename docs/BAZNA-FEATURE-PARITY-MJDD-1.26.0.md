@@ -8,7 +8,7 @@ BAZNA komponentama; originalni MJDD vizualni identitet nije prenesen.
 
 ## Matrica funkcionalnosti
 
-| Funkcionalnost iz reference | BAZNA WordPress 1.5.19 | Web PHP / Joomla 1.1.3 | Shopify 1.1.3 | Android 1.5.19 |
+| Funkcionalnost iz reference | BAZNA WordPress 1.5.20 | Web PHP / Joomla 1.1.4 | Shopify 1.1.4 | Android 1.5.20 |
 |---|---|---|---|---|
 | WooCommerce proizvodi i varijacije | Da | Nije WooCommerce | Shopify adapter | Samo čitanje objavljenog CSV-a |
 | Samostalni katalog proizvoda/usluga | Da | Da | Da, prema dostupnom backendu | Javni pregled |
@@ -60,3 +60,23 @@ Android HTTPS/parser. **Nije potvrđena potpuna funkcionalna
 istovjetnost svih WooCommerce i Shopify administracijskih operacija**,
 stvarna usklađenost trgovca sa zakonom, Google Play Console odobrenje
 niti pixel-diff 0 % na svim grafičkim referencama.
+
+## Dodatna podudarnost u BAZNA 1.5.20
+
+- Web PHP, Joomla i Shopify koriste zajedničku metodu
+  `Core::publicCatalogHtml` za objavljene proizvode, usluge i kriterije
+  cijene na upit. Sve korisničke vrijednosti HTML-escapeaju se.
+  Na Webu je dostupna i pretraga te odabir poslovnice; na Shopifyju
+  zahtjevi i dalje trebaju valjani app-proxy potpis.
+- WordPress i svi serverski adapteri imaju aditivne, opcionalne REST
+  parametre `outlet` i `q` na ruti za usluge s cijenom na upit.
+  Stari klijenti bez tih parametara i dalje dobivaju dosadašnji odgovor.
+- Androidova opća pretraga uključuje objavljene usluge na upit,
+  filtrirane po poslovnici i kategoriji. Ne otvara lažni detalj cijene.
+- PHP i Android imaju regresijske provjere objavljivanja, XSS escaping,
+  pretrage, sprječavanja miješanja poslovnica i skrivenosti nacrta.
+- **Granice ostaju:** nijedan automatski uvoz WooCommerce priključaka
+  u Joomlu ili Shopify nije tvrdnja funkcionalne jednakosti;
+  za Shopify Android pristup potreban je podržan način autentikacije
+  app-proxyja. Testovi ne potvrđuju Google Play odobrenje niti
+  potpuni pravni ili 0% pixel-diff certifikat.
