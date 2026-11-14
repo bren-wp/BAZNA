@@ -4,7 +4,7 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.20
+Stable tag: 1.5.21
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 
 == Description ==
 
-**Svi alati bez aktivacije:** BAZNA 1.5.20 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
+**Svi alati bez aktivacije:** BAZNA 1.5.21 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
 
 
 **BAZNA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
@@ -180,7 +180,14 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 
 == Changelog ==
 
-= 1.5.20 =
+= 1.5.21 =
+
+* Usklađeno objavljivanje na postojeći WordPress.org slug brendigo-sidrena-cijena: nadogradnja kroz standardne WordPress dodatke, bez novog sluga ili reaktivacije.
+* Unificirani WordPress ZIP i WordPress.org izvor, dodatne provjere identiteta i sigurnosne provjere izdanja.
+* Bez promjena spremljenih cijena, postavki, arhive, shortcodova, WooCommerce podataka ili javnog REST v1 API-ja.
+
+
+= 1.5.21 =
 * Uklonjena aktivacijska provjera i zaključavanje uvoza, uređivanja i objave. Službeni ZIP i WordPress.org kandidat koriste istu otključanu jezgru.
 * REST v1 on-request search supports optional outlet and criteria query; public results never include unapproved drafts.
 * Same published HTML price-list semantics across PHP/Joomla/Shopify and Android's global catalog search.
