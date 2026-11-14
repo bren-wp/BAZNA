@@ -93,6 +93,23 @@ try {
         $catalog = $core->read('published.json');
         echo '<!doctype html><html lang="hr"><meta name="viewport" content="width=device-width, initial-scale=1">';
         echo '<meta charset="utf-8"><title>BAZNA — Shopify</title>';
+        // Shopify does not inherit the shared PHP/Joomla stylesheet.
+        // Keep the public rows usable on phones without an external asset.
+        echo '<style>*{box-sizing:border-box}body{margin:0;line-height:1.5}' .
+            'main{width:100%;max-width:900px;padding:0 8px}' .
+            '.bazna-panel{background:#102237;border:1px solid #2c4359;' .
+            'padding:16px;border-radius:12px;margin:14px 0;max-width:100%;overflow-wrap:anywhere}' .
+            '.bazna-muted{color:#a6bbd1}.bazna-table-scroll{max-width:100%;overflow-x:auto}' .
+            'table{border-collapse:collapse;width:100%;min-width:680px}' .
+            'td,th{padding:11px;border-bottom:1px solid #2c4359;text-align:left}' .
+            'th{color:#ffc47b}a{color:#ffb860}' .
+            '@media(max-width:480px){main{padding:0 2px}.bazna-panel{padding:12px}' .
+            'table{min-width:0}thead{display:none}tbody,tr,td{display:block;width:100%}' .
+            'tr{border:1px solid #2c4359;border-radius:8px;margin:10px 0;padding:6px}' .
+            'td{border:0;padding:7px;display:flex;gap:10px;justify-content:space-between;' .
+            'overflow-wrap:anywhere}td:before{content:attr(data-label);color:#a6bbd1;' .
+            'font-size:11px;flex:0 0 42%}}' .
+            '</style>';
         echo '<body style="background:#081525;color:#fff;font:16px system-ui;padding:20px">';
         echo '<main style="max-width:900px;margin:auto"><h1>BAZNA — Bazne cijene</h1>';
         echo '<p>Objavljeno: ' . Core::esc((string) ($catalog['published_at'] ?? 'nije objavljeno')) . '</p>';
