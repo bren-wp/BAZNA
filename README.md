@@ -22,7 +22,7 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 
 ## Sve funkcije bez aktivacijskog ključa
 
-**BAZNA 1.5.20** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
+**BAZNA 1.5.21** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
 
 ## Sve cijene na jednom mjestu
 
@@ -55,7 +55,7 @@ i služi za pregled, a ne upravljanje WordPressom.
 
 ## Jedna javna logika cjenika, uz punu kontrolu objave
 
-**Novo u 1.5.20:** WordPress, samostalni Web PHP, Joomla i Shopify
+**Novo u 1.5.21:** WordPress, samostalni Web PHP, Joomla i Shopify
 prikazuju objavljene proizvode, usluge i usluge s cijenom na upit
 uz jedinstvene nazive, iznose, povijesne datume i poslovnice.
 Web omogućuje pretraživanje i odabir poslovnice, Joomla i Shopify
@@ -74,11 +74,11 @@ i ne pristupa korisničkim računima u WordPressu.
 
 | Platforma | Namjena | Verzija | Status |
 |---|---|---|---|
-| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.20** | CI provjeren; kandidat WordPress.org paketa |
+| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.21** | CI provjeren; kandidat WordPress.org paketa |
 | **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.4** | Funkcionalni paket; potreban test na stvarnom hostingu |
 | **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i sigurnom administracijom | **1.1.4** | Kandidat; potreban instalacijski test u Joomli |
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.4** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.20** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
+| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.21** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
 | **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.7** | Windows CI i stvarne provjere sučelja |
 
 ## Jedinstveni podaci na svim platformama
