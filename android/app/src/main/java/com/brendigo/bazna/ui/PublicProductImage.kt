@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -24,8 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.brendigo.sidrena.data.PublicDns
-import com.brendigo.sidrena.data.SiteUrl
+import com.brendigo.bazna.data.PublicDns
+import com.brendigo.bazna.data.SiteUrl
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

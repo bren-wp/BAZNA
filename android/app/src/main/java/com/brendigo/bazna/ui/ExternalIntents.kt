@@ -1,12 +1,12 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.SiteUrl
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.SiteUrl
 
 internal const val BAZNA_PRIVACY_URL = "https://brendigo.com/politika-privatnosti/"
 

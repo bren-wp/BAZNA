@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -58,10 +58,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.brendigo.sidrena.data.CatalogIndex
-import com.brendigo.sidrena.data.CatalogSearch
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.PriceItem
+import com.brendigo.bazna.data.CatalogIndex
+import com.brendigo.bazna.data.CatalogSearch
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.PriceItem
 
 /**
  * Screen 05/12: Usluge — the reference's title, wide search box and compact

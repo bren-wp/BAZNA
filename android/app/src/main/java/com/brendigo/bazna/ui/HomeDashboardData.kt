@@ -1,7 +1,7 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.SiteUrl
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.SiteUrl
 import java.net.URI
 import java.text.NumberFormat
 import java.util.Locale
