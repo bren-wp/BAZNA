@@ -5,6 +5,8 @@ on:
       - 'wordpress/brendigo-sidrena-cijena/**'
       - 'tools/package_plugin.py'
       - 'tools/package_wporg.py'
+      - 'tools/test_wporg_update_contract.py'
+      - '.github/workflows/deploy-wordpress-org.yml'
       - 'tools/test_legal_contract.php'
       - 'tools/test_public_api_contract.php'
       - 'tools/test_public_feed_columns.php'
@@ -46,6 +48,8 @@ jobs:
         run: php tools/test_public_api_contract.php
       - name: Verify original GPL attribution and license-free review readiness
         run: python3 tools/test_wporg_readiness.py
+      - name: Verify native WordPress.org update-in-place and ZIP identity
+        run: python3 tools/test_wporg_update_contract.py
       - name: Test optional product imagery and CSV field compatibility
         run: php tools/test_public_feed_columns.php
       - name: Test public mobile service cards and HTML escaping
