@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -26,11 +26,11 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.brendigo.sidrena.data.ArchiveEntry
-import com.brendigo.sidrena.data.CatalogIndex
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.Outlet
-import com.brendigo.sidrena.data.PriceItem
+import com.brendigo.bazna.data.ArchiveEntry
+import com.brendigo.bazna.data.CatalogIndex
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.Outlet
+import com.brendigo.bazna.data.PriceItem
 import java.io.File
 import java.io.FileOutputStream
 import org.junit.Assert.assertTrue

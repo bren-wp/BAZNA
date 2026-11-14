@@ -1,4 +1,4 @@
-package com.brendigo.sidrena
+package com.brendigo.bazna
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,9 +7,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import com.brendigo.sidrena.ui.SidrenaApp
-import com.brendigo.sidrena.ui.SidrenaSplashScreen
-import com.brendigo.sidrena.ui.SidrenaTheme
+import com.brendigo.bazna.ui.SidrenaApp
+import com.brendigo.bazna.ui.SidrenaSplashScreen
+import com.brendigo.bazna.ui.SidrenaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

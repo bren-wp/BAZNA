@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.data
+package com.brendigo.bazna.data
 
 /** Filtering uses only data returned by the public SIDRENA API. */
 object CatalogSearch {

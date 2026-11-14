@@ -1,4 +1,4 @@
-package com.brendigo.sidrena
+package com.brendigo.bazna
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.brendigo.sidrena.data.CatalogRepository
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.SiteUrl
+import com.brendigo.bazna.data.CatalogRepository
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.SiteUrl
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 

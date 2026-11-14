@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.data
+package com.brendigo.bazna.data
 
 import java.net.URI
 

@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.data
+package com.brendigo.bazna.data
 
 /**
  * RFC 4180-style quoted fields, with the BAZNA public-feed semicolon separator.

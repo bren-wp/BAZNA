@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.data
+package com.brendigo.bazna.data
 
 data class Outlet(
     val name: String,
