@@ -1,10 +1,10 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
-import com.brendigo.sidrena.data.ArchiveEntry
-import com.brendigo.sidrena.data.CatalogIndex
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.Outlet
-import com.brendigo.sidrena.data.PriceItem
+import com.brendigo.bazna.data.ArchiveEntry
+import com.brendigo.bazna.data.CatalogIndex
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.Outlet
+import com.brendigo.bazna.data.PriceItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

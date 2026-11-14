@@ -1,7 +1,7 @@
-package com.brendigo.sidrena.data
+package com.brendigo.bazna.data
 
-import com.brendigo.sidrena.ui.approvedProductImageUrl
-import com.brendigo.sidrena.ui.filterProductCatalog
+import com.brendigo.bazna.ui.approvedProductImageUrl
+import com.brendigo.bazna.ui.filterProductCatalog
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

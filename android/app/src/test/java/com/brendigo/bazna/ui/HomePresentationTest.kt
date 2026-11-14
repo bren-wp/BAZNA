@@ -1,6 +1,6 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
-import com.brendigo.sidrena.data.ArchiveEntry
+import com.brendigo.bazna.data.ArchiveEntry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

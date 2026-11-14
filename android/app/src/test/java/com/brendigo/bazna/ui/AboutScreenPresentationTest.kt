@@ -1,8 +1,8 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
-import com.brendigo.sidrena.data.CatalogIndex
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.LegalContract
+import com.brendigo.bazna.data.CatalogIndex
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.LegalContract
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
