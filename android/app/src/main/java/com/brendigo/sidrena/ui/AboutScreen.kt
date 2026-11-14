@@ -107,6 +107,7 @@ fun AboutPage(
     onAnchorHelp: () -> Unit,
     onSupport: () -> Unit,
     onOpenPublic: (String) -> Unit,
+    onPrivacy: () -> Unit = {},
 ) {
     val info = aboutMetadata(data, BuildConfig.VERSION_NAME)
     val publicPage = aboutPublicPriceListUrl(data)
@@ -250,6 +251,23 @@ fun AboutPage(
                     value = "Nije automatski potvrđena ovim javnim profilom.",
                 )
             }
+        }
+
+        AboutSectionTitle("PRIVATNOST")
+        AboutGroup {
+            AboutReadOnlyRow(
+                icon = Icons.Outlined.Security,
+                title = "Podaci i povezivanje",
+                value = "BAZNA lokalno pamti HTTPS adresu stranice i odabranu poslovnicu. " +
+                    "Cjenike i slike dohvaća izravno s odabranog javnog poslužitelja.",
+            )
+            AboutDivider()
+            AboutActionRow(
+                icon = Icons.Outlined.OpenInNew,
+                title = "Politika privatnosti",
+                subtitle = "Brendigo · otvori u pregledniku",
+                onClick = onPrivacy,
+            )
         }
 
         AboutSectionTitle("PODRŠKA")

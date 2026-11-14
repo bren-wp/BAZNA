@@ -17,6 +17,7 @@ internal object AdaptiveSizing {
         return availableDp.coerceAtLeast(1).coerceAtMost(bound)
     }
 
-    fun iconOnlyNavigation(availableDp: Int): Boolean =
-        availableDp < ICON_ONLY_NAV_BELOW_DP
+    fun iconOnlyNavigation(availableDp: Int, fontScale: Float = 1f): Boolean =
+        availableDp < ICON_ONLY_NAV_BELOW_DP ||
+            (fontScale >= 1.3f && availableDp < 480)
 }

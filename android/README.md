@@ -42,9 +42,9 @@ Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS dom
 
 ## Tehnička dokumentacija
 
-Izvorni kod koristi Kotlin, Jetpack Compose i Material 3. Za izgradnju otvorite mapu `android/` u Android Studiju (JDK 17, Android SDK 36, Gradle 8.13). Provjere kompilacije, lint i JUnit nalaze se u GitHub Actions postupku.
+Izvorni kod koristi Kotlin, Jetpack Compose i Material 3. Za izgradnju otvorite mapu `android/` u Android Studiju (JDK 17, Android SDK 37, Gradle 9.6). Provjere kompilacije, lint i JUnit nalaze se u GitHub Actions postupku.
 
-[Izdanja](RELEASE.md) · [Audit](../docs/CODE-AUDIT-2026-10-21.md) · [Podrška](mailto:info@brendigo.com)
+[Google Play kontrolni popis](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md) · [Izdanja](RELEASE.md) · [Audit](../docs/CODE-AUDIT-2026-10-21.md) · [Podrška](mailto:info@brendigo.com)
 
 ## Pravni profil (NN 101/2026 i NN 110/2026)
 

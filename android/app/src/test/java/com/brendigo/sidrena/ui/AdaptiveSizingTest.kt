@@ -28,6 +28,13 @@ class AdaptiveSizingTest {
         }
     }
 
+    @Test fun largeFontUsesAccessibleIconOnlyNavigationWhenLabelsCannotFit() {
+        assertTrue(AdaptiveSizing.iconOnlyNavigation(360, fontScale = 1.5f))
+        assertTrue(AdaptiveSizing.iconOnlyNavigation(411, fontScale = 2f))
+        assertFalse(AdaptiveSizing.iconOnlyNavigation(480, fontScale = 2f))
+        assertFalse(AdaptiveSizing.iconOnlyNavigation(393, fontScale = 1f))
+    }
+
     @Test fun sourceArtworkRetainsUnscaledPhoneWidths() {
         for (width in listOf(320, 360, 393, 411, 480, 600)) {
             assertEquals(width, AdaptiveSizing.contentWidthDp(width))

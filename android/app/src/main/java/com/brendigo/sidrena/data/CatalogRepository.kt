@@ -1,5 +1,6 @@
 package com.brendigo.sidrena.data
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -7,10 +8,8 @@ import org.json.JSONObject
 import org.json.JSONException
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.net.InetAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
 import java.net.URI
@@ -51,6 +50,8 @@ class CatalogRepository {
             }
             return try {
                 CsvParser.items(read(site, site.approved(url), 6 * 1024 * 1024))
+            } catch (cancel: CancellationException) {
+                throw cancel
             } catch (exception: Exception) {
                 warnings.add("Nije moguće učitati " + label + ". Provjerite objavu CSV cjenika.")
                 emptyList()
@@ -85,6 +86,8 @@ class CatalogRepository {
                     add(ArchiveEntry(item.optString("date"), item.optString("kind"), outlet, format, url))
                 }
             }
+        } catch (cancel: CancellationException) {
+            throw cancel
         } catch (exception: Exception) {
             warnings.add("Arhiva trenutačno nije dostupna.")
             emptyList()
@@ -115,15 +118,7 @@ class CatalogRepository {
         .followRedirects(false)
         .followSslRedirects(false)
         .proxy(Proxy.NO_PROXY)
-        .dns(object : Dns {
-            override fun lookup(hostname: String): List<InetAddress> {
-                val addresses = Dns.SYSTEM.lookup(hostname)
-                require(addresses.isNotEmpty() && addresses.all(PublicNetworkGuard::isPublic)) {
-                    "Povezana stranica mora imati isključivo javne mrežne adrese."
-                }
-                return addresses
-            }
-        })
+        .dns(PublicDns)
         .connectTimeout(8, TimeUnit.SECONDS)
         .readTimeout(12, TimeUnit.SECONDS)
         .callTimeout(25, TimeUnit.SECONDS)

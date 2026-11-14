@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -184,7 +185,7 @@ fun AppNavigation(active: Int, onSelect: (Int) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopCenter,
     ) {
-        val compact = AdaptiveSizing.iconOnlyNavigation(maxWidth.value.toInt())
+        val compact = AdaptiveSizing.iconOnlyNavigation(maxWidth.value.toInt(), LocalDensity.current.fontScale)
         Column(Modifier.width(minOf(maxWidth, AdaptiveSizing.MAX_CONTENT_WIDTH_DP.dp))) {
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
