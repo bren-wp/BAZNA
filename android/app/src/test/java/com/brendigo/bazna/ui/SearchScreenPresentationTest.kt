@@ -1,6 +1,6 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
-import com.brendigo.sidrena.data.PriceItem
+import com.brendigo.bazna.data.PriceItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

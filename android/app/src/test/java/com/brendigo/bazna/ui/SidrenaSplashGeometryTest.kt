@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
