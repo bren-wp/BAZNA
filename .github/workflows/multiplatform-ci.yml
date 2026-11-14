@@ -45,7 +45,7 @@ jobs:
         run: php shopify/tests/test_webhooks.php
       - name: Central domain-bound license server regression
         run: php licenca/tests/test.php
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       - name: Render PHP/Joomla shared UI and test 14 pages at 13 viewport sizes

@@ -71,7 +71,7 @@ jobs:
         run: php tools/test_public_catalog_markup.php
       - name: Test legally verified reference dates and no historical price inference
         run: php tools/test_legal_price_safety.php
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       - name: Render real public PHP cjenik and audit WordPress responsive layout in Chrome
