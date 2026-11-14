@@ -259,7 +259,8 @@ fun AboutPage(
                 icon = Icons.Outlined.Security,
                 title = "Podaci i povezivanje",
                 value = "BAZNA lokalno pamti HTTPS adresu stranice i odabranu poslovnicu. " +
-                    "Cjenike i slike dohvaća izravno s odabranog javnog poslužitelja.",
+                    "Cjenike i slike dohvaća izravno s odabranog javnog poslužitelja. " +
+                    "Taj poslužitelj može zabilježiti IP adresu i vrijeme pristupa.",
             )
             AboutDivider()
             AboutActionRow(
