@@ -4,7 +4,7 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.17
+Stable tag: 1.5.18
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -173,7 +173,11 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 
 == Changelog ==
 
-= 1.5.17 =
+= 1.5.18 =
+* Usklađen javni status objave svih poslovnica u REST v1 i Androidu. Pravna revizija od 14. 11. 2026. bez automatskog proglašavanja nacrta pravilnika važećim.
+
+
+= 1.5.18 =
 * Android BAZNA package changed to com.brendigo.bazna for a new Play listing; WordPress public API and stored price data remain unchanged.
 
 

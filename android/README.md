@@ -1,6 +1,6 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.17**
+**BAZNA by Brendigo** · **1.5.18**
 
 ![BAZNA](../branding/bazna-banner.png)
 
@@ -38,7 +38,7 @@ Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS dom
 
 ## Google Play — novi identifikator
 
-Android koristi `com.brendigo.bazna`. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
+Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.18 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
 
 ## Instalacija
 
