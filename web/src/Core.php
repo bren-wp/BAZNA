@@ -13,7 +13,7 @@ use RuntimeException;
 
 final class Core
 {
-    public const VERSION = '1.1.2';
+    public const VERSION = '1.1.3';
     public const FIELDS = [
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
@@ -106,14 +106,41 @@ final class Core
         return $row;
     }
 
+    /**
+     * Services with individually agreed prices: descriptive criteria are
+     * public only after explicit publication, never numeric CSV/XML entries.
+     */
+    public static function validateInquiry(array $input): array
+    {
+        foreach (['id', 'naziv', 'kriteriji', 'outlet'] as $field) {
+            if (isset($input[$field]) && !is_string($input[$field])) {
+                throw new InvalidArgumentException('Neispravno polje usluge na upit.');
+            }
+        }
+        $id = trim($input['id'] ?? '');
+        $name = trim($input['naziv'] ?? '');
+        $criteria = trim($input['kriteriji'] ?? '');
+        $outlet = trim($input['outlet'] ?? '');
+        if (!preg_match('/^[A-Za-z0-9-]{1,64}$/D', $id) ||
+            $name === '' || strlen($name) > 240 || $criteria === '' ||
+            strlen($criteria) > 800 ||
+            !preg_match('/^[A-Za-z0-9-]{0,64}$/D', $outlet) ||
+            preg_match('/[\\x00-\\x1F]/', $name . $criteria)) {
+            throw new InvalidArgumentException('Usluga na upit treba naziv, kriterije i valjanu poslovnicu.');
+        }
+        return ['id' => $id, 'naziv' => $name, 'kriteriji' => $criteria, 'outlet' => $outlet];
+    }
+
     public static function validateCatalog(array $document): array
     {
         $outlets = $document['outlets'] ?? [];
         $products = $document['products'] ?? [];
         $services = $document['services'] ?? [];
+        $inquiries = $document['on_request'] ?? [];
         if (!is_array($outlets) || !array_is_list($outlets) || count($outlets) > 500 ||
             !is_array($products) || !array_is_list($products) || count($products) > 10000 ||
-            !is_array($services) || !array_is_list($services) || count($services) > 10000) {
+            !is_array($services) || !array_is_list($services) || count($services) > 10000 ||
+            !is_array($inquiries) || !array_is_list($inquiries) || count($inquiries) > 500) {
             throw new InvalidArgumentException('Neispravna veličina kataloga ili poslovnica.');
         }
         $seen = [];
@@ -131,7 +158,7 @@ final class Core
             $seen[strtolower($code)] = true;
             $cleanOutlets[] = ['code' => $code, 'name' => $name, 'address' => $address];
         }
-        $result = ['outlets' => $cleanOutlets, 'products' => [], 'services' => []];
+        $result = ['outlets' => $cleanOutlets, 'products' => [], 'services' => [], 'on_request' => []];
         foreach (['products', 'services'] as $collection) {
             foreach ($document[$collection] ?? [] as $input) {
                 if (!is_array($input)) throw new InvalidArgumentException('Neispravna stavka.');
@@ -142,6 +169,17 @@ final class Core
                 $row['vrsta'] = $collection === 'products' ? 'proizvod' : 'usluga';
                 $result[$collection][] = $row;
             }
+        }
+        $seenInquiry = [];
+        foreach ($inquiries as $input) {
+            if (!is_array($input)) throw new InvalidArgumentException('Neispravna usluga na upit.');
+            $row = self::validateInquiry($input);
+            if (isset($seenInquiry[$row['id']]) ||
+                ($row['outlet'] !== '' && !isset($seen[strtolower($row['outlet'])]))) {
+                throw new InvalidArgumentException('Duplikat usluge na upit ili nepoznata poslovnica.');
+            }
+            $seenInquiry[$row['id']] = true;
+            $result['on_request'][] = $row;
         }
         return $result;
     }
@@ -155,7 +193,7 @@ final class Core
     public function read(string $file): array
     {
         $path = $this->file($file);
-        if (!is_file($path)) return ['outlets' => [], 'products' => [], 'services' => []];
+        if (!is_file($path)) return ['outlets' => [], 'products' => [], 'services' => [], 'on_request' => []];
         if (filesize($path) > 8 * 1024 * 1024) throw new RuntimeException('Katalog prelazi dopuštenu veličinu.');
         $value = json_decode((string) file_get_contents($path), true, 40, JSON_THROW_ON_ERROR);
         if (!is_array($value)) throw new RuntimeException('Neispravna spremljena datoteka.');
@@ -222,7 +260,7 @@ final class Core
      */
     public function modifyRow(string $collection, int $index, ?array $row, string $expectedHash = ''): void
     {
-        if (!in_array($collection, ['products', 'services', 'outlets'], true) ||
+        if (!in_array($collection, ['products', 'services', 'outlets', 'on_request'], true) ||
             $index < -1 || $index > 10000) {
             throw new InvalidArgumentException('Nevaljana zbirka ili indeks retka.');
         }
@@ -305,6 +343,20 @@ final class Core
             $this->write('published.json', $catalog);
             return $catalog;
         });
+    }
+
+    /** Published snapshot only. Never serves draft inquiry criteria. */
+    public function onRequestServices(): array
+    {
+        $published = $this->read('published.json');
+        $items = [];
+        foreach ($published['on_request'] ?? [] as $row) {
+            $items[] = [
+                'id' => $row['id'], 'name' => $row['naziv'],
+                'criteria' => $row['kriteriji'], 'outlet' => $row['outlet'],
+            ];
+        }
+        return ['schema' => 1, 'items' => $items];
     }
 
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
@@ -468,6 +520,7 @@ final class Core
             'cjenik' => $base . '/bazna/cjenik',
             'archive' => $base . '/bazna/arhiva',
             'type_archive' => $base . '/bazna/v1/arhiva',
+            'on_request' => $base . '/bazna/v1/usluge-na-upit',
             'feeds' => $feeds, 'outlets' => $outlets,
             'publication' => [
                 'csv_ready' => isset($published['published_at']),

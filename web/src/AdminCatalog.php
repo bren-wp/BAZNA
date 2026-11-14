@@ -11,7 +11,7 @@ use InvalidArgumentException;
 
 final class AdminCatalog
 {
-    private const TABS = ['proizvodi' => 'products', 'usluge' => 'services', 'poslovnice' => 'outlets'];
+    private const TABS = ['proizvodi' => 'products', 'usluge' => 'services', 'poslovnice' => 'outlets', 'na-upit' => 'on_request'];
 
     public static function collection(string $tab): string
     {
@@ -23,7 +23,7 @@ final class AdminCatalog
         $row = $post['row'] ?? [];
         if (!is_array($row)) throw new InvalidArgumentException('Neispravan redak.');
         $clean = [];
-        $names = array_merge(Core::FIELDS, ['outlet', 'historical_verified', 'code', 'name', 'address']);
+        $names = array_merge(Core::FIELDS, ['outlet', 'historical_verified', 'code', 'name', 'address', 'kriteriji']);
         foreach ($names as $field) {
             if (!array_key_exists($field, $row)) continue;
             $value = $row[$field];
@@ -69,6 +69,22 @@ final class AdminCatalog
                 self::input('address', 'Adresa poslovnice', $row) .
                 '</div>';
         }
+        if ($collection === 'on_request') {
+            $html = '<div class="bazna-fields-grid">' .
+                self::input('id', 'Trajni ID (automatski ako je prazan)', $row, 'text', false, $editing) .
+                self::input('naziv', 'Naziv usluge na upit', $row, 'text', true) .
+                self::input('kriteriji', 'Kriteriji određivanja cijene', $row, 'text', true);
+            $selected = (string) ($row['outlet'] ?? '');
+            $html .= '<label class="bazna-field">Poslovnica<select name="row[outlet]">';
+            $html .= '<option value="">Webshop</option>';
+            foreach ($outlets as $outlet) {
+                $code = (string) ($outlet['code'] ?? '');
+                $html .= '<option value="' . Core::esc($code) . '"' .
+                    ($code === $selected ? ' selected' : '') . '>' .
+                    Core::esc((string) ($outlet['name'] ?? $code)) . '</option>';
+            }
+            return $html . '</select></label></div>';
+        }
         $html = '<div class="bazna-fields-grid">' .
             self::input('id', 'Trajni ID (automatski ako je prazan)', $row, 'text', false, $editing) .
             self::input('naziv', 'Naziv ' . ($collection === 'products' ? 'proizvoda' : 'usluge'), $row, 'text', true) .
@@ -109,7 +125,7 @@ final class AdminCatalog
         $start = ($page - 1) * 60;
         $outlets = $draft['outlets'] ?? [];
         $disabled = $active ? '' : ' disabled';
-        $headline = ['products' => 'Proizvodi', 'services' => 'Usluge', 'outlets' => 'Poslovnice'][$collection];
+        $headline = ['products' => 'Proizvodi', 'services' => 'Usluge', 'outlets' => 'Poslovnice', 'on_request' => 'Cijena na upit'][$collection];
         $html = '<section class="bazna-panel bazna-catalog-editor"><h2>' . Core::esc($headline) .
             '</h2><p class="bazna-muted">Svi podaci ostaju u nacrtu do zasebne objave. ' .
             'Bazna cijena unosi se samo na temelju dokaza, a pravilo najniže cijene u 30 dana je neovisno.</p>';
@@ -132,7 +148,7 @@ final class AdminCatalog
             $title = (string) ($row[$collection === 'outlets' ? 'name' : 'naziv'] ?? '');
             $detail = $collection === 'outlets'
                 ? (string) ($row['code'] ?? '')
-                : (string) ($row['maloprodajna_cijena'] ?? '') . ' €';
+                : ($collection === 'on_request' ? 'Cijena na upit' : (string) ($row['maloprodajna_cijena'] ?? '') . ' €');
             $hash = hash('sha256', json_encode($row,
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
             $identity = '<input type="hidden" name="collection" value="' . Core::esc($collection) . '">' .
