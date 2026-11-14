@@ -43,7 +43,7 @@ jobs:
           yes | "$manager" --licenses >/dev/null || true
           "$manager" --install "platforms;android-37.0" "build-tools;36.0.0"
           test -d "$ANDROID_HOME/platforms/android-37.0"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '9.6.0'
       - name: Android source/dead-code and security scan
@@ -91,7 +91,7 @@ jobs:
           manager=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)
           yes | "$manager" --licenses >/dev/null || true
           "$manager" --install "platforms;android-37.0" "build-tools;36.0.0"
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '9.6.0'
       - name: Build real device instrumentation APK
