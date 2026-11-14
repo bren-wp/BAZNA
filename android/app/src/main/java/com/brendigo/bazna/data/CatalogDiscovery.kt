@@ -120,6 +120,11 @@ object CatalogDiscovery {
             is JSONObject -> LegalContract.parseOptional(rawLegal)
             else -> throw IllegalArgumentException("Pravni profil nije valjan.")
         }
+        // Optional REST v1 extension. Its endpoint must stay on the same
+        // verified HTTPS origin; old BAZNA servers have no such route.
+        val rawOnRequest = json.optString("on_request").trim()
+        val onRequestUrl = if (rawOnRequest.isBlank()) null
+            else site.approved(rawOnRequest).toASCIIString()
         val archiveApi = json.optString("type_archive")
         if (archiveApi.isNotBlank()) site.approved(archiveApi)
 
@@ -170,6 +175,7 @@ object CatalogDiscovery {
             allOutletsCsvReady = allOutletsReady,
             wordpressLicenseActive = licenseActive,
             platform = platform,
+            onRequestUrl = onRequestUrl,
         )
     }
 }

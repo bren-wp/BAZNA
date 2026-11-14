@@ -96,7 +96,21 @@ class CatalogRepository {
             emptyList()
         }
 
-        CatalogSnapshot(site.display, index, products, services, archive, warnings)
+        val onRequest = index.onRequestUrl?.let { url ->
+            try {
+                OnRequestServices.parse(
+                    JSONObject(read(site, site.approved(url), 256 * 1024)),
+                    index.outlets,
+                )
+            } catch (cancel: CancellationException) {
+                throw cancel
+            } catch (exception: Exception) {
+                warnings.add("Usluge s cijenom na upit trenutno nisu dostupne.")
+                emptyList()
+            }
+        }.orEmpty()
+
+        CatalogSnapshot(site.display, index, products, services, archive, warnings, onRequest)
     }
 
     private fun readDiscovery(site: SiteUrl): JSONObject {
