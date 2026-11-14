@@ -93,18 +93,19 @@ try {
         echo '<body style="background:#081525;color:#fff;font:16px system-ui;padding:20px">';
         echo '<main style="max-width:900px;margin:auto"><h1>BAZNA — Bazne cijene</h1>';
         echo '<p>Objavljeno: ' . Core::esc((string) ($catalog['published_at'] ?? 'nije objavljeno')) . '</p>';
+        // Display the same published rows as Web and Joomla. Shopify app proxy
+        // signatures remain mandatory; do not generate unsigned search links.
+        $outlet = isset($_GET['oznaka']) && is_string($_GET['oznaka']) ? $_GET['oznaka'] : '';
+        $query = isset($_GET['q']) && is_string($_GET['q']) ? $_GET['q'] : '';
+        if (strlen($query) > 100) $query = function_exists('mb_strcut')
+            ? mb_strcut($query, 0, 100, 'UTF-8') : substr($query, 0, 100);
         foreach (Core::KINDS as $kind) {
             echo '<section style="background:#102237;padding:20px;margin:12px 0;border-radius:12px"><h2>' .
-                Core::esc($kind) . '</h2><p><a style="color:#ffb860" href="' .
+                Core::esc($kind === 'proizvodi' ? 'Proizvodi' : 'Usluge') . '</h2><p><a style="color:#ffb860" href="' .
                 Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) . '">CSV cjenik</a></p></section>';
+            echo $core->publicCatalogHtml($kind, $outlet, $query);
         }
-        echo '<section style="background:#102237;padding:20px;margin:12px 0;border-radius:12px"><h2>Cijena na upit</h2>';
-        foreach ($core->onRequestServices()['items'] as $service) {
-            if ($service['outlet'] !== (string) ($_GET['oznaka'] ?? '')) continue;
-            echo '<article><strong>' . Core::esc($service['name']) . '</strong><p>' .
-                Core::esc($service['criteria']) . '</p><small>Cijena na upit</small></article>';
-        }
-        echo '</section></main></body></html>';
+        echo '</main></body></html>';
         exit;
     }
     bazna_shop_response(404, ['error' => 'not_found']);

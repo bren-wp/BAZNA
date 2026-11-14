@@ -207,18 +207,18 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             foreach ($core->archives() as $entry) echo '<p><a href="' . Core::esc($entry['url']) . '">' .
                 Core::esc($entry['date'] . ' — ' . $entry['kind']) . '</a></p>';
         } else {
-            foreach (Core::KINDS as $kind) {
-                echo '<section class="bazna-panel"><h2>' . Core::esc($kind) . '</h2><p>';
-                echo '<a href="' . Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) . '">CSV cjenik</a></p></section>';
-            }
             $outlet = (string) $this->getApplication()->input->getString('oznaka', '');
-            echo '<section class="bazna-panel"><h2>Cijena na upit</h2><p>Usluge čija cijena ovisi o navedenim kriterijima. Bez izmišljenih iznosa u CSV/XML-u.</p>';
-            foreach ($core->onRequestServices()['items'] as $service) {
-                if ($service['outlet'] !== $outlet) continue;
-                echo '<article><strong>' . Core::esc($service['name']) . '</strong><p>' .
-                    Core::esc($service['criteria']) . '</p><small>Cijena na upit</small></article>';
+            $query = (string) $this->getApplication()->input->getString('q', '');
+            if (strlen($query) > 100) $query = function_exists('mb_strcut')
+                ? mb_strcut($query, 0, 100, 'UTF-8') : substr($query, 0, 100);
+            foreach (Core::KINDS as $kind) {
+                echo '<section class="bazna-panel"><h2>' . Core::esc(
+                    $kind === 'proizvodi' ? 'Proizvodi' : 'Usluge'
+                ) . '</h2><a href="' .
+                    Core::esc($core->link('bazna/v1/cjenici/' . $kind . '/csv')) .
+                    '">Preuzmi CSV</a></section>';
+                echo $core->publicCatalogHtml($kind, $outlet, $query);
             }
-            echo '</section>';
         }
         echo '</main></body></html>';
     }
