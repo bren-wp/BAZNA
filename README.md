@@ -148,6 +148,12 @@ Android se povezuje sa stvarnim javnim katalogom preko HTTPS-a. APK služi za in
 
 [Android upute](android/README.md) · [Google Play i migracija](docs/BAZNA-ANDROID-PACKAGE-MIGRATION.md) · [Windows upute](desktop/README.md)
 
+## Google Play slike i BRENDIGO Android identitet
+
+BAZNA Play Store paket proizvodi se isključivo iz uspješno provjerenih **stvarnih Android emulator snimki**: ikona 512 × 512, feature graphic 1024 × 500, osam telefonskih slika 1080 × 1920, svih 12 zaslona i dvije kolekcije tablet prikaza. Korišten je postojeći narančasti znak B i tamnoplava paleta; aplikacijski zasloni nisu izmišljene makete.
+
+[Upute za Play brending](docs/BAZNA-GOOGLE-PLAY-BRANDING.md) · [Tekst za Play Console](docs/BAZNA-GOOGLE-PLAY-STORE-LISTING-HR.txt) · [Workflow za artefakte](.github/workflows/play-store-assets.yml)
+
 ## Stvarni ekrani i provjere sučelja
 
 Ne koristimo izmišljene „screenshotove aplikacije”. Sljedeći GitHub Actions postupci spremaju **stvarne slike provedenih testova**, dostupne u dijelu *Artifacts* dok traje GitHubovo razdoblje zadržavanja:
