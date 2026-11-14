@@ -16,7 +16,7 @@ if (!fromArg || !toArg) throw new Error("Expected FIXTURE_DIR and OUTPUT_DIR");
 const source = resolve(fromArg), output = resolve(toArg);
 await mkdir(output,{recursive:true});
 const fixtures = (await readdir(source)).filter(n => /^(web|joomla)-[\w-]+\.html$/.test(n)).sort();
-if (fixtures.length !== 14) throw new Error("Expected 14 PHP/Joomla fixture pages, got "+fixtures.length);
+if (fixtures.length !== 16) throw new Error("Expected 16 PHP/Joomla fixture pages, got "+fixtures.length);
 const widths = [240,280,320,360,393,411,480,600,720,782,1024,1280,1920];
 const profile = await mkdtemp(join(tmpdir(),"bazna-responsive-"));
 const browser = spawn(process.env.CHROME_BIN || "google-chrome",[
