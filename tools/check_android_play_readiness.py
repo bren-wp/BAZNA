@@ -11,8 +11,8 @@ import xml.etree.ElementTree as ET
 root = Path(__file__).resolve().parents[1]
 gradle = (root / "android/app/build.gradle.kts").read_text(encoding="utf-8")
 manifest = ET.parse(root / "android/app/src/main/AndroidManifest.xml").getroot()
-about = (root / "android/app/src/main/java/com/brendigo/sidrena/ui/AboutScreen.kt").read_text(encoding="utf-8")
-external = (root / "android/app/src/main/java/com/brendigo/sidrena/ui/ExternalIntents.kt").read_text(encoding="utf-8")
+about = (root / "android/app/src/main/java/com/brendigo/bazna/ui/AboutScreen.kt").read_text(encoding="utf-8")
+external = (root / "android/app/src/main/java/com/brendigo/bazna/ui/ExternalIntents.kt").read_text(encoding="utf-8")
 ci = (root / ".github/workflows/android-ci.yml").read_text(encoding="utf-8")
 ns = "{http://schemas.android.com/apk/res/android}"
 errors = []
@@ -29,7 +29,7 @@ check(number("targetSdk") >= 36, "Google Play targetSdk must be at least 36")
 check(number("minSdk") >= 24, "Play-protected package must use minSdk >= 24")
 check(number("compileSdk") >= number("targetSdk"), "compileSdk must not be below targetSdk")
 check(number("versionCode") > 0, "A positive versionCode is required")
-check('applicationId = "com.brendigo.sidrena"' in gradle, "Application ID must remain stable for updates")
+check('applicationId = "com.brendigo.bazna"' in gradle, "BAZNA application ID must be com.brendigo.bazna (new Play listing)")
 check("isMinifyEnabled = true" in gradle and "isShrinkResources = true" in gradle,
       "Release shrinker and resource minimization must remain enabled")
 check("bundleRelease" in ci and "lintDebug" in ci and "testDebugUnitTest" in ci,

@@ -46,13 +46,13 @@ for path, contents in (
         errors.append(f"Missing BAZNA release URL: {path}")
 
 checks = {
-    "android/app/src/main/java/com/brendigo/sidrena/ui/Components.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/Components.kt": [
         'Text("SIDRENA"',
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/ServiceCatalogScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/ServiceCatalogScreen.kt": [
         "WordPress dodatku SIDRENA",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/PublicProductImage.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/PublicProductImage.kt": [
         '"SIDRENA-Android"',
     ],
     "wordpress/brendigo-sidrena-cijena/includes/admin/tab-upute.php": [
@@ -69,16 +69,16 @@ checks = {
         "Arhiva sidrene cijene",
         "Cjenik - sidrena cijena",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/SearchScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/SearchScreen.kt": [
         '"Sidrena: "',
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/HomeScreens.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/HomeScreens.kt": [
         'Text("Sidrene cijene',
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/ProductCatalogScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/ProductCatalogScreen.kt": [
         '"Sa sidrenom cijenom"',
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/CatalogScreens.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/CatalogScreens.kt": [
         '"Sidrena cijena:',
         '"Datum sidrene cijene:',
     ],
@@ -115,28 +115,28 @@ for media in obsolete_media:
         errors.append(f"Obsolete public media still packaged: {media}")
 
 visible_copies = {
-    "android/app/src/main/java/com/brendigo/sidrena/ui/AboutScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/AboutScreen.kt": [
         '"WordPress dodatak"', '"WordPress stranica"',
         "ZAKONSKI STATUS NA 2. 11. 2026.",
         "Pravilnik je još u savjetovanju do 13.",
         "ic_sidrena_mark",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/HomeScreens.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/HomeScreens.kt": [
         "Objavite promjene u WordPressu", "u WordPress dodatku", "ic_sidrena_mark",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/Components.kt": ["ic_sidrena_mark"],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/SidrenaApp.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/Components.kt": ["ic_sidrena_mark"],
+    "android/app/src/main/java/com/brendigo/bazna/ui/SidrenaApp.kt": [
         "mailto:sidrena@", "Podaci na WordPress stranici",
         "svoje WordPress stranice s aktivnim dodatkom",
         "izvornoj WordPress stranici",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/ServiceCatalogScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/ServiceCatalogScreen.kt": [
         '"Objavite cjenik u WordPress', "na povezanoj WordPress stranici",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/LocationsScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/LocationsScreen.kt": [
         "Adrese se prikazuju samo kada su objavljene u WordPressu",
     ],
-    "android/app/src/main/java/com/brendigo/sidrena/ui/PublicPriceListsScreen.kt": [
+    "android/app/src/main/java/com/brendigo/bazna/ui/PublicPriceListsScreen.kt": [
         "WordPress ima neobjavljene izmjene",
         "CSV/XML cjenika u WordPress dodatku",
     ],

@@ -3,7 +3,7 @@
 This checklist covers the Android app only. **Passing CI does not imply Play approval**.
 
 ## Build prerequisites
-- Android package ID: `com.brendigo.sidrena` (DO NOT change for an existing Play listing).
+- Android package ID: `com.brendigo.bazna` (NEW Play listing; NOT an update to the former app).
 - `minSdk = 26`, `targetSdk = 36` (Google Play minimum for new apps and updates after 31 August 2026).
 - Java 17 / Gradle 9.6 / AGP 9.4; Android SDK 37.0 for compilation (use `sdkmanager "platforms;android-37.0"`, not the invalid `android-37` package name), target remains Android 16.
 - Stable Compose BOM, AndroidX Activity/Lifecycle, Kotlin Compose compiler, coroutines and OkHttp.
@@ -12,9 +12,9 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 - CI-produced `BAZNA-Android-unsigned.aab` is **not uploadable until signed** with the authorized upload key.
 
 ## Signing and store delivery
-1. Retain the existing `applicationId` and use a `versionCode` greater than the latest uploaded Play artifact.
+1. Use `applicationId=com.brendigo.bazna` and `versionCode=20`. This is **a new app**, not an update to `com.brendigo.sidrena`. The former app stays installed separately and its local preferences do not automatically transfer.
 2. In Android Studio choose **Build → Generate Signed Bundle / APK → Android App Bundle**.
-3. Select the correct **upload key** previously registered for this app; never commit a keystore or passwords.
+3. Sign using a controlled upload key for the **new** BAZNA Play listing; do not assume the former app's Play App Signing configuration transfers. Never commit a keystore or passwords.
 4. Confirm the resulting AAB is signed with the intended upload certificate.
 5. Upload the AAB to Play Console (internal test first), where **Play App Signing** manages distribution signatures.
 6. Inspect the **Android vitals**, pre-launch report, permission declarations, crash/ANR results and Play warnings.

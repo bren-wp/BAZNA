@@ -25,7 +25,7 @@ DEVELOPER_COPY = re.compile(
     r"|\bdemo(?:nstracija)? mode\b|\btestni (?:build|prikaz)\b"
 )
 SOURCE_DIRS = (
-    ROOT / "android/app/src/main/java/com/brendigo/sidrena/ui",
+    ROOT / "android/app/src/main/java/com/brendigo/bazna/ui",
     ROOT / "wordpress/brendigo-sidrena-cijena/includes",
     ROOT / "wordpress/brendigo-sidrena-cijena/assets/js",
     ROOT / "web/public",

@@ -96,15 +96,15 @@ if f"WORDPRESS_VERSION: '{plugin_version}'" not in release_ci:
 # and no legacy automatic inference of historical prices.
 api_php = (plugin / 'includes/class-public-api.php').read_text(encoding='utf-8')
 snapshot_php = (plugin / 'includes/class-activator.php').read_text(encoding='utf-8')
-android_site = (android / 'app/src/main/java/com/brendigo/sidrena/data/SiteUrl.kt').read_text(encoding='utf-8')
-android_repo = (android / 'app/src/main/java/com/brendigo/sidrena/data/CatalogRepository.kt').read_text(encoding='utf-8')
+android_site = (android / 'app/src/main/java/com/brendigo/bazna/data/SiteUrl.kt').read_text(encoding='utf-8')
+android_repo = (android / 'app/src/main/java/com/brendigo/bazna/data/CatalogRepository.kt').read_text(encoding='utf-8')
 if "'api_version'  => 1" not in api_php or "'mode' => 'public_read_only'" not in api_php:
     issues.append("Missing public read-only WordPress Android discovery contract")
 if "'permission_callback' => '__return_true'" not in api_php and "'permission_callback' => '__return_true'," not in api_php:
     issues.append("Missing explicit anonymous read-only public REST registration")
 if "queryRestEndpoint(" not in android_site or "shouldFallbackToPlainRest(" not in android_repo:
     issues.append("Missing guarded WordPress plain-permalink fallback")
-android_dns = (android / 'app/src/main/java/com/brendigo/sidrena/data/PublicDns.kt').read_text(encoding='utf-8')
+android_dns = (android / 'app/src/main/java/com/brendigo/bazna/data/PublicDns.kt').read_text(encoding='utf-8')
 if not all(token in android_repo for token in ("followRedirects(false)", ".dns(PublicDns)")) or not all(
     token in android_dns for token in ("Dns.SYSTEM.lookup(hostname)", "PublicNetworkGuard::isPublic")
 ):

@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.brendigo.sidrena"
+    namespace = "com.brendigo.bazna"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.brendigo.sidrena"
+        applicationId = "com.brendigo.bazna"
         minSdk = 26
         targetSdk = 36
-        versionCode = 19
-        versionName = "1.5.16"
+        versionCode = 20
+        versionName = "1.5.17"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

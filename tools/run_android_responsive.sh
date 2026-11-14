@@ -43,7 +43,7 @@ for entry in "${cases[@]}"; do
     mkdir -p "$output"
     # am instrument may exit zero even when JUnit fails: validate runner output.
     adb shell am instrument -w -r \
-        com.brendigo.sidrena.test/androidx.test.runner.AndroidJUnitRunner \
+        com.brendigo.bazna.test/androidx.test.runner.AndroidJUnitRunner \
         | tee "$output/instrumentation.txt"
     grep -q 'OK (1 test)' "$output/instrumentation.txt"
 
@@ -57,7 +57,7 @@ for entry in "${cases[@]}"; do
         "05-services" "06-detail" "07-documents" "08-archive"
         "09-outlets" "10-search" "11-settings" "12-about"
     )
-    remote="/sdcard/Android/data/com.brendigo.sidrena/files/responsive"
+    remote="/sdcard/Android/data/com.brendigo.bazna/files/responsive"
     rm -f "$output"/*.png
     for screen in "${screens[@]}"; do
         downloaded=0
