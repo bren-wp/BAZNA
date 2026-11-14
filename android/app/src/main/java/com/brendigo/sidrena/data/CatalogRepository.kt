@@ -68,13 +68,13 @@ class CatalogRepository {
             "usluge",
             if (selected == null) index.servicesCsvReady else selected.servicesCsvReady,
         )
-        val archive = try {
+        val archive: List<ArchiveEntry> = try {
             val discoveryUrl = indexJson.optString("type_archive")
             val remote = if (discoveryUrl.isBlank())
                 site.endpoint("wp-json/brendigo-sidrena/v1/arhiva")
             else site.approved(discoveryUrl)
             val list = JSONArray(read(site, remote, 512 * 1024))
-            buildList {
+            buildList<ArchiveEntry> {
                 for (i in 0 until minOf(list.length(), 1000)) {
                     val item = list.optJSONObject(i) ?: continue
                     val outlet = item.optString("outlet")
