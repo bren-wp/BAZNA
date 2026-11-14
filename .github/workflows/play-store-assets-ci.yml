@@ -1,0 +1,70 @@
+name: BAZNA Google Play asset generator tests
+
+on:
+  pull_request:
+    paths:
+      - 'tools/build_play_store_assets.py'
+      - '.github/workflows/play-store-assets.yml'
+      - '.github/workflows/play-store-assets-ci.yml'
+      - 'docs/BAZNA-GOOGLE-PLAY-*'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  graphics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'pillow==11.3.0' 'cairosvg==2.8.2'
+      - name: Smoke-test the generator with NON-PUBLISHABLE dummy test inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+          root=Path('/tmp/play-fixtures')
+          names=('01-splash','02-connect','03-home','04-products','05-services',
+                 '06-detail','07-documents','08-archive','09-outlets','10-search',
+                 '11-settings','12-about')
+          for folder,(w,h) in [('reference-393',(393,852)),
+                               ('tablet-600',(600,960)),
+                               ('landscape-1280',(1280,800))]:
+              p=root/folder
+              p.mkdir(parents=True,exist_ok=True)
+              for index,name in enumerate(names):
+                  img=Image.new('RGB',(w,h),(8+index,25,44))
+                  ImageDraw.Draw(img).text((16,16),'CI FIXTURE - NOT APP UI',fill='white')
+                  img.save(p/(name+'.png'))
+          PY
+          python3 tools/build_play_store_assets.py \
+            --screenshots-dir /tmp/play-fixtures --output /tmp/play-output
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          root=Path('/tmp/play-output')
+          assert len(list(root.glob('**/*.png')))==33
+          for folder,count,dimension in [
+              ('phone-upload',8,(1080,1920)),
+              ('all-screens',12,(1080,1920)),
+              ('tablet-7inch',4,(1080,1920)),
+              ('tablet-10inch',4,(1920,1080))]:
+              paths=list((root/folder).glob('*.png'))
+              assert len(paths)==count, (folder,len(paths))
+              for p in paths:
+                  with Image.open(p) as img:
+                      assert img.size==dimension and img.mode=='RGB', p
+          with Image.open(root/'icon/BAZNA-icon-512.png') as img:
+              assert img.size==(512,512) and img.mode=='RGBA'
+          assert (root/'icon/BAZNA-icon-512.png').stat().st_size<=1024*1024
+          with Image.open(root/'feature/BAZNA-feature-1024x500.png') as img:
+              assert img.size==(1024,500) and img.mode=='RGB'
+          print('PASS: Play preview formats, all 12 screens and both tablet sizes')
+          PY

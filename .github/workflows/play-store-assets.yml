@@ -1,0 +1,92 @@
+# Marketing graphics from genuine BAZNA emulator captures, not fabricated app UI.
+name: BAZNA Google Play branding assets
+
+on:
+  workflow_run:
+    workflows: ["BAZNA Android build, tests and audited artifacts"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: bazna-play-marketing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  branding:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Play artwork renderer
+        run: python -m pip install 'pillow==11.3.0' 'cairosvg==2.8.2'
+      - name: Select successful Android screenshot run for the same source
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha="$(git rev-parse HEAD)"
+          if [[ "${{ github.event_name }}" == 'workflow_run' ]]; then
+            run="${{ github.event.workflow_run.id }}"
+            [[ "${{ github.event.workflow_run.head_sha }}" == "$sha" ]] || {
+              echo "::error::Screenshot source differs from current main"
+              exit 1
+            }
+          else
+            run=$(gh run list --repo "$GH_REPO" --workflow android-ci.yml \
+              --branch main --event push --status success --limit 50 \
+              --json databaseId,headSha \
+              --jq "[.[] | select(.headSha == \"$sha\")][0].databaseId")
+          fi
+          [[ "$run" =~ ^[0-9]+$ ]] || { echo "::error::Missing successful Android emulator run for HEAD $sha"; exit 1; }
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$sha" >> "$GITHUB_OUTPUT"
+      - name: Download real emulator captures and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/android-responsive
+          gh run download "${{ steps.source.outputs.run }}" --repo "$GH_REPO" \
+            --name BAZNA-Android-responsive-screenshots \
+            --dir artifacts/android-responsive
+          for profile in reference-393 tablet-600 landscape-1280; do
+            count=$(find "artifacts/android-responsive/$profile" -maxdepth 1 -name '*.png' -type f | wc -l)
+            [[ "$count" -eq 12 ]] || { echo "::error::Missing screens in $profile: $count/12"; exit 1; }
+            grep -Fq "OK (1 test)" "artifacts/android-responsive/$profile/instrumentation.txt"
+          done
+      - name: Generate and validate Google Play images
+        run: |
+          set -euo pipefail
+          python tools/build_play_store_assets.py \
+            --screenshots-dir artifacts/android-responsive \
+            --output artifacts/google-play/BAZNA-Google-Play
+          cp docs/BAZNA-GOOGLE-PLAY-STORE-LISTING-HR.txt artifacts/google-play/BAZNA-Google-Play/store-listing-hr.txt
+          cp docs/BAZNA-GOOGLE-PLAY-BRANDING.md artifacts/google-play/BAZNA-Google-Play/README.md
+          cd artifacts/google-play
+          zip -qr "BAZNA-Google-Play-${{ steps.source.outputs.source_sha }}.zip" BAZNA-Google-Play
+          sha256sum BAZNA-Google-Play-*.zip > SHA256SUMS.txt
+          sha256sum -c SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: BAZNA-Google-Play-Branded-Assets
+          path: artifacts/google-play/
+          retention-days: 30
+          if-no-files-found: error

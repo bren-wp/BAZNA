@@ -38,6 +38,14 @@ Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS dom
 
 **Uređivanje cijena ostaje u WordPressu ili Windows aplikaciji** dok ne postoji autorizirani REST API za mobilno uređivanje.
 
+## Google Play brending i grafike
+
+Izradnja kompletnog Google Play vizualnog paketa automatizirana je iz **stvarnih** 12 Jetpack Compose emulator snimki. U `.github/workflows/play-store-assets.yml` nastaju BAZNA ikona 512 × 512, feature graphic 1024 × 500, 8 telefonskih snimki 1080 × 1920, svi dodatni zasloni te 7- i 10-inčne tablet snimke. Izvorni projektni vektorski znak B i boje ostaju usklađeni s Android aplikacijom; testni cjenici označeni su kao primjeri.
+
+**[Play Store grafike, upute i veličine](../docs/BAZNA-GOOGLE-PLAY-BRANDING.md)** · **[Tekstovi Play Store oglasa na hrvatskom](../docs/BAZNA-GOOGLE-PLAY-STORE-LISTING-HR.txt)** · **[Generiranje stvarnih screenshotova](../tools/build_play_store_assets.py)**
+
+Gotovi ZIP nalazi se u GitHub Actions artefaktu `BAZNA-Google-Play-Branded-Assets` nakon uspješnog Android CI-a. Ovaj grafički paket ne potpisuje niti automatski objavljuje AAB na Google Play.
+
 ## Google Play — novi identifikator
 
 Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.21 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
