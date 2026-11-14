@@ -6,7 +6,7 @@ U \`joomla/plg_system_bazna\` je moderni Joomla **system plugin** s instalacijsk
 
 ## Instalacija
 
-1. U GitHub Actions preuzmite \`BAZNA-Joomla-Plugin-1.1.4.zip\`; ZIP sadrži \`vendor/Core.php\`, \`vendor/LicenseClient.php\`, **\`vendor/AdminCatalog.php\`**, zajednički responzivni CSS i manifest.
+1. U GitHub Actions preuzmite \`BAZNA-Joomla-Plugin-1.1.4.zip\`; ZIP sadrži \`vendor/Core.php\`, **\`vendor/AdminCatalog.php\`**, zajednički responzivni CSS i manifest.
 2. Joomla: System → Install → Extensions → Upload Package; zatim Plugins → **System – BAZNA** → Enable.
 3. Konfigurirajte u PHP-FPM/Apache okolini (ne unositi u javni sadržaj):
    - \`BAZNA_JOOMLA_PRIVATE_DIR=/srv/bazna-private/joomla-shop\` (izvan Joomla document root);

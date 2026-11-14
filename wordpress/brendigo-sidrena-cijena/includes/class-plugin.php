@@ -24,6 +24,12 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	public static function init() {
 		Brendigo_Sidrena_Cijena_Migration::maybe_migrate();
+        // One-time cleanup for users upgrading from the licensed build.
+        // Never delete license options or customer data: only an orphaned cron.
+        if ( function_exists( 'wp_next_scheduled' ) &&
+            wp_next_scheduled( 'bazna_license_periodic_check' ) ) {
+            wp_clear_scheduled_hook( 'bazna_license_periodic_check' );
+        }
 
 		if ( self::legacy_plugin_active() ) {
 			add_action( 'admin_notices', array( __CLASS__, 'legacy_plugin_notice' ) );
@@ -200,6 +206,7 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 	 */
 	public static function deactivate() {
 		wp_clear_scheduled_hook( 'sidrena_cijena_snapshot_batch' );
+        wp_clear_scheduled_hook( 'bazna_license_periodic_check' );
 		wp_clear_scheduled_hook( Brendigo_Sidrena_Cijena_Price_History::SEED_HOOK );
 		wp_clear_scheduled_hook( Brendigo_Sidrena_Cijena_Price_History::MANUAL_SEED_HOOK );
 		wp_clear_scheduled_hook( Brendigo_Sidrena_Cijena_Export::DAILY_HOOK );

@@ -32,7 +32,7 @@
 1. Provjeriti sve tri platforme na stvarnoj instalaciji/hostingu i testirati HTTPS, administratorsku prijavu, deinstalaciju, migraciju i oporavak podataka.
 2. Joomla: dovršiti nativnu Joomla MVC komponentu i integracije stvarnih prodajnih sustava; dijeljeni grafički editor već radi za proizvode, usluge i poslovnice.
 3. Shopify: dovršiti Shopify CLI OAuth/App Bridge token lifecycle, marketplace billing/instalaciju, pravi embedded UI i više autoriziranih trgovina. HMAC GDPR/CCPA webhook obrada i provjere brisanja već su implementirane.
-4. Regresijska pixel-diff provjera svih WP/Android/Joomla/Shopify zaslona u odnosu na originalne reference. Web/Joomla CSS i zajednički editor već prolaze 182 stvarne Chrome snimke u 13 veličina. **CI layout/smoke test nije dokaz 0% vizualnog odstupanja.**
+4. Regresijska pixel-diff provjera svih WP/Android/Joomla/Shopify zaslona u odnosu na originalne reference. Web/Joomla CSS i zajednički editor već prolaze 195 stvarnih Chrome snimki u 13 veličina. **CI layout/smoke test nije dokaz 0% vizualnog odstupanja.**
 5. Pravni review službenih propisa i svih budućih konačnih pravilnika; necertificirane cijene neće automatski postati zakonski usklađene.
 
 ## Sigurnost
