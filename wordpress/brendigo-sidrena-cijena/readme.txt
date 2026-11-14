@@ -187,7 +187,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Bez promjena spremljenih cijena, postavki, arhive, shortcodova, WooCommerce podataka ili javnog REST v1 API-ja.
 
 
-= 1.5.21 =
+= 1.5.20 =
 * Uklonjena aktivacijska provjera i zaključavanje uvoza, uređivanja i objave. Službeni ZIP i WordPress.org kandidat koriste istu otključanu jezgru.
 * REST v1 on-request search supports optional outlet and criteria query; public results never include unapproved drafts.
 * Same published HTML price-list semantics across PHP/Joomla/Shopify and Android's global catalog search.
