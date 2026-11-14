@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border

@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import android.graphics.Canvas as AndroidCanvas
 import android.graphics.Paint

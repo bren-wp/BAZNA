@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -26,8 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.brendigo.sidrena.SidrenaViewModel
-import com.brendigo.sidrena.data.CatalogSnapshot
+import com.brendigo.bazna.SidrenaViewModel
+import com.brendigo.bazna.data.CatalogSnapshot
 
 @Composable
 fun SidrenaApp(model: SidrenaViewModel = viewModel()) {
