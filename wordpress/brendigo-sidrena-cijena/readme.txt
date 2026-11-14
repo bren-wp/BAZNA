@@ -177,7 +177,7 @@ Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf p
 * Usklađen javni status objave svih poslovnica u REST v1 i Androidu. Pravna revizija od 14. 11. 2026. bez automatskog proglašavanja nacrta pravilnika važećim.
 
 
-= 1.5.18 =
+= 1.5.17 =
 * Android BAZNA package changed to com.brendigo.bazna for a new Play listing; WordPress public API and stored price data remain unchanged.
 
 
