@@ -155,7 +155,6 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             echo AdminCatalog::render(
                 $tab, $draft, '?bazna=dashboard&tab=' . $tab,
                 \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                true,
                 $app->input->getInt('page', 1)
             );
         } elseif ($tab === 'uvoz-izvoz') {

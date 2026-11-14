@@ -61,7 +61,6 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
     $draft,
     $core->link('bazna/admin?tab=' . $tab),
     '<input type="hidden" name="_csrf" value="' . bazna_html($csrf) . '">',
-    true,
     (int) ($_GET['page'] ?? 1)
 ) ?>
 <?php elseif ($tab === 'uvoz-izvoz'): ?>

@@ -39,7 +39,7 @@ $original = $core->read('draft.json');
 verifyEditor(count($original['products']) === 1, 'existing product retained');
 $render = AdminCatalog::render(
     'proizvodi', $original, 'https://primjer.hr/bazna/admin?tab=proizvodi',
-    '<input name="_csrf" type="hidden" value="test-token">', true
+    '<input name="_csrf" type="hidden" value="test-token">'
 );
 verifyEditor(str_contains($render, 'Bazna cijena') &&
     str_contains($render, 'maloprodajna_cijena') &&
@@ -52,13 +52,13 @@ verifyEditor(!str_contains($render, '<script>alert(1)</script>') &&
 
 foreach (['usluge', 'poslovnice', 'na-upit'] as $tab) {
     $html = AdminCatalog::render($tab, $original, '?bazna=dashboard&tab='.$tab,
-        '<input name="csrf" value="joomla">', true);
+        '<input name="csrf" value="joomla">');
     verifyEditor(str_contains($html, $tab === 'na-upit' ? 'Spremi novu stavku' : 'Spremi izmjene'),
         'same UI reused on '.$tab);
 }
 $inquiryView = AdminCatalog::render(
     'na-upit', $original, 'https://primjer.hr/bazna/admin?tab=na-upit',
-    '<input name="_csrf" value="test">', true
+    '<input name="_csrf" value="test">'
 );
 verifyEditor(str_contains($inquiryView, 'Kriteriji određivanja cijene') &&
     !str_contains($inquiryView, 'Povijesna bazna cijena za usluge na upit'),

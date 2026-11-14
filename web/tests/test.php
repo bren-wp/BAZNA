@@ -3,9 +3,7 @@
 declare(strict_types=1);
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once dirname(__DIR__) . '/src/Core.php';
-require_once dirname(__DIR__) . '/src/LicenseClient.php';
 use Brendigo\Bazna\Core;
-use Brendigo\Bazna\LicenseClient;
 
 function check(bool $ok, string $message): void {
     if (!$ok) throw new RuntimeException('BAZNA web test failed: ' . $message);
@@ -82,12 +80,10 @@ check(str_contains($core->publicCatalogHtml('proizvodi'), 'još nije objavljen')
 check($core->onRequestServices()['items'] === [], 'draft inquiries never visible to public');
 check(str_contains($before['on_request'], '/bazna/v1/usluge-na-upit'),
     'same-origin published inquiries discovery link');
-$licenseActive = $core->discovery('web', null, true);
-$licenseInactive = $core->discovery('joomla', null, false);
-check($licenseActive['licensing'] === ['required' => true, 'active' => true] &&
-    $licenseInactive['licensing'] === ['required' => true, 'active' => false] &&
-    !isset($before['licensing']),
-    'same read-only Android license status as WordPress, backwards-compatible omission');
+check(!array_key_exists('licensing', $before), 'public index has no activation field');
+check($core->discovery('joomla')['api_version'] === 1 &&
+    $core->discovery('shopify')['api_version'] === 1,
+    'All adapters provide public REST without license activation');
 check($before['api_version'] === 1 && $before['feeds']['proizvodi']['available_csv'] === false,
     'unpublished catalog not claimed as public');
 $published = $core->publish();
@@ -216,13 +212,6 @@ try {
 $core->publish();
 check(str_contains($core->archiveCsv($matches[1], 'proizvodi'), '5,99'),
     'archive link remains stable after another publication');
-$license = new LicenseClient($core, str_repeat('ab', 32));
-check(!$license->active() && $license->proof() === null, 'unactivated license cannot unlock local edits');
-try {
-    new LicenseClient($core, 'unsafe-key');
-    throw new RuntimeException('Invalid encryption secret accepted.');
-} catch (RuntimeException $ignored) {}
-
 $remove = static function ($dir) use (&$remove): void {
     foreach (scandir($dir) ?: [] as $part) {
         if ($part === '.' || $part === '..') continue;
@@ -232,4 +221,4 @@ $remove = static function ($dir) use (&$remove): void {
     rmdir($dir);
 };
 $remove($root);
-echo "PASS: BAZNA cross-platform catalog, historical validation, immutable archive, public v1, HTTPS and license guard\n";
+echo "PASS: BAZNA cross-platform catalog, historical validation, immutable archive, public v1, HTTPS and unrestricted authenticated editing\n";
