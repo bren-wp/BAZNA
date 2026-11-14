@@ -12,7 +12,7 @@ WordPress.org je službeni kanal automatskih ažuriranja. **GitHub Releases nije
 
 Dodatak ne smije biti instaliran pod drugim imenom direktorija: time bi WordPress mogao smatrati novu instalaciju drugim dodatkom. Ne mijenjati postojeća imena tablica, opcija, metapodataka, shortcodeove, REST putanje ili uninstall ponašanje samo radi promjene brenda.
 
-> **Važno:** `tools/package_wporg.py` trenutačno stvara zaseban kandidat `bazna-cjenici/` (i `bazna-cjenici.php`). To **nije** distribucija za ažuriranje već objavljenog dodatka `brendigo-sidrena-cijena`. Za postojeći WordPress.org dodatak uvijek koristiti `tools/package_plugin.py` i workflow `deploy-wordpress-org.yml`.
+> **Važno:** `tools/package_wporg.py` prethodno je stvarao zaseban kandidat `bazna-cjenici/` (i `bazna-cjenici.php`). To **nije bio** valjan način distribucije za ažuriranje već objavljenog dodatka `brendigo-sidrena-cijena`. Za postojeći WordPress.org dodatak koristiti `tools/package_plugin.py` (ili kompatibilan `tools/package_wporg.py`) i workflow `deploy-wordpress-org.yml`.
 
 ## Jednokratna konfiguracija
 
