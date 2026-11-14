@@ -7,12 +7,10 @@
  */
 declare(strict_types=1);
 use Brendigo\Bazna\Core;
-use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\Shopify\ProxySignature;
 use Brendigo\Bazna\Shopify\WebhookHandler;
 
 require_once dirname(__DIR__, 2) . '/web/src/Core.php';
-require_once dirname(__DIR__, 2) . '/web/src/LicenseClient.php';
 require_once __DIR__ . '/ProxySignature.php';
 require_once __DIR__ . '/WebhookHandler.php';
 header('X-Content-Type-Options: nosniff');
@@ -52,8 +50,6 @@ try {
     // from the validated, signed and locally authorized shop identity.
     $core = new Core(rtrim($folder, '/') . '/shop-' . hash('sha256', $shop), 'https://' . $shop . '/apps');
     $core->ensurePrivate();
-    $secret = (string) getenv('BAZNA_SHOPIFY_APP_KEY');
-    $license = preg_match('/^[a-f0-9]{64}$/i', $secret) ? new LicenseClient($core, $secret) : null;
     $prefix = (string) (getenv('BAZNA_SHOPIFY_BACKEND_PATH') ?: '/shopify/proxy');
     $path = rawurldecode((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH));
     if (!str_starts_with($path, rtrim($prefix, '/') . '/')) {
@@ -61,7 +57,7 @@ try {
     }
     $tail = substr($path, strlen(rtrim($prefix, '/')));
     if ($tail === '/v1/cjenici') {
-        bazna_shop_response(200, $core->discovery('shopify', null, $license?->active()));
+        bazna_shop_response(200, $core->discovery('shopify'));
     }
     if ($tail === '/v1/usluge-na-upit') {
         bazna_shop_response(200, $core->onRequestServices(
@@ -71,11 +67,6 @@ try {
     }
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
-    }
-    if ($tail === '/v1/license-proof') {
-        $challenge = $license?->proof();
-        if ($challenge === null) bazna_shop_response(404, ['error' => 'proof_not_ready']);
-        bazna_shop_response(200, ['challenge' => $challenge]);
     }
     if (preg_match('#^/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
         $outlet = (string) ($_GET['oznaka'] ?? '');

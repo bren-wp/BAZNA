@@ -1,13 +1,12 @@
 <?php
 /**
  * Joomla 5/6 BAZNA system plugin; public same-origin API and Joomla-authenticated
- * catalog administration. Vendor/Core.php & LicenseClient.php are bundled in ZIP.
+ * catalog administration. Vendor/Core.php is bundled in the ZIP.
  */
 namespace Brendigo\Plugin\System\Bazna\Extension;
 defined('_JEXEC') or die;
 
 use Brendigo\Bazna\Core;
-use Brendigo\Bazna\LicenseClient;
 use Brendigo\Bazna\AdminCatalog;
 use Joomla\CMS\Event\Application\AfterInitialiseEvent;
 use Joomla\CMS\Plugin\CMSPlugin;
@@ -40,7 +39,6 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             $app->close();
         }
         require_once dirname(__DIR__, 2) . '/vendor/Core.php';
-        require_once dirname(__DIR__, 2) . '/vendor/LicenseClient.php';
         require_once dirname(__DIR__, 2) . '/vendor/AdminCatalog.php';
         try {
             $storage = (string) getenv('BAZNA_JOOMLA_PRIVATE_DIR');
@@ -48,21 +46,19 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             if ($storage === '' || $base === '') throw new \RuntimeException('Konfigurirajte privatnu mapu i javni HTTPS URL.');
             $core = new Core($storage, $base);
             $core->ensurePrivate();
-            $key = (string) getenv('BAZNA_JOOMLA_APP_KEY');
-            $license = preg_match('/^[a-f0-9]{64}$/i', $key) ? new LicenseClient($core, $key) : null;
             if ($dashboard) {
                 if (!$app->getIdentity()->authorise('core.admin')) {
                     http_response_code(403);
                     echo 'Administratorska ovlast je obvezna.';
                     $app->close();
                 }
-                $this->adminPage($core, $license, $method);
+                $this->adminPage($core, $method);
                 $app->close();
             }
             header('X-Content-Type-Options: nosniff');
             header('Cache-Control: no-store');
             if ($path === '/bazna/v1/cjenici') {
-                $this->json($core->discovery('joomla', null, $license?->active()));
+                $this->json($core->discovery('joomla'));
             } elseif ($path === '/bazna/v1/usluge-na-upit') {
                 $this->json($core->onRequestServices(
                     (string) $app->input->getString('outlet', ''),
@@ -70,10 +66,6 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 ));
             } elseif ($path === '/bazna/v1/arhiva') {
                 $this->json($core->archives());
-            } elseif ($path === '/bazna/v1/license-proof') {
-                $proof = $license?->proof();
-                if (!$proof) { http_response_code(404); $this->json(['error' => 'not_available']); }
-                $this->json(['challenge' => $proof]);
             } elseif (preg_match('#^/bazna/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $path, $m)) {
                 $outlet = (string) $app->input->getString('oznaka', '');
                 header('Content-Type: ' . ($m[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
@@ -104,7 +96,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
         echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    private function adminPage(Core $core, ?LicenseClient $license, string $method): void
+    private function adminPage(Core $core, string $method): void
     {
         $app = $this->getApplication();
         $status = '';
@@ -115,17 +107,8 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 return;
             }
             $action = $app->input->post->getCmd('action');
-            if ($action === 'activate') {
-                $status = (string) (($license?->activate($app->input->post->getString('key', '')) ?? [])['code'] ?? 'missing_license');
-            } elseif ($action === 'refresh') {
-                $status = (string) (($license?->refresh() ?? [])['code'] ?? 'missing_license');
-            } elseif ($action === 'deactivate') {
-                $status = (string) (($license?->deactivate() ?? [])['code'] ?? 'missing_license');
-            } elseif (in_array($action, ['save', 'publish', 'save_item', 'delete_item'], true)) {
-                if (!$license?->active()) {
-                    http_response_code(403);
-                    $status = 'Za uređivanje je potrebna aktivna BAZNA licenca.';
-                } elseif ($action === 'save') {
+            if (in_array($action, ['save', 'publish', 'save_item', 'delete_item'], true)) {
+                if ($action === 'save') {
                     $raw = $app->input->post->get('catalog', '', 'raw');
                     if (!is_string($raw) || strlen($raw) > 6 * 1024 * 1024) throw new \InvalidArgumentException('Neispravan katalog.');
                     $catalog = json_decode($raw, true, 40, JSON_THROW_ON_ERROR);
@@ -155,7 +138,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
         $links = ['pregled' => 'Pregled', 'proizvodi' => 'Proizvodi',
             'usluge' => 'Usluge', 'na-upit' => 'Cijena na upit', 'poslovnice' => 'Poslovnice',
             'uvoz-izvoz' => 'Uvoz/Izvoz', 'javni-cjenici' => 'Javni cjenici',
-            'arhiva' => 'Arhiva', 'postavke' => 'Postavke', 'licenca' => 'Licenca'];
+            'arhiva' => 'Arhiva', 'postavke' => 'Postavke'];
         if (!isset($links[$tab])) $tab = 'pregled';
         header('Content-Type: text/html; charset=utf-8');
         echo '<!doctype html><html lang="hr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">';
@@ -172,7 +155,7 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             echo AdminCatalog::render(
                 $tab, $draft, '?bazna=dashboard&tab=' . $tab,
                 \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                $license?->active() ?? false,
+                true,
                 $app->input->getInt('page', 1)
             );
         } elseif ($tab === 'uvoz-izvoz') {
@@ -181,15 +164,11 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
             echo '<h2>Uvoz i izvoz JSON kataloga</h2><p>Za pojedinačne izmjene koristite kartice Proizvodi, Usluge i Poslovnice.</p><form method="post">';
             echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
             echo '<input type="hidden" name="action" value="save"><textarea class="bazna-editor" name="catalog">' . Core::esc((string) $json) . '</textarea>';
-            echo '<button type="submit"' . ($license?->active() ? '' : ' disabled') . '>Spremi nacrt</button></form>';
-        } elseif ($tab === 'licenca') {
-            echo '<p>Stanje: ' . ($license?->active() ? 'Aktivna' : 'Neaktivna') . '</p><form method="post">';
-            echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
-            echo '<label>Licencni ključ<input name="key" type="password" autocomplete="off"></label><button name="action" value="activate">Aktiviraj</button> <button name="action" value="refresh">Provjeri</button> <button name="action" value="deactivate">Deaktiviraj</button></form>';
+            echo '<button type="submit"' .'>Spremi nacrt</button></form>';
         } elseif ($tab === 'javni-cjenici') {
             echo '<p>Android REST: <code>' . Core::esc($core->link('bazna/v1/cjenici')) . '</code></p><form method="post">';
             echo \Joomla\CMS\HTML\HTMLHelper::_('form.token');
-            echo '<button name="action" value="publish"' . ($license?->active() ? '' : ' disabled') . '>Objavi cjenike</button></form>';
+            echo '<button name="action" value="publish"' .'>Objavi cjenike</button></form>';
         } elseif ($tab === 'arhiva') {
             foreach ($core->archives() as $a) echo '<p><a href="' . Core::esc($a['url']) . '">' . Core::esc($a['date'].' '.$a['kind']) . '</a></p>';
         } else {
