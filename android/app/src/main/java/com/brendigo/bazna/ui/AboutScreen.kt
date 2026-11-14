@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -46,11 +46,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.brendigo.sidrena.BuildConfig
-import com.brendigo.sidrena.R
-import com.brendigo.sidrena.data.CatalogIndex
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.SiteUrl
+import com.brendigo.bazna.BuildConfig
+import com.brendigo.bazna.R
+import com.brendigo.bazna.data.CatalogIndex
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.SiteUrl
 
 /** Published information only. Never substitute the Android version for a plugin version. */
 internal data class AboutMetadata(

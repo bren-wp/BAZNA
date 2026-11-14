@@ -1,7 +1,7 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.PriceItem
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.PriceItem
 
 /**
  * Never show a saved price as if it were the latest price after process death,

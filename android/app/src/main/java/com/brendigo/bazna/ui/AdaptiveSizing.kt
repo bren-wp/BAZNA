@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 /**
  * Screen-width rules for the native SIDRENA shell, in Android dp.

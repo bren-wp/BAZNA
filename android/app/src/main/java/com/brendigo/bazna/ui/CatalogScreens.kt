@@ -1,4 +1,4 @@
-package com.brendigo.sidrena.ui
+package com.brendigo.bazna.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -44,14 +44,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.brendigo.sidrena.data.CatalogIndex
-import com.brendigo.sidrena.data.CatalogSnapshot
-import com.brendigo.sidrena.data.PriceItem
+import com.brendigo.bazna.data.CatalogIndex
+import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.PriceItem
 
 /** Currency formatting follows the published public WordPress values. */
 fun formatPrice(raw: String): String {
     if (raw.isBlank()) return "—"
-    return com.brendigo.sidrena.data.PriceDisplay.euro(raw)
+    return com.brendigo.bazna.data.PriceDisplay.euro(raw)
 }
 
 /**
@@ -70,7 +70,7 @@ fun DetailPage(
     val view = item?.let(::detailPresentation)
     val publicPage = data.index.publicPage
     val safePublicPage = runCatching {
-        com.brendigo.sidrena.data.SiteUrl.parse(data.site).publicLink(publicPage)
+        com.brendigo.bazna.data.SiteUrl.parse(data.site).publicLink(publicPage)
     }.getOrNull()
 
     LazyColumn(
