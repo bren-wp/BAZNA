@@ -107,10 +107,14 @@ Shopify app-proxy ────────┘             │
 
 ### WordPress / WooCommerce
 
-1. Na [GitHub izdanjima](https://github.com/bren-wp/BAZNA/releases) preuzmite BAZNA WordPress ZIP; poseban paket za WordPress.org izdan je kao kandidat.
-2. Instalirajte i aktivirajte dodatak u WordPressu, otvorite **BAZNA** te konfigurirajte proizvode, usluge i poslovnice.
+**Postojeća WordPress.org instalacija:** koristite službeni [BAZNA/SIDRENA dodatak](https://wordpress.org/plugins/brendigo-sidrena-cijena/) s trajnim slugom `brendigo-sidrena-cijena`. Nakon izdavanja nove verificirane verzije u službenom WordPress.org SVN-u, ažurirajte ga kroz **Dodaci → Instalirani dodaci → Ažuriraj odmah** (ili omogućite WordPress automatska ažuriranja). Nije potrebna ponovna instalacija niti promjena direktorija.
+
+1. Za ručnu ZIP instalaciju preuzmite `BAZNA-WordPress-<verzija>.zip` s [GitHub izdanja](https://github.com/bren-wp/BAZNA/releases); on koristi isti `brendigo-sidrena-cijena/` direktorij i glavni PHP fajl.
+2. Instalirajte i aktivirajte dodatak, otvorite **BAZNA** te konfigurirajte proizvode, usluge i poslovnice.
 3. Provjerite cijene, referentne datume i objavite javne CSV/XML cjenike.
 4. Android povežite HTTPS adresom svoje stranice.
+
+**Objava WordPress.org nadogradnji:** [GitHub Actions / SVN upute](docs/WORDPRESS-ORG-AZURIRANJE.md). Zaseban razvojni kandidat `bazna-cjenici` **nije** nadogradnja postojećeg službenog dodatka. GitHub izdanje samo po sebi ne objavljuje nadogradnju na WordPress.org.
 
 ### Samostalni PHP web — `/web`
 
