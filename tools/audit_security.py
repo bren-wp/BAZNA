@@ -50,9 +50,11 @@ if "WP_REST_Server::CREATABLE" in api or "WP_REST_Server::EDITABLE" in api or "W
 if "usesCleartextTraffic=\"false\"" not in manifest or "allowBackup=\"false\"" not in manifest:
     errors.append("Android transport / backup policy not enforced")
 android_network=read("android/app/src/main/java/com/brendigo/sidrena/data/CatalogRepository.kt")
+android_dns=read("android/app/src/main/java/com/brendigo/sidrena/data/PublicDns.kt")
 if not all(token in android_network for token in (
+    ".dns(PublicDns)", ".followRedirects(false)", ".proxy(Proxy.NO_PROXY)",
+)) or not all(token in android_dns for token in (
     "Dns.SYSTEM.lookup(hostname)", "PublicNetworkGuard::isPublic",
-    ".followRedirects(false)", ".proxy(Proxy.NO_PROXY)",
 )):
     errors.append("Android socket-bound DNS filtering, redirects or proxy policy missing")
 # Require identical versioned, read-only discovery checks on both clients.
