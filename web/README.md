@@ -3,7 +3,7 @@
 **Autor:** Brendigo · https://brendigo.com/  
 **Status:** prva funkcionalna inačica; nije objavljena niti testirana na stvarnom produkcijskom hostingu.
 
-BAZNA Web 1.1.4 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, zasebnu domensku licencu, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
+BAZNA Web 1.1.4 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
 
 ## Instalacija (Apache / PHP 8.1+)
 
@@ -17,13 +17,11 @@ BAZNA Web 1.1.4 pruža administratorsku prijavu i **grafičko uređivanje proizv
 
    \`BAZNA_ADMIN_PASSWORD_HASH=<password_hash(PASSWORD_DEFAULT) output>\` — lozinka nikad u Git.
 
-   \`BAZNA_APP_KEY=<64 hexadecimal characters from random_bytes(32)>\` — služi za AES-256-GCM lokalnu zaštitu licence; čuvati sigurno kroz nadogradnje.
 
 4. Generirajte vrijednosti na poslužitelju:
    \`php -r 'echo password_hash(readline("Password: "), PASSWORD_DEFAULT), PHP_EOL;'\`
-   \`php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'\`
 5. Omogućite Apache rewrite ili ekvivalentno usmjerite \`/bazna/*\` na \`web/public/index.php\`. Poslužitelj mora odbijati HTTP ili preusmjeravati na HTTPS **prije PHP-a**.
-6. Otvorite \`https://www.primjer.hr/bazna/admin\`, aktivirajte domenski vezanu BAZNA licencu i unesite katalog. Objavite eksplicitno preko kartice **Javni cjenici**.
+6. Otvorite \`https://www.primjer.hr/bazna/admin\`, unesite katalog. Objavite eksplicitno preko kartice **Javni cjenici**.
 
 ## Zajednički Android API
 
@@ -33,7 +31,6 @@ BAZNA Web 1.1.4 pruža administratorsku prijavu i **grafičko uređivanje proizv
 
 \`GET /bazna/v1/cjenici/proizvodi/xml\` i \`/usluge/xml\` — javni XML.
 
-\`GET /bazna/v1/arhiva\` — nepromjenjive arhivske poveznice; \`GET /bazna/v1/license-proof\` — kratkotrajan izazov bez ključa.
 
 \`GET /bazna/cjenik\`, \`GET /bazna/arhiva\` — javni responzivni HTML.
 
@@ -72,3 +69,7 @@ REST `/bazna/v1/usluge-na-upit` opcionalno podržava `outlet`
 i `q` za filtriranje po poslovnici i višerječnim kriterijima.
 API ostaje samo za čitanje i ne sadrži administratorske podatke.
 Na samostalnom Web PHP-u dodatno su dostupni pretraga i odabir poslovnice u javnom HTML-u.
+
+## Bez aktivacije
+
+Svi lokalni alati za uvoz, uređivanje i javnu objavu rade bez BAZNA licencnog ključa ili servisa. Potrebna je samo postojeća administratorska lozinka, CSRF i privatna mapa podataka. `BAZNA_APP_KEY` više nije potreban.

@@ -14,10 +14,8 @@ Shopify **ne izvodi PHP u temi/trgovini**. Ovdje je zaseban PHP backend s Shopif
    - \`BAZNA_SHOPIFY_CLIENT_SECRET\` — Shopify Client Secret za HMAC;
    - \`BAZNA_SHOPIFY_ALLOWED_SHOPS=shop.myshopify.com\` — samo autorizirano instalirane trgovine (ne prihvaćati slobodan unos od anonimnog kupca);
    - \`BAZNA_SHOPIFY_PRIVATE_DIR=/srv/bazna-shopify-private\` izvan webroota;
-   - \`BAZNA_SHOPIFY_APP_KEY\` — zaseban 64-znamenkasti hex za AES-GCM;
    - \`BAZNA_SHOPIFY_ACCESS_TOKEN\` — samo tijekom autoriziranog sync CLI poziva; ne smije se pojaviti u logu, Liquid kodu ili HTTP odgovoru.
 5. Server-side komande (CLI, ne otvoreni web):
-   \`BAZNA_LICENSE_KEY=... php shopify/bin/manage.php shop.myshopify.com activate\`
    \`php shopify/bin/manage.php shop.myshopify.com sync\`
    \`php shopify/bin/manage.php shop.myshopify.com publish\`
 6. Dodajte Shopify Theme App Extension blok \`BAZNA javni cjenik\`. Javni Android API je \`https://shop.myshopify.com/apps/bazna/v1/cjenici\`.
@@ -62,3 +60,7 @@ REST `/bazna/v1/usluge-na-upit` opcionalno podržava `outlet`
 i `q` za filtriranje po poslovnici i višerječnim kriterijima.
 API ostaje samo za čitanje i ne sadrži administratorske podatke.
 Shopifyov app proxy i dalje zahtijeva valjan HMAC potpis; nije otvoreni, anonimni API dostupan proizvoljnom Android klijentu.
+
+## Bez BAZNA aktivacije
+
+Komande `status`, `sync` i `publish` rade bez BAZNA licencnog ključa ili servisa. Shopify HMAC, odobrena instalacija i API pristupni token za remote sinkronizaciju ostaju sigurnosne obveze, a ne licenciranje.

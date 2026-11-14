@@ -20,6 +20,10 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 
 ---
 
+## Sve funkcije bez aktivacijskog ključa
+
+**BAZNA 1.5.20** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
+
 ## Sve cijene na jednom mjestu
 
 **BAZNA** pomaže poslovanju javno prikazivati cijene i jednostavno upravljati njihovim promjenama: od jedne poslovnice do kataloga s tisućama proizvoda i usluga. Cjenik nastaje iz provjerene evidencije, objavljuje se izričitom radnjom i zadržava povijest prethodnih objava.
@@ -31,7 +35,7 @@ BAZNA povezuje proizvode, usluge, poslovnice, povijesne bazne cijene, javne obja
 - **Poslovnice** — zasebni katalozi, javne objave i povijesni cjenici po lokaciji.
 - **Javni cjenici** — pregledne HTML stranice te strojno čitljivi CSV/XML.
 - **Arhiva** — dostupne nepromjenjive verzije već objavljenih cjenika.
-- **Licence** — zaštita administrativnih funkcija domenskim licencnim sustavom.
+- **Bez licenciranja** — sve funkcije dostupne bez aktivacije ili ključa.
 
 ## Usluge s cijenom na upit — sve javne platforme
 
@@ -72,11 +76,10 @@ i ne pristupa korisničkim računima u WordPressu.
 |---|---|---|---|
 | **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.20** | CI provjeren; kandidat WordPress.org paketa |
 | **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.4** | Funkcionalni paket; potreban test na stvarnom hostingu |
-| **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i licencama | **1.1.4** | Kandidat; potreban instalacijski test u Joomli |
+| **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i sigurnom administracijom | **1.1.4** | Kandidat; potreban instalacijski test u Joomli |
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.4** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
 | **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.20** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
-| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.6** | Windows CI i stvarne provjere sučelja |
-| **Licencni servis** | Provjera licence vezane uz javnu HTTPS domenu, odvojeno od podataka kataloga | **1.5.20** | Za instalaciju potrebna vlastita privatna konfiguracija |
+| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.7** | Windows CI i stvarne provjere sučelja |
 
 ## Jedinstveni podaci na svim platformama
 
@@ -90,7 +93,6 @@ Shopify app-proxy ────────┘             │
                                        ├──> HTML / CSV / XML
                                        └──> javna arhiva po poslovnici
 
-BAZNA licencni servis ──> provjera instalacije i domene (zasebno)
 ~~~
 
 | Platforma | Otkriće objavljenih cijena |
@@ -99,14 +101,14 @@ BAZNA licencni servis ──> provjera instalacije i domene (zasebno)
 | Shopify | `https://trgovina.myshopify.com/apps/bazna/v1/cjenici` |
 | WordPress | Postojeća BAZNA REST v1 putanja, podržana i u pretty i u plain-permalink načinu |
 
-**Važno:** zajednički javni format i domenska licenca ne znače da svaki CMS ima identične administracijske mogućnosti. Shopify trenutačno treba zaseban server i autoriziranu instalaciju, a Android je namjerno **samo za čitanje**. Svaki kanal objavljuje vlastiti katalog; automatska dvosmjerna sinkronizacija svih trgovina nije implementirana bez dodatne autentificirane integracije.
+**Važno:** zajednički javni format ne znače da svaki CMS ima identične administracijske mogućnosti. Shopify trenutačno treba zaseban server i autoriziranu instalaciju, a Android je namjerno **samo za čitanje**. Svaki kanal objavljuje vlastiti katalog; automatska dvosmjerna sinkronizacija svih trgovina nije implementirana bez dodatne autentificirane integracije.
 
 ## Instalacija po platformama
 
 ### WordPress / WooCommerce
 
 1. Na [GitHub izdanjima](https://github.com/bren-wp/BAZNA/releases) preuzmite BAZNA WordPress ZIP; poseban paket za WordPress.org izdan je kao kandidat.
-2. Instalirajte dodatak u WordPressu, otvorite **BAZNA**, konfigurirajte katalog i, ako koristite licenciranu distribuciju, aktivirajte licencu.
+2. Instalirajte dodatak u WordPressu, otvorite **BAZNA**, konfigurirajte katalog i.
 3. Provjerite cijene, referentne datume i objavite javne CSV/XML cjenike.
 4. Android povežite HTTPS adresom svoje stranice.
 
@@ -114,15 +116,15 @@ BAZNA licencni servis ──> provjera instalacije i domene (zasebno)
 
 1. Preuzmite **BAZNA-Web-1.1.4.zip**. Ne treba WordPress.
 2. Potrebni su PHP 8.1+, HTTPS, pravila preusmjeravanja na `public/index.php` i **privatna mapa izvan webroota**.
-3. Na serveru konfigurirajte `BAZNA_PUBLIC_URL`, `BAZNA_PRIVATE_DIR`, `BAZNA_ADMIN_PASSWORD_HASH` i `BAZNA_APP_KEY`. Ključeve nemojte unositi u JavaScript ni u Git.
-4. Otvorite `/bazna/admin`, aktivirajte licencu i preko kartica **Proizvodi**, **Usluge** i **Poslovnice** unesite podatke. Objavite ih kroz **Javni cjenici**.
+3. Na serveru konfigurirajte `BAZNA_PUBLIC_URL`, `BAZNA_PRIVATE_DIR`, `BAZNA_ADMIN_PASSWORD_HASH`. Ključeve nemojte unositi u JavaScript ni u Git.
+4. Otvorite `/bazna/admin` i preko kartica **Proizvodi**, **Usluge** i **Poslovnice** unesite podatke. Objavite ih kroz **Javni cjenici**.
 
 [**Potpune PHP upute**](web/README.md)
 
 ### Joomla — `/joomla`
 
 1. Preuzmite **BAZNA-Joomla-Plugin-1.1.4.zip** i instalirajte ga kroz **System → Install → Extensions**.
-2. Omogućite *System – BAZNA*, konfigurirajte privatnu pohranu i licencni servis.
+2. Omogućite *System – BAZNA*, konfigurirajte privatnu pohranu.
 3. Otvorite BAZNA administratorski prikaz i koristite iste osnovne forme kao u samostalnom PHP sustavu.
 4. Objavite katalog i povežite Android javnom HTTPS domenom.
 
@@ -132,7 +134,7 @@ BAZNA licencni servis ──> provjera instalacije i domene (zasebno)
 
 Shopify **ne izvršava PHP u temi**. BAZNA koristi zaseban PHP backend povezan s autoriziranom trgovinom preko **potpisanog app-proxyja**. Dostupan je Shopify theme app extension za javni cjenik te serverski uvoz varijanti preko Shopify Admin API-ja.
 
-Za objavu su potrebni registrirana trgovina, Shopify vjerodajnice, privatna pohrana i valjana BAZNA licenca. Shopify usporedna cijena nije dokaz povijesne bazne cijene. **Javna Shopify App Store distribucija još nije spremna:** potreban je potpuni OAuth postupak, trgovinski UI i preostale provjere aplikacije.
+Za objavu su potrebni registrirana trgovina, Shopify vjerodajnice, privatna pohrana bez BAZNA licenciranja. Shopify usporedna cijena nije dokaz povijesne bazne cijene. **Javna Shopify App Store distribucija još nije spremna:** potreban je potpuni OAuth postupak, trgovinski UI i preostale provjere aplikacije.
 
 [**Potpune Shopify upute**](shopify/README.md)
 
@@ -150,7 +152,7 @@ Ne koristimo izmišljene „screenshotove aplikacije”. Sljedeći GitHub Action
 |---|---|
 | [Android — 12 ekrana × 9 konfiguracija](https://github.com/bren-wp/BAZNA/actions/workflows/android-ci.yml) | Compose emulator prikazi i provjere različitosti zaslona |
 | [WordPress — responzivnost](https://github.com/bren-wp/BAZNA/actions/workflows/official-plugin-ci.yml) | Javni cjenik i administratorske kartice na 13 širina |
-| [Web i Joomla — 182 prikaza](https://github.com/bren-wp/BAZNA/actions/workflows/multiplatform-ci.yml) | 14 prikaza × 13 širina; stvarni predlošci i zajednički editor |
+| [Web i Joomla — 195 prikaza](https://github.com/bren-wp/BAZNA/actions/workflows/multiplatform-ci.yml) | 15 prikaza × 13 širina; stvarni predlošci i zajednički editor |
 | [Windows — 10 prikaza](https://github.com/bren-wp/BAZNA/actions/workflows/desktop-ci.yml) | Stvarno WPF sučelje i provjere navigacije |
 
 Prolazak responzivnih i funkcionalnih testova **nije dokaz 0 % vizualnog odstupanja** od referenci. Za pixel-perfect potvrdu trebaju odgovarajući izvorni PNG-ovi, ista razlučivost i automatizirana usporedba.
@@ -161,11 +163,11 @@ BAZNA čuva razliku između **aktualne cijene**, **povijesne bazne cijene** i **
 
 Ugrađeni pravni profil priprema objavu za hrvatski regulatorni okvir i predviđeni početak proširene primjene **17. studenoga 2026.** Konačne propise i evidenciju treba zasebno provjeriti; softver ne predstavlja pravni certifikat trgovčevih cijena.
 
-Zaštite uključuju HTTPS javno čitanje, privatno čuvanje licenci, administratorske CSRF/ACL kontrole, atomsku pohranu, zaštitu od zastarjelih izmjena i provjeru Shopify potpisanih zahtjeva. Sigurnosni audit u CI-ju nije zamjena za produkcijski penetracijski test.
+Zaštite uključuju HTTPS javno čitanje, administratorske CSRF/ACL kontrole, atomsku pohranu, zaštitu od zastarjelih izmjena i provjeru Shopify potpisanih zahtjeva. Sigurnosni audit u CI-ju nije zamjena za produkcijski penetracijski test.
 
 ## Dokumentacija
 
-[Arhitektura i kompatibilnost](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Android i WordPress](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md) · [Vizualni standard](docs/PIXEL-PERFECT-QA.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md) · [Licence](licenca/README.md)
+[Arhitektura i kompatibilnost](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Android i WordPress](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md) · [Vizualni standard](docs/PIXEL-PERFECT-QA.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 
 ---
 
