@@ -101,6 +101,54 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 
 		woocommerce_wp_text_input(
 			array(
+				'id' => 'bazna_historical_source',
+				'name' => 'bazna_historical_source',
+				'label' => __( 'Dokaz bazne cijene', 'brendigo-sidrena-cijena' ),
+				'description' => __( 'Interna oznaka arhivskog cjenika, računa ili evidencije (bez osobnih podataka kupaca). Izvor se ne objavljuje.', 'brendigo-sidrena-cijena' ),
+				'desc_tip' => true,
+				'value' => $meta->get_historical_source( $product_id ),
+			)
+		);
+
+		woocommerce_wp_select(
+			array(
+				'id' => 'bazna_reference_scope',
+				'label' => __( 'Referentna skupina', 'brendigo-sidrena-cijena' ),
+				'options' => array(
+					'' => __( 'Odaberite nakon provjere', 'brendigo-sidrena-cijena' ),
+					'legacy_fmcg' => __( 'Hrana, piće, kozmetika, čišćenje i kućanstvo', 'brendigo-sidrena-cijena' ),
+					'general_goods_services' => __( 'Ostala roba (10. 9. 2026.)', 'brendigo-sidrena-cijena' ),
+				),
+				'value' => $meta->get_reference_scope( $product_id ),
+			)
+		);
+
+		woocommerce_wp_select(
+			array(
+				'id' => 'bazna_historical_method',
+				'label' => __( 'Pravilo utvrđivanja', 'brendigo-sidrena-cijena' ),
+				'options' => array(
+					'' => __( 'Odaberite na temelju dokaza', 'brendigo-sidrena-cijena' ),
+					'reference_day' => __( 'Cijena na referentni dan', 'brendigo-sidrena-cijena' ),
+					'first_offer' => __( 'Cijena prve ponude nakon referentnog dana', 'brendigo-sidrena-cijena' ),
+					'discount_lowest_30d' => __( 'Za FMCG: najniža prije početka popusta (30 dana)', 'brendigo-sidrena-cijena' ),
+					'discount_previous_retail' => __( 'Za ostalu robu: prethodna maloprodajna', 'brendigo-sidrena-cijena' ),
+				),
+				'value' => $meta->get_historical_method( $product_id ),
+			)
+		);
+
+		woocommerce_wp_checkbox(
+			array(
+				'id' => 'bazna_historical_verified',
+				'label' => __( 'Dokaz provjeren', 'brendigo-sidrena-cijena' ),
+				'description' => __( 'Potvrđujem usporedbu sa stvarnim povijesnim izvorom. Promjena iznosa, datuma ili pravila poništava potvrdu.', 'brendigo-sidrena-cijena' ),
+				'value' => $meta->is_historical_verified( $product_id ) ? 'yes' : 'no',
+			)
+		);
+
+		woocommerce_wp_text_input(
+			array(
 				'id'          => 'sidrena_naziv_posebnog_oblika',
 				'name'        => 'sidrena_naziv_posebnog_oblika',
 				'label'       => __( 'Naziv posebnog oblika prodaje', 'brendigo-sidrena-cijena' ),
@@ -261,6 +309,30 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 			<p class="form-row form-row-first">
 				<label><?php echo esc_html__( 'Referentni datum', 'brendigo-sidrena-cijena' ); ?></label>
 				<input type="text" class="short" name="sidrena_cijena_datum[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $meta->get_date( $id ) ); ?>" placeholder="DD.MM.GGGG." />
+			</p>
+			<p class="form-row form-row-full">
+				<label><?php echo esc_html__( 'Interni dokaz povijesne cijene (bez osobnih podataka)', 'brendigo-sidrena-cijena' ); ?></label>
+				<input type="text" class="short" maxlength="500" name="bazna_historical_source[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $meta->get_historical_source( $id ) ); ?>" />
+			</p>
+			<p class="form-row form-row-full">
+				<label><?php echo esc_html__( 'Referentna skupina', 'brendigo-sidrena-cijena' ); ?></label>
+				<select name="bazna_reference_scope[<?php echo esc_attr( (string) $loop ); ?>]">
+					<option value=""><?php echo esc_html__( 'Zahtijeva provjeru', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="legacy_fmcg" <?php selected( $meta->get_reference_scope( $id ), 'legacy_fmcg' ); ?>><?php echo esc_html__( 'FMCG — 2. 5. 2025.', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="general_goods_services" <?php selected( $meta->get_reference_scope( $id ), 'general_goods_services' ); ?>><?php echo esc_html__( 'Ostala roba — 10. 9. 2026.', 'brendigo-sidrena-cijena' ); ?></option>
+				</select>
+			</p>
+			<p class="form-row form-row-full">
+				<label><?php echo esc_html__( 'Metoda dokazane bazne cijene', 'brendigo-sidrena-cijena' ); ?></label>
+				<select name="bazna_historical_method[<?php echo esc_attr( (string) $loop ); ?>]">
+					<option value=""><?php echo esc_html__( 'Zahtijeva provjeru', 'brendigo-sidrena-cijena' ); ?></option>
+					<?php foreach ( array( 'reference_day' => 'Cijena na referentni dan', 'first_offer' => 'Prva ponuda', 'discount_lowest_30d' => 'FMCG: najniža 30 dana prije početka popusta', 'discount_previous_retail' => 'Ostala roba: prethodna maloprodajna' ) as $value => $label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $meta->get_historical_method( $id ), $value ); ?>><?php echo esc_html( $label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</p>
+			<p class="form-row form-row-full">
+				<label><input type="checkbox" name="bazna_historical_verified[<?php echo esc_attr( (string) $loop ); ?>]" value="yes" <?php checked( $meta->is_historical_verified( $id ) ); ?> /> <?php echo esc_html__( 'Potvrđujem provjeru povijesnog izvora', 'brendigo-sidrena-cijena' ); ?></label>
 			</p>
 			<p class="form-row form-row-last">
 				<label><?php echo esc_html__( 'Naziv posebnog oblika prodaje', 'brendigo-sidrena-cijena' ); ?></label>

@@ -302,6 +302,9 @@ class Brendigo_Sidrena_Cijena_Feed_Rows {
 			'sidrena_cijena'  => $sidrena,
 			'vrsta'           => 'proizvod',
 			'sidrena_datum'   => $meta->get_display_date( $product->get_id() ),
+			'reference_scope' => $meta->get_reference_scope( $product->get_id() ),
+			'historical_method' => $meta->get_historical_method( $product->get_id() ),
+			'historical_verified' => $meta->is_historical_verified( $product->get_id() ) ? 'yes' : '',
 		);
 
 		if ( $public ) {
