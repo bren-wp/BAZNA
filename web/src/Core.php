@@ -510,6 +510,22 @@ final class Core
      * Never read draft.json, never infer an unpublished historical price.
      * Search covers both numeric services and price-on-request criteria.
      */
+    /**
+     * Upgrade-safe public projection for snapshots created before explicit
+     * evidence fields existed. Preserve the CURRENT price, while refusing to
+     * advertise an unverified historical amount or date as a legal baseline.
+     * The private immutable JSON snapshot is not modified.
+     */
+    private static function safePublicPriceRow(array $row, string $kind): array
+    {
+        if (trim((string) ($row['sidrena_cijena'] ?? '')) !== '' &&
+            self::legalEvidenceIssue($row, $kind) !== '') {
+            $row['sidrena_cijena'] = '';
+            $row['sidrena_datum'] = '';
+        }
+        return $row;
+    }
+
     public function publicCatalogHtml(string $kind, string $outlet = '', string $query = ''): string
     {
         if (!in_array($kind, self::KINDS, true) ||
@@ -535,7 +551,7 @@ final class Core
         };
         $rows = $published[$kind === 'proizvodi' ? 'products' : 'services'] ?? [];
         $html = '<section class="bazna-panel bazna-table-scroll"><table><thead><tr>' .
-            '<th>Naziv</th><th>SKU</th><th>Redovna cijena</th><th>Bazna cijena</th>' .
+            '<th>Naziv</th><th>SKU</th><th>Maloprodajna cijena</th><th>Bazna cijena</th>' .
             '<th>Referentni datum</th><th>Jedinica mjere</th><th>Dostupnost</th>' .
             '</tr></thead><tbody>';
         $count = 0;
@@ -547,6 +563,7 @@ final class Core
                 ]))) {
                 continue;
             }
+            $row = self::safePublicPriceRow($row, $kind);
             $fields = ['naziv', 'sku', 'maloprodajna_cijena', 'sidrena_cijena',
                 'sidrena_datum', 'jedinica_mjere', 'dostupnost'];
             $html .= '<tr>';
@@ -557,7 +574,7 @@ final class Core
                     $value .= ' €';
                 }
                 $html .= '<td data-label="' . self::esc([
-                    'naziv' => 'Naziv', 'sku' => 'SKU', 'maloprodajna_cijena' => 'Redovna cijena',
+                    'naziv' => 'Naziv', 'sku' => 'SKU', 'maloprodajna_cijena' => 'Maloprodajna cijena',
                     'sidrena_cijena' => 'Bazna cijena', 'sidrena_datum' => 'Referentni datum',
                     'jedinica_mjere' => 'Jedinica mjere', 'dostupnost' => 'Dostupnost',
                 ][$field]) . '">' . self::esc($value) . '</td>';
@@ -844,6 +861,7 @@ final class Core
         fputcsv($handle, self::PUBLIC_FIELDS, ';', '"', '');
         foreach ($rows as $row) {
             if (($row['outlet'] ?? '') !== $outlet) continue;
+            $row = self::safePublicPriceRow($row, $kind);
             fputcsv($handle, array_map(static fn($field): string =>
                 self::safeCsvCell((string) ($row[$field] ?? '')), self::PUBLIC_FIELDS), ';', '"', '');
         }

@@ -325,6 +325,21 @@ check(!str_contains($xml, '<historical_source>') &&
     !str_contains($xml, '<reference_scope>') &&
     !str_contains($xml, 'Arhiva cjenika 2026'),
     'Public XML never exposes private historical source or method');
+// A pre-1.5.24 published snapshot may contain an unverified baseline
+// which must not be claimed as legally verified after upgrading.
+$legacyPublished = $core->read('published.json');
+$legacyPublished['products'][0]['historical_verified'] = false;
+$legacyPrivate = new Core($root . '/legacy-unverified', 'https://primjer.hr');
+$legacyPrivate->write('published.json', $legacyPublished);
+$legacyCsv = $legacyPrivate->csv('proizvodi');
+$legacyHtml = $legacyPrivate->publicCatalogHtml('proizvodi');
+check(str_contains($legacyCsv, 'Maslinovo ulje') &&
+    !str_contains($legacyCsv, ';8,49;') &&
+    !str_contains($legacyHtml, '8,49 €') &&
+    str_contains($legacyHtml, 'Maloprodajna cijena'),
+    'Legacy unverified baseline is redacted while current product price remains public');
+check(!str_contains($legacyPrivate->xml('proizvodi'), '<sidrena_cijena>8,49</sidrena_cijena>'),
+    'Legacy unverified historical price is also absent from public XML');
 check(str_contains($xml, '<bazna-cjenik') && str_contains($xml, '<sidrena_cijena>8,49</sidrena_cijena>'),
     'XML and CSV price parity');
 $core->saveDraft([
