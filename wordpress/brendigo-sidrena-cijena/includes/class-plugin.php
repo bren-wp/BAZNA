@@ -147,6 +147,8 @@ final class Brendigo_Sidrena_Cijena_Plugin {
 		Brendigo_Sidrena_Cijena_Price_History::instance();
 		Brendigo_Sidrena_Cijena_Notifications::instance();
 		Brendigo_Sidrena_Cijena_Public_API::instance();
+		// Admin-only draft sync; public read-only catalog remains unchanged.
+		add_action( 'rest_api_init', array( 'Brendigo_Sidrena_Cijena_Sync_Draft', 'register' ) );
 		Brendigo_Sidrena_Cijena_Frontend::instance();
 
 		// Preserve storefront meta, theme compatibility and Woo Blocks regardless
