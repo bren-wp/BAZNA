@@ -165,7 +165,9 @@ final class Core
                 throw new InvalidArgumentException('Oznaka, naziv ili adresa poslovnice nisu valjani.');
             }
             $seen[strtolower($code)] = true;
-            $cleanOutlets[] = ['code' => $code, 'name' => $name, 'address' => $address, 'type' => $type];
+            $outletClean = ['code' => $code, 'name' => $name, 'address' => $address];
+            if ($type !== '') $outletClean['type'] = $type;
+            $cleanOutlets[] = $outletClean;
         }
         $result = ['outlets' => $cleanOutlets, 'products' => [], 'services' => [], 'on_request' => []];
         foreach (['products', 'services'] as $collection) {
