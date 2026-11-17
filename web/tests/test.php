@@ -140,9 +140,11 @@ $changedReference['products'][0]['sidrena_cijena'] = '9,99';
 $core->saveDraft($changedReference);
 check($core->read('draft.json')['products'][0]['historical_verified'] === false,
     'Changed historic amount invalidates a previously approved source');
-$core->saveDraft($catalog);
+$unverifiedRestored = $catalog;
+$unverifiedRestored['products'][0]['historical_verified'] = false;
+$core->saveDraft($unverifiedRestored);
 check($core->read('draft.json')['products'][0]['historical_verified'] === false,
-    'Restoring old amount does not automatically restore historical attestation');
+    'Restoring old amount without explicit re-attestation remains unverified');
 // The operator must explicitly re-attest the source after a change.
 $reconfirmed = $catalog;
 $reconfirmed['products'][0]['historical_verified'] = true;

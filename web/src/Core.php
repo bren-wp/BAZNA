@@ -302,7 +302,10 @@ final class Core
             foreach ($after[$kind] ?? [] as $index => $row) {
                 if (!is_array($row) || !is_scalar($row['id'] ?? null)) continue;
                 $old = $oldRows[(string) $row['id']] ?? null;
-                if (!is_array($old)) continue;
+                // A first documented attestation is permitted while editing
+                // an earlier unverified draft. Only an ALREADY attested
+                // historic value can carry a stale checked flag forward.
+                if (!is_array($old) || ($old['historical_verified'] ?? false) !== true) continue;
                 foreach ($inputs as $field) {
                     if ((string) ($old[$field] ?? '') !== (string) ($row[$field] ?? '')) {
                         $after[$kind][$index]['historical_verified'] = false;
