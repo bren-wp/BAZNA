@@ -66,7 +66,7 @@ body.bazna-public.bazna-density-compact .cjenik-table th { padding: 8px 11px; }
 
 /* On arbitrary WP pages the wrapper owns its background and contrast.
  * No appearance rules spill into the host theme or WooCommerce. */
-.bazna-publication, .bazna-files-only {
+.bazna-publication, .bazna-files-only, .bazna-single-embed {
   box-sizing: border-box;
   max-width: 100%;
   border: 1px solid var(--bazna-border);
@@ -75,7 +75,7 @@ body.bazna-public.bazna-density-compact .cjenik-table th { padding: 8px 11px; }
   color: var(--bazna-fg);
   padding: clamp(16px, 3vw, 30px);
 }
-.bazna-publication *, .bazna-files-only * { box-sizing: border-box; }
+.bazna-publication *, .bazna-files-only *, .bazna-single-embed * { box-sizing: border-box; }
 .bazna-publication :is(h2,h3,p,a,span,li,th,td,label) { color: inherit; }
 .bazna-publication-header {
   border-radius: 14px;
