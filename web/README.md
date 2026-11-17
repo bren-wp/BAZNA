@@ -78,3 +78,20 @@ Svi lokalni alati za uvoz, uređivanje i javnu objavu rade bez BAZNA licencnog k
 ## NN 132/2026 — službeni izvozi
 
 Osim kompatibilnih javnih v1 CSV/XML izvora, BAZNA objavljuje odvojene službene rute `/bazna/v1/sluzbeni/proizvodi/csv` i `/bazna/v1/sluzbeni/usluge/xml` (obje vrste i formata). Za službeni izvoz postavite stvarni `BAZNA_TRADER_OIB` ili `BAZNA_TRADER_MB`. Bez potvrđene povijesne cijene izvoz ne prikazuje lažnu usklađenost. Rok objave nakon izmjene je 11:00 na datum promjene; treba postaviti pouzdan scheduler na poslužitelju.
+
+
+## Automatizacija objave — shared hosting
+
+BAZNA PHP podržava **dva sigurna načina automatizacije**, bez potrebe za bazom podataka i bez ovisnosti o posjetiteljima web-stranice.
+
+**Na administratorsko spremanje:** postavite okolišnu varijablu `BAZNA_AUTO_PUBLISH_VERIFIED=1`. Kada administrator spremi novu stavku ili katalog, BAZNA pokušava objaviti samo **potpune i potvrđene** cijene, s konfiguriranim valjanim OIB-om/MB-om i podacima prodajnog mjesta. Nepotpuni podaci ostaju u privatnom nacrtu, uz poruku o razlogu blokade. Opcija je isključena dok se izričito ne konfigurira.
+
+**Raspored neovisan o prometu:** cron zadatak za PHP CLI, primjer (prilagodite vlastitim putanjama):
+
+```cron
+* * * * /usr/bin/php /absolute/path/to/bazna-web/bin/publish.php >> /private/logs/bazna-publish.log 2>&1
+```
+
+CLI koristi `BAZNA_PRIVATE_DIR`, `BAZNA_PUBLIC_URL` i točno jednu od `BAZNA_TRADER_OIB`/`BAZNA_TRADER_MB`. Za trgovine s više poslovnica obvezno upišite stvarne vrste, adrese i oznake prodajnih mjesta; za webshop koji nije zajednički svim prodajnim mjestima postavite `BAZNA_MAIN_STORE_TYPE`, `BAZNA_MAIN_STORE_ADDRESS` i `BAZNA_MAIN_STORE_CODE`. Testirajte izvršavanje kao hosting korisnik, vrijeme u `Europe/Zagreb` i vanjski HTTP dohvat prije 11:00 na dan izmjene.
+
+Ponovni poziv bez novih podataka neće promijeniti arhivu niti broj pohrane. Ako je postojeći cjenik nepotpun, automatizacija javlja grešku i ne mijenja zadnji objavljeni snapshot. Nije dopušteno tumačiti ovu zaštitu kao pravnu ovjeru sadržaja. **Običan WP-Cron ili pokretanje samo pri posjetama ne jamče zakonski rok.** Prije automatskog objavljivanja provjerite pravilnu kategorizaciju proizvoda i uvjete iznimaka.
