@@ -353,6 +353,7 @@ final class Core
             $catalog['published_at'] = $timestamp;
             // Monotonic per-store publication sequence, retained with each snapshot.
             $catalog['publication_sequence'] = max(1, (int) ($existing['publication_sequence'] ?? 0) + 1);
+            $catalog['official_identity'] = $this->officialIdentity();
             $this->write('published.json', $catalog);
             return $catalog;
         });
@@ -554,7 +555,8 @@ final class Core
     public function officialRows(string $kind, string $outlet = '', ?array $snapshot = null): array
     {
         $snapshot ??= $this->read('published.json');
-        if (!isset($snapshot['published_at']) || $this->officialIdentity() === '') {
+        if (!isset($snapshot['published_at']) ||
+            (($snapshot['official_identity'] ?? $this->officialIdentity()) === '')) {
             throw new \RuntimeException('Službeni cjenik zahtijeva objavljene podatke i valjan OIB/MB trgovca.');
         }
         if ($this->officialMissing($kind, $outlet, $snapshot) !== []) {
@@ -577,14 +579,14 @@ final class Core
     }
 
     /** Stable URL; Content-Disposition name includes identity, outlet, type and local timestamp. */
-    public function officialFilename(string $kind, string $format, string $outlet = ''): string
+    public function officialFilename(string $kind, string $format, string $outlet = '', ?array $snapshot = null): string
     {
         if (!isset(self::OFFICIAL_FIELDS[$kind]) || !in_array($format, ['csv','xml'], true)) {
             throw new InvalidArgumentException('Neispravna vrsta cjenika.');
         }
-        $id = $this->officialIdentity();
+        $published = $snapshot ?? $this->read('published.json');
+        $id = (string) ($published['official_identity'] ?? $this->officialIdentity());
         if ($id === '') throw new \RuntimeException('Konfigurirajte OIB ili matični broj.');
-        $published = $this->read('published.json');
         $date = (new \DateTimeImmutable((string) ($published['published_at'] ?? 'now')))
             ->setTimezone(new \DateTimeZone('Europe/Zagreb'))->format('Ymd_Hi');
         if ($outlet !== '' && !preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $outlet)) {
@@ -631,9 +633,9 @@ final class Core
         return $id . '_' . $place . '_' . $type . '_' . $sequence . '_' . $date . '.' . $format;
     }
 
-    public function officialCsv(string $kind, string $outlet = ''): string
+    public function officialCsv(string $kind, string $outlet = '', ?array $snapshot = null): string
     {
-        $rows = $this->officialRows($kind, $outlet);
+        $rows = $this->officialRows($kind, $outlet, $snapshot);
         $f = fopen('php://temp', 'w+');
         if (!$f) throw new \RuntimeException('CSV nije dostupan.');
         fwrite($f, "\xEF\xBB\xBF");
@@ -652,9 +654,9 @@ final class Core
         return $content;
     }
 
-    public function officialXml(string $kind, string $outlet = ''): string
+    public function officialXml(string $kind, string $outlet = '', ?array $snapshot = null): string
     {
-        $rows = $this->officialRows($kind, $outlet);
+        $rows = $this->officialRows($kind, $outlet, $snapshot);
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
         $root = $dom->createElement('cjenik');
@@ -891,6 +893,44 @@ final class Core
         ];
     }
 
+    /**
+     * Immutable verified archive snapshot, including the identity used when
+     * it was published. Never serve newly edited drafts as historical exports.
+     */
+    public function archiveSnapshot(string $id): array
+    {
+        if (!preg_match('/^[0-9]{14}-[a-f0-9]{12}$/D', $id)) {
+            throw new InvalidArgumentException('Neispravan identifikator arhive.');
+        }
+        foreach ($this->read('archive.json')['versions'] ?? [] as $v) {
+            if (($v['id'] ?? '') === $id && ($v['file'] ?? '') === 'archive-' . $id . '.json') {
+                $snapshot = $this->read('archive-' . $id . '.json');
+                if (!isset($snapshot['published_at'])) {
+                    throw new InvalidArgumentException('Nepotpuna arhivska snimka.');
+                }
+                return $snapshot;
+            }
+        }
+        throw new InvalidArgumentException('Arhivski zapis ne postoji.');
+    }
+
+    public function officialArchive(string $id, string $kind, string $format, string $outlet = ''): array
+    {
+        $snapshot = $this->archiveSnapshot($id);
+        if ($outlet !== '' &&
+            !in_array($outlet, array_column($snapshot['outlets'] ?? [], 'code'), true)) {
+            throw new InvalidArgumentException('Poslovnica ne postoji u arhivskom cjeniku.');
+        }
+        if (!in_array($format, ['csv','xml'], true)) {
+            throw new InvalidArgumentException('Nepodržani službeni format.');
+        }
+        $name = $this->officialFilename($kind, $format, $outlet, $snapshot);
+        $body = $format === 'csv'
+            ? $this->officialCsv($kind, $outlet, $snapshot)
+            : $this->officialXml($kind, $outlet, $snapshot);
+        return ['filename' => $name, 'body' => $body, 'format' => $format];
+    }
+
     public function archives(): array
     {
         $out = [];
@@ -913,6 +953,27 @@ final class Core
             }
             foreach ($locations as $location) {
                 foreach (self::KINDS as $kind) {
+                    // Keep the original statutory export publicly retrievable
+                    // for at least 15 days after replacement (we retain longer).
+                    $actualOutlet = $location === 'webshop' ? '' : $location;
+                    if (!empty($snapshot['official_identity']) &&
+                        $this->officialMissing($kind, $actualOutlet, $snapshot) === []) {
+                        foreach (['csv', 'xml'] as $format) {
+                            try {
+                                $this->officialFilename($kind, $format, $actualOutlet, $snapshot);
+                                $out[] = [
+                                    'date' => $date, 'kind' => $kind, 'outlet' => $location,
+                                    'format' => $format,
+                                    'official' => true,
+                                    'url' => $this->link('bazna/v1/arhiva/' . $id .
+                                        '/sluzbeni/' . $kind . '/' . $format) .
+                                        ($location === 'webshop' ? '' : '?oznaka=' . rawurlencode($location)),
+                                ];
+                            } catch (\Throwable $error) {
+                                // Old pre-rulebook snapshots are not falsely marked compliant.
+                            }
+                        }
+                    }
                     $out[] = [
                         'date' => $date, 'kind' => $kind, 'outlet' => $location, 'format' => 'csv',
                         'url' => $this->link('bazna/v1/arhiva/' . $id . '/' . $kind . '/csv') .
