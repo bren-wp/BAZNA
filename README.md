@@ -48,7 +48,7 @@ BAZNA povezuje proizvode, usluge, poslovnice, provjerene bazne cijene, javne cje
 
 ## Sve funkcije bez aktivacijskog ključa
 
-**BAZNA 1.5.22** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
+**BAZNA 1.5.23** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
 
 ## Sve cijene na jednom mjestu
 
@@ -81,7 +81,7 @@ i služi za pregled, a ne upravljanje WordPressom.
 
 ## Jedna javna logika cjenika, uz punu kontrolu objave
 
-**Novo u 1.5.22:** WordPress, samostalni Web PHP, Joomla i Shopify
+**Novo u 1.5.23:** WordPress, samostalni Web PHP, Joomla i Shopify
 prikazuju objavljene proizvode, usluge i usluge s cijenom na upit
 uz jedinstvene nazive, iznose, povijesne datume i poslovnice.
 Web omogućuje pretraživanje i odabir poslovnice, Joomla i Shopify
@@ -100,13 +100,13 @@ i ne pristupa korisničkim računima u WordPressu.
 
 | Platforma | Namjena | Verzija | Status |
 |---|---|---|---|
-| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.22** | CI provjeren; kandidat WordPress.org paketa |
-| **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.5** | Funkcionalni paket; potreban test na stvarnom hostingu |
-| **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i sigurnom administracijom | **1.1.5** | Kandidat; potreban instalacijski test u Joomli |
-| **Drupal** | Nativni Drupal 10/11 modul na zajedničkoj PHP jezgri, javni REST i službeni CSV/XML | **1.1.5** | Razvojni kandidat; stvarni Drupal integracijski test potreban |
-| **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.5** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.22** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
-| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.8** | Windows CI i stvarne provjere sučelja |
+| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.23** | CI provjeren; kandidat WordPress.org paketa |
+| **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.6** | Funkcionalni paket; potreban test na stvarnom hostingu |
+| **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i sigurnom administracijom | **1.1.6** | Kandidat; potreban instalacijski test u Joomli |
+| **Drupal** | Nativni Drupal 10/11 modul na zajedničkoj PHP jezgri, javni REST i službeni CSV/XML | **1.1.6** | Razvojni kandidat; stvarni Drupal integracijski test potreban |
+| **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.6** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
+| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.23** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
+| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.9** | Windows CI i stvarne provjere sučelja |
 
 ## Automatizirana objava i praćenje rokova
 
@@ -151,7 +151,7 @@ Shopify app-proxy ────────┘             │
 
 ### Samostalni PHP web — `/web`
 
-1. Preuzmite **BAZNA-Web-1.1.5.zip**. Ne treba WordPress.
+1. Preuzmite **BAZNA-Web-1.1.6.zip**. Ne treba WordPress.
 2. Potrebni su PHP 8.1+, HTTPS, pravila preusmjeravanja na `public/index.php` i **privatna mapa izvan webroota**.
 3. Na serveru konfigurirajte `BAZNA_PUBLIC_URL`, `BAZNA_PRIVATE_DIR`, `BAZNA_ADMIN_PASSWORD_HASH`. Ključeve nemojte unositi u JavaScript ni u Git.
 4. Otvorite `/bazna/admin` i preko kartica **Proizvodi**, **Usluge** i **Poslovnice** unesite podatke. Objavite ih kroz **Javni cjenici**.
@@ -160,7 +160,7 @@ Shopify app-proxy ────────┘             │
 
 ### Joomla — `/joomla`
 
-1. Preuzmite **BAZNA-Joomla-Plugin-1.1.5.zip** i instalirajte ga kroz **System → Install → Extensions**.
+1. Preuzmite **BAZNA-Joomla-Plugin-1.1.6.zip** i instalirajte ga kroz **System → Install → Extensions**.
 2. Omogućite *System – BAZNA*, konfigurirajte privatnu pohranu.
 3. Otvorite BAZNA administratorski prikaz i koristite iste osnovne forme kao u samostalnom PHP sustavu.
 4. Objavite katalog i povežite Android javnom HTTPS domenom.

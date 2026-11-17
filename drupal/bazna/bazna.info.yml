@@ -3,4 +3,4 @@ type: module
 description: 'Verified historical prices, public read-only catalogs and NN 132/2026 CSV/XML feeds.'
 package: 'BAZNA'
 core_version_requirement: '^10.3 || ^11'
-version: '1.1.5'
+version: '1.1.6'

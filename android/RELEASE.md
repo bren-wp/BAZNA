@@ -1,11 +1,11 @@
-# BAZNA 1.5.22 — službeni izvorni paketi i Google Play provjere
+# BAZNA 1.5.23 — službeni izvorni paketi i Google Play provjere
 
 | Komponenta | Verzija | Napomena |
 |---|---|---|
-| Android | **1.5.22**, code **25** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
-| WordPress / WooCommerce | **1.5.22** | Zadržani svi postojeći podaci i REST v1 |
-| Web PHP, Joomla, Drupal, Shopify | **1.1.5** | Zajednički Core, javni HTML i filtrirani REST |
-| Windows | **0.10.8** | Isporučuje se u istom releaseu nakon smoke testova |
+| Android | **1.5.23**, code **26** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
+| WordPress / WooCommerce | **1.5.23** | Zadržani svi postojeći podaci i REST v1 |
+| Web PHP, Joomla, Drupal, Shopify | **1.1.6** | Zajednički Core, javni HTML i filtrirani REST |
+| Windows | **0.10.9** | Isporučuje se u istom releaseu nakon smoke testova |
 
 ## Novo: ažuriranja postojećeg WordPress.org dodatka
 
@@ -51,4 +51,4 @@ certifikat.
 
 ## Bez licenciranja i bez pozivanja aktivacijskog servera
 
-BAZNA WordPress, Web PHP, Joomla i Shopify sada ne zahtijevaju BAZNA licencni ključ. Android ne učitava ni prikazuje status licence; stare REST v1 objave s poljem `licensing` sigurno ignorira. Windows Setup/Portable 0.10.8 ne traže aktivaciju. Ovlasti administratora, CSRF, Shopify HMAC i Android HTTPS ostaju sigurnosne kontrole. Distribucijska GPL licenca izvornog koda ostaje valjana.
+BAZNA WordPress, Web PHP, Joomla i Shopify sada ne zahtijevaju BAZNA licencni ključ. Android ne učitava ni prikazuje status licence; stare REST v1 objave s poljem `licensing` sigurno ignorira. Windows Setup/Portable 0.10.9 ne traže aktivaciju. Ovlasti administratora, CSRF, Shopify HMAC i Android HTTPS ostaju sigurnosne kontrole. Distribucijska GPL licenca izvornog koda ostaje valjana.

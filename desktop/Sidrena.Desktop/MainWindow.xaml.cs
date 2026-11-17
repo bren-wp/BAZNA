@@ -832,7 +832,7 @@ public partial class MainWindow : Window
         outer.Children.Add(U.Card("Informacije o izdanju",
             U.Text("BAZNA Desktop "+GetDesktopVersion(),18,true),
             U.Muted("Windows 10/11 · Brendigo · Bez aktivacijskog ključa"),
-            U.Notice("WordPress BAZNA 1.5.22 podržava pravni profil NN 132/2026; bazne cijene zahtijevaju provjeru izvora."),
+            U.Notice("WordPress BAZNA 1.5.23 podržava pravni profil NN 132/2026; bazne cijene zahtijevaju provjeru izvora."),
             U.Action("Preuzmi najnoviju Windows aplikaciju",()=>
                 OpenUrl("https://github.com/bren-wp/BAZNA/releases"),true),
             U.Action("Informacije o programu",()=>OpenUrl("https://brendigo.com/"))));
