@@ -39,6 +39,8 @@ try
         Expect(product.AnchorCents == 210 && product.AnchorDate == "2026-09-10", "Anchor unchanged");
         MustThrow(() => store.AddItem("Bez izvora", "Proizvod", "", "", "", 1m, 1m, "2026-09-10", null));
         MustThrow(() => store.AddItem("Pogrešan datum", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Izvor"));
+        var newGoods = store.AddItem("Prvi put ponuđeno", "Proizvod", "NEW-1", "", "kom", 2m, 2m, "2026-09-11", "Prva ponuda: račun od 11. 9. 2026.");
+        Expect(store.ListItems().Any(p => p.Id == newGoods && p.AnchorDate == "2026-09-11"), "Verified first-offer date accepted");
         MustThrow(() => store.AddItem("Preciznost", "Usluga", "", "", "", 1.123m, null, null, null));
         Expect(MoneyParser.Parse("12,50") == 12.50m, "Croatian decimal comma");
         Expect(MoneyParser.Parse("12.50") == 12.50m, "Invariant decimal dot");
