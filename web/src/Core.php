@@ -346,6 +346,21 @@ final class Core
     {
         return $this->catalogTransaction(function () use ($onlyWhenChanged, $requireOfficial): array {
             $catalog = self::validateCatalog($this->read('draft.json'));
+            // Public compatibility feeds and official feeds MUST agree:
+            // manual publication cannot bypass the documentary check.
+            // Preserve drafts and the last published snapshot on failure.
+            foreach (['products' => 'proizvodi', 'services' => 'usluge'] as $collection => $kind) {
+                foreach ($catalog[$collection] as $index => $row) {
+                    if ($row['sidrena_cijena'] === '') continue;
+                    $issue = self::legalEvidenceIssue($row, $kind);
+                    if ($issue !== '') {
+                        throw new RuntimeException(
+                            'Javna objava blokirana: ' . $kind . ', redak ' . ($index + 1) .
+                            ', provjerite ' . $issue . '.'
+                        );
+                    }
+                }
+            }
             $existing = $this->read('published.json');
             $identity = $this->officialIdentity();
             if ($requireOfficial) {
