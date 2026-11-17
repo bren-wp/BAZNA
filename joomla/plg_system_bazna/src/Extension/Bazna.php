@@ -143,6 +143,15 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                     $status = $action === 'save_item' ? 'Stavka je spremljena.' : 'Stavka je uklonjena.';
                 }
             }
+            if ($action !== 'publish' && in_array($action, ['save', 'save_item', 'delete_item'], true)
+                && getenv('BAZNA_AUTO_PUBLISH_VERIFIED') === '1') {
+                try {
+                    $core->publish(true, true);
+                    $status .= ' Automatska objava potvrđenih cijena izvršena.';
+                } catch (\RuntimeException $error) {
+                    $status .= ' Objava nije izvršena: ' . $error->getMessage();
+                }
+            }
         }
         $draft = $core->read('draft.json');
         $tab = $app->input->getCmd('tab', 'pregled');
