@@ -21,7 +21,7 @@ $automated->ensurePrivate();
 $autoProduct = [
     'id' => 'AUTO-P1', 'naziv' => 'Novo verificirano dobro',
     'maloprodajna_cijena' => '5,00', 'sidrena_cijena' => '4,00',
-    'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day'
+    'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day',
 ];
 $autoService = [
     'id' => 'AUTO-S1', 'naziv' => 'Usluga',
@@ -42,6 +42,9 @@ check(!isset($automated->read('published.json')['published_at']), 'Rejected auto
 $autoService['sidrena_cijena'] = '14,00';
 $autoService['sidrena_datum'] = '2026-09-10';
 $autoService['historical_verified'] = true;
+$autoService['historical_source'] = 'Arhiva usluga 2026';
+$autoService['reference_scope'] = 'general_goods_services';
+$autoService['historical_method'] = 'reference_day';
 $automated->saveDraft([
     'products' => [$autoProduct], 'services' => [$autoService],
     'outlets' => [], 'on_request' => [],
@@ -78,7 +81,7 @@ try {
 $oil = [
     'id' => 'SKU-1', 'naziv' => 'Maslinovo ulje', 'sku' => 'MU-1',
     'maloprodajna_cijena' => '5,99', 'sidrena_cijena' => '8,49',
-    'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day'
+    'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day',
     'jedinica_mjere' => 'L', 'outlet' => '',
 ];
 $catalog = [
@@ -263,7 +266,7 @@ $core->saveDraft([
     'products' => [[
         'id' => 'SKU-1', 'naziv' => 'Maslinovo ulje',
         'maloprodajna_cijena' => '6,19', 'sidrena_cijena' => '8,49',
-        'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day'
+        'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day',
     ]],
     'services' => $catalog['services'],
 ]);

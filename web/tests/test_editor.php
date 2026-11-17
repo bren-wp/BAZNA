@@ -28,7 +28,7 @@ $core->saveDraft([
         'id' => 'sku-a', 'naziv' => 'Baza <script>alert(1)</script>',
         'maloprodajna_cijena' => '12,49',
         'sidrena_cijena' => '11,99', 'sidrena_datum' => '2026-09-10',
-        'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day' 'outlet' => 'RI-01',
+        'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day', 'outlet' => 'RI-01',
     ]],
     'services' => [[
         'id' => 'svc-a', 'naziv' => 'Usluga', 'maloprodajna_cijena' => '4,99',
