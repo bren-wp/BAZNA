@@ -272,7 +272,28 @@ check(str_contains($csv, 'sidrena_cijena') && str_contains($csv, 'Maslinovo ulje
     'legacy Android CSV columns compatible with BAZNA user branding');
 $lines = array_map('str_getcsv', explode("\n", trim(substr($csv, 3))));
 check(str_contains($csv, "\xEF\xBB\xBF"), 'UTF-8 BOM');
+// Public compatibility schema is frozen: documentary source references are
+// private even in archives. Android may rely on the original v1 headers.
+$expectedPublicFields = [
+    'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod',
+    'jedinica_mjere', 'cijena_jedinice_mjere', 'maloprodajna_cijena',
+    'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
+    'barkod', 'dostupnost', 'slika_url',
+];
+check(Core::PUBLIC_FIELDS === $expectedPublicFields &&
+    str_getcsv(strtok(substr($csv, 3), "\n"), ';', '"', '') === $expectedPublicFields,
+    'Legacy public CSV retains exact Android v1 columns/order');
+check(!str_contains($csv, 'Arhiva cjenika 2026') &&
+    !str_contains($csv, 'historical_source') &&
+    !str_contains($csv, 'historical_method') &&
+    !str_contains($csv, 'reference_scope'),
+    'Public compatibility CSV never exposes private historical evidence');
 $xml = $core->xml('proizvodi');
+check(!str_contains($xml, '<historical_source>') &&
+    !str_contains($xml, '<historical_method>') &&
+    !str_contains($xml, '<reference_scope>') &&
+    !str_contains($xml, 'Arhiva cjenika 2026'),
+    'Public XML never exposes private historical source or method');
 check(str_contains($xml, '<bazna-cjenik') && str_contains($xml, '<sidrena_cijena>8,49</sidrena_cijena>'),
     'XML and CSV price parity');
 $core->saveDraft([

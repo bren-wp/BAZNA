@@ -21,6 +21,20 @@ final class Core
         'historical_source', 'reference_scope', 'historical_method',
         'barkod', 'dostupnost', 'slika_url',
     ];
+    /**
+     * Immutable v1 client feed schema. PRIVATE documentary evidence is held
+     * in draft/published JSON outside DocumentRoot but NEVER sent in public
+     * CSV/XML or returned to Android/Windows clients.
+     *
+     * Do not derive this from FIELDS: administrative fields can be added
+     * without silently expanding the public API or exposing invoice IDs.
+     */
+    public const PUBLIC_FIELDS = [
+        'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
+        'cijena_jedinice_mjere', 'maloprodajna_cijena',
+        'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
+        'barkod', 'dostupnost', 'slika_url',
+    ];
     public const KINDS = ['proizvodi', 'usluge'];
     public const REFERENCE_DATES = ['legacy_fmcg' => '2025-05-02', 'general_goods_services' => '2026-09-10'];
 
@@ -779,10 +793,10 @@ final class Core
         $handle = fopen('php://temp', 'w+');
         if (!$handle) throw new RuntimeException('CSV nije moguće pripremiti.');
         fwrite($handle, "\xEF\xBB\xBF");
-        fputcsv($handle, self::FIELDS, ';', '"', '');
+        fputcsv($handle, self::PUBLIC_FIELDS, ';', '"', '');
         foreach ($rows as $row) {
             if (($row['outlet'] ?? '') !== $outlet) continue;
-            fputcsv($handle, array_map(static fn($field) => $row[$field] ?? '', self::FIELDS), ';', '"', '');
+            fputcsv($handle, array_map(static fn($field) => $row[$field] ?? '', self::PUBLIC_FIELDS), ';', '"', '');
         }
         rewind($handle);
         $csv = stream_get_contents($handle);
