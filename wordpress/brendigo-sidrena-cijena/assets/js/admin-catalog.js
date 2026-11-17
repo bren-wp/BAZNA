@@ -912,6 +912,10 @@
 		$("#sidrena-wc-filter").on("input", applyFilters);
 		$("#sidrena-wc-price-filter").on("change", applyFilters);
 		$form.on("change", ".js-sidrena-wc-price", applyFilters);
+		$form.on("input change", ".js-sidrena-wc-price, .js-sidrena-wc-date", function () {
+			$(this).closest(".brendigo-woo-row").find(".bazna-evidence-status")
+				.text("Izmijenjeno — potrebno ponovno potvrditi dokaz u uređivaču proizvoda");
+		});
 
 		// Historical reference prices and dates must be entered individually
 		// with evidence, never copied from the current WooCommerce price.

@@ -170,6 +170,7 @@ final class Brendigo_Sidrena_Cijena_Woo_Bulk_Editor {
 			'current'    => $current,
 			'display'    => $display,
 			'sidrena'    => $meta->get_price( $id ),
+			'historical_verified' => $meta->is_historical_verified( $id ),
 			'date'       => $meta->get_date( $id ),
 			'barcode'    => $meta->get_barcode( $id ),
 			'visibility' => $meta->get_cjenik_visibility( $id ),

@@ -113,7 +113,7 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 			</span>
 		</div>
 		<p><?php echo esc_html__( 'U Android aplikaciju unesite HTTPS adresu ove WordPress stranice. Korisnička imena i lozinke nisu potrebni: aplikacija čita samo javni BAZNA REST API.', 'brendigo-sidrena-cijena' ); ?></p>
-		<p><?php echo esc_html__( 'Objavljena datoteka ne dokazuje točnost bazne cijene ni najniže cijene prije sniženja. Povijesne iznose i datume potvrdite izvornom evidencijom. Objavljene odluke imaju predviđen početak primjene 17. studenoga 2026.; pravilnici su 9. studenoga još bili u savjetovanju.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'Objavljena datoteka ne dokazuje točnost bazne cijene ni najniže cijene prije sniženja. Povijesne iznose i datume potvrdite izvornom evidencijom. Pravilnici NN 132/2026 (1583 i 1584) primjenjuju se od 17. studenoga 2026. Izmijenjeni cjenik treba biti javno dostupan do 11:00 na dan izmjene, a prethodni ostaje najmanje 15 dana od zamjene. Evidentirajte izvor, kategoriju, način utvrđivanja i potvrdu povijesne cijene prije objave.', 'brendigo-sidrena-cijena' ); ?></p>
 		<?php if ( $sidrena_android_pending ) : ?>
 			<p class="sidrena-android-bridge__warning"><?php echo esc_html__( 'Upozorenje: katalog je izmijenjen nakon posljednje javne objave. Ponovno generirajte CSV/XML cjenike kako Android ne bi prikazivao zastarjele cijene.', 'brendigo-sidrena-cijena' ); ?></p>
 		<?php endif; ?>
