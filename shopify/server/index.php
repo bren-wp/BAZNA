@@ -68,6 +68,14 @@ try {
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
     }
+    if (preg_match('#^/v1/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
+        $outlet = (string) ($_GET['oznaka'] ?? '');
+        $filename = $core->officialFilename($match[1], $match[2], $outlet);
+        header('Content-Type: ' . ($match[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+        echo $match[2] === 'csv' ? $core->officialCsv($match[1], $outlet) : $core->officialXml($match[1], $outlet);
+        exit;
+    }
     if (preg_match('#^/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
         $outlet = (string) ($_GET['oznaka'] ?? '');
         header('Content-Type: ' . ($match[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
