@@ -701,6 +701,17 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 		}
 
 		if ( $official_ready ) {
+			// A verified state marker prevents stale aliases from being advertised
+			// when an OIB/MB changes or official publication was disabled.
+			$history = get_option( 'bazna_official_publications', array() );
+			$history = is_array( $history ) ? $history : array();
+			$history[ '' === $oznaka ? '_webshop' : $oznaka ] = array(
+				'identifier' => $id,
+				'identifier_kind' => $id_kind,
+				'published_at' => time(),
+				'sequence' => $sequence,
+			);
+			update_option( 'bazna_official_publications', $history, false );
 			update_option( 'bazna_official_publication_sequence', $sequence + 1, false );
 			$this->prune_official_snapshots();
 		}
