@@ -16,6 +16,7 @@ function wp_date( $format, $stamp = null ) { return ( new DateTimeImmutable( '@'
 function esc_url_raw( $url ) { return $url; }
 function esc_url( $url ) { return htmlspecialchars( $url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ); }
 function esc_html( $text ) { return htmlspecialchars( (string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ); }
+function esc_attr( $text ) { return esc_html( $text ); }
 function esc_html__( $s, $domain ) { return esc_html( $s ); }
 function wp_upload_dir( ...$args ) { return array( 'baseurl' => 'https://example.test/wp-content/uploads', 'error' => false ); }
 class Brendigo_Sidrena_Cijena_Settings {
