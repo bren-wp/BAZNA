@@ -108,4 +108,46 @@ expect_official( str_contains( $official::filename( 'usluge', 'xml', '', 3, 1794
 Brendigo_Sidrena_Cijena_Settings::$multi = false;
 expect_official( str_contains( $official::filename( 'proizvodi', 'csv', '', 4, 1794913200 ),
 	'ZA_SVA_PRODAJNA_MJESTA_ROBA_4_' ), 'All-outlets exception does not need fake outlet data' );
+
+/**
+ * Shared legal decisions: WordPress plugin and PHP Core, which also runs
+ * inside Joomla, Drupal and the self-hosted web edition, must agree.
+ * No historical source text is put into official published CSV or XML.
+ */
+require_once __DIR__ . '/../web/src/Core.php';
+$cases = array(
+	array( 'proizvodi', 'legacy_fmcg', 'reference_day', '2025-05-02', true, 'Arhiva 2025', '' ),
+	array( 'proizvodi', 'legacy_fmcg', 'first_offer', '2025-05-03', true, 'Prva ponuda 2025', '' ),
+	array( 'proizvodi', 'legacy_fmcg', 'discount_lowest_30d', '2025-05-02', true, 'Najniža prije početka popusta', '' ),
+	array( 'usluge', 'general_goods_services', 'discount_previous_retail', '2026-09-10', true, 'Prethodna cijena 2026', '' ),
+	array( 'proizvodi', 'general_goods_services', 'first_offer', '2026-10-01', true, 'Prva ponuda 2026', '' ),
+	array( 'proizvodi', 'general_goods_services', 'first_offer', '2026-09-10', true, 'Krivi dan', 'historical_method' ),
+	array( 'proizvodi', 'general_goods_services', 'reference_day', '2025-05-02', true, 'Krivi dan', 'sidrena_datum' ),
+	array( 'usluge', 'legacy_fmcg', 'reference_day', '2025-05-02', true, 'Pogrešna grupa', 'reference_scope' ),
+	array( 'proizvodi', 'legacy_fmcg', 'discount_previous_retail', '2025-05-02', true, 'Krivo pravilo', 'historical_method' ),
+	array( 'usluge', 'general_goods_services', 'discount_lowest_30d', '2026-09-10', true, 'Krivo pravilo', 'historical_method' ),
+	array( 'proizvodi', 'general_goods_services', 'reference_day', '2026-09-10', false, 'Dokaz', 'historical_verified' ),
+	array( 'proizvodi', 'general_goods_services', 'reference_day', '2026-09-10', true, '', 'historical_source' ),
+);
+foreach ( $cases as $case ) {
+	list( $kind, $scope, $method, $date, $verified, $source, $expected ) = $case;
+	$input = array(
+		'reference_scope' => $scope,
+		'historical_method' => $method,
+		'sidrena_datum' => $date,
+		'historical_verified' => $verified,
+		'historical_source' => $source,
+	);
+	$core_issue = \Brendigo\Bazna\Core::legalEvidenceIssue( $input, $kind );
+	$wp_input = $input;
+	$wp_input['historical_verified'] = $verified && strlen( trim( $source ) ) >= 4 ? 'yes' : '';
+	$wp_issue = Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $wp_input, $kind );
+	// The WordPress stored flag is already a derived source-evidence marker:
+	// core preserves the more specific missing historical_source reason.
+	if ( 'historical_source' === $expected ) {
+		$wp_issue = '' === $wp_input['historical_verified'] ? 'historical_source' : $wp_issue;
+	}
+	expect_official( $core_issue === $expected && $wp_issue === $expected,
+		'WP and Core NN132 evidence parity: ' . implode( '/', array( $kind, $scope, $method, $date, $expected ) ) );
+}
 echo "PASS: NN 132/2026 official feed projection\n";
