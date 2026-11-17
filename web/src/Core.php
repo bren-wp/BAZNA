@@ -355,6 +355,12 @@ final class Core
                                 ': nedostaje ' . $first['field'] . ' u retku ' . $first['row'] . '.'
                             );
                         }
+                        // The filename also needs the exact shop/outlet type,
+                        // registered address and code; never invent them.
+                        $candidate = $catalog;
+                        $candidate['published_at'] = gmdate('c');
+                        $candidate['official_identity'] = $identity;
+                        $this->officialFilename($kind, 'csv', $outlet, $candidate);
                     }
                 }
             }
