@@ -74,6 +74,11 @@ GQL;
                 'sidrena_cijena' => ($old['historical_verified'] ?? false) ? ($old['sidrena_cijena'] ?? '') : '',
                 'sidrena_datum' => ($old['historical_verified'] ?? false) ? ($old['sidrena_datum'] ?? '') : '',
                 'historical_verified' => ($old['historical_verified'] ?? false) === true,
+                // These documentary fields are private and never synthesized
+                // from Shopify's compareAt price or a newly imported product.
+                'historical_source' => (string) ($old['historical_source'] ?? ''),
+                'reference_scope' => (string) ($old['reference_scope'] ?? ''),
+                'historical_method' => (string) ($old['historical_method'] ?? ''),
                 'barkod' => (string) ($node['barcode'] ?? ''),
                 'dostupnost' => !empty($node['availableForSale']) ? 'Dostupno' : 'Nedostupno',
                 'slika_url' => (string) ($product['featuredImage']['url'] ?? ''),

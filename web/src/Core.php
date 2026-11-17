@@ -18,6 +18,7 @@ final class Core
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
         'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
+        'historical_source', 'reference_scope', 'historical_method',
         'barkod', 'dostupnost', 'slika_url',
     ];
     public const KINDS = ['proizvodi', 'usluge'];
@@ -82,6 +83,13 @@ final class Core
             if ($row[$money] !== '' && !preg_match('/^\d{1,9}(?:[,.]\d{1,4})?$/D', $row[$money])) {
                 throw new InvalidArgumentException('Neispravan iznos: ' . $money);
             }
+        }
+        if (strlen($row['historical_source']) > 500 ||
+            ($row['reference_scope'] !== '' && !isset(self::REFERENCE_DATES[$row['reference_scope']])) ||
+            ($row['historical_method'] !== '' && !in_array($row['historical_method'], [
+                'reference_day', 'first_offer', 'discount_lowest_30d', 'discount_previous_retail',
+            ], true))) {
+            throw new InvalidArgumentException('Neispravan izvor, referentna skupina ili metoda bazne cijene.');
         }
         if ($row['sidrena_cijena'] !== '') {
             $date = $row['sidrena_datum'];
@@ -561,6 +569,31 @@ final class Core
         return preg_match('/^\d{8}$/D', $mb) ? $mb : '';
     }
 
+    /**
+     * Structurally validate one documented NN132 reference; never infer a
+     * historic retail price from the current price or a Shopify compareAt.
+     * This contract intentionally matches WP Official_Feed::evidence_issue.
+     */
+    public static function legalEvidenceIssue(array $row, string $kind): string
+    {
+        if (($row['historical_verified'] ?? false) !== true) return 'historical_verified';
+        if (strlen(trim((string) ($row['historical_source'] ?? ''))) < 4) return 'historical_source';
+        $scope = (string) ($row['reference_scope'] ?? '');
+        $method = (string) ($row['historical_method'] ?? '');
+        if (!isset(self::REFERENCE_DATES[$scope]) ||
+            ($kind === 'usluge' && $scope === 'legacy_fmcg')) return 'reference_scope';
+        $reference = self::REFERENCE_DATES[$scope];
+        $date = (string) ($row['sidrena_datum'] ?? '');
+        if (!preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $date, $m) ||
+            !checkdate((int) $m[2], (int) $m[3], (int) $m[1]) ||
+            $date < $reference) return 'sidrena_datum';
+        if ($method === 'reference_day') return $date === $reference ? '' : 'historical_method';
+        if ($method === 'first_offer') return $date > $reference ? '' : 'historical_method';
+        if ($method === 'discount_lowest_30d' && $scope === 'legacy_fmcg') return '';
+        if ($method === 'discount_previous_retail' && $scope === 'general_goods_services') return '';
+        return 'historical_method';
+    }
+
     /** Preview missing historical data, never silently certify a catalog. */
     public function officialMissing(string $kind, string $outlet = '', ?array $snapshot = null): array
     {
@@ -576,6 +609,12 @@ final class Core
             foreach (['naziv', 'maloprodajna_cijena', 'sidrena_cijena'] as $field) {
                 if (trim((string) ($row[$field] ?? '')) === '') {
                     $issues[] = ['row' => $index + 1, 'field' => $field];
+                }
+            }
+            if (trim((string) ($row['sidrena_cijena'] ?? '')) !== '') {
+                $evidenceIssue = self::legalEvidenceIssue($row, $kind);
+                if ($evidenceIssue !== '') {
+                    $issues[] = ['row' => $index + 1, 'field' => $evidenceIssue];
                 }
             }
             if (!empty($row['cijena_jedinice_mjere']) && $kind === 'proizvodi') {
