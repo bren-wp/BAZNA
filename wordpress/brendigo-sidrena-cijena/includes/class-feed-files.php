@@ -598,15 +598,28 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 		if ( ! is_array( $files ) ) {
 			return;
 		}
+		$holds = get_option( 'bazna_official_retention_holds', array() );
+		$holds = is_array( $holds ) ? $holds : array();
+		$original_holds = $holds;
+		$now = time();
+		foreach ( $holds as $name => $until ) {
+			if ( (int) $until <= $now ) {
+				unset( $holds[ $name ] );
+			}
+		}
 		foreach ( $files as $name => $info ) {
 			if ( ! preg_match( '/_(\\d{8})_(\\d{4})\\.(?:csv|xml)$/D', (string) $name, $m ) ||
 				! preg_match( '/^\\d{8,11}_/', (string) $name ) ) {
 				continue;
 			}
 			$date = DateTimeImmutable::createFromFormat( '!Ymd_Hi', $m[1] . '_' . $m[2], new DateTimeZone( 'Europe/Zagreb' ) );
-			if ( $date && $date->getTimestamp() < time() - 31 * DAY_IN_SECONDS ) {
+			if ( $date && $date->getTimestamp() < $now - 31 * DAY_IN_SECONDS &&
+				! isset( $holds[ $name ] ) ) {
 				Brendigo_Sidrena_Cijena_Filesystem::delete( trailingslashit( $dir ) . $name );
 			}
+		}
+		if ( $holds !== $original_holds ) {
+			update_option( 'bazna_official_retention_holds', $holds, false );
 		}
 	}
 
@@ -660,6 +673,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			return new WP_Error( 'bazna_official_identifier', __( 'Neispravan OIB ili matični broj za službeni cjenik.', 'brendigo-sidrena-cijena' ) );
 		}
 		$official_paths = array();
+		$official_snapshot_names = array();
 		if ( $official_ready ) {
 			$sequence = max( 1, (int) get_option( 'bazna_official_publication_sequence', 1 ) );
 			foreach ( $types as $kind => $type_rows ) {
@@ -683,6 +697,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 						? Brendigo_Sidrena_Cijena_Official_Feed::csv( $type_rows, $kind )
 						: Brendigo_Sidrena_Cijena_Official_Feed::xml( $type_rows, $kind );
 					$bundle[ trailingslashit( $dir ) . $name ] = $body;
+					$official_snapshot_names[] = $name;
 					$stable = $this->official_live_path( $kind, $extension, $oznaka );
 					$bundle[ $stable ] = $body;
 					$official_paths[ $kind ][ $extension ] = $stable;
@@ -705,11 +720,27 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			// when an OIB/MB changes or official publication was disabled.
 			$history = get_option( 'bazna_official_publications', array() );
 			$history = is_array( $history ) ? $history : array();
-			$history[ '' === $oznaka ? '_webshop' : $oznaka ] = array(
+			$key = '' === $oznaka ? '_webshop' : $oznaka;
+			$prior = isset( $history[ $key ] ) && is_array( $history[ $key ] ) ? $history[ $key ] : array();
+			if ( ! empty( $prior['snapshot_files'] ) && is_array( $prior['snapshot_files'] ) ) {
+				// Article 3(6): every replaced official file stays online at
+				// least 15 days AFTER replacement, even if created long ago.
+				$holds = get_option( 'bazna_official_retention_holds', array() );
+				$holds = is_array( $holds ) ? $holds : array();
+				foreach ( $prior['snapshot_files'] as $old_name ) {
+					if ( is_string( $old_name ) &&
+						preg_match( '/^\\d{8,11}_[A-Za-z0-9_-]+_(?:ROBA|USLUGE)_\\d+_\\d{8}_\\d{4}\\.(?:csv|xml)$/D', $old_name ) ) {
+						$holds[ $old_name ] = max( isset( $holds[ $old_name ] ) ? (int) $holds[ $old_name ] : 0, time() + 15 * DAY_IN_SECONDS );
+					}
+				}
+				update_option( 'bazna_official_retention_holds', $holds, false );
+			}
+			$history[ $key ] = array(
 				'identifier' => $id,
 				'identifier_kind' => $id_kind,
 				'published_at' => time(),
 				'sequence' => $sequence,
+				'snapshot_files' => $official_snapshot_names,
 			);
 			update_option( 'bazna_official_publications', $history, false );
 			update_option( 'bazna_official_publication_sequence', $sequence + 1, false );
