@@ -114,10 +114,18 @@ $badInquiry['on_request'][0]['kriteriji'] = '<script>alert(1)</script>';
 $badInquiry['on_request'][0]['outlet'] = 'OTHER';
 $bad = $catalog;
 $bad['products'][0]['historical_verified'] = false;
+$core->saveDraft($bad);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Unverified historical amounts may be edited in a private draft');
 try {
-    $core->saveDraft($bad);
-    throw new RuntimeException('Unverified historical price was accepted.');
-} catch (InvalidArgumentException $ignored) {}
+    $core->publish();
+    throw new RuntimeException('Unverified historical draft became public.');
+} catch (RuntimeException $e) {
+    check(str_contains($e->getMessage(), 'historical_verified'),
+        'An unverified private draft cannot be published');
+}
+check(!isset($core->read('published.json')['published_at']),
+    'Failed publication keeps unverified draft private');
 $bad = $catalog;
 $bad['products'][0]['outlet'] = 'UNKNOWN';
 try {
@@ -125,6 +133,22 @@ try {
     throw new RuntimeException('Unregistered outlet was accepted.');
 } catch (InvalidArgumentException $ignored) {}
 $core->saveDraft($catalog);
+// A bulk JSON replacement cannot silently carry a verified flag when the
+// historical amount was changed, although current sale price may change.
+$changedReference = $catalog;
+$changedReference['products'][0]['sidrena_cijena'] = '9,99';
+$core->saveDraft($changedReference);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Changed historic amount invalidates a previously approved source');
+$core->saveDraft($catalog);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Restoring old amount does not automatically restore historical attestation');
+// The operator must explicitly re-attest the source after a change.
+$reconfirmed = $catalog;
+$reconfirmed['products'][0]['historical_verified'] = true;
+$core->saveDraft($reconfirmed);
+check($core->read('draft.json')['products'][0]['historical_verified'] === true,
+    'Explicit re-attestation is accepted when the documented source is complete');
 // Legacy manual publishing may not bypass official documentary evidence.
 $unverifiedMethod = $catalog;
 $unverifiedMethod['products'][0]['historical_method'] = '';

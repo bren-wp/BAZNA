@@ -76,7 +76,7 @@ final class Core
         }
     }
 
-    public static function validateItem(array $input): array
+    public static function validateItem(array $input, string $kind = 'proizvodi'): array
     {
         $row = [];
         foreach (self::FIELDS as $field) {
@@ -105,13 +105,18 @@ final class Core
             ], true))) {
             throw new InvalidArgumentException('Neispravan izvor, referentna skupina ili metoda bazne cijene.');
         }
-        if ($row['sidrena_cijena'] !== '') {
-            $date = $row['sidrena_datum'];
-            $validDate = preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $date, $m) &&
-                checkdate((int) $m[2], (int) $m[3], (int) $m[1]);
-            if (!$validDate || ($input['historical_verified'] ?? false) !== true) {
-                throw new InvalidArgumentException('Bazna cijena zahtijeva stvarno potvrđen povijesni iznos i datum.');
-            }
+        // Incomplete evidence is permitted in PRIVATE drafts. Only a complete
+        // and explicitly attested record can be marked verified; publish()
+        // makes incomplete drafts inaccessible through public CSV/XML/HTML.
+        $verified = ($input['historical_verified'] ?? false) === true;
+        $date = $row['sidrena_datum'];
+        if ($date !== '' && (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $date, $m) ||
+            !checkdate((int) $m[2], (int) $m[3], (int) $m[1]))) {
+            throw new InvalidArgumentException('Datum bazne cijene mora biti valjan YYYY-MM-DD.');
+        }
+        if ($verified && ($row['sidrena_cijena'] === '' ||
+            self::legalEvidenceIssue(array_merge($row, ['historical_verified' => true]), $kind) !== '')) {
+            throw new InvalidArgumentException('Potvrda povijesne cijene zahtijeva dokaz, referentnu skupinu, metodu i datum.');
         }
         if ($row['ean_barkod'] !== '' && !self::validEan($row['ean_barkod'])) {
             throw new InvalidArgumentException('EAN-8/EAN-13 kontrolna znamenka nije valjana.');
@@ -195,7 +200,7 @@ final class Core
         foreach (['products', 'services'] as $collection) {
             foreach ($document[$collection] ?? [] as $input) {
                 if (!is_array($input)) throw new InvalidArgumentException('Neispravna stavka.');
-                $row = self::validateItem($input);
+                $row = self::validateItem($input, $collection === 'products' ? 'proizvodi' : 'usluge');
                 if ($row['outlet'] !== '' && !isset($seen[strtolower($row['outlet'])])) {
                     throw new InvalidArgumentException('Stavka je pridružena nepostojećoj poslovnici.');
                 }
@@ -278,11 +283,42 @@ final class Core
         }
     }
 
+    /**
+     * An existing attestation is revoked when any of its underlying historic
+     * inputs change. This also applies to entire JSON/Shopify catalog imports:
+     * a copied "verified=true" flag may not survive a changed reference price.
+     */
+    private static function revokeStaleEvidence(array $before, array $after): array
+    {
+        $inputs = ['sidrena_cijena', 'sidrena_datum', 'historical_source',
+            'reference_scope', 'historical_method'];
+        foreach (['products', 'services'] as $kind) {
+            $oldRows = [];
+            foreach ($before[$kind] ?? [] as $row) {
+                if (is_array($row) && is_scalar($row['id'] ?? null)) {
+                    $oldRows[(string) $row['id']] = $row;
+                }
+            }
+            foreach ($after[$kind] ?? [] as $index => $row) {
+                if (!is_array($row) || !is_scalar($row['id'] ?? null)) continue;
+                $old = $oldRows[(string) $row['id']] ?? null;
+                if (!is_array($old)) continue;
+                foreach ($inputs as $field) {
+                    if ((string) ($old[$field] ?? '') !== (string) ($row[$field] ?? '')) {
+                        $after[$kind][$index]['historical_verified'] = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return $after;
+    }
+
     public function saveDraft(array $document): void
     {
-        $validated = self::validateCatalog($document);
-        $this->catalogTransaction(function () use ($validated): void {
-            $this->write('draft.json', $validated);
+        $this->catalogTransaction(function () use ($document): void {
+            $prepared = self::revokeStaleEvidence($this->read('draft.json'), $document);
+            $this->write('draft.json', self::validateCatalog($prepared));
         });
     }
 
@@ -299,6 +335,7 @@ final class Core
         }
         $this->catalogTransaction(function () use ($collection, $index, $row, $expectedHash): void {
             $draft = $this->read('draft.json');
+            $before = $draft;
             $rows = $draft[$collection] ?? [];
             if (!is_array($rows) || !array_is_list($rows)) {
                 throw new RuntimeException('Neispravan zapis kataloga.');
@@ -335,6 +372,7 @@ final class Core
                 }
             }
             $draft[$collection] = $rows;
+            $draft = self::revokeStaleEvidence($before, $draft);
             $validated = self::validateCatalog($draft);
             if ($collection !== 'outlets') {
                 $seen = [];
