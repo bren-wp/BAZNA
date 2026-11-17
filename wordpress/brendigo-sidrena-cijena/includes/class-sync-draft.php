@@ -180,7 +180,11 @@ final class Brendigo_Sidrena_Cijena_Sync_Draft {
                     $rows[ $index ] = $row;
                 }
             }
-            $after = Brendigo_Sidrena_Cijena_Catalog::instance()->save( $rows );
+            // Remote changes remain private until a separately authorized publication.
+            $after = Brendigo_Sidrena_Cijena_Catalog::instance()->save( $rows, false );
+            if ( self::revision( $after ) !== $state['revision'] ) {
+                Brendigo_Sidrena_Cijena_Automation::instance()->mark_pending( 'sync-draft' );
+            }
             if ( self::revision( $after ) === $state['revision'] && $rows !== $state['rows'] ) {
                 return new WP_Error( 'bazna_sync_storage', 'Nije potvrđena promjena u pohrani.', array( 'status' => 500 ) );
             }
