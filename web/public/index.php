@@ -64,6 +64,15 @@ try {
                 ($outlet === '' || $a['outlet'] === $outlet);
         })));
     }
+    // Public URL remains stable across each verified publication.
+    if ($method === 'GET' && preg_match('#^/bazna/v1/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $path, $parts)) {
+        $outlet = (string) ($_GET['oznaka'] ?? '');
+        $filename = $core->officialFilename($parts[1], $parts[2], $outlet);
+        header('Content-Type: ' . ($parts[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+        echo $parts[2] === 'csv' ? $core->officialCsv($parts[1], $outlet) : $core->officialXml($parts[1], $outlet);
+        exit;
+    }
     if ($method === 'GET' && preg_match('#^/bazna/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $path, $parts)) {
         $outlet = (string) ($_GET['oznaka'] ?? '');
         $csv = $core->csv($parts[1], $outlet);
