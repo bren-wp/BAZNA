@@ -130,6 +130,20 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 			. '_' . max( 1, (int) $sequence ) . '_' . $date . '.' . $ext;
 	}
 
+	/** EAN-8 and EAN-13 checksum, preserving leading zeroes. */
+	public static function valid_ean( $value ) {
+		$value = (string) $value;
+		if ( ! preg_match( '/^(?:\\d{8}|\\d{13})$/D', $value ) ) {
+			return false;
+		}
+		$length = strlen( $value ) - 1;
+		$sum = 0;
+		for ( $i = 0; $i < $length; $i++ ) {
+			$sum += (int) $value[$i] * ( ( $length - $i ) % 2 ? 3 : 1 );
+		}
+		return ( 10 - $sum % 10 ) % 10 === (int) $value[$length];
+	}
+
 	/** ISO 7064 MOD 11,10 check digit; all leading zeroes are significant. */
 	public static function valid_oib( $value ) {
 		$value = (string) $value;
