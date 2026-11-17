@@ -35,6 +35,7 @@ final class Brendigo_Sidrena_Cijena_Autoloader {
 		'Brendigo_Sidrena_Cijena_Migration'        => 'includes/class-migration.php',
 		'Brendigo_Sidrena_Cijena_Feed_Rows'        => 'includes/class-feed-rows.php',
 		'Brendigo_Sidrena_Cijena_Feed_Files'       => 'includes/class-feed-files.php',
+		'Brendigo_Sidrena_Cijena_Official_Feed'    => 'includes/class-official-feed.php',
 		'Brendigo_Sidrena_Cijena_Archive'          => 'includes/class-archive.php',
 		'Brendigo_Sidrena_Cijena_Feed_Routes'      => 'includes/class-feed-routes.php',
 		'Brendigo_Sidrena_Cijena_Export'           => 'includes/class-export.php',
