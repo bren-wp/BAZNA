@@ -15,6 +15,7 @@ on:
       - 'tools/test_public_embed.php'
       - 'tools/test_public_archive.php'
       - 'tools/test_official_retention.php'
+      - 'tools/test_sync_draft.php'
       - 'tools/test_legal_price_safety.php'
       - 'tools/test_responsive_browser.mjs'
       - 'tools/audit_public_bazna.py'
@@ -64,6 +65,7 @@ jobs:
           php tools/test_public_embed.php
           php tools/test_public_archive.php
           php tools/test_official_retention.php
+          php tools/test_sync_draft.php
       - name: Test legally verified reference dates and no historical price inference
         run: php tools/test_legal_price_safety.php
       - uses: actions/setup-node@v7
