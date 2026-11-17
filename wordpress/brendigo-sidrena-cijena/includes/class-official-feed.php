@@ -45,6 +45,52 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 		return $out;
 	}
 
+
+	/**
+	 * NN 132/2026 art. 3: a number alone is not legal evidence of a
+	 * historical base price. The admin must explicitly confirm a documented
+	 * source, classification and the applicable method.
+	 *
+	 * @return string Empty on structurally verified evidence; otherwise the
+	 *                failing input field. This never certifies its truth.
+	 */
+	public static function evidence_issue( $row, $kind ) {
+		if ( 'yes' !== ( isset( $row['historical_verified'] ) ? $row['historical_verified'] : '' ) ) {
+			return 'historical_verified';
+		}
+		$scope = isset( $row['reference_scope'] ) ? $row['reference_scope'] : '';
+		$method = isset( $row['historical_method'] ) ? $row['historical_method'] : '';
+		if ( ! in_array( $scope, array( 'legacy_fmcg', 'general_goods_services' ), true ) ||
+			( 'usluge' === $kind && 'legacy_fmcg' === $scope ) ) {
+			return 'reference_scope';
+		}
+		$reference = 'legacy_fmcg' === $scope ? '2025-05-02' : '2026-09-10';
+		$raw_date = isset( $row['sidrena_datum'] ) ? (string) $row['sidrena_datum'] : '';
+		if ( preg_match( '/^(\\d{2})\\.(\\d{2})\\.(\\d{4})\\.?$/D', $raw_date, $parts ) ) {
+			$date = $parts[3] . '-' . $parts[2] . '-' . $parts[1];
+		} else {
+			$date = $raw_date;
+		}
+		if ( ! preg_match( '/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $date, $parts ) ||
+			! checkdate( (int) $parts[2], (int) $parts[3], (int) $parts[1] ) ||
+			$date < $reference ) {
+			return 'sidrena_datum';
+		}
+		if ( 'reference_day' === $method ) {
+			return $date === $reference ? '' : 'historical_method';
+		}
+		if ( 'first_offer' === $method ) {
+			return $date > $reference ? '' : 'historical_method';
+		}
+		if ( 'discount_lowest_30d' === $method && 'legacy_fmcg' === $scope ) {
+			return '';
+		}
+		if ( 'discount_previous_retail' === $method && 'general_goods_services' === $scope ) {
+			return '';
+		}
+		return 'historical_method';
+	}
+
 	/** Returns missing evidence without making an unfounded declaration of compliance. */
 	public static function missing_required_data( $rows, $kind ) {
 		$missing = array();
@@ -53,6 +99,12 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 			foreach ( array( 'naziv', 'maloprodajna_cijena', 'bazna_cijena' ) as $required ) {
 				if ( '' === trim( $projected[ $required ] ) ) {
 					$missing[] = array( 'row' => $i + 1, 'field' => $required );
+				}
+			}
+			if ( '' !== trim( $projected['bazna_cijena'] ) ) {
+				$issue = self::evidence_issue( $row, $kind );
+				if ( '' !== $issue ) {
+					$missing[] = array( 'row' => $i + 1, 'field' => $issue );
 				}
 			}
 			if ( 'proizvodi' === $kind && '' !== $projected['cijena_jedinice_mjere'] ) {

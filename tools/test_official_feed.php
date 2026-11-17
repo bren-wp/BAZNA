@@ -29,6 +29,8 @@ $row = array(
 	'cijena_jedinice_mjere' => '6.20', 'barkod' => '0123456789012',
 	'ean_barkod' => '0123456789012', 'sidrena_cijena' => '3.90',
 	'dostupnost' => 'dostupno', 'url' => 'https://example.com/',
+	'historical_verified' => 'yes', 'reference_scope' => 'legacy_fmcg',
+	'historical_method' => 'reference_day', 'sidrena_datum' => '02.05.2025.',
 );
 $projected = Brendigo_Sidrena_Cijena_Official_Feed::project( $row, 'proizvodi' );
 expect_official( array_keys( $projected ) === $goods, 'No extra compatibility fields in official export' );
@@ -36,6 +38,22 @@ expect_official( $projected['bazna_cijena'] === '3.90', 'Historical base is reta
 expect_official( $projected['poseban_oblik_prodaje'] === 'da', 'Special sale flag' );
 expect_official( $projected['ean_barkod'] === '0123456789012', 'Leading EAN zeros retained' );
 expect_official( array() === Brendigo_Sidrena_Cijena_Official_Feed::missing_required_data( array( $row ), 'proizvodi' ), 'Complete row accepted' );
+$not_verified = $row;
+$not_verified['historical_verified'] = '';
+expect_official( 'historical_verified' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $not_verified, 'proizvodi' ), 'No historic evidence: block official publication' );
+$bad_scope = $row;
+$bad_scope['reference_scope'] = 'general_goods_services';
+expect_official( 'sidrena_datum' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $bad_scope, 'proizvodi' ), 'A later general-goods reference cannot use 2025 date' );
+$bad_method = $row;
+$bad_method['historical_method'] = 'discount_previous_retail';
+expect_official( 'historical_method' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $bad_method, 'proizvodi' ), 'FMCG cannot use the other-goods discount method' );
+$bad_services = $row;
+expect_official( 'reference_scope' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $bad_services, 'usluge' ), 'Services cannot use FMCG reference scope' );
+$first_offer = $row;
+$first_offer['historical_method'] = 'first_offer';
+$first_offer['sidrena_datum'] = '03.05.2025.';
+expect_official( '' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $first_offer, 'proizvodi' ), 'First-offer date after applicable reference accepted with verified evidence' );
+
 $incomplete = $row;
 $incomplete['neto_kolicina'] = '';
 expect_official( 1 === count( Brendigo_Sidrena_Cijena_Official_Feed::missing_required_data( array( $incomplete ), 'proizvodi' ) ), 'Net quantity checked when unit price is present' );
