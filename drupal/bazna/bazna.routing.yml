@@ -40,7 +40,7 @@ bazna.official_feeds:
 bazna.official_archive:
   path: '/bazna/v1/arhiva/{id}/sluzbeni/{kind}/{format}'
   defaults:
-    _controller: '\\Drupal\\bazna\\Controller\\BaznaController::officialArchive'
+    _controller: '\Drupal\bazna\Controller\BaznaController::officialArchive'
   requirements:
     _permission: 'access content'
     id: '[0-9]{14}-[a-f0-9]{12}'
