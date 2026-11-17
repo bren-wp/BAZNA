@@ -110,6 +110,46 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 				<div class="brendigo-preview-note"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span><?php echo esc_html__( 'Datum se može spremiti zasebno za svaki proizvod.', 'brendigo-sidrena-cijena' ); ?></span></div>
 			</div>
 		</section>
+		<section class="sidrena-cijena-card brendigo-settings-card bazna-public-options">
+			<div class="sidrena-cijena-card__head brendigo-card-title">
+				<span class="dashicons dashicons-art" aria-hidden="true"></span>
+				<div>
+					<h2><?php echo esc_html__( 'Izgled javnog cjenika i arhive', 'brendigo-sidrena-cijena' ); ?></h2>
+					<p><?php echo esc_html__( 'Prilagodite javni HTML prikaz bez promjene obveznog CSV/XML sadržaja.', 'brendigo-sidrena-cijena' ); ?></p>
+				</div>
+			</div>
+			<label class="brendigo-field" for="sidrena_cijena_public_theme">
+				<span><?php echo esc_html__( 'Tema', 'brendigo-sidrena-cijena' ); ?></span>
+				<select name="sidrena_cijena_public_theme" id="sidrena_cijena_public_theme">
+					<option value="dark" <?php selected( $sidrena_settings->get( 'public_theme', 'dark' ), 'dark' ); ?>><?php echo esc_html__( 'Tamna', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="light" <?php selected( $sidrena_settings->get( 'public_theme', 'dark' ), 'light' ); ?>><?php echo esc_html__( 'Svijetla', 'brendigo-sidrena-cijena' ); ?></option>
+				</select>
+			</label>
+			<label class="brendigo-field" for="sidrena_cijena_public_accent">
+				<span><?php echo esc_html__( 'Naglasna boja', 'brendigo-sidrena-cijena' ); ?></span>
+				<select name="sidrena_cijena_public_accent" id="sidrena_cijena_public_accent">
+					<option value="orange" <?php selected( $sidrena_settings->get( 'public_accent', 'orange' ), 'orange' ); ?>><?php echo esc_html__( 'Narančasta · BAZNA', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="blue" <?php selected( $sidrena_settings->get( 'public_accent', 'orange' ), 'blue' ); ?>><?php echo esc_html__( 'Plava', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="green" <?php selected( $sidrena_settings->get( 'public_accent', 'orange' ), 'green' ); ?>><?php echo esc_html__( 'Zelena', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="purple" <?php selected( $sidrena_settings->get( 'public_accent', 'orange' ), 'purple' ); ?>><?php echo esc_html__( 'Ljubičasta', 'brendigo-sidrena-cijena' ); ?></option>
+				</select>
+			</label>
+			<label class="brendigo-field" for="sidrena_cijena_public_density">
+				<span><?php echo esc_html__( 'Razmaci u prikazu', 'brendigo-sidrena-cijena' ); ?></span>
+				<select name="sidrena_cijena_public_density" id="sidrena_cijena_public_density">
+					<option value="comfortable" <?php selected( $sidrena_settings->get( 'public_density', 'comfortable' ), 'comfortable' ); ?>><?php echo esc_html__( 'Prozračno', 'brendigo-sidrena-cijena' ); ?></option>
+					<option value="compact" <?php selected( $sidrena_settings->get( 'public_density', 'comfortable' ), 'compact' ); ?>><?php echo esc_html__( 'Kompaktno', 'brendigo-sidrena-cijena' ); ?></option>
+				</select>
+			</label>
+			<div class="brendigo-info-box">
+				<span class="dashicons dashicons-shortcode" aria-hidden="true"></span>
+				<p><?php echo esc_html__( 'Umetnite u WordPress blok „Kratki kod”: ', 'brendigo-sidrena-cijena' ); ?><code>[bazna_objava]</code><br />
+				<?php echo esc_html__( 'Samo cjenik:', 'brendigo-sidrena-cijena' ); ?> <code>[bazna_cjenik]</code> ·
+				<?php echo esc_html__( 'Arhiva:', 'brendigo-sidrena-cijena' ); ?> <code>[bazna_arhiva]</code> ·
+				<?php echo esc_html__( 'Službeni formati:', 'brendigo-sidrena-cijena' ); ?> <code>[bazna_datoteke]</code></p>
+			</div>
+			<p class="description"><?php echo esc_html__( 'HTML sučelje služi za pregled. Službene datoteke moraju ostati javno dostupne u CSV/XML formatu na stabilnim URL adresama, neovisno o odabranoj temi.', 'brendigo-sidrena-cijena' ); ?></p>
+		</section>
 	</div>
 
 	<div class="brendigo-settings-submit">
