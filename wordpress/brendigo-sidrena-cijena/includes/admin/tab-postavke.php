@@ -14,7 +14,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 	<div>
 		<p class="brendigo-section-kicker"><?php echo esc_html__( 'Pravna napomena', 'brendigo-sidrena-cijena' ); ?></p>
 		<h2><?php echo esc_html__( 'Prikaz bazne cijene', 'brendigo-sidrena-cijena' ); ?></h2>
-		<p><?php echo esc_html__( 'Odredite naziv, datum i način prikaza referentne cijene uz proizvod.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'Odaberite prikaz bazne cijene.', 'brendigo-sidrena-cijena' ); ?></p>
 	</div>
 </section>
 
@@ -37,7 +37,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 			</div>
 			<div class="brendigo-setting-row">
 				<div><strong><?php echo esc_html__( 'Povijesna cijena unosi se uz dokaz', 'brendigo-sidrena-cijena' ); ?></strong>
-				<small><?php echo esc_html__( 'Automatsko preslikavanje današnje redovne cijene u baznu cijenu isključeno je. Upišite stvarnu povijesnu cijenu i odgovarajući datum za svaku stavku; sačuvajte izvorne dokaze.', 'brendigo-sidrena-cijena' ); ?></small></div>
+				<small><?php echo esc_html__( 'Bazna cijena zahtijeva povijesni dokaz.', 'brendigo-sidrena-cijena' ); ?></small></div>
 				<span class="sidrena-android-bridge__status is-pending"><?php echo esc_html__( 'Povijesni unos: ručna provjera', 'brendigo-sidrena-cijena' ); ?></span>
 			</div>
 			<?php endif; ?>
@@ -71,17 +71,17 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 		<section class="sidrena-cijena-card brendigo-settings-card">
 			<div class="sidrena-cijena-card__head brendigo-card-title">
 				<span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
-				<div><h2><?php echo esc_html__( 'Referentni datumi', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Globalni referentni datumi su zaključani i ne mijenjaju se u postavkama dodatka.', 'brendigo-sidrena-cijena' ); ?></p></div>
+				<div><h2><?php echo esc_html__( 'Referentni datumi', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Zakonski referentni datumi.', 'brendigo-sidrena-cijena' ); ?></p></div>
 			</div>
 			<div class="brendigo-locked-date"><span class="dashicons dashicons-lock" aria-hidden="true"></span><div><strong><?php echo esc_html( Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_GENERAL ); ?></strong><small><?php echo esc_html__( 'ostali proizvodi i usluge', 'brendigo-sidrena-cijena' ); ?></small></div></div>
 			<div class="brendigo-locked-date"><span class="dashicons dashicons-lock" aria-hidden="true"></span><div><strong><?php echo esc_html( Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_FMCG ); ?></strong><small><?php echo esc_html__( 'hrana, piće, kozmetika i kućanske potrepštine', 'brendigo-sidrena-cijena' ); ?></small></div></div>
-			<div class="brendigo-info-box"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><p><?php echo esc_html__( 'Vlastiti referentni datum unosite samo na konkretnoj novoj stavci kada je proizvod ili usluga uvedena nakon odgovarajućeg referentnog datuma. Globalni datum ostaje zaključan.', 'brendigo-sidrena-cijena' ); ?></p></div>
+			<div class="brendigo-info-box"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><p><?php echo esc_html__( 'Iznimke i kasnije uvođenje stavke provjerite u Pomoći.', 'brendigo-sidrena-cijena' ); ?></p></div>
 		</section>
 
 		<section class="sidrena-cijena-card brendigo-settings-card">
 			<div class="sidrena-cijena-card__head brendigo-card-title">
 				<span class="dashicons dashicons-media-spreadsheet" aria-hidden="true"></span>
-				<div><h2><?php echo esc_html__( 'Javni cjenik i podaci', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Postavke podataka koji se objavljuju u javnom HTML/XML/CSV cjeniku.', 'brendigo-sidrena-cijena' ); ?></p></div>
+				<div><h2><?php echo esc_html__( 'Javni cjenik i podaci', 'brendigo-sidrena-cijena' ); ?></h2><p><?php echo esc_html__( 'Postavke javnih cjenika.', 'brendigo-sidrena-cijena' ); ?></p></div>
 			</div>
 			<div class="brendigo-setting-row">
 				<div><strong><?php echo esc_html__( 'Cijena za jedinicu mjere (CJM)', 'brendigo-sidrena-cijena' ); ?></strong><small><?php echo esc_html__( 'Omogućite mjernu jedinicu i pripadajući iznos kada je primjenjivo.', 'brendigo-sidrena-cijena' ); ?></small></div>
@@ -115,7 +115,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 				<span class="dashicons dashicons-art" aria-hidden="true"></span>
 				<div>
 					<h2><?php echo esc_html__( 'Izgled javnog cjenika i arhive', 'brendigo-sidrena-cijena' ); ?></h2>
-					<p><?php echo esc_html__( 'Prilagodite javni HTML prikaz bez promjene obveznog CSV/XML sadržaja.', 'brendigo-sidrena-cijena' ); ?></p>
+					<p><?php echo esc_html__( 'Izgled javne stranice i arhive.', 'brendigo-sidrena-cijena' ); ?></p>
 				</div>
 			</div>
 			<label class="brendigo-field" for="sidrena_cijena_public_theme">
@@ -148,7 +148,7 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 				<?php echo esc_html__( 'Arhiva:', 'brendigo-sidrena-cijena' ); ?> <code>[bazna_arhiva]</code> ·
 				<?php echo esc_html__( 'Službeni formati:', 'brendigo-sidrena-cijena' ); ?> <code>[bazna_datoteke]</code></p>
 			</div>
-			<p class="description"><?php echo esc_html__( 'HTML sučelje služi za pregled. Službene datoteke moraju ostati javno dostupne u CSV/XML formatu na stabilnim URL adresama, neovisno o odabranoj temi.', 'brendigo-sidrena-cijena' ); ?></p>
+			<p class="description"><?php echo esc_html__( 'Službene CSV/XML datoteke ostaju javno dostupne.', 'brendigo-sidrena-cijena' ); ?></p>
 		</section>
 	</div>
 
@@ -162,11 +162,11 @@ $sidrena_woo = Brendigo_Sidrena_Cijena_Plugin::woocommerce_active();
 	<div class="sidrena-cijena-card__head brendigo-card-title">
 		<span class="dashicons dashicons-shield" aria-hidden="true"></span>
 		<div><h2><?php echo esc_html__( 'Provjera povijesnih cijena', 'brendigo-sidrena-cijena' ); ?></h2>
-		<p><?php echo esc_html__( 'Masovno kopiranje trenutačnih cijena i automatsko dodavanje datuma onemogućeno je: ne dokazuje cijenu na referentni dan.', 'brendigo-sidrena-cijena' ); ?></p></div>
+		<p><?php echo esc_html__( 'Potrebna je provjera povijesnog izvora.', 'brendigo-sidrena-cijena' ); ?></p></div>
 	</div>
 	<div class="brendigo-info-box">
 		<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
-		<p><?php echo esc_html__( 'Za svaku stavku utvrdite je li primjenjiv 2. 5. 2025. ili 10. 9. 2026.; koristite sačuvanu evidenciju i ručno unesite odgovarajući iznos i datum. Bazna cijena i najniža cijena u 30 dana ne smiju se automatski izvoditi iz bazne cijene.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'Provjerite datum i dokaz za svaku stavku. Detalji su u Pomoći.', 'brendigo-sidrena-cijena' ); ?></p>
 	</div>
 </section>
 <?php endif; ?>
