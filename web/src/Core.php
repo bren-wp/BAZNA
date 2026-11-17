@@ -157,13 +157,15 @@ final class Core
             $code = trim((string) ($outlet['code'] ?? ''));
             $name = trim((string) ($outlet['name'] ?? ''));
             $address = trim((string) ($outlet['address'] ?? ''));
+            $type = trim((string) ($outlet['type'] ?? ''));
             if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $code) ||
                 isset($seen[strtolower($code)]) || $name === '' || strlen($name) > 240 ||
-                strlen($address) > 400 || preg_match('/[\x00-\x1F]/', $address)) {
+                strlen($address) > 400 || strlen($type) > 100 ||
+                preg_match('/[\x00-\x1F]/', $address . $type)) {
                 throw new InvalidArgumentException('Oznaka, naziv ili adresa poslovnice nisu valjani.');
             }
             $seen[strtolower($code)] = true;
-            $cleanOutlets[] = ['code' => $code, 'name' => $name, 'address' => $address];
+            $cleanOutlets[] = ['code' => $code, 'name' => $name, 'address' => $address, 'type' => $type];
         }
         $result = ['outlets' => $cleanOutlets, 'products' => [], 'services' => [], 'on_request' => []];
         foreach (['products', 'services'] as $collection) {
@@ -347,6 +349,8 @@ final class Core
                 $this->write('archive.json', $history);
             }
             $catalog['published_at'] = $timestamp;
+            // Monotonic per-store publication sequence, retained with each snapshot.
+            $catalog['publication_sequence'] = max(1, (int) ($existing['publication_sequence'] ?? 0) + 1);
             $this->write('published.json', $catalog);
             return $catalog;
         });
@@ -581,12 +585,48 @@ final class Core
         $published = $this->read('published.json');
         $date = (new \DateTimeImmutable((string) ($published['published_at'] ?? 'now')))
             ->setTimezone(new \DateTimeZone('Europe/Zagreb'))->format('Ymd_Hi');
-        $place = $outlet === '' ? 'ZA_SVA_PRODAJNA_MJESTA' : $outlet;
         if ($outlet !== '' && !preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $outlet)) {
             throw new InvalidArgumentException('Nevaljana oznaka poslovnice.');
         }
+        $place = 'ZA_SVA_PRODAJNA_MJESTA';
+        $outlets = $published['outlets'] ?? [];
+        if ($outlet !== '' || $outlets !== []) {
+            $match = null;
+            if ($outlet !== '') {
+                foreach ($outlets as $row) {
+                    if (($row['code'] ?? '') === $outlet) {
+                        $match = $row;
+                        break;
+                    }
+                }
+                if ($match === null) throw new \RuntimeException('Poslovnica nije u objavljenom katalogu.');
+                $kindOfPlace = (string) ($match['type'] ?? '');
+                $address = (string) ($match['address'] ?? '');
+                $code = $outlet;
+            }
+            else {
+                // A webshop feed is NOT automatically the same price list as
+                // all physical outlets; operator supplies exact place metadata.
+                $kindOfPlace = (string) (getenv('BAZNA_MAIN_STORE_TYPE') ?: '');
+                $address = (string) (getenv('BAZNA_MAIN_STORE_ADDRESS') ?: '');
+                $code = (string) (getenv('BAZNA_MAIN_STORE_CODE') ?: '');
+            }
+            $slug = static function (string $raw): string {
+                $raw = strtolower(trim($raw));
+                $safe = preg_replace('/[^a-z0-9-]+/', '-', $raw);
+                return trim((string) $safe, '-');
+            };
+            $typeName = $slug($kindOfPlace);
+            $street = $slug($address);
+            $branch = $slug($code);
+            if ($typeName === '' || $street === '' || $branch === '') {
+                throw new \RuntimeException('Nedostaju pravni tip prodajnog mjesta, adresa ili oznaka.');
+            }
+            $place = $typeName . '_' . $street . '_' . $branch;
+        }
         $type = $kind === 'proizvodi' ? 'ROBA' : 'USLUGE';
-        return $id . '_' . $place . '_' . $type . '_1_' . $date . '.' . $format;
+        $sequence = max(1, (int) ($published['publication_sequence'] ?? 1));
+        return $id . '_' . $place . '_' . $type . '_' . $sequence . '_' . $date . '.' . $format;
     }
 
     public function officialCsv(string $kind, string $outlet = ''): string
@@ -781,6 +821,10 @@ final class Core
         foreach (self::KINDS as $kind) {
             $ready = isset($published['published_at']) && $this->officialIdentity() !== '' &&
                 $this->officialMissing($kind, '', $published) === [];
+            if ($ready) {
+                try { $this->officialFilename($kind, 'csv'); }
+                catch (\Throwable $error) { $ready = false; }
+            }
             $officialFeeds[$kind] = [
                 'csv' => $ready ? $base . '/bazna/v1/sluzbeni/' . $kind . '/csv' : '',
                 'xml' => $ready ? $base . '/bazna/v1/sluzbeni/' . $kind . '/xml' : '',
@@ -805,6 +849,10 @@ final class Core
             foreach (self::KINDS as $kind) {
                 $ready = isset($published['published_at']) && $this->officialIdentity() !== '' &&
                     $this->officialMissing($kind, $outlet['code'], $published) === [];
+                if ($ready) {
+                    try { $this->officialFilename($kind, 'csv', $outlet['code']); }
+                    catch (\Throwable $error) { $ready = false; }
+                }
                 $o['official_feeds'][$kind] = [
                     'csv' => $ready ? $officialFeeds[$kind]['csv'] ?: $base . '/bazna/v1/sluzbeni/' . $kind . '/csv' : '',
                     'xml' => $ready ? $officialFeeds[$kind]['xml'] ?: $base . '/bazna/v1/sluzbeni/' . $kind . '/xml' : '',
