@@ -130,9 +130,30 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 			. '_' . max( 1, (int) $sequence ) . '_' . $date . '.' . $ext;
 	}
 
+	/** ISO 7064 MOD 11,10 check digit; all leading zeroes are significant. */
+	public static function valid_oib( $value ) {
+		$value = (string) $value;
+		if ( ! preg_match( '/^\d{11}$/D', $value ) ) {
+			return false;
+		}
+		$state = 10;
+		for ( $i = 0; $i < 10; $i++ ) {
+			$state = ( $state + (int) $value[ $i ] ) % 10;
+			if ( 0 === $state ) {
+				$state = 10;
+			}
+			$state = ( $state * 2 ) % 11;
+		}
+		$digit = 11 - $state;
+		if ( 10 === $digit ) {
+			$digit = 0;
+		}
+		return $digit === (int) $value[10];
+	}
+
 	public static function valid_identifier( $value, $type ) {
 		$value = (string) $value;
-		return ( 'oib' === $type && (bool) preg_match( '/^\d{11}$/D', $value ) )
+		return ( 'oib' === $type && self::valid_oib( $value ) )
 			|| ( 'maticni_broj' === $type && (bool) preg_match( '/^\d{8}$/D', $value ) );
 	}
 }
