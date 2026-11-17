@@ -22,6 +22,7 @@ data class LegalContract(
     val historicalPriceVerificationRequired: Boolean? = null,
     val legalComplianceCertified: Boolean? = null,
     val implementationReadyFrom: String? = null,
+    val finalRulebooksVerified: Boolean? = null,
 ) {
     /**
      * The publication decisions' scheduled application date, NOT evidence
@@ -32,10 +33,12 @@ data class LegalContract(
         else "published_decisions_effective"
 
     companion object {
-        const val REVISION = "NN-101-2026-NN-110-2026"
+        const val REVISION = "NN-132-2026-1583-1584"
         const val EFFECTIVE = "2026-11-17"
         const val LEGACY = "2025-05-02"
         const val GENERAL = "2026-09-10"
+        const val ARCHIVE_DAYS = 15
+        const val PUBLICATION_DEADLINE = "11:00"
         const val CONSUMER_LAW = "NN-59-2026"
         const val UNIT_PRICE_RULE = "NN-105-2026"
         const val UNIT_PRICE_EFFECTIVE = "2026-09-26"
@@ -52,7 +55,7 @@ data class LegalContract(
             val legacy = iso(dates.getString("legacy_fmcg"))
             val general = iso(dates.getString("general_goods_services"))
             val days = json.getInt("archive_min_days")
-            require(days in 30..3650) { "Neispravno čuvanje arhive." }
+            require(days in 15..3650) { "Neispravno čuvanje arhive." }
             val deadline = json.getString("product_publication_deadline")
             require(Regex("(?:[01][0-9]|2[0-3]):[0-5][0-9]").matches(deadline)) {
                 "Neispravno vrijeme objave."
@@ -92,14 +95,21 @@ data class LegalContract(
             }
             val baseStatus = if (json.has("base_price_regulation_status")) {
                 json.getString("base_price_regulation_status").also {
-                    require(it in setOf("draft_consultation", "consultation_closed_pending_final_text")) {
+                    require(it in setOf("draft_consultation", "consultation_closed_pending_final_text", "enacted")) {
                         "Nepoznat status pravilnika o baznoj cijeni."
                     }
                 }
             } else null
             // Optional: new WordPress versions explicitly report when final
             // rulebook texts have not yet been verified in Narodne novine.
-            optionalFalse("final_rulebooks_verified")
+            val rulebooksVerified = if (json.has("final_rulebooks_verified")) {
+                val verified = json.get("final_rulebooks_verified")
+                require(verified is Boolean) { "Neispravna potvrda objave pravilnika." }
+                if (verified) require(baseStatus == "enacted" && revision == REVISION) {
+                    "Potvrda konačnih pravilnika ne odgovara pravnoj reviziji."
+                }
+                verified
+            } else null
             val baseEffective = if (json.has("base_price_rule_effective_from")) {
                 iso(json.getString("base_price_rule_effective_from"))
             } else null
@@ -133,6 +143,7 @@ data class LegalContract(
                 optionalTrue("historical_price_verification_required"),
                 optionalFalse("legal_compliance_certified"),
                 targetDate,
+                rulebooksVerified,
             )
         }
 
