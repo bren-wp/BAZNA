@@ -110,6 +110,27 @@ check(!str_contains($core->csv('usluge'), 'Ovisno o materijalu'),
 check(!str_contains($core->xml('usluge'), 'Izrada po mjeri'),
     'inquiry-only services are excluded from numeric XML');
 check(isset($published['published_at']), 'publication timestamp');
+check(Core::validOib('12345678903') && !Core::validOib('12345678901'), 'OIB checksum enforced');
+check(Core::validEan('0123456789012') && !Core::validEan('0123456789011'),
+    'EAN13 checksum enforced with leading zero');
+putenv('BAZNA_TRADER_OIB=12345678903');
+check($core->officialIdentity() === '12345678903', 'Explicit valid legal identity');
+check(count($core->officialMissing('usluge')) === 1, 'Incomplete service history detected');
+try {
+    $core->officialXml('usluge');
+    throw new RuntimeException('Incomplete official service feed falsely published.');
+} catch (RuntimeException $ignored) {}
+$official = $core->officialCsv('proizvodi');
+check(str_contains($official, 'neto_kolicina;jedinica_mjere;maloprodajna_cijena;poseban_oblik_prodaje'),
+    'NN132 official goods column order and names');
+check(!str_contains($official, 'sidrena_datum') && !str_contains($official, 'dostupnost'),
+    'Legacy compatibility-only columns omitted from official CSV');
+check(str_contains($core->officialXml('proizvodi'), '<bazna_cijena>8,49</bazna_cijena>'),
+    'NN132 official XML holds verified original historical price');
+check(str_contains($core->officialFilename('proizvodi', 'csv'), 'ZA_SVA_PRODAJNA_MJESTA_ROBA_'),
+    'Official filename includes all-outlets marker and goods type');
+putenv('BAZNA_TRADER_OIB');
+
 $htmlGoods = $core->publicCatalogHtml('proizvodi', '', 'maslinovo MU-1');
 check(str_contains($htmlGoods, 'Maslinovo ulje') &&
     !str_contains($htmlGoods, 'Riječka sol'), 'only published webshop goods in multi-term search');
