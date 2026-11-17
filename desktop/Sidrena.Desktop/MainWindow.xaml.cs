@@ -657,6 +657,12 @@ public partial class MainWindow : Window
                 foreach(var item in result.Feeds)
                     feeds.Children.Add(U.Action("Otvori javni "+item.Kind+" "+item.Format.ToUpperInvariant(),
                         ()=>OpenUrl(item.Url.AbsoluteUri)));
+                if(result.OfficialFeeds.Count==0 && result.Legal?.RulesRevision==SidrenaLegalContract.Revision)
+                    feeds.Children.Add(U.Notice("Službeni CSV/XML izvozi nisu dostupni. U WordPress BAZNA provjerite identifikator trgovca, bazne cijene i objavu."));
+                foreach(var item in result.OfficialFeeds)
+                    feeds.Children.Add(U.Action("Otvori službeni "+item.Kind+" "+item.Format.ToUpperInvariant()+" (NN 132/2026)",
+                        ()=>OpenUrl(item.Url.AbsoluteUri)));
+
                 if(result.CombinedFeed is not null)
                     feeds.Children.Add(U.Action("Objedinjeni javni izvor",()=>OpenUrl(result.CombinedFeed.AbsoluteUri)));
                 if(result.ArchiveApi is not null)
