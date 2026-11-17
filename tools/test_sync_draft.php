@@ -42,10 +42,6 @@ class Brendigo_Sidrena_Cijena_Plugin {
     public static function woocommerce_active() { return $GLOBALS['sync_woo']; }
 }
 class Brendigo_Sidrena_Cijena_Automation {
-    public static function instance() { return new self(); }
-    public function mark_pending( $reason ) { $GLOBALS['sync_pending'] = $reason; }
-}
-class Brendigo_Sidrena_Cijena_Automation {
     public static $pending = array();
     public static function instance() { return new self(); }
     public function mark_pending( $reason ) { self::$pending[] = $reason; }
