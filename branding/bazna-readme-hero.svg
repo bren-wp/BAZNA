@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="480" viewBox="0 0 1280 480" role="img" aria-labelledby="title desc">
+<title id="title">BAZNA — Bazne cijene, više platformi</title>
+<desc id="desc">Marketinška ilustracija BAZNA platforme s integracijama i prikazom tijeka objave.</desc>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07152A"/><stop offset=".57" stop-color="#102747"/><stop offset="1" stop-color="#0B1D34"/></linearGradient>
+<linearGradient id="brand" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#19C7E8"/><stop offset="1" stop-color="#2469D6"/></linearGradient>
+<linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#243C5E"/><stop offset="1" stop-color="#122A4A"/></linearGradient>
+<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000" flood-opacity=".25"/></filter>
+</defs>
+<rect width="1280" height="480" rx="28" fill="url(#bg)"/>
+<circle cx="1160" cy="120" r="240" fill="#174E88" opacity=".18"/><circle cx="770" cy="430" r="210" fill="#0AC6E7" opacity=".06"/>
+<rect x="48" y="42" width="76" height="76" rx="24" fill="url(#brand)"/>
+<path d="M75 57h27a18 18 0 0 1 2 35H75Zm0 34h29a12 12 0 0 1 0 24H75Z" fill="none" stroke="#F4FAFF" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="144" y="89" fill="#F4FAFF" font-family="Arial,Helvetica,sans-serif" font-size="53" font-weight="800" letter-spacing="1.5">BAZNA</text>
+<text x="145" y="118" fill="#97B8D3" font-family="Arial,Helvetica,sans-serif" font-size="17">by Brendigo</text>
+<text x="49" y="187" fill="#FFFFFF" font-family="Arial,Helvetica,sans-serif" font-size="35" font-weight="800">Bazne cijene. Jedan sustav.</text>
+<text x="49" y="226" fill="#D0E5F5" font-family="Arial,Helvetica,sans-serif" font-size="21">Katalog, objava cjenika i arhiva</text>
+<text x="49" y="257" fill="#D0E5F5" font-family="Arial,Helvetica,sans-serif" font-size="21">za više prodajnih kanala.</text>
+<rect x="48" y="298" width="270" height="54" rx="13" fill="#F28A37"/>
+<text x="67" y="331" fill="#112139" font-size="18" font-weight="700" font-family="Arial,Helvetica,sans-serif">CSV / XML i javni cjenici</text>
+<rect x="330" y="298" width="203" height="54" rx="13" fill="#193C60" stroke="#346188"/>
+<text x="350" y="331" fill="#E0F0FC" font-size="18" font-weight="700" font-family="Arial,Helvetica,sans-serif">NN 132/2026</text>
+<text x="49" y="427" fill="#99B6CF" font-size="18" font-family="Arial,Helvetica,sans-serif">WordPress  ·  Android  ·  Windows  ·  Joomla  ·  Drupal  ·  Shopify  ·  PHP</text>
+<g transform="translate(685 55)" filter="url(#shadow)">
+<rect width="540" height="340" rx="20" fill="#0A1524" stroke="#366283" stroke-width="2"/>
+<rect x="2" y="2" width="536" height="47" rx="19" fill="#193653"/>
+<circle cx="24" cy="25" r="6" fill="#EE8D43"/><circle cx="45" cy="25" r="6" fill="#53CFA8"/><circle cx="66" cy="25" r="6" fill="#47A9E8"/>
+<text x="92" y="31" fill="#EAF5FF" font-size="17" font-weight="700" font-family="Arial,Helvetica,sans-serif">BAZNA • javni cjenik</text>
+<rect x="20" y="69" width="500" height="250" rx="14" fill="#F3F8FD"/>
+<text x="38" y="105" fill="#102B49" font-size="19" font-weight="700" font-family="Arial,Helvetica,sans-serif">Pregled proizvoda i usluga</text>
+<rect x="36" y="123" width="466" height="35" rx="7" fill="#DFECF7"/>
+<text x="50" y="146" fill="#2F5474" font-size="14" font-weight="700" font-family="Arial,Helvetica,sans-serif">Naziv</text>
+<text x="272" y="146" fill="#2F5474" font-size="14" font-weight="700" font-family="Arial,Helvetica,sans-serif">Maloprodajna</text>
+<text x="406" y="146" fill="#2F5474" font-size="14" font-weight="700" font-family="Arial,Helvetica,sans-serif">Bazna</text>
+<g fill="#31546F" font-size="16" font-family="Arial,Helvetica,sans-serif">
+<text x="50" y="190">Proizvod A</text><text x="290" y="190">12,49 €</text><text x="418" y="190">13,90 €</text>
+<text x="50" y="234">Proizvod B</text><text x="290" y="234">4,99 €</text><text x="418" y="234">5,59 €</text>
+<text x="50" y="278">Usluga A</text><text x="290" y="278">35,00 €</text><text x="418" y="278">39,00 €</text>
+</g>
+<path d="M40 205H500M40 248H500" stroke="#DDE8F1" stroke-width="1"/>
+</g>
+<text x="731" y="428" fill="#8EACC7" font-family="Arial,Helvetica,sans-serif" font-size="16">Ilustrativni podaci — nisu stvarne cijene trgovca</text>
+</svg>
