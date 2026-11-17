@@ -49,3 +49,21 @@
 - Android: `LegalEvidenceRulesTest.kt` pokriva jednake metode, iznimku prve ponude, krivi referentni dan, buduću ponudu i nedostatak izvora/oznaku potvrde.
 
 **Granica testa:** strukturna potvrda postojanja izvora ne dokazuje autentičnost računa. Datumi i metode moraju biti ljudski i pravno provjereni prema stvarnoj povijesti cijena.
+
+
+## Dodatni dubinski sigurnosni i funkcionalni zahvati
+
+- `Core::FIELDS` služi samo za privatne administracijske podatke. Odvojeni `Core::PUBLIC_FIELDS` zamrzava **stari Android v1** redoslijed javnih CSV/XML stupaca. `historical_source`, `reference_scope` i `historical_method` nikad ne smiju biti javni stupci — uključujući arhivu i Shopify/Joomla/Drupal proxy rute.
+- Public CSV/XML imaju provjeru neutralizacije proračunskih formula u tekstu trgovca; iznos cijene ostaje stvaran numerički podatak. Provjeriti još pri izvozu na stvarnom POS-u.
+- Nacrti PHP/Joomla/Drupal kataloga smiju imati nepotpunu povijesnu cijenu radi naknadnog uređivanja. **Niti ručna niti automatska javna objava** ne smiju prihvatiti nepotpun dokaz. Već potvrđeni iznos gubi potvrdu pri promjeni iznosa, datuma, izvora, skupine ili metode — uključujući puni JSON uvoz, ne samo obrasce. Novi potpuno dokumentirani zapis može biti izričito potvrđen pri prvom unosu.
+- Javna kompatibilna HTML/CSV/XML projekcija ranijih privatnih snapshotova prikazuje aktualnu cijenu, ali **ne reklamira nedokumentiranu staru baznu cijenu**. Originalni privatni snapshot ostaje nepromijenjen. Za zakonski arhivski format i točnu historijsku reprodukciju obvezna je zasebna produkcijska provjera; retroaktivno prilagođavanje javne projekcije **nije** isto što i čuvanje originalne javno objavljene datoteke.
+- WordPress kartica **Javni cjenik** razlikuje postojeće kompatibilne poveznice od regulatornih `official_feeds` i prikazuje službene CSV/XML URL-ove **samo kada ih stvarni public discovery potvrdi**; isto vrijedi za poslovnice. Prazan službeni status ne smije biti lažno zelen.
+
+## Preostali kritični uvjeti za prihvat (release blocking)
+
+1. **Popusti na referentni dan / na prvu ponudu:** trenutno se unosi metoda i izvor koji trgovac potvrđuje. Automatska provjera stvarne akcije, njezina datuma početka i najniže cijene u prethodnih 30 dana / prethodne maloprodajne cijene još nije izvediva bez potpunih povijesnih POS podataka. Posebne iznimke prema članku 4. oba pravilnika zahtijevaju stručnu klasifikaciju; ne uvoditi generički 'izuzmi sve' gumb koji bi sakrio obvezne podatke.
+2. **Do 11:00 i arhiva 15 dana od zamjene:** provesti kontrolirani test promjene i dviju zamjena u istom danu na pravoj HTTPS domeni, s poslužiteljskim cron rasporedom, per-outlet URL-ovima, bot pristupom i očuvanjem izvornog arhivskog sadržaja.
+3. **Vizualna usklađenost 1:1:** izvorni referentni PNG za svaki Android/WPF/WP zaslon nije dostupan kao verzionirani repozitorijski dokaz. Emulator screenshotovi i WPF snimke sami nisu dokaz `MAE=0`; referentne slike na istoj DPI rezoluciji moraju proći `tools/compare_ui_reference.py` i ručni QA interakcijskih stanja.
+4. **Distribucija:** do zelenih svih relevantnih CI poslova i QA prihvata ne spajati PR niti objavljivati 1.5.24 kao produkcijski usklađeno. APK/AAB iz CI može biti nepotpisan ili samo debug, a Windows Setup/Portable bez Authenticode potpisa.
+
+Prethodni uspješni CI ne zamjenjuje novu CI provjeru na zadnjem HEAD-u PR-a. Rezultate povezati s konkretnim commit SHA prije odobrenja.
