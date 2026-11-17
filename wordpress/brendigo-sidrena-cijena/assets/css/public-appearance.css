@@ -168,3 +168,28 @@ body.bazna-public.bazna-density-compact .cjenik-table th { padding: 8px 11px; }
 @media (prefers-reduced-motion: reduce) {
   .bazna-public :is(a,button,input) { transition: none !important; }
 }
+
+/* Public archive date filter: scoped and fully keyboard accessible. */
+.bazna-archive-browser .bazna-archive-controls {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: end;
+  padding: 12px 0 18px; color: var(--bazna-fg, inherit);
+}
+.bazna-archive-browser .bazna-archive-controls label { font-weight: 650; }
+.bazna-archive-browser .bazna-archive-controls input {
+  display: block; min-height: 44px; padding: 9px 12px; margin-top: 5px;
+  background: var(--bazna-panel, #fff); color: var(--bazna-fg, #242424);
+  border: 1px solid var(--bazna-border, #aab); border-radius: 9px;
+  font: inherit; max-width: 100%;
+}
+.bazna-archive-browser .bazna-archive-controls button {
+  min-height: 44px; border-radius: 9px; padding: 9px 14px;
+  border: 1px solid var(--bazna-border, #aab);
+  background: var(--bazna-panel, #eee); color: var(--bazna-fg, #242424);
+  font: inherit; cursor: pointer;
+}
+.bazna-archive-browser .sidrena-arhiva li[hidden] { display: none !important; }
+@media (max-width: 480px) {
+  .bazna-archive-browser .bazna-archive-controls { flex-direction: column; align-items: stretch; }
+  .bazna-archive-browser .bazna-archive-controls input,
+  .bazna-archive-browser .bazna-archive-controls button { width: 100%; }
+}
