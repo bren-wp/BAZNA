@@ -38,3 +38,8 @@ Sve javne rute čitaju **samo objavljeni** snapshot bez privilegija pisanja.
 Izvorni propisi:
 https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1583.html
 https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1584.html
+
+
+## Automatska objava Drupal kataloga
+
+Kada PHP okruženje sadrži `BAZNA_AUTO_PUBLISH_VERIFIED=1`, spremanje nativnog Drupal Form API obrasca pokušava odmah objaviti provjerene promjene u zajedničkoj PHP jezgri. Ako nedostaje bazna cijena ili naziv/adresa/oznaka poslovnice, korisnik dobiva upozorenje i nacrt ne postaje nova javna verzija. Ista privatna mapa može se nadzirati kroz `web/bin/publish.php` pozivajući ga putem cron rasporeda, uz odgovarajuće `BAZNA_PRIVATE_DIR` i `BAZNA_PUBLIC_URL`; modul i dalje zahtijeva autorizaciju i CSRF kontrolu. To nije zamjena za stvarnu instalacijsku provjeru na Drupal 10/11.
