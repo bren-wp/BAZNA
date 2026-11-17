@@ -86,7 +86,7 @@ candidate_patterns=[
     (r"\bshell_exec\s*\(", "PHP shell command"),
     (r"\b(?:passthru|system|exec)\s*\(", "Potential PHP command execution"),
 ]
-php_sources=list(WP.rglob("*.php"))
+php_sources = [file for directory in (WP, ROOT/"web", ROOT/"joomla", ROOT/"drupal", ROOT/"shopify") for file in directory.rglob("*.php") if "tests" not in file.parts and "fixtures" not in file.parts]
 for path in php_sources:
     source=path.read_text(encoding="utf-8-sig")
     for pattern,label in candidate_patterns:
