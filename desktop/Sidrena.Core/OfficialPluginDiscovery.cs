@@ -15,6 +15,7 @@ public sealed record OfficialPluginSnapshot(DateTimeOffset? PublishedAt,Uri Publ
     public Uri? ArchiveApi { get; init; }
     public Uri? CombinedFeed { get; init; }
     public IReadOnlyList<OfficialOutlet> Outlets { get; init; }=Array.Empty<OfficialOutlet>();
+    public IReadOnlyList<OfficialFeed> OfficialFeeds { get; init; }=Array.Empty<OfficialFeed>();
 }
 
 /// <summary>Read-only official plugin API. Does not send prices, credentials or local database contents.</summary>
@@ -132,6 +133,28 @@ public static class OfficialPluginDiscovery
                 list.Add(new OfficialFeed(kind,format,SecureUrl(value.GetString(),endpoint)));
             }
         }
+
+        // Optional additive NN132 official feeds. Never treat a compatibility
+        // CSV as a certified statutory publication. Reject external hosts.
+        var official=new List<OfficialFeed>();
+        if(root.TryGetProperty("official_feeds",out var officialObject))
+        {
+            if(officialObject.ValueKind!=JsonValueKind.Object)
+                throw new InvalidDataException("Neispravan popis službenih cjenika.");
+            foreach(var kind in new[]{"proizvodi","usluge"})
+            {
+                if(!officialObject.TryGetProperty(kind,out var kindObject) ||
+                    kindObject.ValueKind!=JsonValueKind.Object)continue;
+                foreach(var format in new[]{"csv","xml"})
+                {
+                    if(!kindObject.TryGetProperty(format,out var link) ||
+                        link.ValueKind!=JsonValueKind.String)continue;
+                    var text=link.GetString();
+                    if(!string.IsNullOrWhiteSpace(text))
+                        official.Add(new OfficialFeed(kind,format,SecureUrl(text,endpoint)));
+                }
+            }
+        }
         var outlets=new List<OfficialOutlet>();
         if(root.TryGetProperty("outlets",out var branch))
         {
@@ -185,7 +208,7 @@ public static class OfficialPluginDiscovery
         return new OfficialPluginSnapshot(published,cjenik,archive,list,outlets.Count)
         {
             ArchiveApi=archiveApi,CombinedFeed=combined,Outlets=outlets,
-            PluginVersion=pluginVersion,Legal=legal
+            PluginVersion=pluginVersion,Legal=legal,OfficialFeeds=official
         };
     }
 
