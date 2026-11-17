@@ -641,7 +641,7 @@ public partial class MainWindow : Window
                     result.PublishedAt.Value.ToLocalTime().ToString("dd. MM. yyyy. HH:mm",Hr):
                     "nije evidentirana")+$"\nDostupna su {result.Feeds.Count} tipizirana izvora i {result.OutletCount} poslovnica."+
                     (result.Legal is null?
-                        "\\nNema pravnog API profila. Ažurirajte WordPress BAZNA dodatak na 1.5.11.":
+                        "\\nNema pravnog API profila. Ažurirajte WordPress BAZNA dodatak.":
                         "\\nPravni profil: "+result.Legal.RulesRevision+
                         " · početak primjene "+result.Legal.EffectiveFrom.ToString("dd. MM. yyyy.",Hr)+
                         " · referentni datumi "+result.Legal.LegacyReferenceDate.ToString("dd. MM. yyyy.",Hr)+
@@ -649,7 +649,10 @@ public partial class MainWindow : Window
                         " · arhiva najmanje "+result.Legal.ArchiveMinDays+" dana."+
                         (result.Legal.ConsumerLawRevision is null?"":" · zaštita potrošača "+result.Legal.ConsumerLawRevision)+
                         (result.Legal.UnitPriceRuleRevision is null?"":" · cijena po jedinici mjere "+result.Legal.UnitPriceRuleRevision)+
-                        (result.Legal.PriceReductionLookbackDays is null?"":" · sniženja: najniža prethodna cijena "+result.Legal.PriceReductionLookbackDays+" dana (nije sidrena)"))+
+                        (result.Legal.PriceReductionLookbackDays is null?"":" · sniženja: najniža prethodna cijena "+result.Legal.PriceReductionLookbackDays+" dana (odvojeno od bazne cijene)") +
+                        (result.Legal.RulesRevision==SidrenaLegalContract.Revision && result.Legal.FinalRulebooksVerified==true
+                            ? "\\nPravni profil uključuje NN 132/2026; podaci trgovca nisu automatski pravno ovjereni."
+                            : "\\nUpozorenje: zastarjeli pravni profil. Ažurirajte WordPress BAZNA prema NN 132/2026."))+
                     "\\nSlužbena objava i pravna usklađenost zahtijevaju provjeru stvarnih podataka.";
                 foreach(var item in result.Feeds)
                     feeds.Children.Add(U.Action("Otvori javni "+item.Kind+" "+item.Format.ToUpperInvariant(),
