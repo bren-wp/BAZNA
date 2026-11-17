@@ -329,7 +329,7 @@ public partial class MainWindow : Window
         rightFields.Children.Add(money);
         rightFields.Children.Add(U.Field("Datum povijesne cijene (YYYY-MM-DD)",date));
         rightFields.Children.Add(U.Field("Izvor povijesne cijene",source));
-        rightFields.Children.Add(U.Notice("Za potvrdu bazne cijene priložite povijesni dokaz. Zapis ostaje nacrt do potvrde dokumentirani izvor."));
+        rightFields.Children.Add(U.Notice("Za potvrdu bazne cijene potreban je dokumentirani izvor."));
         rightFields.Children.Add(U.Action("Spremi novu stavku",()=>{
             try{
                 var historical=string.IsNullOrWhiteSpace(anchor.Text)?(decimal?)null:MoneyParser.Parse(anchor.Text);
@@ -850,14 +850,14 @@ public partial class MainWindow : Window
             }
         }));
         outer.Children.Add(U.Card("Sigurna razmjena radnog nacrta",
-            U.Muted("Pristupni podaci nisu trajno pohranjeni. Zastarjelo uređivanje se odbija verzija. Javna objava ostaje odvojena."),
+            U.Muted("Pristupni podaci se ne spremaju. Sukob izmjena se odbija."),
             U.Field("WordPress korisničko ime",syncUsername),
             U.Field("Aplikacijska lozinka (WordPress → Profil)",syncPassword),
             U.Field("Stavka iz WordPress nacrta",remoteRows),
             U.Field("Nova maloprodajna cijena",remotePrice),
             syncActions,syncStatus));
         outer.Children.Add(U.Card("Automatska objava i sinkronizacija",
-            U.Muted("Sinkronizacija nacrta ne objavljuje cjenik. Objavu potvrdite u WordPressuavači još trebaju transakcijski adapter."),
+            U.Muted("Sinkronizacija nacrta nije javna objava. Objavu potvrdite u WordPressu."),
             U.Action("Službeni WordPress dodatak",()=>
                 OpenUrl("https://wordpress.org/plugins/brendigo-sidrena-cijena/"))));
         return outer;
