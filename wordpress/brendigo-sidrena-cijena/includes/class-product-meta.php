@@ -88,7 +88,7 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 				return is_string( $barcode ) ? $barcode : '';
 			},
 			'_bazna_neto_kolicina' => static function ( $value ) { return substr( sanitize_text_field( $value ), 0, 100 ); },
-			'_bazna_ean_barkod' => static function ( $value ) { return preg_match( '/^\d{8}(?:\d{5})?$/D', (string) $value ) ? (string) $value : ''; },
+			'_bazna_ean_barkod' => static function ( $value ) { return Brendigo_Sidrena_Cijena_Official_Feed::valid_ean( $value ) ? (string) $value : ''; },
 			BRENDIGO_SIDRENA_CIJENA_META_VISIBILITY => static function ( $value ) {
 				$value = sanitize_key( $value );
 				return in_array( $value, array( 'include', 'exclude' ), true ) ? $value : '';
@@ -622,7 +622,7 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 	}
 	public function set_ean_barkod( $product_id, $value ) {
 		$value = is_scalar( $value ) ? trim( (string) $value ) : '';
-		if ( '' !== $value && ! preg_match( '/^\d{8}(?:\d{5})?$/D', $value ) ) {
+		if ( '' !== $value && ! Brendigo_Sidrena_Cijena_Official_Feed::valid_ean( $value ) ) {
 			return false;
 		}
 		return '' === $value ? $this->delete_meta_if_present( $product_id, '_bazna_ean_barkod' )
