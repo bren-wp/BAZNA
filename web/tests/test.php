@@ -283,6 +283,13 @@ $expectedPublicFields = [
 check(Core::PUBLIC_FIELDS === $expectedPublicFields &&
     str_getcsv(strtok(substr($csv, 3), "\n"), ';', '"', '') === $expectedPublicFields,
     'Legacy public CSV retains exact Android v1 columns/order');
+// Attack-looking names must never become formulas in the public CSV.
+$injectedSnapshot = $core->read('published.json');
+$injectedSnapshot['products'][0]['naziv'] = '=HYPERLINK("https://example.test", "Click")';
+$injectedCsv = $core->csv('proizvodi', '', $injectedSnapshot);
+check(str_contains($injectedCsv, "'=HYPERLINK") &&
+    !str_contains($injectedCsv, ';=HYPERLINK'),
+    'Public compatibility CSV neutralizes merchant-controlled spreadsheet formulas');
 check(!str_contains($csv, 'Arhiva cjenika 2026') &&
     !str_contains($csv, 'historical_source') &&
     !str_contains($csv, 'historical_method') &&
@@ -325,6 +332,9 @@ try {
     throw new RuntimeException('Foreign branch archive accepted.');
 } catch (InvalidArgumentException $ignored) {}
 $core->publish();
+check(!str_contains($core->archiveCsv($matches[1], 'proizvodi'), 'Arhiva cjenika 2026') &&
+    !str_contains($core->archiveCsv($matches[1], 'proizvodi'), 'historical_source'),
+    'Published archives never disclose documentary source identifiers');
 check(str_contains($core->archiveCsv($matches[1], 'proizvodi'), '5,99'),
     'archive link remains stable after another publication');
 $remove = static function ($dir) use (&$remove): void {

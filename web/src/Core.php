@@ -750,12 +750,8 @@ final class Core
         fwrite($f, "\xEF\xBB\xBF");
         fputcsv($f, self::OFFICIAL_FIELDS[$kind], ';', '"', '');
         foreach ($rows as $row) {
-            $values = array_values($row);
-            foreach ($values as &$value) {
-                if (preg_match('/^[\s]*[=+\-@]/u', (string) $value)) $value = "'" . $value;
-            }
-            unset($value);
-            fputcsv($f, $values, ';', '"', '');
+            fputcsv($f, array_map(static fn($value): string =>
+                self::safeCsvCell((string) $value), array_values($row)), ';', '"', '');
         }
         rewind($f);
         $content = (string) stream_get_contents($f);
@@ -782,6 +778,20 @@ final class Core
         return (string) $dom->saveXML();
     }
 
+    /**
+     * CSV is consumed by spreadsheet applications as well as mobile clients.
+     * Preserve ordinary values but prevent a merchant-controlled product
+     * name, SKU or other text from becoming executable spreadsheet formula.
+     */
+    private static function safeCsvCell(string $value): string
+    {
+        if ($value !== '' && (preg_match('/^[\\x00-\\x1F\\x7F]/', $value) ||
+            preg_match('/^\\s*[=+\\-@]/u', $value))) {
+            return "'" . $value;
+        }
+        return $value;
+    }
+
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
     {
         if (!in_array($kind, self::KINDS, true) || ($outlet !== '' &&
@@ -796,7 +806,8 @@ final class Core
         fputcsv($handle, self::PUBLIC_FIELDS, ';', '"', '');
         foreach ($rows as $row) {
             if (($row['outlet'] ?? '') !== $outlet) continue;
-            fputcsv($handle, array_map(static fn($field) => $row[$field] ?? '', self::PUBLIC_FIELDS), ';', '"', '');
+            fputcsv($handle, array_map(static fn($field): string =>
+                self::safeCsvCell((string) ($row[$field] ?? '')), self::PUBLIC_FIELDS), ';', '"', '');
         }
         rewind($handle);
         $csv = stream_get_contents($handle);
