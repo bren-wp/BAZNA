@@ -29,7 +29,7 @@ check(number("targetSdk") >= 36, "Google Play targetSdk must be at least 36")
 check(number("minSdk") >= 24, "Play-protected package must use minSdk >= 24")
 check(number("compileSdk") >= number("targetSdk"), "compileSdk must not be below targetSdk")
 # Version is governed by the same-commit unified release contract, not a stale pinned test.
-version_match = re.search(r'\\bversionName\\s*=\\s*"([0-9]+\\.[0-9]+\\.[0-9]+)"', gradle)
+version_match = re.search(r'\bversionName\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"', gradle)
 version_name = version_match.group(1) if version_match else ""
 release_yaml = (root / ".github/workflows/desktop-release.yml").read_text(encoding="utf-8")
 check(number("versionCode") > 26, "Google Play update must increment versionCode beyond prior release 26")
