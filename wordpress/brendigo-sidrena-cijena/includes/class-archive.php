@@ -802,7 +802,7 @@ class Brendigo_Sidrena_Cijena_Archive {
 		if ( array() !== $official ) {
 			$html .= '<h4 class="bazna-archive-heading">' . esc_html__( 'Službeni CSV/XML cjenici', 'brendigo-sidrena-cijena' ) . '</h4><ol class="sidrena-arhiva bazna-official-archive">';
 			foreach ( $official as $file ) {
-				$html .= '<li><a href="' . esc_url( $file['url'] ) . '">' . esc_html( $file['name'] ) . '</a>';
+				$html .= '<li data-bazna-date="' . esc_attr( wp_date( 'Y-m-d', $file['stamp'] ) ) . '"><a href="' . esc_url( $file['url'] ) . '">' . esc_html( $file['name'] ) . '</a>';
 				$html .= '<span>' . esc_html( wp_date( 'd.m.Y. H:i', $file['stamp'] ) ) . '</span></li>';
 			}
 			$html .= '</ol>';
@@ -819,7 +819,7 @@ class Brendigo_Sidrena_Cijena_Archive {
 			$label = $stamp ? wp_date( 'd.m.Y. H:i', $stamp ) : ( isset( $file['date'] ) ? (string) $file['date'] : '' );
 			$name  = isset( $file['name'] ) ? (string) $file['name'] : '';
 			$url   = isset( $file['url'] ) ? (string) $file['url'] : '';
-			$html .= '<li><a href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>';
+			$html .= '<li data-bazna-date="' . esc_attr( $stamp ? wp_date( 'Y-m-d', $stamp ) : '' ) . '"><a href="' . esc_url( $url ) . '">' . esc_html( $name ) . '</a>';
 			if ( '' !== $label ) {
 				$html .= '<span>' . esc_html( $label ) . '</span>';
 			}

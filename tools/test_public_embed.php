@@ -95,6 +95,7 @@ bazna_embed_check( str_contains( $per_outlet, 'RI-01-usluge.csv' ) && ! str_cont
 $invalid = $frontend->bazna_official_files_shortcode( array( 'oznaka' => 'UNKNOWN' ) );
 bazna_embed_check( str_contains( $invalid, 'nije pronađeno' ) && ! str_contains( $invalid, 'roba.csv' ), 'Unknown outlet is rejected' );
 $full = $frontend->bazna_publication_shortcode( array() );
+bazna_embed_check( file_exists( __DIR__ . '/../wordpress/brendigo-sidrena-cijena/assets/js/public-archive-filter.js' ), 'Date filter script is shipped with WordPress plugin' );
 bazna_embed_check( str_contains( $full, 'PUB-ONLY' ) && str_contains( $full, 'ARCHIVE-ONLY' ) && str_contains( $full, 'roba.csv' ), 'Combined shortcode renders public table, archive, official file links' );
 $no_archive = $frontend->bazna_publication_shortcode( array( 'arhiva' => 'ne' ) );
 bazna_embed_check( ! str_contains( $no_archive, 'ARCHIVE-ONLY' ) && str_contains( $no_archive, 'roba.csv' ), 'Archive can be hidden without hiding official files' );

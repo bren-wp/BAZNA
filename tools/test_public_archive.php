@@ -16,6 +16,7 @@ function wp_date( $format, $stamp = null ) { return ( new DateTimeImmutable( '@'
 function esc_url_raw( $url ) { return $url; }
 function esc_url( $url ) { return htmlspecialchars( $url, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ); }
 function esc_html( $text ) { return htmlspecialchars( (string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ); }
+function esc_attr( $text ) { return esc_html( $text ); }
 function esc_html__( $s, $domain ) { return esc_html( $s ); }
 function wp_upload_dir( ...$args ) { return array( 'baseurl' => 'https://example.test/wp-content/uploads', 'error' => false ); }
 class Brendigo_Sidrena_Cijena_Settings {
@@ -70,6 +71,7 @@ bazna_archive_assert( 1 === count( $ri ) && str_contains( $ri[0]['name'], 'RI-01
 $nope = $archive->get_official_archive_files( 'FAKE' );
 bazna_archive_assert( array() === $nope, 'Unknown outlet cannot acquire other official snapshots' );
 $html = $archive->get_archive_embed_html( 'RI-01' );
+bazna_archive_assert( false !== strpos( $html, 'data-bazna-date=' ), 'Archive rows expose ISO dates for accessible filtering' );
 bazna_archive_assert( str_contains( $html, 'Službeni CSV/XML cjenici' ) && str_contains( $html, 'RI-01' ), 'Official archive is included in front-end shortcode' );
 bazna_archive_assert( ! str_contains( $html, '_001_' ), 'Outlet page does not mix webshop price archive' );
 foreach ( $names as $name ) { unlink( $GLOBALS['bazna_archive_test_dir'] . '/' . $name ); }

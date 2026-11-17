@@ -432,12 +432,34 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		$this->enqueue_archive_embed_style();
 
 		$html = Brendigo_Sidrena_Cijena_Export::instance()->get_archive_embed_html( (string) $atts['oznaka'] );
+		$html = $this->wrap_archive_date_filter( $html );
 		if ( in_array( $shortcode_tag, array( 'bazna_arhiva', 'bazna-arhiva' ), true ) ) {
 			return $this->wrap_bazna_single( $html );
 		}
 		return $html;
 	}
 
+
+	/**
+	 * Accessible progressive enhancement inspired by date-filtered public
+	 * price-list archives. The original CSV/XML links remain ordinary anchors.
+	 */
+	private function wrap_archive_date_filter( $html ) {
+		if ( false === strpos( $html, '<li' ) ) {
+			return $html;
+		}
+		$handle = 'bazna-public-archive-filter';
+		if ( ! wp_script_is( $handle, 'registered' ) ) {
+			wp_register_script( $handle, BRENDIGO_SIDRENA_CIJENA_URL . 'assets/js/public-archive-filter.js', array(), BRENDIGO_SIDRENA_CIJENA_VERSION, true );
+		}
+		wp_enqueue_script( $handle );
+		return '<div class="bazna-archive-browser" data-bazna-archive>'
+			. '<div class="bazna-archive-controls"><label>' . esc_html__( 'Filtriraj arhivu po datumu', 'brendigo-sidrena-cijena' )
+			. ' <input type="date" data-bazna-archive-date></label>'
+			. '<button type="button" data-bazna-archive-reset>' . esc_html__( 'Prikaži sve', 'brendigo-sidrena-cijena' ) . '</button>'
+			. '<span aria-live="polite" data-bazna-archive-count></span></div>'
+			. $html . '</div>';
+	}
 
 	/** Wrap individual BAZNA shortcodes without affecting legacy embedded markup. */
 	private function wrap_bazna_single( $html ) {
