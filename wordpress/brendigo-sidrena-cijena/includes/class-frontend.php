@@ -383,10 +383,13 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		} elseif ( in_array( $shortcode_tag, array( 'sidrena_proizvodi', 'bazna_proizvodi' ), true ) ) {
 			$kind = 'proizvodi';
 		}
-		if ( in_array( $kind, array( 'proizvodi', 'usluge' ), true ) ) {
-			return $this->separate_cjenik_shortcode( $kind, (string) $atts['oznaka'] );
+		$html = in_array( $kind, array( 'proizvodi', 'usluge' ), true )
+			? $this->separate_cjenik_shortcode( $kind, (string) $atts['oznaka'] )
+			: Brendigo_Sidrena_Cijena_Export::instance()->get_cjenik_embed_html( (string) $atts['oznaka'] );
+		if ( in_array( $shortcode_tag, array( 'bazna_cjenik', 'bazna-cjenik', 'bazna_usluge', 'bazna_proizvodi' ), true ) ) {
+			return $this->wrap_bazna_single( $html );
 		}
-		return Brendigo_Sidrena_Cijena_Export::instance()->get_cjenik_embed_html( (string) $atts['oznaka'] );
+		return $html;
 	}
 
 	/** Render the already-published, type-specific HTML fragment (no live database query). */
@@ -417,7 +420,7 @@ class Brendigo_Sidrena_Cijena_Frontend {
 	 * @param array<string, mixed> $atts Attributes.
 	 * @return string
 	 */
-	public function arhiva_shortcode( $atts ) {
+	public function arhiva_shortcode( $atts, $content = null, $shortcode_tag = '' ) {
 		$atts = shortcode_atts(
 			array(
 				'oznaka' => '',
@@ -428,9 +431,20 @@ class Brendigo_Sidrena_Cijena_Frontend {
 
 		$this->enqueue_archive_embed_style();
 
-		return Brendigo_Sidrena_Cijena_Export::instance()->get_archive_embed_html( (string) $atts['oznaka'] );
+		$html = Brendigo_Sidrena_Cijena_Export::instance()->get_archive_embed_html( (string) $atts['oznaka'] );
+		if ( in_array( $shortcode_tag, array( 'bazna_arhiva', 'bazna-arhiva' ), true ) ) {
+			return $this->wrap_bazna_single( $html );
+		}
+		return $html;
 	}
 
+
+	/** Wrap individual BAZNA shortcodes without affecting legacy embedded markup. */
+	private function wrap_bazna_single( $html ) {
+		$this->enqueue_public_appearance_style();
+		return '<div class="' . esc_attr( Brendigo_Sidrena_Cijena_Settings::instance()->public_appearance_classes() ) . ' bazna-single-embed">'
+			. $html . '</div>';
+	}
 
 	/**
 	 * Legal files embed: links ONLY to confirmed, existing official CSV/XML
