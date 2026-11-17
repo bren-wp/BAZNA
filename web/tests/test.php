@@ -127,8 +127,14 @@ check(!str_contains($official, 'sidrena_datum') && !str_contains($official, 'dos
     'Legacy compatibility-only columns omitted from official CSV');
 check(str_contains($core->officialXml('proizvodi'), '<bazna_cijena>8,49</bazna_cijena>'),
     'NN132 official XML holds verified original historical price');
-check(str_contains($core->officialFilename('proizvodi', 'csv'), 'ZA_SVA_PRODAJNA_MJESTA_ROBA_'),
-    'Official filename includes all-outlets marker and goods type');
+putenv('BAZNA_MAIN_STORE_TYPE=webshop');
+putenv('BAZNA_MAIN_STORE_ADDRESS=Rijeka');
+putenv('BAZNA_MAIN_STORE_CODE=001');
+check(str_contains($core->officialFilename('proizvodi', 'csv'), 'webshop_rijeka_001_ROBA_'),
+    'Different-outlet file includes actual main store type/address/code');
+putenv('BAZNA_MAIN_STORE_TYPE');
+putenv('BAZNA_MAIN_STORE_ADDRESS');
+putenv('BAZNA_MAIN_STORE_CODE');
 putenv('BAZNA_TRADER_OIB');
 
 $htmlGoods = $core->publicCatalogHtml('proizvodi', '', 'maslinovo MU-1');
