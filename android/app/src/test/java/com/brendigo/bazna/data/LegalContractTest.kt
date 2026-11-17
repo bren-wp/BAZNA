@@ -76,7 +76,7 @@ class LegalContractTest {
             policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 16)),
         )
         assertEquals(
-            "published_decisions_effective",
+            "rules_effective",
             policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 17)),
         )
         assertThrows(IllegalArgumentException::class.java) {
