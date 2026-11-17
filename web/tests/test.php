@@ -155,12 +155,14 @@ check($core->read('draft.json')['products'][0]['historical_verified'] === true,
 $unverifiedMethod = $catalog;
 $unverifiedMethod['products'][0]['historical_method'] = '';
 $core->saveDraft($unverifiedMethod);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Editing the legal method invalidates the old historical attestation');
 try {
     $core->publish();
     throw new RuntimeException('Manual publication accepted an undocumented legal method.');
 } catch (RuntimeException $e) {
-    check(str_contains($e->getMessage(), 'historical_method'),
-        'Manual public feed rejects missing documentary method');
+    check(str_contains($e->getMessage(), 'historical_verified'),
+        'Manual public feed rejects the revoked attestation');
 }
 check(!isset($core->read('published.json')['published_at']),
     'Manual publication failure preserves the last published state');
