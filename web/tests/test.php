@@ -86,6 +86,8 @@ check($core->discovery('joomla')['api_version'] === 1 &&
     'All adapters provide public REST without license activation');
 check($before['api_version'] === 1 && $before['feeds']['proizvodi']['available_csv'] === false,
     'unpublished catalog not claimed as public');
+// The original publication's legal identity is immutable even when environment changes.
+putenv('BAZNA_TRADER_OIB=12345678903');
 $published = $core->publish();
 $requests = $core->onRequestServices();
 check($requests['schema'] === 1 && count($requests['items']) === 2,
