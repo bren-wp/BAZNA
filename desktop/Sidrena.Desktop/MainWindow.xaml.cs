@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        EditionLabel.Text="BAZNA Desktop "+GetDesktopVersion()+" · Brendigo LTD";
+        EditionLabel.Text="BAZNA Desktop "+GetDesktopVersion()+" · Brendigo";
         ConfigureNavigationIcons();
         var workArea=SystemParameters.WorkArea;
         var initialSize=ResponsiveLayoutPolicy.Initial(workArea.Width,workArea.Height);
@@ -611,7 +611,7 @@ public partial class MainWindow : Window
     {
         var outer=U.Vertical();
         outer.Children.Add(U.Card("WordPress i vaše poslovnice",
-            U.Text("BAZNA WordPress 1.5.11",18,true),
+            U.Text("BAZNA WordPress — povezivanje",18,true),
             U.Muted("Učitajte javne cjenike i povijest objava povezane web-stranice.")));
 
         var site=U.Box("https://primjer.hr/",420);
@@ -641,7 +641,7 @@ public partial class MainWindow : Window
                     result.PublishedAt.Value.ToLocalTime().ToString("dd. MM. yyyy. HH:mm",Hr):
                     "nije evidentirana")+$"\nDostupna su {result.Feeds.Count} tipizirana izvora i {result.OutletCount} poslovnica."+
                     (result.Legal is null?
-                        "\\nNema pravnog API profila. Ažurirajte WordPress BAZNA dodatak na 1.5.11.":
+                        "\\nNema pravnog API profila. Ažurirajte WordPress BAZNA dodatak.":
                         "\\nPravni profil: "+result.Legal.RulesRevision+
                         " · početak primjene "+result.Legal.EffectiveFrom.ToString("dd. MM. yyyy.",Hr)+
                         " · referentni datumi "+result.Legal.LegacyReferenceDate.ToString("dd. MM. yyyy.",Hr)+
@@ -649,11 +649,20 @@ public partial class MainWindow : Window
                         " · arhiva najmanje "+result.Legal.ArchiveMinDays+" dana."+
                         (result.Legal.ConsumerLawRevision is null?"":" · zaštita potrošača "+result.Legal.ConsumerLawRevision)+
                         (result.Legal.UnitPriceRuleRevision is null?"":" · cijena po jedinici mjere "+result.Legal.UnitPriceRuleRevision)+
-                        (result.Legal.PriceReductionLookbackDays is null?"":" · sniženja: najniža prethodna cijena "+result.Legal.PriceReductionLookbackDays+" dana (nije sidrena)"))+
+                        (result.Legal.PriceReductionLookbackDays is null?"":" · sniženja: najniža prethodna cijena "+result.Legal.PriceReductionLookbackDays+" dana (odvojeno od bazne cijene)") +
+                        (result.Legal.RulesRevision==SidrenaLegalContract.Revision && result.Legal.FinalRulebooksVerified==true
+                            ? "\\nPravni profil uključuje NN 132/2026; podaci trgovca nisu automatski pravno ovjereni."
+                            : "\\nUpozorenje: zastarjeli pravni profil. Ažurirajte WordPress BAZNA prema NN 132/2026."))+
                     "\\nSlužbena objava i pravna usklađenost zahtijevaju provjeru stvarnih podataka.";
                 foreach(var item in result.Feeds)
                     feeds.Children.Add(U.Action("Otvori javni "+item.Kind+" "+item.Format.ToUpperInvariant(),
                         ()=>OpenUrl(item.Url.AbsoluteUri)));
+                if(result.OfficialFeeds.Count==0 && result.Legal?.RulesRevision==SidrenaLegalContract.Revision)
+                    feeds.Children.Add(U.Notice("Službeni CSV/XML izvozi nisu dostupni. U WordPress BAZNA provjerite identifikator trgovca, bazne cijene i objavu."));
+                foreach(var item in result.OfficialFeeds)
+                    feeds.Children.Add(U.Action("Otvori službeni "+item.Kind+" "+item.Format.ToUpperInvariant()+" (NN 132/2026)",
+                        ()=>OpenUrl(item.Url.AbsoluteUri)));
+
                 if(result.CombinedFeed is not null)
                     feeds.Children.Add(U.Action("Objedinjeni javni izvor",()=>OpenUrl(result.CombinedFeed.AbsoluteUri)));
                 if(result.ArchiveApi is not null)
@@ -823,7 +832,7 @@ public partial class MainWindow : Window
         outer.Children.Add(U.Card("Informacije o izdanju",
             U.Text("BAZNA Desktop "+GetDesktopVersion(),18,true),
             U.Muted("Windows 10/11 · Brendigo · Bez aktivacijskog ključa"),
-            U.Notice("WordPress BAZNA 1.5.20 dijeli javni pravni profil s Androidom i Windowsom."),
+            U.Notice("WordPress BAZNA 1.5.22 podržava pravni profil NN 132/2026; bazne cijene zahtijevaju provjeru izvora."),
             U.Action("Preuzmi najnoviju Windows aplikaciju",()=>
                 OpenUrl("https://github.com/bren-wp/BAZNA/releases"),true),
             U.Action("Informacije o programu",()=>OpenUrl("https://brendigo.com/"))));

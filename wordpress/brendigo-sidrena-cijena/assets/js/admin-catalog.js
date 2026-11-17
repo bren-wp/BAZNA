@@ -23,6 +23,8 @@
 					naziv: "",
 					sku: "",
 					barkod: "",
+					neto_kolicina: "",
+					ean_barkod: "",
 					marka: "",
 					url: "",
 					cijena_redovna: "",
@@ -172,6 +174,9 @@
 				'<td><input type="text" class="js-barkod" value="' +
 				escAttr(row.barkod) +
 				'" /></td>' +
+				'<td><input type="text" class="js-ean" inputmode="numeric" value="' +
+				escAttr(row.ean_barkod) +
+				'" /></td>' +
 				'<td><input type="text" class="js-marka" value="' +
 				escAttr(row.marka) +
 				'" /></td>' +
@@ -193,6 +198,9 @@
 				escAttr(i18n.jedinicaPlaceholder || "kg") +
 				'" value="' +
 				escAttr(row.jedinica_mjere) +
+				'" /></td>' +
+				'<td><input type="text" class="js-neto" inputmode="decimal" value="' +
+				escAttr(row.neto_kolicina) +
 				'" /></td>' +
 				'<td><input type="text" class="js-jedinica-cijena" inputmode="decimal" value="' +
 				escAttr(row.cijena_jedinice_mjere) +
@@ -237,6 +245,8 @@
 					naziv: $.trim($tr.find(".js-naziv").val() || ""),
 					sku: $.trim($tr.find(".js-sku").val() || ""),
 					barkod: $.trim($tr.find(".js-barkod").val() || ""),
+					ean_barkod: $.trim($tr.find(".js-ean").val() || ""),
+					neto_kolicina: $.trim($tr.find(".js-neto").val() || ""),
 					marka: $.trim($tr.find(".js-marka").val() || ""),
 					url: $.trim($tr.find(".js-url").val() || ""),
 					cijena_redovna: $.trim($tr.find(".js-regular").val() || ""),
@@ -478,6 +488,8 @@
 				naziv: $tr.find(".js-naziv").val(),
 				sku: $tr.find(".js-sku").val(),
 				barkod: $tr.find(".js-barkod").val(),
+				ean_barkod: $tr.find(".js-ean").val(),
+				neto_kolicina: $tr.find(".js-neto").val(),
 				marka: $tr.find(".js-marka").val(),
 				url: $tr.find(".js-url").val(),
 				cijena_redovna: $tr.find(".js-regular").val(),

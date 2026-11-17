@@ -15,7 +15,7 @@ public static class LocalPricelistPreview
     private static string Safe(string? value) => WebUtility.HtmlEncode(value ?? "");
     private static string Euro(long cents)=>(cents / 100m).ToString("N2",Hr)+" €";
 
-    public static void Write(IEnumerable<PriceItem> items,string path,string title="SIDRENA — pregled cjenika")
+    public static void Write(IEnumerable<PriceItem> items,string path,string title="BAZNA — pregled cjenika")
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -50,13 +50,13 @@ public static class LocalPricelistPreview
             table{page-break-inside:auto} tr{break-inside:avoid} .money{white-space:nowrap}}
           </style></head><body>
           """);
-        html.AppendLine("<header><div class=\"brand\">⚓ SIDRENA <small>Sidrene cijene i digitalni cjenici</small></div></header>");
+        html.AppendLine("<header><div class=\"brand\">◆ BAZNA <small>Bazne cijene i digitalni cjenici</small></div></header>");
         html.Append("<h1>").Append(Safe(title)).AppendLine("</h1>");
         html.Append("<p class=\"subtitle\">Izrađeno: ")
             .Append(Safe(DateTimeOffset.Now.ToString("dd. MM. yyyy. HH:mm",Hr)))
             .Append(" &nbsp; · &nbsp; Stavki: ").Append(entries.Count.ToString(Hr)).AppendLine("</p>");
         html.AppendLine("<div class=\"warning\">PRIPREMLJENI CJENIK — NIJE SLUŽBENI JAVNI CJENIK NI DOKAZ ZAKONSKE USKLAĐENOSTI</div>");
-        html.AppendLine("<table><thead><tr><th>Naziv</th><th>Vrsta</th><th>Šifra</th><th>Jedinica</th><th class=\"money\">Aktualna cijena</th><th class=\"money\">Sidrena cijena</th><th>Referentni datum</th></tr></thead><tbody>");
+        html.AppendLine("<table><thead><tr><th>Naziv</th><th>Vrsta</th><th>Šifra</th><th>Jedinica</th><th class=\"money\">Aktualna cijena</th><th class=\"money\">Bazna cijena</th><th>Referentni datum</th></tr></thead><tbody>");
         foreach(var item in entries)
         {
             html.Append("<tr><td>").Append(Safe(item.Name)).Append("</td><td>")

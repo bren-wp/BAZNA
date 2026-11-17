@@ -13,9 +13,9 @@ use RuntimeException;
 
 final class Core
 {
-    public const VERSION = '1.1.4';
+    public const VERSION = '1.1.5';
     public const FIELDS = [
-        'id', 'naziv', 'vrsta', 'sku', 'marka', 'jedinica_mjere',
+        'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
         'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
         'barkod', 'dostupnost', 'slika_url',
@@ -91,6 +91,13 @@ final class Core
                 throw new InvalidArgumentException('Bazna cijena zahtijeva stvarno potvrđen povijesni iznos i datum.');
             }
         }
+        if ($row['ean_barkod'] !== '' && !self::validEan($row['ean_barkod'])) {
+            throw new InvalidArgumentException('EAN-8/EAN-13 kontrolna znamenka nije valjana.');
+        }
+        if ($row['neto_kolicina'] !== '' &&
+            !preg_match('/^\\d{1,9}(?:[,.]\\d{1,5})?$/D', $row['neto_kolicina'])) {
+            throw new InvalidArgumentException('Neto količina nije valjana.');
+        }
         if ($row['slika_url'] !== '') {
             $urlHost = parse_url($row['slika_url'], PHP_URL_HOST);
             if (parse_url($row['slika_url'], PHP_URL_SCHEME) !== 'https' || !$urlHost) {
@@ -150,13 +157,17 @@ final class Core
             $code = trim((string) ($outlet['code'] ?? ''));
             $name = trim((string) ($outlet['name'] ?? ''));
             $address = trim((string) ($outlet['address'] ?? ''));
+            $type = trim((string) ($outlet['type'] ?? ''));
             if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $code) ||
                 isset($seen[strtolower($code)]) || $name === '' || strlen($name) > 240 ||
-                strlen($address) > 400 || preg_match('/[\x00-\x1F]/', $address)) {
+                strlen($address) > 400 || strlen($type) > 100 ||
+                preg_match('/[\x00-\x1F]/', $address . $type)) {
                 throw new InvalidArgumentException('Oznaka, naziv ili adresa poslovnice nisu valjani.');
             }
             $seen[strtolower($code)] = true;
-            $cleanOutlets[] = ['code' => $code, 'name' => $name, 'address' => $address];
+            $outletClean = ['code' => $code, 'name' => $name, 'address' => $address];
+            if ($type !== '') $outletClean['type'] = $type;
+            $cleanOutlets[] = $outletClean;
         }
         $result = ['outlets' => $cleanOutlets, 'products' => [], 'services' => [], 'on_request' => []];
         foreach (['products', 'services'] as $collection) {
@@ -340,6 +351,9 @@ final class Core
                 $this->write('archive.json', $history);
             }
             $catalog['published_at'] = $timestamp;
+            // Monotonic per-store publication sequence, retained with each snapshot.
+            $catalog['publication_sequence'] = max(1, (int) ($existing['publication_sequence'] ?? 0) + 1);
+            $catalog['official_identity'] = $this->officialIdentity();
             $this->write('published.json', $catalog);
             return $catalog;
         });
@@ -467,6 +481,198 @@ final class Core
         return $html;
     }
 
+    /** NN 132/2026 article 3: exact public ordering, separate from legacy Android v1 CSV. */
+    public const OFFICIAL_FIELDS = [
+        'proizvodi' => [
+            'naziv', 'sku', 'marka', 'neto_kolicina', 'jedinica_mjere',
+            'maloprodajna_cijena', 'poseban_oblik_prodaje',
+            'cijena_jedinice_mjere', 'barkod', 'ean_barkod', 'bazna_cijena',
+        ],
+        'usluge' => ['naziv', 'maloprodajna_cijena', 'poseban_oblik_prodaje', 'bazna_cijena'],
+    ];
+
+    public static function validOib(string $oib): bool
+    {
+        if (!preg_match('/^\d{11}$/D', $oib)) return false;
+        $state = 10;
+        for ($i = 0; $i < 10; $i++) {
+            $state = ($state + (int) $oib[$i]) % 10;
+            if ($state === 0) $state = 10;
+            $state = ($state * 2) % 11;
+        }
+        $check = 11 - $state;
+        return ($check === 10 ? 0 : $check) === (int) $oib[10];
+    }
+
+    public static function validEan(string $value): bool
+    {
+        if (!preg_match('/^(?:\d{8}|\d{13})$/D', $value)) return false;
+        $n = strlen($value) - 1;
+        $sum = 0;
+        for ($i = 0; $i < $n; $i++) $sum += (int) $value[$i] * (($n - $i) % 2 ? 3 : 1);
+        return (10 - $sum % 10) % 10 === (int) $value[$n];
+    }
+
+    /** Must be explicitly configured. An unknown identity cannot be invented. */
+    public function officialIdentity(): string
+    {
+        $oib = (string) (getenv('BAZNA_TRADER_OIB') ?: '');
+        $mb = (string) (getenv('BAZNA_TRADER_MB') ?: '');
+        if ($oib !== '' && $mb !== '') return '';
+        if ($oib !== '') return self::validOib($oib) ? $oib : '';
+        return preg_match('/^\d{8}$/D', $mb) ? $mb : '';
+    }
+
+    /** Preview missing historical data, never silently certify a catalog. */
+    public function officialMissing(string $kind, string $outlet = '', ?array $snapshot = null): array
+    {
+        if (!isset(self::OFFICIAL_FIELDS[$kind]) || ($outlet !== '' &&
+            !preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $outlet))) {
+            throw new InvalidArgumentException('Nepodržana vrsta ili poslovnica.');
+        }
+        $snapshot ??= $this->read('published.json');
+        $rows = $snapshot[$kind === 'proizvodi' ? 'products' : 'services'] ?? [];
+        $issues = [];
+        foreach ($rows as $index => $row) {
+            if (($row['outlet'] ?? '') !== $outlet) continue;
+            foreach (['naziv', 'maloprodajna_cijena', 'sidrena_cijena'] as $field) {
+                if (trim((string) ($row[$field] ?? '')) === '') {
+                    $issues[] = ['row' => $index + 1, 'field' => $field];
+                }
+            }
+            if (!empty($row['cijena_jedinice_mjere']) && $kind === 'proizvodi') {
+                foreach (['jedinica_mjere', 'neto_kolicina'] as $field) {
+                    if (trim((string) ($row[$field] ?? '')) === '') {
+                        $issues[] = ['row' => $index + 1, 'field' => $field];
+                    }
+                }
+            }
+        }
+        return $issues;
+    }
+
+    /** Strict official projection; never publishes a draft, failed evidence or fake history. */
+    public function officialRows(string $kind, string $outlet = '', ?array $snapshot = null): array
+    {
+        $snapshot ??= $this->read('published.json');
+        if (!isset($snapshot['published_at']) ||
+            (($snapshot['official_identity'] ?? $this->officialIdentity()) === '')) {
+            throw new \RuntimeException('Službeni cjenik zahtijeva objavljene podatke i valjan OIB/MB trgovca.');
+        }
+        if ($this->officialMissing($kind, $outlet, $snapshot) !== []) {
+            throw new \RuntimeException('Službeni cjenik ima neprovjerene ili nepotpune obvezne podatke.');
+        }
+        $rows = [];
+        foreach ($snapshot[$kind === 'proizvodi' ? 'products' : 'services'] ?? [] as $row) {
+            if (($row['outlet'] ?? '') !== $outlet) continue;
+            $values = [];
+            foreach (self::OFFICIAL_FIELDS[$kind] as $field) {
+                $values[$field] = match ($field) {
+                    'bazna_cijena' => (string) ($row['sidrena_cijena'] ?? ''),
+                    'poseban_oblik_prodaje' => !empty($row['naziv_posebnog_oblika']) ? 'da' : 'ne',
+                    default => (string) ($row[$field] ?? ''),
+                };
+            }
+            $rows[] = $values;
+        }
+        return $rows;
+    }
+
+    /** Stable URL; Content-Disposition name includes identity, outlet, type and local timestamp. */
+    public function officialFilename(string $kind, string $format, string $outlet = '', ?array $snapshot = null): string
+    {
+        if (!isset(self::OFFICIAL_FIELDS[$kind]) || !in_array($format, ['csv','xml'], true)) {
+            throw new InvalidArgumentException('Neispravna vrsta cjenika.');
+        }
+        $published = $snapshot ?? $this->read('published.json');
+        $id = (string) ($published['official_identity'] ?? $this->officialIdentity());
+        if ($id === '') throw new \RuntimeException('Konfigurirajte OIB ili matični broj.');
+        $date = (new \DateTimeImmutable((string) ($published['published_at'] ?? 'now')))
+            ->setTimezone(new \DateTimeZone('Europe/Zagreb'))->format('Ymd_Hi');
+        if ($outlet !== '' && !preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $outlet)) {
+            throw new InvalidArgumentException('Nevaljana oznaka poslovnice.');
+        }
+        $place = 'ZA_SVA_PRODAJNA_MJESTA';
+        $outlets = $published['outlets'] ?? [];
+        if ($outlet !== '' || $outlets !== []) {
+            $match = null;
+            if ($outlet !== '') {
+                foreach ($outlets as $row) {
+                    if (($row['code'] ?? '') === $outlet) {
+                        $match = $row;
+                        break;
+                    }
+                }
+                if ($match === null) throw new \RuntimeException('Poslovnica nije u objavljenom katalogu.');
+                $kindOfPlace = (string) ($match['type'] ?? '');
+                $address = (string) ($match['address'] ?? '');
+                $code = $outlet;
+            }
+            else {
+                // A webshop feed is NOT automatically the same price list as
+                // all physical outlets; operator supplies exact place metadata.
+                $kindOfPlace = (string) (getenv('BAZNA_MAIN_STORE_TYPE') ?: '');
+                $address = (string) (getenv('BAZNA_MAIN_STORE_ADDRESS') ?: '');
+                $code = (string) (getenv('BAZNA_MAIN_STORE_CODE') ?: '');
+            }
+            $slug = static function (string $raw): string {
+                $raw = strtolower(trim($raw));
+                $safe = preg_replace('/[^a-z0-9-]+/', '-', $raw);
+                return trim((string) $safe, '-');
+            };
+            $typeName = $slug($kindOfPlace);
+            $street = $slug($address);
+            $branch = $slug($code);
+            if ($typeName === '' || $street === '' || $branch === '') {
+                throw new \RuntimeException('Nedostaju pravni tip prodajnog mjesta, adresa ili oznaka.');
+            }
+            $place = $typeName . '_' . $street . '_' . $branch;
+        }
+        $type = $kind === 'proizvodi' ? 'ROBA' : 'USLUGE';
+        $sequence = max(1, (int) ($published['publication_sequence'] ?? 1));
+        return $id . '_' . $place . '_' . $type . '_' . $sequence . '_' . $date . '.' . $format;
+    }
+
+    public function officialCsv(string $kind, string $outlet = '', ?array $snapshot = null): string
+    {
+        $rows = $this->officialRows($kind, $outlet, $snapshot);
+        $f = fopen('php://temp', 'w+');
+        if (!$f) throw new \RuntimeException('CSV nije dostupan.');
+        fwrite($f, "\xEF\xBB\xBF");
+        fputcsv($f, self::OFFICIAL_FIELDS[$kind], ';', '"', '');
+        foreach ($rows as $row) {
+            $values = array_values($row);
+            foreach ($values as &$value) {
+                if (preg_match('/^[\s]*[=+\-@]/u', (string) $value)) $value = "'" . $value;
+            }
+            unset($value);
+            fputcsv($f, $values, ';', '"', '');
+        }
+        rewind($f);
+        $content = (string) stream_get_contents($f);
+        fclose($f);
+        return $content;
+    }
+
+    public function officialXml(string $kind, string $outlet = '', ?array $snapshot = null): string
+    {
+        $rows = $this->officialRows($kind, $outlet, $snapshot);
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+        $root = $dom->createElement('cjenik');
+        $dom->appendChild($root);
+        foreach ($rows as $row) {
+            $entry = $dom->createElement($kind === 'proizvodi' ? 'roba' : 'usluga');
+            foreach ($row as $key => $value) {
+                $element = $dom->createElement($key);
+                $element->appendChild($dom->createTextNode($value));
+                $entry->appendChild($element);
+            }
+            $root->appendChild($entry);
+        }
+        return (string) $dom->saveXML();
+    }
+
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
     {
         if (!in_array($kind, self::KINDS, true) || ($outlet !== '' &&
@@ -527,65 +733,85 @@ final class Core
      */
     public function legal(): array
     {
-        return [
-            'schema' => 1,
-            'reviewed_on' => '2026-11-14',
-            'jurisdiction' => 'HR',
-            'rules_revision' => 'NN-101-2026-NN-110-2026',
-            'consumer_law_revision' => 'NN-59-2026',
-            'unit_price_rule_revision' => 'NN-105-2026',
-            'unit_price_rule_effective_from' => '2026-09-26',
-            'price_reduction_lookback_days' => 30,
-            'discount_baseline_is_anchor_price' => false,
-            'base_price_regulation_status' => 'consultation_closed_pending_final_text',
-            'base_price_rule_effective_from' => '2026-11-17',
-            'base_price_is_automatically_derived' => false,
-            'historical_price_verification_required' => true,
-            'legal_compliance_certified' => false,
-            'consumer_30_day_low_is_anchor_price' => false,
-            'consumer_30_day_low_is_base_price' => false,
-            'draft_rulebooks_consultation_until' => '2026-11-13',
-            'final_rulebooks_verified' => false,
-            'implementation' => [
-                'published_decisions_ready_from' => '2026-11-17',
-                'reference_price_data_entry' => 'verified_manual',
-                'product_service_publication' => 'csv_xml_html',
-                'publication_source_of_truth' => 'platform_published_feeds',
-                'unpublished_draft_features' => 'not_automatically_enabled',
-                'discount_30_day_low_independent' => true,
-                'automatic_historical_inference' => false,
-            ],
-            'effective_from' => '2026-11-17',
-            'reference_dates' => self::REFERENCE_DATES,
-            'legacy_categories' => [
-                'hrana', 'pice', 'kozmetika', 'sredstva_za_ciscenje',
-                'toaletne_potrepstine', 'proizvodi_za_kucanstvo',
-            ],
-            'product_publication_deadline' => '08:00',
-            'service_change_deadline' => '08:00',
-            'timezone' => 'Europe/Zagreb',
-            'archive_min_days' => 30,
-            'formats' => ['csv', 'xml'],
-            'products_required_fields' => [
-                'naziv', 'sku', 'marka', 'jedinica_mjere',
-                'cijena_jedinice_mjere', 'maloprodajna_cijena',
-                'naziv_posebnog_oblika', 'sidrena_cijena', 'barkod', 'dostupnost',
-            ],
-            'services_required_fields' => [
-                'naziv', 'maloprodajna_cijena', 'naziv_posebnog_oblika', 'sidrena_cijena',
-            ],
-            'classification' => 'manual_verified',
-            'historical_prices' => 'not_inferred',
-            'source_urls' => [
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2025_05_75_979.html',
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1212.html',
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1213.html',
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1309.html',
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1310.html',
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_06_59_728.html',
-                'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_105_1270.html',
-            ],
-        ];
+        // Kept byte-for-byte equivalent to the WordPress v1 public legal fields.
+        // Test web/tests/test.php enforces full cross-platform parity.
+        return array(
+                    'schema' => 1,
+                    'reviewed_on' => '2026-11-17',
+                    'jurisdiction' => 'HR',
+                    'rules_revision' => 'NN-132-2026-1583-1584',
+                    'consumer_law_revision' => 'NN-59-2026',
+                    'unit_price_rule_revision' => 'NN-105-2026',
+                    'unit_price_rule_effective_from' => '2026-09-26',
+                    'price_reduction_lookback_days' => 30,
+                    'discount_baseline_is_anchor_price' => false,
+                    // Enacted under NN 132/2026; actual merchant price evidence is NOT certified.
+                    'base_price_regulation_status' => 'enacted',
+                    'base_price_rule_effective_from' => '2026-11-17',
+                    'base_price_is_automatically_derived' => false,
+                    'historical_price_verification_required' => true,
+                    'legal_compliance_certified' => false,
+                    'consumer_30_day_low_is_anchor_price' => false,
+                    'consumer_30_day_low_is_base_price' => false,
+                    'draft_rulebooks_consultation_until' => '2026-11-13',
+                    'final_rulebooks_verified' => true,
+                    // The enacted legal rules are active; catalog compliance still requires verification.
+                    'implementation' => array(
+                        'published_decisions_ready_from' => '2026-11-17',
+                        'reference_price_data_entry' => 'verified_manual',
+                        'product_service_publication' => 'csv_xml_html',
+                        'publication_source_of_truth' => 'wordPress_published_feeds',
+                        'new_rules_effective' => true,
+                        'unpublished_draft_features' => 'not_automatically_enabled',
+                        'discount_30_day_low_independent' => true,
+                        'automatic_historical_inference' => false,
+                    ),
+                    'effective_from' => '2026-11-17',
+                    'reference_dates' => array(
+                        'legacy_fmcg' => '2025-05-02',
+                        'fmcg' => '2025-05-02',
+                        'general_goods_services' => '2026-09-10',
+                    ),
+                    'legacy_categories' => array(
+                        'hrana', 'pice', 'kozmetika', 'sredstva_za_ciscenje',
+                        'toaletne_potrepstine', 'proizvodi_za_kucanstvo',
+                    ),
+                    'product_publication_deadline' => '11:00',
+                    'service_change_deadline' => '11:00',
+                    'timezone' => 'Europe/Zagreb', // Croatian regulatory deadline, regardless of WordPress site timezone.
+                    'archive_min_days' => 15,
+                    'archive_retention_anchor' => 'replacement_time',
+                    'price_list_update_deadline_local' => '11:00',
+                    'advertising_print_tv_base_price_required' => true,
+                    'reference_fmcg_discount_method' => 'lowest_price_in_30_days_before_discount_start',
+                    'reference_general_discount_method' => 'previous_retail_price_before_discount',
+                    'formats' => array( 'csv', 'xml' ),
+                    'products_required_fields' => array(
+                        'naziv', 'sku', 'marka', 'neto_kolicina', 'jedinica_mjere',
+                        'maloprodajna_cijena', 'poseban_oblik_prodaje',
+                        'cijena_jedinice_mjere', 'barkod', 'ean_barkod', 'bazna_cijena',
+                    ),
+                    'services_required_fields' => array(
+                        'naziv', 'maloprodajna_cijena', 'poseban_oblik_prodaje', 'bazna_cijena',
+                    ),
+                    'publication_filename_fields' => array( 'identity', 'outlet_or_all', 'goods_or_services', 'sequence', 'YYYYMMDD_HHMM' ),
+                    'classification' => 'manual_verified',
+                    'historical_prices' => 'not_inferred',
+                    'source_urls' => array(
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1583.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1584.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1578.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1579.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_11_132_1580.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1212.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_101_1213.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1309.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_110_1310.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_06_59_728.html',
+                        'https://narodne-novine.nn.hr/clanci/sluzbeni/2026_09_105_1270.html',
+                        'https://mingo.gov.hr/vijesti/ministar-susnjar-kroz-dijalog-s-gospodarstvenicima-do-provedivih-pravila-i-vece-zastite-potrosaca/10461',
+                    ),
+                );
     }
 
     public function discovery(string $platform = 'web', ?string $publicRoot = null): array
@@ -595,7 +821,20 @@ final class Core
         $draft = $this->read('draft.json');
         $endpoint = $base . '/bazna/v1/cjenici';
         $feeds = [];
+        $officialFeeds = [];
         foreach (self::KINDS as $kind) {
+            $ready = isset($published['published_at']) && $this->officialIdentity() !== '' &&
+                $this->officialMissing($kind, '', $published) === [];
+            if ($ready) {
+                try { $this->officialFilename($kind, 'csv'); }
+                catch (\Throwable $error) { $ready = false; }
+            }
+            $officialFeeds[$kind] = [
+                'csv' => $ready ? $base . '/bazna/v1/sluzbeni/' . $kind . '/csv' : '',
+                'xml' => $ready ? $base . '/bazna/v1/sluzbeni/' . $kind . '/xml' : '',
+                'available_csv' => $ready,
+                'available_xml' => $ready,
+            ];
             $feeds[$kind] = [
                 'csv' => $endpoint . '/' . $kind . '/csv',
                 'available_csv' => isset($published['published_at']),
@@ -609,6 +848,24 @@ final class Core
                     'csv' => $feeds[$kind]['csv'] . '?oznaka=' . rawurlencode($outlet['code']),
                     'available_csv' => true,
                 ];
+            }
+            $o['official_feeds'] = [];
+            foreach (self::KINDS as $kind) {
+                $ready = isset($published['published_at']) && $this->officialIdentity() !== '' &&
+                    $this->officialMissing($kind, $outlet['code'], $published) === [];
+                if ($ready) {
+                    try { $this->officialFilename($kind, 'csv', $outlet['code']); }
+                    catch (\Throwable $error) { $ready = false; }
+                }
+                $o['official_feeds'][$kind] = [
+                    'csv' => $ready ? $officialFeeds[$kind]['csv'] ?: $base . '/bazna/v1/sluzbeni/' . $kind . '/csv' : '',
+                    'xml' => $ready ? $officialFeeds[$kind]['xml'] ?: $base . '/bazna/v1/sluzbeni/' . $kind . '/xml' : '',
+                    'available_csv' => $ready, 'available_xml' => $ready,
+                ];
+                if ($ready) {
+                    $o['official_feeds'][$kind]['csv'] = $base . '/bazna/v1/sluzbeni/' . $kind . '/csv?oznaka=' . rawurlencode($outlet['code']);
+                    $o['official_feeds'][$kind]['xml'] = $base . '/bazna/v1/sluzbeni/' . $kind . '/xml?oznaka=' . rawurlencode($outlet['code']);
+                }
             }
             $outlets[] = $o;
         }
@@ -626,7 +883,7 @@ final class Core
             'archive' => $base . '/bazna/arhiva',
             'type_archive' => $base . '/bazna/v1/arhiva',
             'on_request' => $base . '/bazna/v1/usluge-na-upit',
-            'feeds' => $feeds, 'outlets' => $outlets,
+            'feeds' => $feeds, 'official_feeds' => $officialFeeds, 'outlets' => $outlets,
             'publication' => [
                 'csv_ready' => isset($published['published_at']),
                 'generated_at' => $published['published_at'] ?? null,
@@ -634,6 +891,44 @@ final class Core
                 'compliance_certified' => false,
             ],
         ];
+    }
+
+    /**
+     * Immutable verified archive snapshot, including the identity used when
+     * it was published. Never serve newly edited drafts as historical exports.
+     */
+    public function archiveSnapshot(string $id): array
+    {
+        if (!preg_match('/^[0-9]{14}-[a-f0-9]{12}$/D', $id)) {
+            throw new InvalidArgumentException('Neispravan identifikator arhive.');
+        }
+        foreach ($this->read('archive.json')['versions'] ?? [] as $v) {
+            if (($v['id'] ?? '') === $id && ($v['file'] ?? '') === 'archive-' . $id . '.json') {
+                $snapshot = $this->read('archive-' . $id . '.json');
+                if (!isset($snapshot['published_at'])) {
+                    throw new InvalidArgumentException('Nepotpuna arhivska snimka.');
+                }
+                return $snapshot;
+            }
+        }
+        throw new InvalidArgumentException('Arhivski zapis ne postoji.');
+    }
+
+    public function officialArchive(string $id, string $kind, string $format, string $outlet = ''): array
+    {
+        $snapshot = $this->archiveSnapshot($id);
+        if ($outlet !== '' &&
+            !in_array($outlet, array_column($snapshot['outlets'] ?? [], 'code'), true)) {
+            throw new InvalidArgumentException('Poslovnica ne postoji u arhivskom cjeniku.');
+        }
+        if (!in_array($format, ['csv','xml'], true)) {
+            throw new InvalidArgumentException('Nepodržani službeni format.');
+        }
+        $name = $this->officialFilename($kind, $format, $outlet, $snapshot);
+        $body = $format === 'csv'
+            ? $this->officialCsv($kind, $outlet, $snapshot)
+            : $this->officialXml($kind, $outlet, $snapshot);
+        return ['filename' => $name, 'body' => $body, 'format' => $format];
     }
 
     public function archives(): array
@@ -658,6 +953,27 @@ final class Core
             }
             foreach ($locations as $location) {
                 foreach (self::KINDS as $kind) {
+                    // Keep the original statutory export publicly retrievable
+                    // for at least 15 days after replacement (we retain longer).
+                    $actualOutlet = $location === 'webshop' ? '' : $location;
+                    if (!empty($snapshot['official_identity']) &&
+                        $this->officialMissing($kind, $actualOutlet, $snapshot) === []) {
+                        foreach (['csv', 'xml'] as $format) {
+                            try {
+                                $this->officialFilename($kind, $format, $actualOutlet, $snapshot);
+                                $out[] = [
+                                    'date' => $date, 'kind' => $kind, 'outlet' => $location,
+                                    'format' => $format,
+                                    'official' => true,
+                                    'url' => $this->link('bazna/v1/arhiva/' . $id .
+                                        '/sluzbeni/' . $kind . '/' . $format) .
+                                        ($location === 'webshop' ? '' : '?oznaka=' . rawurlencode($location)),
+                                ];
+                            } catch (\Throwable $error) {
+                                // Old pre-rulebook snapshots are not falsely marked compliant.
+                            }
+                        }
+                    }
                     $out[] = [
                         'date' => $date, 'kind' => $kind, 'outlet' => $location, 'format' => 'csv',
                         'url' => $this->link('bazna/v1/arhiva/' . $id . '/' . $kind . '/csv') .

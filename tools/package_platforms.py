@@ -52,7 +52,7 @@ def build(target: Path) -> None:
         for p in files_under(web_root)
         if not p.parts[-2:] == ("tests", "test.php")
     }
-    archive(target / "BAZNA-Web-1.1.4.zip", web)
+    archive(target / "BAZNA-Web-1.1.5.zip", web)
 
     joomla = {
         p.relative_to(joomla_root).as_posix(): p.read_bytes()
@@ -62,7 +62,19 @@ def build(target: Path) -> None:
     joomla["vendor/AdminCatalog.php"] = (web_root / "src/AdminCatalog.php").read_bytes()
     joomla["assets/bazna.css"] = (web_root / "public/assets/bazna.css").read_bytes()
     assert "bazna.xml" in joomla and "services/provider.php" in joomla
-    archive(target / "BAZNA-Joomla-Plugin-1.1.4.zip", joomla)
+    archive(target / "BAZNA-Joomla-Plugin-1.1.5.zip", joomla)
+
+    # Drupal module is a native route/form adapter over the very same core.
+    drupal_root = ROOT / "drupal/bazna"
+    drupal = {
+        "bazna/" + p.relative_to(drupal_root).as_posix(): p.read_bytes()
+        for p in files_under(drupal_root)
+    }
+    drupal["bazna/vendor/Core.php"] = (web_root / "src/Core.php").read_bytes()
+    drupal["bazna/vendor/AdminCatalog.php"] = (web_root / "src/AdminCatalog.php").read_bytes()
+    drupal["bazna/assets/bazna.css"] = (web_root / "public/assets/bazna.css").read_bytes()
+    assert "bazna/bazna.info.yml" in drupal and "bazna/bazna.routing.yml" in drupal
+    archive(target / "BAZNA-Drupal-Module-1.1.5.zip", drupal)
 
     shopify = {
         "bazna-shopify/shopify/" + p.relative_to(shop_root).as_posix(): p.read_bytes()
@@ -71,7 +83,7 @@ def build(target: Path) -> None:
     }
     for p in files_under(web_root / "src"):
         shopify["bazna-shopify/web/src/" + p.name] = p.read_bytes()
-    archive(target / "BAZNA-Shopify-Adapter-1.1.4.zip", shopify)
+    archive(target / "BAZNA-Shopify-Adapter-1.1.5.zip", shopify)
 
 
 if __name__ == "__main__":

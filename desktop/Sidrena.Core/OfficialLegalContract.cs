@@ -14,6 +14,8 @@ public sealed record OfficialLegalContract(
     public int? PriceReductionLookbackDays { get; init; }
     public bool? DiscountBaselineIsAnchorPrice { get; init; }
     public DateOnly? UnitPriceRuleEffectiveFrom { get; init; }
+    public string? BasePriceRegulationStatus { get; init; }
+    public bool? FinalRulebooksVerified { get; init; }
 
     public static OfficialLegalContract? ParseOptional(JsonElement root)
     {
@@ -47,7 +49,7 @@ public sealed record OfficialLegalContract(
         var newDate=Iso(Required(refs,"general_goods_services"));
         if(!section.TryGetProperty("archive_min_days",out var minDays)||
            minDays.ValueKind!=JsonValueKind.Number||
-           !minDays.TryGetInt32(out var days)||days is <30 or >3650)
+           !minDays.TryGetInt32(out var days)||days is <15 or >3650)
             throw new InvalidDataException("Pravno trajanje arhive nije valjano.");
         var deadline=Required(section,"product_publication_deadline");
         if(!TimeOnly.TryParseExact(deadline,"HH:mm",CultureInfo.InvariantCulture,DateTimeStyles.None,out _))
@@ -80,20 +82,39 @@ public sealed record OfficialLegalContract(
         }
         DateOnly? unitEffective=section.TryGetProperty("unit_price_rule_effective_from",out var unitDate)
             ? Iso(unitDate.ValueKind==JsonValueKind.String ? unitDate.GetString()??"" : "") : null;
+        string? baseStatus=null;
+        if(section.TryGetProperty("base_price_regulation_status",out var status))
+        {
+            if(status.ValueKind!=JsonValueKind.String ||
+               (status.GetString() is not ("draft_consultation" or "consultation_closed_pending_final_text" or "enacted")))
+                throw new InvalidDataException("Nepoznat status pravilnika.");
+            baseStatus=status.GetString();
+        }
+        bool? finalVerified=null;
+        if(section.TryGetProperty("final_rulebooks_verified",out var verified))
+        {
+            if(verified.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+                throw new InvalidDataException("Neispravna potvrda objave pravilnika.");
+            finalVerified=verified.GetBoolean();
+            if(finalVerified.Value && (baseStatus!="enacted" || revision!=SidrenaLegalContract.Revision))
+                throw new InvalidDataException("Potvrda pravilnika ne odgovara reviziji.");
+        }
         return new OfficialLegalContract(revision,effective,oldDate,newDate,days,deadline)
         {
             ConsumerLawRevision=OptionalRevision("consumer_law_revision"),
             UnitPriceRuleRevision=OptionalRevision("unit_price_rule_revision"),
             PriceReductionLookbackDays=reductionDays,
             DiscountBaselineIsAnchorPrice=discountAnchor,
-            UnitPriceRuleEffectiveFrom=unitEffective
+            UnitPriceRuleEffectiveFrom=unitEffective,
+            BasePriceRegulationStatus=baseStatus,
+            FinalRulebooksVerified=finalVerified
         };
     }
 }
 
 public static class SidrenaLegalContract
 {
-    public const string Revision="NN-101-2026-NN-110-2026";
+    public const string Revision="NN-132-2026-1583-1584";
     public const string EffectiveFrom="2026-11-17";
     public const string LegacyReferenceDate="2025-05-02";
     public const string GeneralReferenceDate="2026-09-10";
@@ -101,5 +122,7 @@ public static class SidrenaLegalContract
     public const string UnitPriceRuleRevision="NN-105-2026";
     public const string UnitPriceRuleEffectiveFrom="2026-09-26";
     public const int PriceReductionLookbackDays=30;
+    public const int ArchiveMinimumDays=15;
+    public const string PublicationDeadline="11:00";
     public static readonly string[] KnownReferenceDates={LegacyReferenceDate,GeneralReferenceDate};
 }

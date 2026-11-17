@@ -15,6 +15,7 @@ public sealed record OfficialPluginSnapshot(DateTimeOffset? PublishedAt,Uri Publ
     public Uri? ArchiveApi { get; init; }
     public Uri? CombinedFeed { get; init; }
     public IReadOnlyList<OfficialOutlet> Outlets { get; init; }=Array.Empty<OfficialOutlet>();
+    public IReadOnlyList<OfficialFeed> OfficialFeeds { get; init; }=Array.Empty<OfficialFeed>();
 }
 
 /// <summary>Read-only official plugin API. Does not send prices, credentials or local database contents.</summary>
@@ -88,7 +89,7 @@ public static class OfficialPluginDiscovery
         var root=document.RootElement;
         if(root.ValueKind!=JsonValueKind.Object ||
            !root.TryGetProperty("feeds",out var feeds) || feeds.ValueKind!=JsonValueKind.Object)
-            throw new InvalidDataException("Ovo nije odgovor službenog Brendigo Sidrena Cijena REST API-ja.");
+            throw new InvalidDataException("Ovo nije podržani odgovor javnog BAZNA API-ja.");
 
         Uri Url(string field)
         {
@@ -108,7 +109,7 @@ public static class OfficialPluginDiscovery
         if(!root.TryGetProperty("api_version",out var apiVersion) ||
            apiVersion.ValueKind!=JsonValueKind.Number || !apiVersion.TryGetInt32(out var version) ||
            version!=1)
-            throw new InvalidDataException("Nepodržana verzija SIDRENA javnog API-ja.");
+            throw new InvalidDataException("Nepodržana verzija BAZNA javnog API-ja.");
         var cjenik=Url("cjenik");
         var archive=Url("archive");
         var archiveApi=OptionalUrl("type_archive");
@@ -130,6 +131,28 @@ public static class OfficialPluginDiscovery
                 if(!type.TryGetProperty(format,out var value)||value.ValueKind!=JsonValueKind.String)
                     throw new InvalidDataException("Nedostaje format: "+kind+"/"+format);
                 list.Add(new OfficialFeed(kind,format,SecureUrl(value.GetString(),endpoint)));
+            }
+        }
+
+        // Optional additive NN132 official feeds. Never treat a compatibility
+        // CSV as a certified statutory publication. Reject external hosts.
+        var official=new List<OfficialFeed>();
+        if(root.TryGetProperty("official_feeds",out var officialObject))
+        {
+            if(officialObject.ValueKind!=JsonValueKind.Object)
+                throw new InvalidDataException("Neispravan popis službenih cjenika.");
+            foreach(var kind in new[]{"proizvodi","usluge"})
+            {
+                if(!officialObject.TryGetProperty(kind,out var kindObject) ||
+                    kindObject.ValueKind!=JsonValueKind.Object)continue;
+                foreach(var format in new[]{"csv","xml"})
+                {
+                    if(!kindObject.TryGetProperty(format,out var link) ||
+                        link.ValueKind!=JsonValueKind.String)continue;
+                    var text=link.GetString();
+                    if(!string.IsNullOrWhiteSpace(text))
+                        official.Add(new OfficialFeed(kind,format,SecureUrl(text,endpoint)));
+                }
             }
         }
         var outlets=new List<OfficialOutlet>();
@@ -185,7 +208,7 @@ public static class OfficialPluginDiscovery
         return new OfficialPluginSnapshot(published,cjenik,archive,list,outlets.Count)
         {
             ArchiveApi=archiveApi,CombinedFeed=combined,Outlets=outlets,
-            PluginVersion=pluginVersion,Legal=legal
+            PluginVersion=pluginVersion,Legal=legal,OfficialFeeds=official
         };
     }
 

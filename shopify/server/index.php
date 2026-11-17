@@ -68,11 +68,25 @@ try {
     if ($tail === '/v1/arhiva') {
         bazna_shop_response(200, $core->archives());
     }
+    if (preg_match('#^/v1/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
+        $outlet = (string) ($_GET['oznaka'] ?? '');
+        $filename = $core->officialFilename($match[1], $match[2], $outlet);
+        header('Content-Type: ' . ($match[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+        echo $match[2] === 'csv' ? $core->officialCsv($match[1], $outlet) : $core->officialXml($match[1], $outlet);
+        exit;
+    }
     if (preg_match('#^/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
         $outlet = (string) ($_GET['oznaka'] ?? '');
         header('Content-Type: ' . ($match[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
         echo $match[2] === 'csv' ? $core->csv($match[1], $outlet) : $core->xml($match[1], $outlet);
         exit;
+    }
+    if (preg_match('#^/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $tail, $match)) {
+        $archive = $core->officialArchive($match[1], $match[2], $match[3], (string) ($_GET['oznaka'] ?? ''));
+        header('Content-Type: ' . ($match[3] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+        header('Content-Disposition: inline; filename="' . $archive['filename'] . '"');
+        echo $archive['body']; exit;
     }
     if (preg_match('#^/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $tail, $match)) {
         header('Content-Type: text/csv; charset=utf-8');

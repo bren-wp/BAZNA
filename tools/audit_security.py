@@ -38,11 +38,13 @@ if not plugin_version or "Stable tag: " + plugin_version not in readme:
 for token in ("2026-11-17","2025-05-02","2026-09-10"):
     if any(token not in source for source in (legal,android,win)):
         errors.append("Cross-platform legal date drift: "+token)
-for token in ("NN-101-2026-NN-110-2026", "NN-59-2026", "NN-105-2026", "2026-09-26"):
+for token in ("NN-132-2026-1583-1584", "NN-59-2026", "NN-105-2026", "2026-09-26"):
     if any(token not in source for source in (legal,android,win)):
         errors.append("Cross-platform rule revision drift")
-if "const ARCHIVE_MIN_DAYS = 30" not in legal:
-    errors.append("WordPress archive legal minimum changed unexpectedly")
+if "const PUBLICATION_DEADLINE = '11:00'" not in legal:
+    errors.append("NN 132/2026 11:00 publication deadline drift")
+if "const ARCHIVE_MIN_DAYS = 15" not in legal:
+    errors.append("NN 132/2026 WordPress archive minimum must remain 15 days")
 if "'permission_callback' => '__return_true'" not in api and "'permission_callback' => '__return_true'" not in api.replace("             "," "):
     warnings.append("Confirm public REST permission callbacks are read-only")
 if "WP_REST_Server::CREATABLE" in api or "WP_REST_Server::EDITABLE" in api or "WP_REST_Server::DELETABLE" in api:

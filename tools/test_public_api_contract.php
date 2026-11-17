@@ -38,6 +38,12 @@ function wp_json_encode( $value ) {
 	return json_encode( $value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 }
 
+function wp_upload_dir( $time = null, $create_dir = false ) {
+	return array( 'baseurl' => 'https://primjer.hr/wp-content/uploads', 'error' => false );
+}
+function trailingslashit( $value ) {
+	return rtrim( $value, '/' ) . '/';
+}
 function rest_url( $route ) {
 	global $sidrena_plain_permalinks;
 	if ( ! empty( $sidrena_plain_permalinks ) ) {
@@ -100,6 +106,7 @@ class Brendigo_Sidrena_Cijena_Settings {
 	public function is_multi_poslovnica() {
 		return true;
 	}
+	public function get( $key, $default = '' ) { return $default; }
     public function normalize_oznaka( $code ) { return trim( (string) $code ); }
 }
 class Brendigo_Sidrena_Cijena_Archive {
@@ -125,6 +132,10 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 	public static $dir;
 	public static function instance() {
 		return new self();
+	}
+	public function official_live_path( $kind, $format = 'csv', $oznaka = '' ) {
+		$part = '' !== $oznaka ? '-' . $oznaka : '';
+		return self::$dir . '/bazna-sluzbeni-' . $kind . $part . '.' . $format;
 	}
 	public function get_type_public_path( $kind, $format = 'csv', $oznaka = '' ) {
 		$part = '' !== $oznaka ? '-' . $oznaka : '';

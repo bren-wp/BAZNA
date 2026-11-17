@@ -325,6 +325,15 @@ try
     var invalidLegal=restJson.Replace("\"archive_min_days\":30", "\"archive_min_days\":10");
     MustThrowType<InvalidDataException>(()=>OfficialPluginDiscovery.Parse(
         System.Text.Encoding.UTF8.GetBytes(invalidLegal),endpoint));
+    var enactedLegal=restJson.Replace("\"rules_revision\":\"NN-101-2026-NN-110-2026\"",
+         "\"rules_revision\":\"NN-132-2026-1583-1584\"")
+       .Replace("\"archive_min_days\":30", "\"archive_min_days\":15")
+       .Replace("\"product_publication_deadline\":\"08:00\"", "\"product_publication_deadline\":\"11:00\"")
+       .Replace("\"discount_baseline_is_anchor_price\":false",
+          "\"discount_baseline_is_anchor_price\":false,\"base_price_regulation_status\":\"enacted\",\"final_rulebooks_verified\":true");
+    var parsedEnacted=OfficialPluginDiscovery.Parse(System.Text.Encoding.UTF8.GetBytes(enactedLegal),endpoint);
+    Expect(parsedEnacted.Legal?.ArchiveMinDays==15 && parsedEnacted.Legal?.FinalRulebooksVerified==true,
+        "NN 132/2026 legal profile and 15-day retention parsed");
     var untrustedFragment=restJson.Replace("https://sidrena.example.hr/javni-cjenik",
         "https://sidrena.example.hr/javni-cjenik#secret");
     MustThrowType<InvalidDataException>(()=>OfficialPluginDiscovery.Parse(

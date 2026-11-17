@@ -62,6 +62,38 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 		return is_string( $path ) && '' !== $path && is_file( $path ) && is_readable( $path );
 	}
 
+
+	/**
+	 * Read-only discovery of confirmed official publication per outlet. Never
+	 * advertise an old live alias after the trader identity was changed.
+	 */
+	private function official_feeds_for( $outlet, $uploads, $history ) {
+		$settings = Brendigo_Sidrena_Cijena_Settings::instance();
+		$identifier = (string) $settings->get( 'trader_identifier', '' );
+		$id_kind = (string) $settings->get( 'trader_identifier_kind', 'oib' );
+		$record = isset( $history[ '' === $outlet ? '_webshop' : $outlet ] )
+			? $history[ '' === $outlet ? '_webshop' : $outlet ] : null;
+		$confirmed = is_array( $record ) &&
+			Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( $identifier, $id_kind ) &&
+			isset( $record['identifier'], $record['identifier_kind'] ) &&
+			$record['identifier'] === $identifier && $record['identifier_kind'] === $id_kind;
+		$ready_url = is_array( $uploads ) && empty( $uploads['error'] ) && ! empty( $uploads['baseurl'] );
+		$files = Brendigo_Sidrena_Cijena_Feed_Files::instance();
+		$out = array();
+		foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
+			$out[ $kind ] = array();
+			foreach ( array( 'csv', 'xml' ) as $format ) {
+				$path = $files->official_live_path( $kind, $format, $outlet );
+				$available = $confirmed && $ready_url && '' !== $path && is_file( $path ) && is_readable( $path );
+				$out[ $kind ][ $format ] = $available
+					? esc_url_raw( trailingslashit( $uploads['baseurl'] ) . 'sidrena-cijena/' . rawurlencode( basename( $path ) ) )
+					: '';
+				$out[ $kind ]['available_' . $format ] = $available;
+			}
+		}
+		return $out;
+	}
+
 	public function index() {
 		$export = Brendigo_Sidrena_Cijena_Export::instance();
 		$meta = $export->get_public_meta();
@@ -87,11 +119,19 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			'archive'      => esc_url_raw( $export->get_archive_url() ),
 			'type_archive' => esc_url_raw( rest_url( 'brendigo-bazna/v1/arhiva' ) ),
 			'combined'     => esc_url_raw( $export->get_public_url() ),
+			// Official NN 132/2026 exports are additive: old Android/Windows
+			// consumers keep the unchanged compatibility feed above.
+			'official_feeds' => array(),
+
 			'feeds'        => array(),
 			// Optional additive REST v1 endpoint (MJDD-compatible HTML-only services).
 			'on_request'  => esc_url_raw( rest_url( 'brendigo-bazna/v1/usluge-na-upit' ) ),
 			'outlets'      => array(),
 		);
+		$uploads = wp_upload_dir( null, false );
+		$official_history = get_option( 'bazna_official_publications', array() );
+		$official_history = is_array( $official_history ) ? $official_history : array();
+		$out['official_feeds'] = $this->official_feeds_for( '', $uploads, $official_history );
 		foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
 			$out['feeds'][ $kind ] = array( 'available_csv' => $this->feed_available( $kind ) );
 			foreach ( array( 'xml', 'csv' ) as $ext ) {
@@ -121,6 +161,7 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 						$entry['feeds'][ $kind ][ $ext ] = esc_url_raw( add_query_arg( 'oznaka', $code, rest_url( 'brendigo-bazna/v1/cjenici/' . $kind . '/' . $ext ) ) );
 					}
 				}
+				$entry['official_feeds'] = $this->official_feeds_for( $code, $uploads, $official_history );
 				$out['outlets'][] = $entry;
 			}
 		}

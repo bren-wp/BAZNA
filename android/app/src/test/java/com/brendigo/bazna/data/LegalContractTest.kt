@@ -12,6 +12,8 @@ class LegalContractTest {
         assertEquals("2025-05-02", LegalContract.LEGACY)
         assertEquals("2026-09-10", LegalContract.GENERAL)
         assertEquals("2026-09-26", LegalContract.UNIT_PRICE_EFFECTIVE)
+        assertEquals(15, LegalContract.ARCHIVE_DAYS)
+        assertEquals("11:00", LegalContract.PUBLICATION_DEADLINE)
     }
 
     @Test fun oldPluginIsSupportedWithoutFabricatedLegalStatus() {
@@ -74,7 +76,7 @@ class LegalContractTest {
             policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 16)),
         )
         assertEquals(
-            "published_decisions_effective",
+            "rules_effective",
             policy?.publishedDecisionPhaseOn(java.time.LocalDate.of(2026, 11, 17)),
         )
         assertThrows(IllegalArgumentException::class.java) {
@@ -82,6 +84,17 @@ class LegalContractTest {
         }
         assertThrows(IllegalArgumentException::class.java) {
             LegalContract.parseOptional(JSONObject(json.toString()).put("price_reduction_lookback_days", 5))
+        }
+        val enacted = JSONObject(json.toString())
+            .put("rules_revision", LegalContract.REVISION)
+            .put("base_price_regulation_status", "enacted")
+            .put("final_rulebooks_verified", true)
+            .put("archive_min_days", 15)
+            .put("product_publication_deadline", "11:00")
+        assertEquals(true, LegalContract.parseOptional(enacted)?.finalRulebooksVerified)
+        assertEquals(15, LegalContract.parseOptional(enacted)?.archiveMinDays)
+        assertThrows(IllegalArgumentException::class.java) {
+            LegalContract.parseOptional(JSONObject(enacted.toString()).put("rules_revision", "NN-101-2026"))
         }
         val invalidRevision = JSONObject(json.toString()).put("unit_price_rule_revision", "script:value")
         assertThrows(IllegalArgumentException::class.java) { LegalContract.parseOptional(invalidRevision) }

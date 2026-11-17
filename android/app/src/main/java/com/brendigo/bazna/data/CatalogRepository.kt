@@ -38,7 +38,25 @@ class CatalogRepository {
         if (selectedOutlet.isBlank() && index.allOutletsCsvReady == false) {
             warnings.add("Neki CSV cjenici poslovnica nisu javno objavljeni. Provjerite svaku poslovnicu u WordPressu.")
         }
-        if (index.legal == null) warnings.add("Povezana BAZNA platforma ne objavljuje pravni profil.")
+        if (index.legal?.rulesRevision == LegalContract.REVISION &&
+            index.legal.finalRulebooksVerified == true && selectedOutlet.isBlank()
+        ) {
+            val official = indexJson.optJSONObject("official_feeds")
+            for (type in listOf("proizvodi", "usluge")) {
+                val kind = official?.optJSONObject(type)
+                if (kind?.opt("available_csv") != true && kind?.opt("available_xml") != true) {
+                    warnings.add("Službeni CSV/XML cjenik za " + type +
+                        " nije potvrđen kao javno objavljen. Provjerite OIB, bazne cijene i objavu u CMS-u.")
+                }
+            }
+        }
+        if (index.legal == null) {
+            warnings.add("Povezana BAZNA platforma ne objavljuje pravni profil.")
+        } else if (index.legal.rulesRevision != LegalContract.REVISION ||
+            index.legal.finalRulebooksVerified != true
+        ) {
+            warnings.add("WordPress objavljuje zastarjeli pravni profil. Provjerite usklađenje s NN 132/2026 i službene CSV/XML cjenike.")
+        }
         fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
             if (ready == false) {
                 warnings.add("Cjenik za " + label + " još nije javno objavljen. Objavite ga u administraciji BAZNA.")

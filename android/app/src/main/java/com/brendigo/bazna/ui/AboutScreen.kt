@@ -230,13 +230,16 @@ fun AboutPage(
             }
         }
 
-        if (data.index.legal?.basePriceRegulationStatus == "draft_consultation") {
+        if (data.index.legal != null &&
+            (data.index.legal?.rulesRevision != com.brendigo.bazna.data.LegalContract.REVISION ||
+                data.index.legal?.finalRulebooksVerified != true)
+        ) {
             AboutSectionTitle("PRAVNI STATUS POVEZANE PLATFORME")
             AboutGroup {
                 AboutReadOnlyRow(
                     icon = Icons.Outlined.Info,
                     title = "Bazna cijena",
-                    value = "Objavljeni profil označava pravilnik kao nacrt. Provjerite konačni propis.",
+                    value = "Povezana platforma još ne potvrđuje važeći NN 132/2026 profil. Ažurirajte WordPress dodatak i provjerite službene cjenike.",
                 )
                 AboutDivider()
                 AboutReadOnlyRow(

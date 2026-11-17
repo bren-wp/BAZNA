@@ -135,6 +135,28 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 			)
 		);
 
+
+		woocommerce_wp_text_input(
+			array(
+				'id' => 'sidrena_neto_kolicina',
+				'name' => 'sidrena_neto_kolicina',
+				'label' => __( 'Neto količina (za službeni cjenik)', 'brendigo-sidrena-cijena' ),
+				'desc_tip' => true,
+				'description' => __( 'Unesite deklariranu neto količinu iz proizvoda, npr. 0,5; ne izvodi se automatski iz težine za dostavu.', 'brendigo-sidrena-cijena' ),
+				'value' => $meta->get_neto_kolicina( $product_id ),
+			)
+		);
+		woocommerce_wp_text_input(
+			array(
+				'id' => 'sidrena_ean_barkod',
+				'name' => 'sidrena_ean_barkod',
+				'label' => __( 'EAN barkod (8 ili 13 znamenaka)', 'brendigo-sidrena-cijena' ),
+				'desc_tip' => true,
+				'description' => __( 'Zasebni EAN u propisanom XML/CSV cjeniku. Vodeće nule se čuvaju.', 'brendigo-sidrena-cijena' ),
+				'value' => $meta->get_ean_barkod( $product_id ),
+			)
+		);
+
 		woocommerce_wp_text_input(
 			array(
 				'id'          => 'brendigo_sidrena_barcode',
@@ -251,6 +273,15 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 			<p class="form-row form-row-last">
 				<label><?php echo esc_html__( 'Cijena za jedinicu mjere', 'brendigo-sidrena-cijena' ) . ' (' . esc_html( get_woocommerce_currency_symbol() ) . ')'; ?></label>
 				<input type="text" class="short wc_input_price" name="sidrena_cijena_jedinice_mjere[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( wc_format_localized_price( $meta->get_jedinica_cijena( $id ) ) ); ?>" />
+			</p>
+
+			<p class="form-row form-row-first">
+				<label><?php echo esc_html__( 'Neto količina', 'brendigo-sidrena-cijena' ); ?></label>
+				<input type="text" class="short" name="sidrena_neto_kolicina[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $meta->get_neto_kolicina( $id ) ); ?>" />
+			</p>
+			<p class="form-row form-row-last">
+				<label><?php echo esc_html__( 'EAN barkod', 'brendigo-sidrena-cijena' ); ?></label>
+				<input type="text" class="short" name="sidrena_ean_barkod[<?php echo esc_attr( (string) $loop ); ?>]" value="<?php echo esc_attr( $meta->get_ean_barkod( $id ) ); ?>" />
 			</p>
 			<p class="form-row form-row-first">
 				<label><?php echo esc_html__( 'Barkod (EAN / GTIN)', 'brendigo-sidrena-cijena' ); ?></label>

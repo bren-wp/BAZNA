@@ -48,6 +48,16 @@ class Brendigo_Sidrena_Cijena_Fields {
 				'kind'   => 'price',
 			),
 			array(
+				'post' => 'sidrena_neto_kolicina',
+				'setter' => 'set_neto_kolicina',
+				'kind' => 'text',
+			),
+			array(
+				'post' => 'sidrena_ean_barkod',
+				'setter' => 'set_ean_barkod',
+				'kind' => 'text',
+			),
+			array(
 				'post'   => 'brendigo_sidrena_barcode',
 				'setter' => 'set_barcode',
 				'kind'   => 'text',

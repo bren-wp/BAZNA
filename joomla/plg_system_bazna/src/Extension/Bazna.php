@@ -66,10 +66,21 @@ final class Bazna extends CMSPlugin implements SubscriberInterface
                 ));
             } elseif ($path === '/bazna/v1/arhiva') {
                 $this->json($core->archives());
-            } elseif (preg_match('#^/bazna/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $path, $m)) {
+            } elseif (preg_match('#^/bazna/v1/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $path, $m)) {
+                $outlet = (string) $app->input->getString('oznaka', '');
+                $filename = $core->officialFilename($m[1], $m[2], $outlet);
+                header('Content-Type: ' . ($m[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+                header('Content-Disposition: inline; filename="' . $filename . '"');
+                echo $m[2] === 'csv' ? $core->officialCsv($m[1], $outlet) : $core->officialXml($m[1], $outlet);
+                        } elseif (preg_match('#^/bazna/v1/cjenici/(proizvodi|usluge)/(csv|xml)$#D', $path, $m)) {
                 $outlet = (string) $app->input->getString('oznaka', '');
                 header('Content-Type: ' . ($m[2] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
                 echo $m[2] === 'csv' ? $core->csv($m[1], $outlet) : $core->xml($m[1], $outlet);
+            } elseif (preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $path, $m)) {
+                $archive = $core->officialArchive($m[1], $m[2], $m[3], (string) $app->input->getString('oznaka', ''));
+                header('Content-Type: ' . ($m[3] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+                header('Content-Disposition: inline; filename="' . $archive['filename'] . '"');
+                echo $archive['body'];
             } elseif (preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $m)) {
                 header('Content-Type: text/csv; charset=utf-8');
                 echo $core->archiveCsv($m[1], $m[2], (string) $app->input->getString('oznaka', ''));

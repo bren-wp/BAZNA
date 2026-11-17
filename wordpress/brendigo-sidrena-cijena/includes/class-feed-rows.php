@@ -313,6 +313,12 @@ class Brendigo_Sidrena_Cijena_Feed_Rows {
 			$image_url = $image_id > 0 ? wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' ) : false;
 			$row['slika_url'] = is_string( $image_url ) ? esc_url_raw( $image_url ) : '';
 			$row['barkod']                 = $this->product_barcode( $product );
+			$ean = $meta->get_ean_barkod( $product->get_id() );
+			if ( '' === $ean && Brendigo_Sidrena_Cijena_Official_Feed::valid_ean( $row['barkod'] ) ) {
+				$ean = $row['barkod']; // Verified original EAN; no fabricated identifier.
+			}
+			$row['ean_barkod'] = $ean;
+			$row['neto_kolicina']            = $meta->get_neto_kolicina( $product->get_id() );
 			$row['marka']                  = Brendigo_Sidrena_Cijena_Settings::instance()->product_marka( $product );
 			$row['dostupnost']             = $this->product_dostupnost( $product );
 			$row['jedinica_mjere']         = $meta->get_jedinica( $product->get_id() );

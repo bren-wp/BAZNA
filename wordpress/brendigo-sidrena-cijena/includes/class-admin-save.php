@@ -200,6 +200,8 @@ class Brendigo_Sidrena_Cijena_Admin_Save {
 			'email_alerts'    => isset( $_POST['sidrena_cijena_email_alerts'] ) ? 'yes' : 'no',
 			'alert_email'     => isset( $_POST['sidrena_cijena_alert_email'] ) ? sanitize_email( wp_unslash( $_POST['sidrena_cijena_alert_email'] ) ) : '',
 			'export_format'    => isset( $_POST['sidrena_cijena_public_format'] ) ? sanitize_key( wp_unslash( $_POST['sidrena_cijena_public_format'] ) ) : 'xml',
+			'trader_identifier' => isset( $_POST['sidrena_cijena_trader_identifier'] ) ? sanitize_text_field( wp_unslash( $_POST['sidrena_cijena_trader_identifier'] ) ) : '',
+			'trader_identifier_kind' => isset( $_POST['sidrena_cijena_trader_identifier_kind'] ) ? sanitize_key( wp_unslash( $_POST['sidrena_cijena_trader_identifier_kind'] ) ) : 'oib',
 		);
 
 		$settings->save( $payload );

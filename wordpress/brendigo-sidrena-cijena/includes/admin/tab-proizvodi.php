@@ -207,12 +207,14 @@ defined( 'ABSPATH' ) || exit;
 								<th><?php echo esc_html__( 'Vrsta', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'SKU', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Barkod', 'brendigo-sidrena-cijena' ); ?></th>
+								<th><?php echo esc_html__( 'EAN', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Marka', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'URL', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Redovna cijena', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Akcijska cijena', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Poseban oblik', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Jedinica mjere', 'brendigo-sidrena-cijena' ); ?></th>
+								<th><?php echo esc_html__( 'Neto količina', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Cijena za jedinicu', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Datum sidrene', 'brendigo-sidrena-cijena' ); ?></th>
