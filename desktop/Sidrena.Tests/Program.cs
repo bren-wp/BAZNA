@@ -202,13 +202,14 @@ try
     // Catalog editing must never alter the historical reference or current price.
     using (var editable = new PriceStore(file))
     {
+        var auditBeforeDetailChange=editable.ListMetadataChanges(id).Count;
         editable.UpdateItemDetails(id, "Mlijeko punomasno", "SKU-EDIT", "3851234567890", "l", "Ispravak naziva");
         var edited = editable.ListItems().Single(x => x.Id == id);
         Expect(edited.Name == "Mlijeko punomasno" && edited.Sku == "SKU-EDIT", "Metadata changes persisted");
         Expect(edited.CurrentCents == 249 && edited.AnchorCents == 210, "Edit preserves price and anchor");
-        Expect(editable.ListMetadataChanges(id).Count == 1, "Metadata has its own audit");
+        Expect(editable.ListMetadataChanges(id).Count == auditBeforeDetailChange+1, "Metadata and legal evidence have separate audit entries");
         editable.UpdateItemDetails(id, "Mlijeko punomasno", "SKU-EDIT", "3851234567890", "l", "Bez promjene");
-        Expect(editable.ListMetadataChanges(id).Count == 1, "Unchanged metadata does not create audit");
+        Expect(editable.ListMetadataChanges(id).Count == auditBeforeDetailChange+1, "Unchanged metadata does not create audit");
         MustThrow(() => editable.UpdateItemDetails(id, "", "sku", "", "", "Invalid name"));
         Expect(editable.ListItems().Single(x => x.Id == id).Name == "Mlijeko punomasno", "Invalid edit rolled back");
         editable.AddItem("Drugi proizvod", "Proizvod", "OTHER", "", "kom", 1m, null, null, null);
