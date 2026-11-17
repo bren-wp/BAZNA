@@ -653,6 +653,18 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			$kind = isset( $row['vrsta'] ) && 'usluga' === $row['vrsta'] ? 'usluge' : 'proizvodi';
 			$types[ $kind ][] = $row;
 		}
+		// Both the compatibility feed and the official feed must refuse
+		// unverified base prices. Existing stored rows remain editable;
+		// the last valid public snapshot is not overwritten on failure.
+		foreach ( $types as $kind => $type_rows ) {
+			$issues = Brendigo_Sidrena_Cijena_Official_Feed::missing_required_data( $type_rows, $kind );
+			if ( $issues ) {
+				return new WP_Error(
+					'bazna_documentary_evidence_required',
+					__( 'Objava blokirana: provjerite povijesni izvor, referentnu skupinu, metodu i obvezna polja svih stavki.', 'brendigo-sidrena-cijena' )
+				);
+			}
+		}
 		foreach ( $types as $kind => $type_rows ) {
 			foreach ( array( 'xml', 'csv' ) as $extension ) {
 				$path = $this->get_type_public_path( $kind, $extension, $oznaka );

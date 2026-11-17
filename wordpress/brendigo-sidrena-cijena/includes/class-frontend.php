@@ -837,7 +837,11 @@ class Brendigo_Sidrena_Cijena_Frontend {
 	private function product_display_amount( $product, $prikaz ) {
 		if ( 'sidrena' === $prikaz ) {
 			$meta = Brendigo_Sidrena_Cijena_Product_Meta::instance();
-			$raw  = $meta->get_price( $meta->display_id( $product->get_id() ) );
+			$stored_id = $meta->display_id( $product->get_id() );
+			if ( ! $meta->is_historical_verified( $stored_id ) ) {
+				return null;
+			}
+			$raw  = $meta->get_price( $stored_id );
 			if ( '' === $raw ) {
 				return null;
 			}
@@ -885,7 +889,12 @@ class Brendigo_Sidrena_Cijena_Frontend {
 	 * @return string
 	 */
 	public function get_html_for_catalog_row( $row ) {
-		if ( ! is_array( $row ) || '' === (string) $row['sidrena_cijena'] ) {
+		if ( ! is_array( $row ) || '' === (string) $row['sidrena_cijena'] ||
+			'yes' !== ( isset( $row['historical_verified'] ) ? $row['historical_verified'] : '' ) ||
+			'' !== Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue(
+				$row, isset( $row['vrsta'] ) && 'usluga' === $row['vrsta'] ? 'usluge' : 'proizvodi'
+			) ) {
+			// Never render a supposed base price without historical evidence.
 			return '';
 		}
 
@@ -961,7 +970,7 @@ class Brendigo_Sidrena_Cijena_Frontend {
 
 		$stored_id = $meta->display_id( $product->get_id() );
 		$price     = $meta->get_price( $stored_id );
-		if ( '' === $price ) {
+		if ( '' === $price || ! $meta->is_historical_verified( $stored_id ) ) {
 			return '';
 		}
 
@@ -996,6 +1005,11 @@ class Brendigo_Sidrena_Cijena_Frontend {
 			$value     = $meta->get_price( $stored_id );
 			if ( '' === $value ) {
 				continue;
+			}
+			if ( ! $meta->is_historical_verified( $stored_id ) ) {
+				// A variable parent cannot advertise a range omitting one
+				// unverified purchasable variation.
+				return '';
 			}
 
 			$display = $meta->get_price_to_display( $variation, $value );
