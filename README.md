@@ -2,7 +2,7 @@
 
 ### Bazne cijene
 
-![BAZNA — Bazne cijene by Brendigo](branding/bazna-banner.png)
+![BAZNA — Bazne cijene, jedna evidencija za više platformi](branding/bazna-readme-hero.svg)
 
 <div align="center">
 
@@ -23,11 +23,11 @@ BAZNA povezuje proizvode, usluge, poslovnice, provjerene bazne cijene, javne cje
 ## Platforme i vizualni identitet
 
 <p align="center">
-  <img src="branding/bazna-icon.png" alt="BAZNA — izvorna ikona aplikacije" width="104">
-  <img src="wordpress/brendigo-sidrena-cijena/assets/banner-772x250.png" alt="BAZNA WordPress — novi javni banner" width="340">
+  <img src="branding/bazna-mark.svg" alt="BAZNA — vektorska ikona" width="104">
+  <img src="desktop/branding/bazna-banner.svg" alt="BAZNA Desktop — vektorski banner" width="340">
 </p>
 
-**BAZNA za svaku platformu** — glavna WordPress administracija, Android javni pregled, Windows lokalna obrada te integracijski sloj za CMS i web trgovine. Novi banneri i ikone prikazuju isključivo naziv BAZNA. Ilustrativni brending nije snimka aplikacije; stvarne snimke zaslona dostupne su kao artefakti automatiziranih vizualnih provjera.
+**BAZNA za svaku platformu** — WordPress administracija, Android javni pregled, Windows lokalna obrada te integracijski sloj za CMS i web trgovine. Vektorski logotip i nova promocijska grafika koriste identitet BAZNA bez starih marketinških natpisa. Ilustrirani zaslon i primjerne cijene nisu snimke stvarne aplikacije; stvarni emulator/desktop screenshotovi dostupni su u GitHub Actions artefaktima.
 
 [<img src="https://img.shields.io/badge/WordPress-WooCommerce-21759B?logo=wordpress&logoColor=white" alt="WordPress">](wordpress/brendigo-sidrena-cijena)
 [<img src="https://img.shields.io/badge/Android-Kotlin-2E7D32?logo=android&logoColor=white" alt="Android">](android)
@@ -52,9 +52,9 @@ BAZNA povezuje proizvode, usluge, poslovnice, provjerene bazne cijene, javne cje
 
 ## Sve cijene na jednom mjestu
 
-**BAZNA** pomaže poslovanju javno prikazivati cijene i jednostavno upravljati njihovim promjenama: od jedne poslovnice do kataloga s tisućama proizvoda i usluga. Cjenik nastaje iz provjerene evidencije, objavljuje se izričitom radnjom i zadržava povijest prethodnih objava.
+**BAZNA** pomaže poslovanju javno prikazivati cijene i jednostavno upravljati njihovim promjenama: od jedne poslovnice do kataloga s tisućama proizvoda i usluga. Cjenik nastaje iz provjerene evidencije, a objavljuje se ručno ili kroz nadziranu automatizaciju (PHP/Joomla/Drupal); svaka izmjena mora očuvati prethodnu javnu verziju.
 
-<img src="branding/bazna-icon.png" width="80" alt="BAZNA — ikona dodatka" />
+<img src="branding/bazna-mark.svg" width="80" alt="BAZNA — ikona dodatka" />
 
 - **Proizvodi i usluge** — aktualne cijene, jedinice mjere, SKU, barkod i dostupnost.
 - **Bazne cijene** — povijesni iznos i datum povezani s izvornom evidencijom.
@@ -107,6 +107,12 @@ i ne pristupa korisničkim računima u WordPressu.
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.5** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
 | **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.22** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
 | **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.8** | Windows CI i stvarne provjere sučelja |
+
+## Automatizirana objava i praćenje rokova
+
+Web PHP, Joomla i Drupal koriste zajednički PHP Core za objavljivanje samo provjerenih cjenika. Postavite `BAZNA_AUTO_PUBLISH_VERIFIED=1` za automatsku objavu nakon spremanja u administraciji. Na shared hostingu postavite **poslužiteljski cron svake minute** koji pokreće `web/bin/publish.php` s konfiguriranim `BAZNA_PRIVATE_DIR`, `BAZNA_PUBLIC_URL` i OIB-om odnosno matičnim brojem. Zadaci su idempotentni: bez promjene podataka nema ponovnog izdavanja niti nove arhive. Neprovjerena bazna cijena ili nepotpuni podaci poslovnice blokiraju automatsku objavu. Bez pouzdanog schedulera nije moguće zajamčiti pravodobnu objavu.
+
+WordPress koristi vlastiti mehanizam objave i mora imati provjeren raspored na hostingu. **Android ostaje samo čitač**, a Windows je lokalni alat; oba prikazuju upozorenje o zastarjelom pravnom profilu povezanog izvora.
 
 ## Jedinstveni podaci na svim platformama
 
@@ -204,7 +210,7 @@ Prolazak responzivnih i funkcionalnih testova **nije dokaz 0 % vizualnog odstupa
 
 BAZNA čuva razliku između **aktualne cijene**, **povijesne bazne cijene** i **najniže cijene u 30 dana prije sniženja**. Ne izvodi baznu cijenu iz današnjeg iznosa ni Shopifyjeve usporedne cijene. Povijesni iznos zahtijeva stvarni datum i potvrdu dokaza.
 
-Ugrađeni pravni profil priprema objavu za hrvatski regulatorni okvir i predviđeni početak proširene primjene **17. studenoga 2026.** Konačne propise i evidenciju treba zasebno provjeriti; softver ne predstavlja pravni certifikat trgovčevih cijena.
+Od **17. studenoga 2026.** važe pravilnici NN 132/2026 br. 1583 i 1584. Pravni profil bilježi objavljene propise; pojedini trgovac mora dodatno dokazati povijesne iznose, ispravno primijeniti iznimke i testirati točnost svojih javnih cjenika. Softver nije pravni certifikat.
 
 Zaštite uključuju HTTPS javno čitanje, administratorske CSRF/ACL kontrole, atomsku pohranu, zaštitu od zastarjelih izmjena i provjeru Shopify potpisanih zahtjeva. Sigurnosni audit u CI-ju nije zamjena za produkcijski penetracijski test.
 
