@@ -45,6 +45,11 @@ class Brendigo_Sidrena_Cijena_Automation {
     public static function instance() { return new self(); }
     public function mark_pending( $reason ) { $GLOBALS['sync_pending'] = $reason; }
 }
+class Brendigo_Sidrena_Cijena_Automation {
+    public static $pending = array();
+    public static function instance() { return new self(); }
+    public function mark_pending( $reason ) { self::$pending[] = $reason; }
+}
 class Brendigo_Sidrena_Cijena_Catalog {
     const OPTION_KEY = 'sidrena_cijena_catalog';
     public static function instance() { return new self(); }
@@ -119,7 +124,7 @@ sync_check( true === $sync::authorize(), 'Authenticated HTTPS administrator allo
 $read = $sync::read();
 sync_check( $read instanceof SyncResponse && $read->data['schema'] === 1 &&
     $read->data['mode'] === 'standalone_draft' && $read->data['rows'] === array(), 'Read current private draft' );
-sync_check( str_contains( $read->headers['Cache-Control'], 'no-store' ), 'Never cache sensitive draft or evidence' );
+sync_check( false !== strpos( $read->headers['Cache-Control'], 'no-store' ), 'Never cache sensitive draft or evidence' );
 $base = $read->data['revision'];
 sync_check( hash('sha256', '[]') === $base, 'Deterministic initial revision' );
 $create = array( 'expected_revision' => $base, 'operation' => 'upsert', 'id' => '',
@@ -134,6 +139,7 @@ sync_check( $created instanceof SyncResponse && $created->data['published'] === 
     count( $GLOBALS['sync_rows'] ) === 1 && $GLOBALS['sync_rows'][0]['historical_verified'] === '',
     'Creates private draft without documentary attestation or publication' );
 sync_check( '' === $GLOBALS['sync_lock'], 'Atomic write releases lock after success' );
+sync_check( Brendigo_Sidrena_Cijena_Automation::$pending === array( 'sync-draft' ), 'Remote draft edit is pending and never queued for public auto-release' );
 sync_check( ( $GLOBALS['sync_pending'] ?? '' ) === 'sync-draft', 'Draft write marks publication pending but never publishes' );
 
 $conflict = $sync::write( new SyncRequest( $create ) );
