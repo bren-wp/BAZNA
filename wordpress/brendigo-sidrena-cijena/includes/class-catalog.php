@@ -93,6 +93,12 @@ class Brendigo_Sidrena_Cijena_Catalog {
 		return isset( $this->cached_by_id[ $id ] ) ? $this->cached_by_id[ $id ] : null;
 	}
 
+	/** Refresh request cache before an authenticated revision-guarded write. */
+	public function refresh_for_sync() {
+		$this->cached_all = null;
+		$this->cached_by_id = null;
+	}
+
 	/**
 	 * All stored rows.
 	 *
