@@ -239,7 +239,7 @@ fun HomePage(
         if (!error.isNullOrBlank()) {
             Text(error, color = Color(0xFFFFC997), fontSize = 13.sp)
         }
-        data.warnings.take(3).forEach { warning ->
+        data.warnings.take(1).forEach { warning ->
             Text(warning, color = Color(0xFFFFC997), fontSize = 13.sp)
         }
 
@@ -285,10 +285,7 @@ fun HomePage(
                             color = TextMuted, fontSize = 13.sp,
                         )
                         Text(
-                            "Najniža cijena u prethodnih 30 dana zasebna je od bazne cijene. " +
-                                if (legal.basePriceRegulationStatus == "consultation_closed_pending_final_text")
-                                    "Savjetovanje je završilo 13. 11. 2026.; konačni tekst pravilnika nije potvrđen."
-                                else "Nacrti pravilnika nisu automatski potvrđeni propisi.",
+                            "Najniža cijena u 30 dana i bazna cijena prikazuju se zasebno.",
                             color = TextMuted,
                             fontSize = 12.sp,
                         )
