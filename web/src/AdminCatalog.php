@@ -67,6 +67,7 @@ final class AdminCatalog
                 self::input('code', 'Oznaka poslovnice', $row, 'text', true, $editing) .
                 self::input('name', 'Naziv poslovnice', $row, 'text', true) .
                 self::input('address', 'Adresa poslovnice', $row) .
+                self::input('type', 'Vrsta prodajnog mjesta (službeni cjenik)', $row) .
                 '</div>';
         }
         if ($collection === 'on_request') {
