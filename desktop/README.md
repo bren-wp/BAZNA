@@ -1,12 +1,14 @@
 # BAZNA Desktop za Windows
 
-![BAZNA](branding/bazna-banner.svg)
+![BAZNA Desktop — službeni vizualni identitet](branding/bazna-banner.svg)
+
+<img src="../branding/bazna-icon.png" alt="BAZNA ikona" width="72" />
 
 **Vaše cijene. Vaša evidencija. Vaša kontrola.**
 
-BAZNA Desktop **0.10.9** je Windows aplikacija Brendigo za upravljanje proizvodima, uslugama, trenutačnim i baznim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
+BAZNA Desktop **0.10.10** je Windows aplikacija Brendigo za upravljanje proizvodima, uslugama, trenutačnim i baznim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
 
-## Funkcionalnosti
+## Sve cijene pod vašom kontrolom
 
 - Upravljanje lokalnim katalozima i uslugama uz brzu pretragu.
 - Promjene cijena s evidencijom vremena i razloga.
@@ -28,7 +30,7 @@ Obje verzije koriste isti direktorij korisničkih podataka u sustavu Windows. Pr
 
 ## WordPress povezivanje
 
-Windows pregled koristi **javne objave** WordPress dodatka **Brendigo Sidrena Cijena 1.5.20**. Lokalni Windows katalog ne objavljuje se automatski na WordPressu.
+Windows pregled koristi **javne objave** WordPress dodatka **BAZNA 1.5.24**. Lokalni Windows katalog ne objavljuje se automatski na WordPressu.
 
 ## Upute i dokumentacija
 
@@ -38,7 +40,7 @@ Windows pregled koristi **javne objave** WordPress dodatka **Brendigo Sidrena Ci
 
 ## Sinkronizacija javnih pravnih pravila
 
-Windows 0.10.9 prepoznaje `plugin_version` i javni `legal` profil WordPress dodatka 1.5.23. Datumi primjene i arhiviranja preuzimaju se iz istog ugovora kao u Android aplikaciji. Lokalni katalog ostaje odvojena baza i ne mijenja WordPress bez izričite autorizirane integracije.
+Windows 0.10.10 prepoznaje `plugin_version` i javni `legal` profil WordPress dodatka 1.5.23. Datumi primjene i arhiviranja preuzimaju se iz istog ugovora kao u Android aplikaciji. Lokalni katalog ostaje odvojena baza i ne mijenja WordPress bez izričite autorizirane integracije.
 
 [Pravni okvir i interoperabilnost](../docs/LEGAL-2026-INTEROPERABILITY.md) · [Security i dead-code audit](../docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 
@@ -51,4 +53,4 @@ U izborniku **Cjenici** opcija **CSV za uvoz u WordPress** izrađuje datoteku s 
 
 ### Pravna dopuna 29. 10. 2026.
 
-Profil WordPress 1.5.20 razlikuje pravilo najniže cijene 30 dana prije sniženja od sidrene cijene; NN 105/2026 na snazi je od 26. 9. 2026. Windows samo čita javne podatke, dok lokalne nacrte prenosi na WordPress uz ručnu potvrdu, bez automatske administrativne sinkronizacije. Detalji u `docs/LEGAL-REVIEW-2026-10-29.md` u korijenu repozitorija.
+Profil WordPress 1.5.24 razlikuje pravilo najniže cijene 30 dana prije sniženja od sidrene cijene; NN 105/2026 na snazi je od 26. 9. 2026. Windows samo čita javne podatke, dok lokalne nacrte prenosi na WordPress uz ručnu potvrdu, bez automatske administrativne sinkronizacije. Detalji u `docs/LEGAL-REVIEW-2026-10-29.md` u korijenu repozitorija.
