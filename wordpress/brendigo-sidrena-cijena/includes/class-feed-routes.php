@@ -560,7 +560,14 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 			wp_register_style( $style_handle, $style_url, array(), BRENDIGO_SIDRENA_CIJENA_VERSION );
 			wp_print_styles( $style_handle );
 		}
-		echo '</head><body><main>';
+		// The same validated theme and accent apply to standalone public routes
+		// and shortcode embeds. The legal CSV/XML payload is unchanged.
+		$appearance_handle = 'bazna-public-appearance';
+		if ( ! wp_style_is( $appearance_handle, 'registered' ) ) {
+			wp_register_style( $appearance_handle, BRENDIGO_SIDRENA_CIJENA_URL . 'assets/css/public-appearance.css', array(), BRENDIGO_SIDRENA_CIJENA_VERSION );
+		}
+		wp_print_styles( $appearance_handle );
+		echo '</head><body class="' . esc_attr( Brendigo_Sidrena_Cijena_Settings::instance()->public_appearance_classes() ) . '"><main>';
 	}
 
 	/**
