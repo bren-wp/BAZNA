@@ -1,0 +1,6 @@
+bazna.admin:
+  title: 'BAZNA — Bazne cijene'
+  description: 'Upravljanje provjerenim baznim cijenama i javnom objavom'
+  route_name: bazna.admin
+  parent: system.admin_config_services
+  weight: 10
