@@ -1,7 +1,6 @@
 # BAZNA
 
-<div align="center">
-  <img src="branding/bazna-icon.png" alt="BAZNA logotip" width="104" />
+<p align="center"><img src="branding/bazna-icon.png" alt="BAZNA logotip" width="104" /></p>
 
 ### Bazne cijene · Javni cjenici · Arhiva
 
@@ -9,11 +8,9 @@
 
 Upravljajte proizvodima i uslugama, dokumentirajte povijesne bazne cijene i objavite pregledne cjenike u svojem digitalnom poslovanju — bez dodatnog korisničkog računa za BAZNA sustav.
 
-<img src="branding/bazna-banner.png" alt="BAZNA — vizualni identitet za upravljanje cijenama" width="920" />
+<p align="center"><img src="branding/bazna-banner.png" alt="BAZNA — vizualni identitet za upravljanje cijenama" width="920" /></p>
 
 [**Preuzmite BAZNA**](https://github.com/bren-wp/BAZNA/releases) · [**WordPress dodatak**](wordpress/brendigo-sidrena-cijena) · [**Vodič za instalaciju**](#instalacija-po-platformama) · [**Javni cjenici**](#javni-cjenici-i-arhiva-na-vlastitoj-stranici)
-
-</div>
 
 ---
 
@@ -223,7 +220,7 @@ Zaštite uključuju HTTPS javno čitanje, administratorske CSRF/ACL kontrole, at
 
 ## Dokumentacija
 
-[Arhitektura i kompatibilnost](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Android i WordPress](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md) · [Vizualni standard](docs/PIXEL-PERFECT-QA.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
+[Arhitektura i kompatibilnost](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Android i WordPress](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md) · [Vizualni standard](docs/PIXEL-PERFECT-QA.md) · [Sigurnosna i dead-code revizija 1.5.24](docs/BAZNA-SECURITY-DEADCODE-1.5.24.md)
 
 ---
 
