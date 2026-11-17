@@ -758,7 +758,7 @@ class Brendigo_Sidrena_Cijena_Archive {
 			}
 			// Permit letters, digits, hyphens and underscores in the outlet part
 			// but do not expose arbitrary uploads or private compatibility files.
-			if ( ! preg_match( '/^([0-9]{8,11})_([\\p{L}\\p{N}._-]+)_(ROBA|USLUGE)_([0-9]+)_([0-9]{8})_([0-9]{4})\\.(csv|xml)$/uD', $name, $parts ) ||
+			if ( ! preg_match( '/^([0-9]{8,11})_([\\p{L}\\p{N} ._-]+)_(ROBA|USLUGE)_([0-9]+)_([0-9]{8})_([0-9]{4})\\.(csv|xml)$/uD', $name, $parts ) ||
 				$parts[1] !== $identity ) {
 				continue;
 			}
