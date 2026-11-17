@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        EditionLabel.Text="BAZNA Desktop "+GetDesktopVersion()+" · Brendigo LTD";
+        EditionLabel.Text="BAZNA Desktop "+GetDesktopVersion()+" · Brendigo";
         ConfigureNavigationIcons();
         var workArea=SystemParameters.WorkArea;
         var initialSize=ResponsiveLayoutPolicy.Initial(workArea.Width,workArea.Height);
@@ -611,7 +611,7 @@ public partial class MainWindow : Window
     {
         var outer=U.Vertical();
         outer.Children.Add(U.Card("WordPress i vaše poslovnice",
-            U.Text("BAZNA WordPress 1.5.11",18,true),
+            U.Text("BAZNA WordPress — povezivanje",18,true),
             U.Muted("Učitajte javne cjenike i povijest objava povezane web-stranice.")));
 
         var site=U.Box("https://primjer.hr/",420);
@@ -826,7 +826,7 @@ public partial class MainWindow : Window
         outer.Children.Add(U.Card("Informacije o izdanju",
             U.Text("BAZNA Desktop "+GetDesktopVersion(),18,true),
             U.Muted("Windows 10/11 · Brendigo · Bez aktivacijskog ključa"),
-            U.Notice("WordPress BAZNA 1.5.20 dijeli javni pravni profil s Androidom i Windowsom."),
+            U.Notice("WordPress BAZNA 1.5.22 podržava pravni profil NN 132/2026; bazne cijene zahtijevaju provjeru izvora."),
             U.Action("Preuzmi najnoviju Windows aplikaciju",()=>
                 OpenUrl("https://github.com/bren-wp/BAZNA/releases"),true),
             U.Action("Informacije o programu",()=>OpenUrl("https://brendigo.com/"))));
