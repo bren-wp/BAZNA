@@ -25,12 +25,12 @@ data class LegalContract(
     val finalRulebooksVerified: Boolean? = null,
 ) {
     /**
-     * The publication decisions' scheduled application date, NOT evidence
-     * that the draft rulebooks were enacted or a merchant is compliant.
+     * The enacted rulebooks' application date, NOT evidence that a merchant's
+     * individual historical prices have been audited.
      */
     fun publishedDecisionPhaseOn(localDate: LocalDate): String =
         if (localDate.isBefore(LocalDate.parse(effectiveFrom))) "preparation"
-        else "published_decisions_effective"
+        else "rules_effective"
 
     companion object {
         const val REVISION = "NN-132-2026-1583-1584"
