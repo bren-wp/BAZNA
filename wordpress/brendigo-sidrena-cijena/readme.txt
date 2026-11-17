@@ -4,7 +4,7 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.24
+Stable tag: 1.5.25
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 
 == Description ==
 
-**Svi alati bez aktivacije:** BAZNA 1.5.24 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
+**Svi alati bez aktivacije:** BAZNA 1.5.25 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
 
 
 **BAZNA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
@@ -59,6 +59,14 @@ New installations default to a daily publication time of 07:00 in the WordPress 
 Reference prices and dates are entered or imported by the site administrator. The plugin does not infer historical prices.
 
 Documentation: https://brendigo.com/
+
+= Privacy and connected applications =
+
+* The plugin does not include tracking, advertising or a license activation service. It does not transmit catalog data to Brendigo servers.
+* Published HTML/CSV/XML price lists and the public read-only REST API are intentionally accessible without login. Do not put private documents in fields designated for public output.
+* Administrator activity and observed price changes may be recorded locally as audit/history data; configured WordPress mail services may deliver publication alerts.
+* Optional Windows editing of a **standalone** BAZNA draft requires HTTPS, an authorized WordPress user and a separate WordPress Application Password. The client supplies credentials per operation; the plugin does not require the account's main password. These private routes cannot edit WooCommerce prices or directly publish CSV/XML files.
+* The Android companion app reads only already published prices from the site URL supplied by its user. HTTPS requests reveal ordinary network metadata, such as an IP address, to the selected site's server.
 
 == Installation ==
 
@@ -179,6 +187,11 @@ Adds observed price history, publication alerts, separate product/service feeds,
 Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf placeholders that could append internal text to publication, pending-change, and pagination labels.
 
 == Changelog ==
+
+= 1.5.25 =
+* Keep the existing WordPress.org plugin identity, WooCommerce data and public v1 API stable; synchronize public Android prices through HTTPS without requiring mobile administrator access.
+* Make the administrative standalone-draft sync contract explicit and version-safe. Only authorized Windows sessions may change private drafts; actual publication remains a separate administrator action.
+* Clarify privacy and connected-client behavior; improve concise WordPress settings guidance and extend release regression checks.
 
 = 1.5.24 =
 * Legal publication hardening: 15-day archive holds for official filenames containing spaces or Croatian characters; secure archive lookup rejects encoded path separators.
