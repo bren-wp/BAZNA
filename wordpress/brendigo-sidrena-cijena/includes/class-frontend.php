@@ -50,6 +50,9 @@ class Brendigo_Sidrena_Cijena_Frontend {
 		add_shortcode( 'sidrena-arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'bazna_arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'bazna-arhiva', array( $this, 'arhiva_shortcode' ) );
+		add_shortcode( 'bazna_objava', array( $this, 'bazna_publication_shortcode' ) );
+		add_shortcode( 'bazna-objava', array( $this, 'bazna_publication_shortcode' ) );
+		add_shortcode( 'bazna_datoteke', array( $this, 'bazna_official_files_shortcode' ) );
 		add_shortcode( 'sidrena_arhiva', array( $this, 'arhiva_shortcode' ) );
 		add_shortcode( 'brendigo-sidrena-arhiva', array( $this, 'arhiva_shortcode' ) );
 
@@ -430,6 +433,120 @@ class Brendigo_Sidrena_Cijena_Frontend {
 
 
 	/**
+	 * Legal files embed: links ONLY to confirmed, existing official CSV/XML
+	 * publication URLs. Never present compatibility feeds or drafts as official.
+	 * [bazna_datoteke oznaka="RI-01" vrsta="proizvodi"]
+	 *
+	 * @param array<string,mixed> $atts Shortcode attributes.
+	 * @return string Safe public HTML.
+	 */
+	public function bazna_official_files_shortcode( $atts ) {
+		$atts = shortcode_atts( array( 'oznaka' => '', 'vrsta' => 'sve' ), $atts, 'bazna_datoteke' );
+		$settings = Brendigo_Sidrena_Cijena_Settings::instance();
+		$code = $settings->normalize_oznaka( (string) $atts['oznaka'] );
+		$kind = sanitize_key( (string) $atts['vrsta'] );
+		if ( ! in_array( $kind, array( 'sve', 'proizvodi', 'usluge' ), true ) ) {
+			$kind = 'sve';
+		}
+		$this->enqueue_public_appearance_style();
+		return '<div class="' . esc_attr( $settings->public_appearance_classes() ) . ' bazna-files-only">'
+			. $this->bazna_official_files_html( $code, $kind ) . '</div>';
+	}
+
+	/** The server-generated discovery is the only source of official file links. */
+	private function bazna_official_files_html( $code, $kind ) {
+		if ( '' !== $code && ! Brendigo_Sidrena_Cijena_Poslovnice::instance()->get_by_oznaka( $code ) ) {
+			return '<p class="bazna-public-notice">' . esc_html__( 'Odabrano prodajno mjesto nije pronađeno.', 'brendigo-sidrena-cijena' ) . '</p>';
+		}
+		$response = Brendigo_Sidrena_Cijena_Public_API::instance()->index();
+		$data = is_object( $response ) && method_exists( $response, 'get_data' ) ? $response->get_data() : array();
+		if ( ! is_array( $data ) ) {
+			return '<p class="bazna-public-notice">' . esc_html__( 'Status javnih datoteka trenutačno nije dostupan.', 'brendigo-sidrena-cijena' ) . '</p>';
+		}
+		$feeds = isset( $data['official_feeds'] ) && is_array( $data['official_feeds'] ) ? $data['official_feeds'] : array();
+		if ( '' !== $code ) {
+			$feeds = array();
+			foreach ( $data['outlets'] ?? array() as $outlet ) {
+				if ( is_array( $outlet ) && isset( $outlet['code'] ) && $outlet['code'] === $code ) {
+					$feeds = isset( $outlet['official_feeds'] ) && is_array( $outlet['official_feeds'] ) ? $outlet['official_feeds'] : array();
+					break;
+				}
+			}
+		}
+		$labels = array(
+			'proizvodi' => __( 'Cjenik robe', 'brendigo-sidrena-cijena' ),
+			'usluge'    => __( 'Cjenik usluga', 'brendigo-sidrena-cijena' ),
+		);
+		$links = '';
+		foreach ( $labels as $type => $label ) {
+			if ( 'sve' !== $kind && $kind !== $type ) {
+				continue;
+			}
+			foreach ( array( 'csv', 'xml' ) as $format ) {
+				$url = isset( $feeds[ $type ][ $format ] ) && is_string( $feeds[ $type ][ $format ] ) ? $feeds[ $type ][ $format ] : '';
+				if ( '' === $url ) {
+					continue;
+				}
+				$links .= '<a class="bazna-file-link" href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">'
+					. esc_html( $label . ' · ' . strtoupper( $format ) ) . '</a>';
+			}
+		}
+		if ( '' === $links ) {
+			return '<p class="bazna-public-notice">' . esc_html__( 'Službene CSV/XML datoteke još nisu potvrđeno objavljene. Dostupnost provjerite u BAZNA administraciji.', 'brendigo-sidrena-cijena' ) . '</p>';
+		}
+		$pending = ! empty( $data['publication']['pending_changes'] );
+		$html = '<nav class="bazna-file-links" aria-label="' . esc_attr__( 'Javni strojno čitljivi cjenici', 'brendigo-sidrena-cijena' ) . '">' . $links . '</nav>';
+		if ( $pending ) {
+			$html .= '<p class="bazna-public-notice" role="status">' . esc_html__( 'Promjene cijena čekaju ponovnu objavu. Poveznice trenutačno vode na posljednju objavljenu verziju.', 'brendigo-sidrena-cijena' ) . '</p>';
+		}
+		return $html;
+	}
+
+	/**
+	 * Combined responsive legal publication view on any WP page:
+	 * [bazna_objava] or [bazna_objava vrsta="usluge" oznaka="RI-01" arhiva="da"].
+	 * Official CSV/XML remain separately public even when this HTML is embedded.
+	 */
+	public function bazna_publication_shortcode( $atts ) {
+		$atts = shortcode_atts( array( 'oznaka' => '', 'vrsta' => 'sve', 'arhiva' => 'da' ), $atts, 'bazna_objava' );
+		$settings = Brendigo_Sidrena_Cijena_Settings::instance();
+		$code = $settings->normalize_oznaka( (string) $atts['oznaka'] );
+		$kind = sanitize_key( (string) $atts['vrsta'] );
+		if ( ! in_array( $kind, array( 'sve', 'proizvodi', 'usluge' ), true ) ) {
+			$kind = 'sve';
+		}
+		if ( '' !== $code && ! Brendigo_Sidrena_Cijena_Poslovnice::instance()->get_by_oznaka( $code ) ) {
+			return '<p class="bazna-public-notice">' . esc_html__( 'Odabrano prodajno mjesto nije pronađeno.', 'brendigo-sidrena-cijena' ) . '</p>';
+		}
+		$this->enqueue_public_appearance_style();
+		$table = $this->cjenik_shortcode( array( 'oznaka' => $code, 'vrsta' => 'sve' === $kind ? '' : $kind ) );
+		$html = '<section class="' . esc_attr( $settings->public_appearance_classes() ) . ' bazna-publication" aria-label="' . esc_attr__( 'BAZNA javni cjenici i arhiva', 'brendigo-sidrena-cijena' ) . '">';
+		$html .= '<header class="bazna-publication-header"><span class="bazna-publication-kicker">BAZNA by BRENDIGO</span><h2>'
+			. esc_html__( 'Javni cjenici', 'brendigo-sidrena-cijena' ) . '</h2><p>'
+			. esc_html__( 'Objavljene maloprodajne i bazne cijene robe i usluga.', 'brendigo-sidrena-cijena' ) . '</p></header>';
+		$html .= '<div class="bazna-publication-content">' . $table . '</div>';
+		$html .= '<section class="bazna-publication-section"><h3>' . esc_html__( 'Službeni CSV/XML cjenici', 'brendigo-sidrena-cijena' ) . '</h3>'
+			. $this->bazna_official_files_html( $code, $kind ) . '</section>';
+		if ( 'ne' !== sanitize_key( (string) $atts['arhiva'] ) ) {
+			$html .= '<section class="bazna-publication-section"><h3>' . esc_html__( 'Arhiva objavljenih cjenika', 'brendigo-sidrena-cijena' ) . '</h3>'
+				. $this->arhiva_shortcode( array( 'oznaka' => $code ) ) . '</section>';
+		}
+		return $html . '</section>';
+	}
+
+	/** Load scoped public appearance on pages with shortcodes and in builders. */
+	private function enqueue_public_appearance_style() {
+		$handle = 'bazna-public-appearance';
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, BRENDIGO_SIDRENA_CIJENA_URL . 'assets/css/public-appearance.css', array(), BRENDIGO_SIDRENA_CIJENA_VERSION );
+		}
+		wp_enqueue_style( $handle );
+		if ( did_action( 'wp_head' ) && ! wp_style_is( $handle, 'done' ) ) {
+			wp_print_styles( $handle );
+		}
+	}
+
+	/**
 	 * Compatibility renderer for the 1.0.x [sidrena_objava_cjenika] page.
 	 *
 	 * @param array<string,mixed> $atts Attributes.
@@ -544,7 +661,12 @@ class Brendigo_Sidrena_Cijena_Frontend {
 			return false;
 		}
 
-		return has_shortcode( $post->post_content, 'bazna_cjenik' )
+		return has_shortcode( $post->post_content, 'bazna_objava' )
+			|| has_shortcode( $post->post_content, 'bazna-objava' )
+			|| has_shortcode( $post->post_content, 'bazna_datoteke' )
+			|| has_shortcode( $post->post_content, 'bazna_arhiva' )
+			|| has_shortcode( $post->post_content, 'bazna-arhiva' )
+			|| has_shortcode( $post->post_content, 'bazna_cjenik' )
 				|| has_shortcode( $post->post_content, 'bazna-cjenik' )
 				|| has_shortcode( $post->post_content, 'bazna_proizvodi' )
 				|| has_shortcode( $post->post_content, 'bazna_usluge' )
