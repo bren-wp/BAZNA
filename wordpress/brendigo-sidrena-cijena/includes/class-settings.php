@@ -80,6 +80,9 @@ class Brendigo_Sidrena_Cijena_Settings {
 			'brand_manual'    => '',
 			'multi_poslovnica' => 'no',
 			'public_cjenik'    => 'yes',
+			'public_theme'     => 'dark',
+			'public_accent'    => 'orange',
+			'public_density'   => 'comfortable',
 			'i18n'            => array(
 				'prefix'  => array(),
 				'tooltip' => array(),
@@ -239,6 +242,9 @@ class Brendigo_Sidrena_Cijena_Settings {
 			'brand_manual'     => sanitize_text_field( isset( $settings['brand_manual'] ) ? $settings['brand_manual'] : '' ),
 			'multi_poslovnica' => ( isset( $settings['multi_poslovnica'] ) && 'yes' === $settings['multi_poslovnica'] ) ? 'yes' : 'no',
 			'public_cjenik'    => 'yes',
+			'public_theme'     => self::safe_public_option( isset( $settings['public_theme'] ) ? $settings['public_theme'] : 'dark', 'theme' ),
+			'public_accent'    => self::safe_public_option( isset( $settings['public_accent'] ) ? $settings['public_accent'] : 'orange', 'accent' ),
+			'public_density'   => self::safe_public_option( isset( $settings['public_density'] ) ? $settings['public_density'] : 'comfortable', 'density' ),
 			'i18n'           => $this->sanitize_i18n( isset( $settings['i18n'] ) ? $settings['i18n'] : array() ),
 		);
 
@@ -251,6 +257,33 @@ class Brendigo_Sidrena_Cijena_Settings {
 		if ( class_exists( 'Brendigo_Sidrena_Cijena_I18n' ) ) {
 			Brendigo_Sidrena_Cijena_I18n::instance()->register_strings();
 		}
+	}
+
+	/**
+	 * Fixed design choices: never interpolate arbitrary CSS from POST.
+	 * Public HTML appearance does not change the prescribed CSV/XML schema.
+	 * @param mixed $value Raw value.
+	 * @param string $kind theme|accent|density.
+	 * @return string Validated token.
+	 */
+	public static function safe_public_option( $value, $kind ) {
+		$options = array(
+			'theme'   => array( 'dark', 'light' ),
+			'accent'  => array( 'orange', 'blue', 'green', 'purple' ),
+			'density' => array( 'comfortable', 'compact' ),
+		);
+		$defaults = array( 'theme' => 'dark', 'accent' => 'orange', 'density' => 'comfortable' );
+		if ( ! isset( $options[ $kind ] ) ) {
+			return '';
+		}
+		return is_string( $value ) && in_array( $value, $options[ $kind ], true ) ? $value : $defaults[ $kind ];
+	}
+
+	/** Known-safe CSS classes for BAZNA HTML cjenik and archive pages. */
+	public function public_appearance_classes() {
+		return 'bazna-public bazna-theme-' . self::safe_public_option( $this->get( 'public_theme', 'dark' ), 'theme' )
+			. ' bazna-accent-' . self::safe_public_option( $this->get( 'public_accent', 'orange' ), 'accent' )
+			. ' bazna-density-' . self::safe_public_option( $this->get( 'public_density', 'comfortable' ), 'density' );
 	}
 
 	/**

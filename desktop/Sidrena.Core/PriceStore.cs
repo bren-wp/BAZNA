@@ -6,7 +6,8 @@ namespace Sidrena.Core;
 public sealed record PriceItem(
     long Id, string Name, string Kind, string Sku, string Barcode, string Unit,
     long CurrentCents, long? AnchorCents, string? AnchorDate, string? AnchorSource,
-    DateTimeOffset CreatedUtc);
+    DateTimeOffset CreatedUtc, string? AnchorScope=null, string? AnchorMethod=null,
+    bool AnchorVerified=false);
 
 public sealed record PriceChange(long Id, long ItemId, long PreviousCents, long CurrentCents, string Reason, DateTimeOffset ChangedUtc);
 
@@ -20,9 +21,6 @@ public sealed class PriceStore : IDisposable
 {
     private readonly SqliteConnection _connection;
     private bool _disposed;
-    private static readonly HashSet<string> PermittedAnchorDates =
-        new(SidrenaLegalContract.KnownReferenceDates,StringComparer.Ordinal);
-
     public PriceStore(string databasePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(databasePath);
@@ -66,6 +64,15 @@ public sealed class PriceStore : IDisposable
             )
             """);
         Execute("CREATE INDEX IF NOT EXISTS idx_changes_item_time ON price_changes(item_id, id DESC)");
+        // Additive migration: no legacy price is silently marked verified.
+        Execute("""
+            CREATE TABLE IF NOT EXISTS item_evidence (
+                item_id INTEGER PRIMARY KEY REFERENCES price_items(id) ON DELETE RESTRICT,
+                reference_scope TEXT NOT NULL,
+                historical_method TEXT NOT NULL,
+                verified_utc TEXT NOT NULL
+            )
+            """);
         Execute("""
             CREATE TABLE IF NOT EXISTS item_metadata_changes(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -262,31 +269,19 @@ public sealed class PriceStore : IDisposable
         if(kind is not ("Proizvod" or "Usluga"))throw new ArgumentException("Nepoznata vrsta stavke.");
         if(price.HasValue)
         {
-            // NN 132/2026: an item first offered AFTER its applicable
-            // reference date uses the documented first-offer price.
-            // Require an explicit source marker instead of silently
-            // treating every later historical date as a reference date.
-            // Services have only the 2026-09-10 general-goods reference date;
-            // the legacy 2025-05-02 date is reserved for FMCG goods.
-            var known = date is not null && PermittedAnchorDates.Contains(date) &&
-                (kind == "Proizvod" || date == SidrenaLegalContract.GeneralReferenceDate);
-            // Validate the evidence marker before accessing its content;
-            // missing evidence is a controlled validation error, not a crash.
-            var hasSource = !string.IsNullOrWhiteSpace(source);
-            var documentedFmcg = hasSource &&
-                source!.Contains("FMCG",StringComparison.OrdinalIgnoreCase);
-            var offeredLater = date is not null && hasSource &&
-                DateOnly.TryParseExact(date,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None,out var firstOffer) &&
-                firstOffer > (kind == "Proizvod" && documentedFmcg
-                    ? new DateOnly(2025,5,2) : new DateOnly(2026,9,10)) &&
-                firstOffer <= DateOnly.FromDateTime(DateTime.UtcNow) &&
-                (source!.Contains("Prva ponuda:",StringComparison.OrdinalIgnoreCase) ||
-                 source.Contains("Prvo stavljanje u ponudu:",StringComparison.OrdinalIgnoreCase));
-            if(!known && !offeredLater)
-                throw new ArgumentException("Bazna cijena zahtijeva pravilan referentni datum; kasniji datum dopušten je uz dokaz Prva ponuda:.");
-
-            if(string.IsNullOrWhiteSpace(source))
+            // Store historical candidates without falsely certifying them.
+            // Scope and discounted-day method are confirmed separately with
+            // structured LegalEvidenceRules and item_evidence. Never infer from
+            // a free-text token such as "FMCG" or "Prva ponuda:".
+            if(!DateOnly.TryParseExact(date,"yyyy-MM-dd",CultureInfo.InvariantCulture,
+                DateTimeStyles.None,out var candidate))
+                throw new ArgumentException("Povijesni datum mora biti YYYY-MM-DD.");
+            var firstLegalDay=kind=="Usluga"?new DateOnly(2026,9,10):new DateOnly(2025,5,2);
+            var today=DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("Europe/Zagreb")).DateTime);
+            if(candidate<firstLegalDay || candidate>today)
+                throw new ArgumentException("Povijesni datum zahtijeva provjeru zakonske skupine i razdoblja.");
+            if(string.IsNullOrWhiteSpace(source) || source.Trim().Length<4)
                 throw new ArgumentException("Za baznu cijenu potreban je dokumentirani izvor.");
             if(source.Trim().Length>500||source.Any(c=>char.IsControl(c)&&c!='\t'))
                 throw new ArgumentException("Izvor bazne cijene sadrži nedopuštene znakove ili je predug.");
@@ -331,10 +326,74 @@ public sealed class PriceStore : IDisposable
         tx.Commit();
     }
 
+    public void ConfirmEvidence(long itemId,string scope,string method)
+    {
+        using var tx=_connection.BeginTransaction();
+        using var select=_connection.CreateCommand();
+        select.Transaction=tx;
+        select.CommandText="""
+            SELECT kind,anchor_date,anchor_source,anchor_cents FROM price_items WHERE id=$id
+            """;
+        select.Parameters.AddWithValue("$id",itemId);
+        string kind; string? date; string? source; bool hasPrice;
+        using(var reader=select.ExecuteReader())
+        {
+            if(!reader.Read())throw new KeyNotFoundException("Stavka nije pronađena.");
+            kind=reader.GetString(0);
+            date=reader.IsDBNull(1)?null:reader.GetString(1);
+            source=reader.IsDBNull(2)?null:reader.GetString(2);
+            hasPrice=!reader.IsDBNull(3);
+        }
+        if(!hasPrice)throw new ArgumentException("Bazna cijena još nije unesena.");
+        var issue=LegalEvidenceRules.Issue(kind,scope,method,date,source);
+        if(issue is not null)throw new ArgumentException("Dokaz bazne cijene nije potpun: "+issue);
+        using var readOld=_connection.CreateCommand();
+        readOld.Transaction=tx;
+        readOld.CommandText="SELECT reference_scope,historical_method FROM item_evidence WHERE item_id=$id";
+        readOld.Parameters.AddWithValue("$id",itemId);
+        string oldScope="",oldMethod="";
+        using(var reader=readOld.ExecuteReader())
+        {
+            if(reader.Read()){oldScope=reader.GetString(0);oldMethod=reader.GetString(1);}
+        }
+        if(oldScope==scope && oldMethod==method){tx.Commit();return;}
+        using var write=_connection.CreateCommand();
+        write.Transaction=tx;
+        write.CommandText="""
+            INSERT INTO item_evidence(item_id,reference_scope,historical_method,verified_utc)
+            VALUES($id,$scope,$method,$time)
+            ON CONFLICT(item_id) DO UPDATE SET reference_scope=excluded.reference_scope,
+                historical_method=excluded.historical_method,verified_utc=excluded.verified_utc
+            """;
+        write.Parameters.AddWithValue("$id",itemId);
+        write.Parameters.AddWithValue("$scope",scope);
+        write.Parameters.AddWithValue("$method",method);
+        var time=DateTimeOffset.UtcNow.ToString("O",CultureInfo.InvariantCulture);
+        write.Parameters.AddWithValue("$time",time);
+        if(write.ExecuteNonQuery()!=1)throw new InvalidOperationException("Potvrda dokaza nije spremljena.");
+        using var audit=_connection.CreateCommand();
+        audit.Transaction=tx;
+        audit.CommandText="""
+            INSERT INTO item_metadata_changes(item_id,before_json,after_json,reason,changed_utc)
+            VALUES($id,$before,$after,$reason,$time)
+            """;
+        audit.Parameters.AddWithValue("$id",itemId);
+        audit.Parameters.AddWithValue("$before",System.Text.Json.JsonSerializer.Serialize(new{Scope=oldScope,Method=oldMethod}));
+        audit.Parameters.AddWithValue("$after",System.Text.Json.JsonSerializer.Serialize(new{Scope=scope,Method=method}));
+        audit.Parameters.AddWithValue("$reason","Potvrda dokumentirane metode bazne cijene");
+        audit.Parameters.AddWithValue("$time",time);
+        audit.ExecuteNonQuery();
+        tx.Commit();
+    }
+
     public (long Total,long ConfirmedAnchors) GetCatalogueTotals()
     {
         using var cmd=_connection.CreateCommand();
-        cmd.CommandText="SELECT COUNT(*),COUNT(anchor_cents) FROM price_items";
+        cmd.CommandText="""
+            SELECT COUNT(*),COUNT(e.item_id)
+            FROM price_items AS p
+            LEFT JOIN item_evidence AS e ON e.item_id=p.id
+            """;
         using var r=cmd.ExecuteReader();
         if(!r.Read())return (0,0);
         return (r.GetInt64(0),r.GetInt64(1));
@@ -344,8 +403,11 @@ public sealed class PriceStore : IDisposable
     {
         using var cmd = _connection.CreateCommand();
         cmd.CommandText = """
-            SELECT id,name,kind,sku,barcode,unit,current_cents,anchor_cents,anchor_date,anchor_source,created_utc
-            FROM price_items ORDER BY name COLLATE NOCASE, id
+            SELECT p.id,p.name,p.kind,p.sku,p.barcode,p.unit,p.current_cents,p.anchor_cents,
+                   p.anchor_date,p.anchor_source,p.created_utc,
+                   e.reference_scope,e.historical_method
+            FROM price_items AS p LEFT JOIN item_evidence AS e ON e.item_id=p.id
+            ORDER BY p.name COLLATE NOCASE, p.id
             """;
         using var reader = cmd.ExecuteReader();
         var result = new List<PriceItem>();
@@ -356,7 +418,10 @@ public sealed class PriceStore : IDisposable
                 reader.GetInt64(6), reader.IsDBNull(7) ? null : reader.GetInt64(7),
                 reader.IsDBNull(8) ? null : reader.GetString(8),
                 reader.IsDBNull(9) ? null : reader.GetString(9),
-                DateTimeOffset.Parse(reader.GetString(10), CultureInfo.InvariantCulture)));
+                DateTimeOffset.Parse(reader.GetString(10), CultureInfo.InvariantCulture),
+                reader.IsDBNull(11) ? null : reader.GetString(11),
+                reader.IsDBNull(12) ? null : reader.GetString(12),
+                !reader.IsDBNull(11)));
         return result;
     }
 

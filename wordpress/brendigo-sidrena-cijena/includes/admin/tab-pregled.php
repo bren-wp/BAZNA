@@ -37,7 +37,7 @@ $sidrena_preview_name    = '';
 $sidrena_preview_image   = '';
 $sidrena_preview_current = '';
 $sidrena_preview_anchor  = '';
-$sidrena_preview_date    = Brendigo_Sidrena_Cijena_Settings::REFERENCE_DATE_GENERAL;
+$sidrena_preview_date    = '';
 
 if ( $sidrena_woo_active ) {
 	$sidrena_preview_id = isset( $sidrena_overview['preview_id'] ) ? absint( $sidrena_overview['preview_id'] ) : 0;
@@ -49,9 +49,11 @@ if ( $sidrena_woo_active ) {
 			$sidrena_preview_name    = $sidrena_preview_product->get_name();
 			$sidrena_preview_image   = wp_get_attachment_image_url( $sidrena_preview_product->get_image_id(), 'woocommerce_thumbnail' );
 			$sidrena_preview_current = wc_price( (float) $sidrena_preview_product->get_price() );
-			$sidrena_anchor_display  = $sidrena_meta->get_price_to_display( $sidrena_preview_product );
-			$sidrena_preview_anchor  = '' !== (string) $sidrena_anchor_display ? wc_price( (float) $sidrena_anchor_display ) : '';
-			$sidrena_preview_date    = $sidrena_meta->get_display_date( $sidrena_preview_id );
+			if ( $sidrena_meta->is_historical_verified( $sidrena_preview_id ) ) {
+				$sidrena_anchor_display = $sidrena_meta->get_price_to_display( $sidrena_preview_product );
+				$sidrena_preview_anchor = '' !== (string) $sidrena_anchor_display ? wc_price( (float) $sidrena_anchor_display ) : '';
+				$sidrena_preview_date = $sidrena_meta->get_display_date( $sidrena_preview_id );
+			}
 		}
 	}
 } else {
@@ -60,8 +62,15 @@ if ( $sidrena_woo_active ) {
 		$sidrena_row             = $sidrena_catalog_rows[0];
 		$sidrena_preview_name    = isset( $sidrena_row['naziv'] ) ? (string) $sidrena_row['naziv'] : '';
 		$sidrena_preview_current = isset( $sidrena_row['cijena_redovna'] ) ? esc_html( $sidrena_row['cijena_redovna'] ) . ' €' : '';
-		$sidrena_preview_anchor  = isset( $sidrena_row['sidrena_cijena'] ) ? esc_html( $sidrena_row['sidrena_cijena'] ) . ' €' : '';
-		$sidrena_preview_date    = Brendigo_Sidrena_Cijena_Catalog::instance()->display_date( $sidrena_row );
+		if ( isset( $sidrena_row['sidrena_cijena'], $sidrena_row['historical_source'] ) &&
+			strlen( trim( (string) $sidrena_row['historical_source'] ) ) >= 4 &&
+			'' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue(
+				$sidrena_row,
+				isset( $sidrena_row['vrsta'] ) && 'usluga' === $sidrena_row['vrsta'] ? 'usluge' : 'proizvodi'
+			) ) {
+			$sidrena_preview_anchor = esc_html( $sidrena_row['sidrena_cijena'] ) . ' €';
+			$sidrena_preview_date = Brendigo_Sidrena_Cijena_Catalog::instance()->display_date( $sidrena_row );
+		}
 	}
 }
 

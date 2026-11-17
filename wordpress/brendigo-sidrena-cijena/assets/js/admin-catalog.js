@@ -34,6 +34,10 @@
 					cijena_jedinice_mjere: "",
 					sidrena_cijena: "",
 					sidrena_datum: "",
+					historical_source: "",
+					reference_scope: "",
+					historical_method: "",
+					historical_verified: "",
 					vrsta: "proizvod",
 					poslovnica: "",
 					dostupnost: "dostupno",
@@ -212,7 +216,25 @@
 				escAttr(i18n.datePlaceholder || "") +
 				'" value="' +
 				escAttr(row.sidrena_datum) +
-				'" /></td>' +
+				'" />' +
+				'<input type="text" class="js-historical-source" aria-label="Interna oznaka izvora bazne cijene" maxlength="500" placeholder="Izvor (arhiva, račun, evidencija)" value="' +
+				escAttr(row.historical_source) +
+				'" />' +
+				'<select class="js-reference-scope" aria-label="Referentna skupina">' +
+				'<option value="">Odaberite skupinu</option>' +
+				'<option value="legacy_fmcg"' + (row.reference_scope === "legacy_fmcg" ? " selected" : "") + '>FMCG / 2. 5. 2025.</option>' +
+				'<option value="general_goods_services"' + (row.reference_scope === "general_goods_services" ? " selected" : "") + '>Ostala roba i usluge / 10. 9. 2026.</option>' +
+				'</select>' +
+				'<select class="js-historical-method" aria-label="Metoda bazne cijene">' +
+				'<option value="">Odaberite metodu</option>' +
+				'<option value="reference_day"' + (row.historical_method === "reference_day" ? " selected" : "") + '>Na referentni dan</option>' +
+				'<option value="first_offer"' + (row.historical_method === "first_offer" ? " selected" : "") + '>Prva ponuda nakon datuma</option>' +
+				'<option value="discount_lowest_30d"' + (row.historical_method === "discount_lowest_30d" ? " selected" : "") + '>FMCG: najniža 30 dana prije popusta</option>' +
+				'<option value="discount_previous_retail"' + (row.historical_method === "discount_previous_retail" ? " selected" : "") + '>Ostali: prethodna maloprodajna</option>' +
+				'</select>' +
+				'<label class="bazna-evidence-label"><input type="checkbox" class="js-historical-verified"' +
+				(row.historical_verified === "yes" ? " checked" : "") +
+				' /> Provjeren izvor</label></td>' +
 				cjmCell(row) +
 				'<td><select class="js-dostupnost">' +
 				'<option value="dostupno"' +
@@ -256,6 +278,10 @@
 					cijena_jedinice_mjere: $.trim($tr.find(".js-jedinica-cijena").val() || ""),
 					sidrena_cijena: $.trim($tr.find(".js-sidrena").val() || ""),
 					sidrena_datum: $.trim($tr.find(".js-datum").val() || ""),
+					historical_source: $.trim($tr.find(".js-historical-source").val() || ""),
+					reference_scope: $tr.find(".js-reference-scope").val() || "",
+					historical_method: $tr.find(".js-historical-method").val() || "",
+					historical_verified: $tr.find(".js-historical-verified").is(":checked") ? "yes" : "",
 					vrsta: $tr.find(".js-vrsta").val() === "usluga" ? "usluga" : "proizvod",
 					poslovnica: $.trim($tr.find(".js-poslovnica").val() || ""),
 					dostupnost: $tr.find(".js-dostupnost").val() === "nedostupno" ? "nedostupno" : "dostupno",
@@ -420,6 +446,8 @@
 				!$.trim(row.cijena_jedinice_mjere) &&
 				!$.trim(row.sidrena_cijena) &&
 				!$.trim(row.sidrena_datum) &&
+				!$.trim(row.historical_source) &&
+				row.historical_verified !== "yes" &&
 				row.vrsta !== "usluga" &&
 				row.dostupnost !== "nedostupno" &&
 				row.cjm !== "yes" &&
@@ -499,6 +527,11 @@
 				cijena_jedinice_mjere: $tr.find(".js-jedinica-cijena").val(),
 				sidrena_cijena: $tr.find(".js-sidrena").val(),
 				sidrena_datum: $tr.find(".js-datum").val(),
+				// Clones are new legal subjects and cannot inherit a verified source.
+				historical_source: "",
+				reference_scope: "",
+				historical_method: "",
+				historical_verified: "",
 				vrsta: $tr.find(".js-vrsta").val(),
 				poslovnica: currentScope() || $tr.find(".js-poslovnica").val(),
 				dostupnost: $tr.find(".js-dostupnost").val(),
@@ -512,6 +545,10 @@
 			showPageOf(at);
 		});
 
+
+		$tbody.on("input change", ".js-sidrena, .js-datum, .js-historical-source, .js-reference-scope, .js-historical-method, .js-vrsta", function () {
+			$(this).closest("tr").find(".js-historical-verified").prop("checked", false);
+		});
 
 		$tbody.on("input change", "input, select", function () {
 			$(this).removeClass("has-error").removeAttr("aria-invalid");
@@ -875,6 +912,10 @@
 		$("#sidrena-wc-filter").on("input", applyFilters);
 		$("#sidrena-wc-price-filter").on("change", applyFilters);
 		$form.on("change", ".js-sidrena-wc-price", applyFilters);
+		$form.on("input change", ".js-sidrena-wc-price, .js-sidrena-wc-date", function () {
+			$(this).closest(".brendigo-woo-row").find(".bazna-evidence-status")
+				.text("Izmijenjeno — potrebno ponovno potvrditi dokaz u uređivaču proizvoda");
+		});
 
 		// Historical reference prices and dates must be entered individually
 		// with evidence, never copied from the current WooCommerce price.

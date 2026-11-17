@@ -1,0 +1,170 @@
+/**
+ * BAZNA public presentation layer for standalone pages and embedded sections.
+ * Fixed tokens only: server validates theme/accent/density before class output.
+ * Presentation does not alter statutory CSV/XML schemas or archive retention.
+ */
+.bazna-public {
+  --bazna-bg: #07182d;
+  --bazna-panel: #10263d;
+  --bazna-fg: #fff;
+  --bazna-secondary: #b5c5d8;
+  --bazna-border: rgba(159,181,210,.25);
+  --bazna-accent: #ff852c;
+  --bazna-accent-text: #1b2531;
+  --bazna-space: 16px;
+  color: var(--bazna-fg);
+  font-family: inherit;
+  line-height: 1.55;
+  color-scheme: dark;
+}
+.bazna-public.bazna-theme-light {
+  --bazna-bg: #f4f7fb;
+  --bazna-panel: #fff;
+  --bazna-fg: #162438;
+  --bazna-secondary: #45566a;
+  --bazna-border: rgba(38,62,92,.22);
+  --bazna-accent-text: #fff;
+  color-scheme: light;
+}
+.bazna-public.bazna-accent-blue { --bazna-accent: #2e70dc; --bazna-accent-text: #fff; }
+.bazna-public.bazna-accent-green { --bazna-accent: #087c5b; --bazna-accent-text: #fff; }
+.bazna-public.bazna-accent-purple { --bazna-accent: #8853d7; --bazna-accent-text: #fff; }
+.bazna-public.bazna-theme-dark.bazna-accent-orange { --bazna-accent: #ff952c; --bazna-accent-text: #142235; }
+.bazna-public.bazna-density-compact { --bazna-space: 10px; }
+
+body.bazna-public {
+  background: var(--bazna-bg);
+  color: var(--bazna-fg);
+}
+body.bazna-public h1, body.bazna-public h2, body.bazna-public h3 { color: var(--bazna-fg); }
+body.bazna-public .cjenik-hero,
+body.bazna-public .cjenik-table-wrap,
+body.bazna-public ol {
+  border-color: var(--bazna-border);
+  background: var(--bazna-panel);
+}
+body.bazna-public .cjenik-table th,
+body.bazna-public .cjenik-upit th { background: var(--bazna-panel); color: var(--bazna-secondary); }
+body.bazna-public .cjenik-table td,
+body.bazna-public .cjenik-upit td,
+body.bazna-public li { border-color: var(--bazna-border); color: var(--bazna-fg); }
+body.bazna-public .cjenik-meta,
+body.bazna-public .cjenik-hero p,
+body.bazna-public .cjenik-upit p,
+body.bazna-public p { color: var(--bazna-secondary); }
+body.bazna-public a { color: var(--bazna-accent); }
+body.bazna-public .cjenik-btn:not(.cjenik-btn--ghost) { background: var(--bazna-accent); color: var(--bazna-accent-text); }
+body.bazna-public .cjenik-table td[data-field="maloprodajna_cijena"] { color: var(--bazna-accent); }
+body.bazna-public .cjenik-page.is-current { border-color: var(--bazna-accent); color: var(--bazna-accent); }
+body.bazna-public .cjenik-search input {
+  background: var(--bazna-panel);
+  color: var(--bazna-fg);
+  border-color: var(--bazna-border);
+}
+body.bazna-public.bazna-density-compact .cjenik-table td,
+body.bazna-public.bazna-density-compact .cjenik-table th { padding: 8px 11px; }
+
+/* On arbitrary WP pages the wrapper owns its background and contrast.
+ * No appearance rules spill into the host theme or WooCommerce. */
+.bazna-publication, .bazna-files-only, .bazna-single-embed {
+  box-sizing: border-box;
+  max-width: 100%;
+  border: 1px solid var(--bazna-border);
+  border-radius: 18px;
+  background: var(--bazna-bg);
+  color: var(--bazna-fg);
+  padding: clamp(16px, 3vw, 30px);
+}
+.bazna-publication *, .bazna-files-only *, .bazna-single-embed * { box-sizing: border-box; }
+.bazna-publication :is(h2,h3,p,a,span,li,th,td,label) { color: inherit; }
+.bazna-publication-header {
+  border-radius: 14px;
+  padding: clamp(18px, 3vw, 28px);
+  background: var(--bazna-panel);
+  border: 1px solid var(--bazna-border);
+  margin-bottom: 24px;
+}
+.bazna-publication .bazna-publication-kicker {
+  color: var(--bazna-accent);
+  display: inline-block;
+  font-size: .8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .085em;
+  margin-bottom: 6px;
+}
+.bazna-publication .bazna-publication-header h2 {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  margin: 0 0 9px;
+}
+.bazna-publication .bazna-publication-header p { margin: 0; color: var(--bazna-secondary); }
+.bazna-publication-section { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--bazna-border); }
+.bazna-publication-section h3 {
+  font-size: 1.15rem;
+  margin: 0 0 12px;
+  font-weight: 750;
+}
+.bazna-file-links { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.bazna-public .bazna-file-link {
+  display: inline-flex;
+  text-decoration: none;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  background: var(--bazna-accent);
+  border: 1px solid var(--bazna-accent);
+  color: var(--bazna-accent-text);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: .94rem;
+}
+.bazna-public .bazna-file-link:hover { filter: brightness(.94); }
+.bazna-public .bazna-file-link:focus-visible,
+.bazna-public :is(input,button,a):focus-visible {
+  outline: 3px solid var(--bazna-accent);
+  outline-offset: 3px;
+}
+.bazna-public .bazna-public-notice {
+  background: var(--bazna-panel);
+  border: 1px solid var(--bazna-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--bazna-secondary);
+  margin: 8px 0;
+}
+.bazna-public .sidrena-cjenik {
+  --brsc-line: var(--bazna-border);
+  --brsc-soft: var(--bazna-panel);
+  --brsc-accent: var(--bazna-accent);
+  color: var(--bazna-fg);
+}
+.bazna-public .sidrena-cjenik .cjenik-table-wrap { background: var(--bazna-panel); }
+.bazna-public .sidrena-cjenik .cjenik-table th { color: var(--bazna-secondary); }
+.bazna-public .sidrena-cjenik .cjenik-table td { color: var(--bazna-fg); }
+.bazna-public .sidrena-cjenik td[data-field="maloprodajna_cijena"] { color: var(--bazna-accent); font-weight: 750; }
+.bazna-public .sidrena-cjenik .cjenik-search input {
+  background: var(--bazna-panel);
+  color: var(--bazna-fg);
+  border-color: var(--bazna-border);
+}
+.bazna-public .sidrena-arhiva { --brsc-line: var(--bazna-border); --brsc-soft: var(--bazna-panel); }
+.bazna-public .sidrena-arhiva a { color: var(--bazna-accent); }
+.bazna-public .sidrena-arhiva span { color: var(--bazna-secondary); }
+.bazna-public.bazna-density-compact .sidrena-cjenik .cjenik-table td,
+.bazna-public.bazna-density-compact .sidrena-cjenik .cjenik-table th { padding: 8px 10px; }
+.bazna-public.bazna-density-compact .sidrena-arhiva li { padding: 6px 0; }
+@media (max-width: 720px) {
+  .bazna-publication { padding: 13px; border-radius: 13px; }
+  .bazna-publication-header { padding: 16px; margin-bottom: 15px; }
+  .bazna-publication .bazna-file-links { flex-direction: column; }
+  .bazna-publication .bazna-file-link { width: 100%; }
+  .bazna-public .sidrena-cjenik .cjenik-table td,
+  body.bazna-public .cjenik-table td { white-space: normal; overflow-wrap: anywhere; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bazna-public :is(a,button,input) { transition: none !important; }
+}

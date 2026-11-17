@@ -74,6 +74,60 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 				$this->render_url_box( $sidrena_kind_label . ' – ' . strtoupper( $sidrena_extension ), $sidrena_url, $sidrena_url, __( 'Otvori', 'brendigo-sidrena-cijena' ) );
 			}
 		}
+		// Use the SAME confirmed-publication discovery as Android.
+		// A stale file or missing OIB/MB must not become a clickable
+		// official link just because it remains in uploads.
+		// REST index() returns WP_REST_Response, not a PHP array.
+		// Extract the published data explicitly before accessing official_feeds.
+		$sidrena_discovery_response = Brendigo_Sidrena_Cijena_Public_API::instance()->index();
+		$sidrena_discovery = is_object( $sidrena_discovery_response ) && method_exists( $sidrena_discovery_response, 'get_data' )
+			? $sidrena_discovery_response->get_data() : array();
+		$sidrena_official_count = 0;
+		$sidrena_official = isset( $sidrena_discovery['official_feeds'] ) && is_array( $sidrena_discovery['official_feeds'] )
+			? $sidrena_discovery['official_feeds'] : array();
+		foreach ( array( 'proizvodi' => __( 'Roba', 'brendigo-sidrena-cijena' ), 'usluge' => __( 'Usluge', 'brendigo-sidrena-cijena' ) ) as $sidrena_kind => $sidrena_name ) {
+			foreach ( array( 'csv', 'xml' ) as $sidrena_format ) {
+				$sidrena_official_url = isset( $sidrena_official[ $sidrena_kind ][ $sidrena_format ] )
+					? (string) $sidrena_official[ $sidrena_kind ][ $sidrena_format ] : '';
+				if ( '' === $sidrena_official_url ) {
+					continue;
+				}
+				$this->render_url_box(
+					sprintf(
+						/* translators: 1: Goods or services, 2: CSV or XML. */
+						__( 'Službeni cjenik — %1$s (%2$s)', 'brendigo-sidrena-cijena' ),
+						$sidrena_name,
+						strtoupper( $sidrena_format )
+					),
+					$sidrena_official_url, $sidrena_official_url,
+					__( 'Otvori službeni cjenik', 'brendigo-sidrena-cijena' )
+				);
+				++$sidrena_official_count;
+			}
+		}
+		if ( isset( $sidrena_discovery['outlets'] ) && is_array( $sidrena_discovery['outlets'] ) ) {
+			foreach ( array_slice( $sidrena_discovery['outlets'], 0, 12 ) as $sidrena_entry ) {
+				$sidrena_outlet_feeds = isset( $sidrena_entry['official_feeds'] ) && is_array( $sidrena_entry['official_feeds'] )
+					? $sidrena_entry['official_feeds'] : array();
+				$sidrena_outlet_label = isset( $sidrena_entry['name'] ) ? (string) $sidrena_entry['name'] : '';
+				foreach ( array( 'proizvodi', 'usluge' ) as $sidrena_kind ) {
+					foreach ( array( 'csv', 'xml' ) as $sidrena_format ) {
+						$sidrena_official_url = isset( $sidrena_outlet_feeds[ $sidrena_kind ][ $sidrena_format ] )
+							? (string) $sidrena_outlet_feeds[ $sidrena_kind ][ $sidrena_format ] : '';
+						if ( '' === $sidrena_official_url ) {
+							continue;
+						}
+						$this->render_url_box(
+							$sidrena_outlet_label . ' — ' . ( 'proizvodi' === $sidrena_kind ? __( 'Roba', 'brendigo-sidrena-cijena' ) : __( 'Usluge', 'brendigo-sidrena-cijena' ) ) . ' ' . strtoupper( $sidrena_format ),
+							$sidrena_official_url, $sidrena_official_url,
+							__( 'Otvori službeni cjenik', 'brendigo-sidrena-cijena' )
+						);
+						++$sidrena_official_count;
+					}
+				}
+			}
+		}
+
 		$this->render_url_box( __( 'Javni REST API', 'brendigo-sidrena-cijena' ), rest_url( 'brendigo-bazna/v1/cjenici' ), rest_url( 'brendigo-bazna/v1/cjenici' ), __( 'Otvori API', 'brendigo-sidrena-cijena' ) );
 
 		if ( $sidrena_settings->is_multi_poslovnica() ) {
@@ -85,6 +139,11 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 		}
 		?>
 	</div>
+	<?php if ( ! $sidrena_official_count ) : ?>
+		<p class="notice notice-warning inline" role="status">
+			<?php echo esc_html__( 'Službeni CSV/XML cjenik još nije potvrđeno objavljen. Provjerite OIB/MB, podatke prodajnog mjesta, dokumentirane bazne cijene i status posljednje objave. Stari kompatibilni CSV nije službeni format iz NN 132/2026.', 'brendigo-sidrena-cijena' ); ?>
+		</p>
+	<?php endif; ?>
 
 	<?php
 	// Read the exact same published files as the public Android discovery API.
@@ -113,7 +172,7 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 			</span>
 		</div>
 		<p><?php echo esc_html__( 'U Android aplikaciju unesite HTTPS adresu ove WordPress stranice. Korisnička imena i lozinke nisu potrebni: aplikacija čita samo javni BAZNA REST API.', 'brendigo-sidrena-cijena' ); ?></p>
-		<p><?php echo esc_html__( 'Objavljena datoteka ne dokazuje točnost bazne cijene ni najniže cijene prije sniženja. Povijesne iznose i datume potvrdite izvornom evidencijom. Objavljene odluke imaju predviđen početak primjene 17. studenoga 2026.; pravilnici su 9. studenoga još bili u savjetovanju.', 'brendigo-sidrena-cijena' ); ?></p>
+		<p><?php echo esc_html__( 'Objavljena datoteka ne dokazuje točnost bazne cijene ni najniže cijene prije sniženja. Povijesne iznose i datume potvrdite izvornom evidencijom. Pravilnici NN 132/2026 (1583 i 1584) primjenjuju se od 17. studenoga 2026. Izmijenjeni cjenik treba biti javno dostupan do 11:00 na dan izmjene, a prethodni ostaje najmanje 15 dana od zamjene. Evidentirajte izvor, kategoriju, način utvrđivanja i potvrdu povijesne cijene prije objave.', 'brendigo-sidrena-cijena' ); ?></p>
 		<?php if ( $sidrena_android_pending ) : ?>
 			<p class="sidrena-android-bridge__warning"><?php echo esc_html__( 'Upozorenje: katalog je izmijenjen nakon posljednje javne objave. Ponovno generirajte CSV/XML cjenike kako Android ne bi prikazivao zastarjele cijene.', 'brendigo-sidrena-cijena' ); ?></p>
 		<?php endif; ?>

@@ -21,7 +21,7 @@ $automated->ensurePrivate();
 $autoProduct = [
     'id' => 'AUTO-P1', 'naziv' => 'Novo verificirano dobro',
     'maloprodajna_cijena' => '5,00', 'sidrena_cijena' => '4,00',
-    'sidrena_datum' => '2026-09-10', 'historical_verified' => true,
+    'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day',
 ];
 $autoService = [
     'id' => 'AUTO-S1', 'naziv' => 'Usluga',
@@ -42,6 +42,9 @@ check(!isset($automated->read('published.json')['published_at']), 'Rejected auto
 $autoService['sidrena_cijena'] = '14,00';
 $autoService['sidrena_datum'] = '2026-09-10';
 $autoService['historical_verified'] = true;
+$autoService['historical_source'] = 'Arhiva usluga 2026';
+$autoService['reference_scope'] = 'general_goods_services';
+$autoService['historical_method'] = 'reference_day';
 $automated->saveDraft([
     'products' => [$autoProduct], 'services' => [$autoService],
     'outlets' => [], 'on_request' => [],
@@ -78,7 +81,7 @@ try {
 $oil = [
     'id' => 'SKU-1', 'naziv' => 'Maslinovo ulje', 'sku' => 'MU-1',
     'maloprodajna_cijena' => '5,99', 'sidrena_cijena' => '8,49',
-    'sidrena_datum' => '2026-09-10', 'historical_verified' => true,
+    'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day',
     'jedinica_mjere' => 'L', 'outlet' => '',
 ];
 $catalog = [
@@ -111,16 +114,58 @@ $badInquiry['on_request'][0]['kriteriji'] = '<script>alert(1)</script>';
 $badInquiry['on_request'][0]['outlet'] = 'OTHER';
 $bad = $catalog;
 $bad['products'][0]['historical_verified'] = false;
+$core->saveDraft($bad);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Unverified historical amounts may be edited in a private draft');
 try {
-    $core->saveDraft($bad);
-    throw new RuntimeException('Unverified historical price was accepted.');
-} catch (InvalidArgumentException $ignored) {}
+    $core->publish();
+    throw new RuntimeException('Unverified historical draft became public.');
+} catch (RuntimeException $e) {
+    check(str_contains($e->getMessage(), 'historical_verified'),
+        'An unverified private draft cannot be published');
+}
+check(!isset($core->read('published.json')['published_at']),
+    'Failed publication keeps unverified draft private');
 $bad = $catalog;
 $bad['products'][0]['outlet'] = 'UNKNOWN';
 try {
     $core->saveDraft($bad);
     throw new RuntimeException('Unregistered outlet was accepted.');
 } catch (InvalidArgumentException $ignored) {}
+$core->saveDraft($catalog);
+// A bulk JSON replacement cannot silently carry a verified flag when the
+// historical amount was changed, although current sale price may change.
+$changedReference = $catalog;
+$changedReference['products'][0]['sidrena_cijena'] = '9,99';
+$core->saveDraft($changedReference);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Changed historic amount invalidates a previously approved source');
+$unverifiedRestored = $catalog;
+$unverifiedRestored['products'][0]['historical_verified'] = false;
+$core->saveDraft($unverifiedRestored);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Restoring old amount without explicit re-attestation remains unverified');
+// The operator must explicitly re-attest the source after a change.
+$reconfirmed = $catalog;
+$reconfirmed['products'][0]['historical_verified'] = true;
+$core->saveDraft($reconfirmed);
+check($core->read('draft.json')['products'][0]['historical_verified'] === true,
+    'Explicit re-attestation is accepted when the documented source is complete');
+// Legacy manual publishing may not bypass official documentary evidence.
+$unverifiedMethod = $catalog;
+$unverifiedMethod['products'][0]['historical_method'] = '';
+$core->saveDraft($unverifiedMethod);
+check($core->read('draft.json')['products'][0]['historical_verified'] === false,
+    'Editing the legal method invalidates the old historical attestation');
+try {
+    $core->publish();
+    throw new RuntimeException('Manual publication accepted an undocumented legal method.');
+} catch (RuntimeException $e) {
+    check(str_contains($e->getMessage(), 'historical_verified'),
+        'Manual public feed rejects the revoked attestation');
+}
+check(!isset($core->read('published.json')['published_at']),
+    'Manual publication failure preserves the last published state');
 $core->saveDraft($catalog);
 $before = $core->discovery('web');
 check(str_contains($core->publicCatalogHtml('proizvodi'), 'još nije objavljen'),
@@ -255,7 +300,50 @@ check(str_contains($csv, 'sidrena_cijena') && str_contains($csv, 'Maslinovo ulje
     'legacy Android CSV columns compatible with BAZNA user branding');
 $lines = array_map('str_getcsv', explode("\n", trim(substr($csv, 3))));
 check(str_contains($csv, "\xEF\xBB\xBF"), 'UTF-8 BOM');
+// Public compatibility schema is frozen: documentary source references are
+// private even in archives. Android may rely on the original v1 headers.
+$expectedPublicFields = [
+    'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod',
+    'jedinica_mjere', 'cijena_jedinice_mjere', 'maloprodajna_cijena',
+    'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
+    'barkod', 'dostupnost', 'slika_url',
+];
+check(Core::PUBLIC_FIELDS === $expectedPublicFields &&
+    str_getcsv(strtok(substr($csv, 3), "\n"), ';', '"', '') === $expectedPublicFields,
+    'Legacy public CSV retains exact Android v1 columns/order');
+// Attack-looking names must never become formulas in the public CSV.
+$injectedSnapshot = $core->read('published.json');
+$injectedSnapshot['products'][0]['naziv'] = '=HYPERLINK("https://example.test", "Click")';
+$injectedCsv = $core->csv('proizvodi', '', $injectedSnapshot);
+check(str_contains($injectedCsv, "'=HYPERLINK") &&
+    !str_contains($injectedCsv, ';=HYPERLINK'),
+    'Public compatibility CSV neutralizes merchant-controlled spreadsheet formulas');
+check(!str_contains($csv, 'Arhiva cjenika 2026') &&
+    !str_contains($csv, 'historical_source') &&
+    !str_contains($csv, 'historical_method') &&
+    !str_contains($csv, 'reference_scope'),
+    'Public compatibility CSV never exposes private historical evidence');
 $xml = $core->xml('proizvodi');
+check(!str_contains($xml, '<historical_source>') &&
+    !str_contains($xml, '<historical_method>') &&
+    !str_contains($xml, '<reference_scope>') &&
+    !str_contains($xml, 'Arhiva cjenika 2026'),
+    'Public XML never exposes private historical source or method');
+// A pre-1.5.24 published snapshot may contain an unverified baseline
+// which must not be claimed as legally verified after upgrading.
+$legacyPublished = $core->read('published.json');
+$legacyPublished['products'][0]['historical_verified'] = false;
+$legacyPrivate = new Core($root . '/legacy-unverified', 'https://primjer.hr');
+$legacyPrivate->write('published.json', $legacyPublished);
+$legacyCsv = $legacyPrivate->csv('proizvodi');
+$legacyHtml = $legacyPrivate->publicCatalogHtml('proizvodi');
+check(str_contains($legacyCsv, 'Maslinovo ulje') &&
+    !str_contains($legacyCsv, ';8,49;') &&
+    !str_contains($legacyHtml, '8,49 €') &&
+    str_contains($legacyHtml, 'Maloprodajna cijena'),
+    'Legacy unverified baseline is redacted while current product price remains public');
+check(!str_contains($legacyPrivate->xml('proizvodi'), '<sidrena_cijena>8,49</sidrena_cijena>'),
+    'Legacy unverified historical price is also absent from public XML');
 check(str_contains($xml, '<bazna-cjenik') && str_contains($xml, '<sidrena_cijena>8,49</sidrena_cijena>'),
     'XML and CSV price parity');
 $core->saveDraft([
@@ -263,7 +351,7 @@ $core->saveDraft([
     'products' => [[
         'id' => 'SKU-1', 'naziv' => 'Maslinovo ulje',
         'maloprodajna_cijena' => '6,19', 'sidrena_cijena' => '8,49',
-        'sidrena_datum' => '2026-09-10', 'historical_verified' => true,
+        'sidrena_datum' => '2026-09-10', 'historical_verified' => true, 'historical_source' => 'Arhiva cjenika 2026', 'reference_scope' => 'general_goods_services', 'historical_method' => 'reference_day',
     ]],
     'services' => $catalog['services'],
 ]);
@@ -287,6 +375,9 @@ try {
     throw new RuntimeException('Foreign branch archive accepted.');
 } catch (InvalidArgumentException $ignored) {}
 $core->publish();
+check(!str_contains($core->archiveCsv($matches[1], 'proizvodi'), 'Arhiva cjenika 2026') &&
+    !str_contains($core->archiveCsv($matches[1], 'proizvodi'), 'historical_source'),
+    'Published archives never disclose documentary source identifiers');
 check(str_contains($core->archiveCsv($matches[1], 'proizvodi'), '5,99'),
     'archive link remains stable after another publication');
 $remove = static function ($dir) use (&$remove): void {

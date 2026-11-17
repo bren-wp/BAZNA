@@ -60,6 +60,19 @@ final class AdminCatalog
             ($readonly ? ' readonly' : '') . $inputMode . '></label>';
     }
 
+    private static function select(string $name, string $label, array $values, array $options): string
+    {
+        $selected = (string) ($values[$name] ?? '');
+        $html = '<label class="bazna-field">' . Core::esc($label) .
+            '<select name="row[' . Core::esc($name) . ']">';
+        foreach ($options as $value => $option) {
+            $html .= '<option value="' . Core::esc((string) $value) . '"' .
+                ($selected === (string) $value ? ' selected' : '') . '>' .
+                Core::esc($option) . '</option>';
+        }
+        return $html . '</select></label>';
+    }
+
     private static function fields(string $collection, array $row, array $outlets, bool $editing): string
     {
         if ($collection === 'outlets') {
@@ -92,6 +105,19 @@ final class AdminCatalog
             self::input('maloprodajna_cijena', 'Aktualna cijena (€)', $row, 'text', true) .
             self::input('sidrena_cijena', 'Bazna cijena (€)', $row) .
             self::input('sidrena_datum', 'Datum bazne cijene', $row, 'date') .
+            self::input('historical_source', 'Interna oznaka povijesnog dokaza (bez osobnih podataka)', $row) .
+            self::select('reference_scope', 'Referentna skupina', $row, [
+                '' => 'Odaberite nakon provjere',
+                'legacy_fmcg' => 'FMCG — 2. 5. 2025.',
+                'general_goods_services' => 'Ostala roba / usluge — 10. 9. 2026.',
+            ]) .
+            self::select('historical_method', 'Metoda povijesne bazne cijene', $row, [
+                '' => 'Odaberite na temelju evidencije',
+                'reference_day' => 'Cijena na referentni dan',
+                'first_offer' => 'Cijena prve ponude',
+                'discount_lowest_30d' => 'FMCG: najniža 30 dana prije početka popusta',
+                'discount_previous_retail' => 'Ostali: prethodna maloprodajna cijena',
+            ]) .
             self::input('sku', 'SKU / interna oznaka', $row) .
             self::input('marka', 'Marka / pružatelj', $row) .
             self::input('barkod', 'Barkod', $row) .
@@ -114,7 +140,7 @@ final class AdminCatalog
         $html .= '<label class="bazna-check"><input type="hidden" name="row[historical_verified]" value="0">' .
             '<input type="checkbox" name="row[historical_verified]" value="1"' .
             (!empty($row['historical_verified']) ? ' checked' : '') .
-            '> Potvrđujem da za baznu cijenu postoji izvorni dokaz o iznosu na navedeni datum.</label>';
+            '> Potvrđujem da sam provjerio izvor, referentnu skupinu i primijenjeno zakonsko pravilo. Potvrda ne ovjerava podatke trgovca.</label>';
         return $html;
     }
 

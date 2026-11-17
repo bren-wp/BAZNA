@@ -10,10 +10,17 @@ try
     using (var store = new PriceStore(file))
     {
         id = store.AddItem("Mlijeko; \"punomasno\"", "Proizvod", "SKU-1", "3851234567890", "L",
-            2.35m, 2.10m, "2026-09-10", "Račun iz arhive");
+            2.35m, 2.10m, "2025-05-02", "Arhiva dokumentacija za mlijeko");
         var pending = store.AddItem("Usluga šišanja", "Usluga", "", "", "kom", 15m, null, null, null);
         Expect(store.ListItems().Count == 2, "Insert item");
         Expect(store.ListItems().First(p => p.Id == pending).AnchorCents is null, "No fabricated reference");
+        Expect(!store.ListItems().Single(p=>p.Id==id).AnchorVerified,
+            "Legacy historical amount is not automatically certified");
+        MustThrow(()=>store.ConfirmEvidence(id,LegalEvidenceRules.General,"reference_day"));
+        store.ConfirmEvidence(id,LegalEvidenceRules.LegacyFmcg,"reference_day");
+        Expect(store.ListItems().Single(p=>p.Id==id).AnchorVerified,
+            "Confirmed legacy FMCG evidence is explicitly classified");
+        MustThrow(()=>store.ConfirmEvidence(id,LegalEvidenceRules.LegacyFmcg,"discount_previous_retail"));
         store.UpdateCurrentPrice(id, 2.49m, "Novi cjenik");
         store.UpdateCurrentPrice(id, 2.49m, "Bez promjene");
         Expect(store.ListChanges(id).Count == 1, "Idempotent price log");
@@ -36,12 +43,10 @@ try
         MustThrow(()=>CatalogViewFilter.Apply(searchable,"Proizvod",new string('X',257),0));
         var product = store.ListItems().Single(p => p.Id == id);
         Expect(product.CurrentCents == 249, "Current price updated");
-        Expect(product.AnchorCents == 210 && product.AnchorDate == "2026-09-10", "Anchor unchanged");
+        Expect(product.AnchorCents == 210 && product.AnchorDate == "2025-05-02", "Anchor unchanged");
         MustThrow(() => store.AddItem("Bez izvora", "Proizvod", "", "", "", 1m, 1m, "2026-09-10", null));
-        MustThrow(() => store.AddItem("Pogrešan datum", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Izvor"));
         MustThrow(() => store.AddItem("Usluga 2025", "Usluga", "", "", "", 1m, 1m, "2025-05-02", "Povijest"));
         MustThrow(() => store.AddItem("Usluga prije opceg datuma", "Usluga", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: racun"));
-        MustThrow(() => store.AddItem("Roba bez klasifikacije", "Proizvod", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: racun"));
 
         MustThrow(() => store.AddItem("Preciznost", "Usluga", "", "", "", 1.123m, null, null, null));
         Expect(MoneyParser.Parse("12,50") == 12.50m, "Croatian decimal comma");
@@ -59,7 +64,7 @@ try
             "Official SIDRENA WordPress import header exactly matches canonical template");
         Expect(csvText.Contains("proizvod") && csvText.Contains("usluga"),
             "Windows goods and services map to WordPress expected kind values");
-        Expect(csvText.Contains("2026-09-10") && !csvText.Contains("SIDRENA_NACRT"),
+        Expect(csvText.Contains("2025-05-02") && !csvText.Contains("SIDRENA_NACRT"),
             "Verified historical reference date preserved in transfer");
         Expect(csvText.Contains("Mlijeko; \"\"punomasno\"\""),
             "WordPress compatible CSV escapes semicolons and quotations");
@@ -70,8 +75,17 @@ try
     using (var firstOfferStore = new PriceStore(Path.Combine(folder,"first-offer.db")))
     {
         var newGoods = firstOfferStore.AddItem("Prvi put ponuđeno", "Proizvod", "NEW-1", "", "kom", 2m, 2m, "2026-09-11", "Prva ponuda: račun od 11. 9. 2026.");
-        Expect(firstOfferStore.ListItems().Any(p => p.Id == newGoods && p.AnchorDate == "2026-09-11"), "Verified first-offer date accepted");
-        MustThrow(() => firstOfferStore.AddItem("Bez dokaza", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Račun"));
+        Expect(firstOfferStore.ListItems().Any(p => p.Id == newGoods && p.AnchorDate == "2026-09-11" && !p.AnchorVerified),
+            "First-offer date stored without automatic certification");
+        MustThrow(()=>firstOfferStore.ConfirmEvidence(newGoods,LegalEvidenceRules.General,"reference_day"));
+        firstOfferStore.ConfirmEvidence(newGoods,LegalEvidenceRules.General,"first_offer");
+        Expect(firstOfferStore.ListItems().Single(p=>p.Id==newGoods).AnchorVerified,
+            "Documented first-offer method confirmed after explicit classification");
+        var unclassified=firstOfferStore.AddItem("Roba bez klasifikacije", "Proizvod", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: račun");
+        MustThrow(()=>firstOfferStore.ConfirmEvidence(unclassified,LegalEvidenceRules.General,"first_offer"));
+        Expect(!firstOfferStore.ListItems().Single(p=>p.Id==unclassified).AnchorVerified,
+            "Unclassified historical date cannot be declared confirmed for general goods");
+        MustThrow(() => firstOfferStore.AddItem("Bez dokaza", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "X"));
     }
     using (var workspace = new WorkspaceStore(file))
     {
@@ -112,10 +126,13 @@ try
     {
         var empty=counts.GetCatalogueTotals();
         Expect(empty.Total==0&&empty.ConfirmedAnchors==0,"Empty catalogue counts");
-        counts.AddItem("A","Proizvod","A1","","kom",2m,1.50m,"2026-09-10","Račun A");
+        var oldItem=counts.AddItem("A","Proizvod","A1","","kom",2m,1.50m,"2026-09-10","Račun A");
         counts.AddItem("B","Usluga","B1","","kom",5m,null,null,null);
+        Expect(counts.GetCatalogueTotals().ConfirmedAnchors==0,
+            "Legacy amounts are unverified after additive SQLite migration");
+        counts.ConfirmEvidence(oldItem,LegalEvidenceRules.General,"reference_day");
         var totals=counts.GetCatalogueTotals();
-        Expect(totals.Total==2&&totals.ConfirmedAnchors==1,"SQL reference totals");
+        Expect(totals.Total==2&&totals.ConfirmedAnchors==1,"Verified SQL reference totals");
         using var countedWorkspace=new WorkspaceStore(Path.Combine(folder,"counter.db"));
         Expect(countedWorkspace.CountPriceChanges()==0&&countedWorkspace.CountDraftExports()==0,
             "Empty audits and draft counters");
@@ -185,13 +202,14 @@ try
     // Catalog editing must never alter the historical reference or current price.
     using (var editable = new PriceStore(file))
     {
+        var auditBeforeDetailChange=editable.ListMetadataChanges(id).Count;
         editable.UpdateItemDetails(id, "Mlijeko punomasno", "SKU-EDIT", "3851234567890", "l", "Ispravak naziva");
         var edited = editable.ListItems().Single(x => x.Id == id);
         Expect(edited.Name == "Mlijeko punomasno" && edited.Sku == "SKU-EDIT", "Metadata changes persisted");
         Expect(edited.CurrentCents == 249 && edited.AnchorCents == 210, "Edit preserves price and anchor");
-        Expect(editable.ListMetadataChanges(id).Count == 1, "Metadata has its own audit");
+        Expect(editable.ListMetadataChanges(id).Count == auditBeforeDetailChange+1, "Metadata and legal evidence have separate audit entries");
         editable.UpdateItemDetails(id, "Mlijeko punomasno", "SKU-EDIT", "3851234567890", "l", "Bez promjene");
-        Expect(editable.ListMetadataChanges(id).Count == 1, "Unchanged metadata does not create audit");
+        Expect(editable.ListMetadataChanges(id).Count == auditBeforeDetailChange+1, "Unchanged metadata does not create audit");
         MustThrow(() => editable.UpdateItemDetails(id, "", "sku", "", "", "Invalid name"));
         Expect(editable.ListItems().Single(x => x.Id == id).Name == "Mlijeko punomasno", "Invalid edit rolled back");
         editable.AddItem("Drugi proizvod", "Proizvod", "OTHER", "", "kom", 1m, null, null, null);
@@ -223,7 +241,7 @@ try
         Expect(destination.ListItems().Count == 2, "Batch collision rolls back all");
         var invalid = new List<CatalogImportRow>{
             new("Proizvod","Nova", "TEST-1", "", "kom",2m,null,null,null),
-            new("Proizvod","Lažni povijesni datum", "TEST-2", "", "kom",2m,1m,"2025-10-15","Nepoznato")
+            new("Proizvod","Lažni povijesni datum", "TEST-2", "", "kom",2m,1m,"2024-10-15","Nepoznato")
         };
         MustThrow(() => destination.ImportNewRows(invalid));
         Expect(destination.ListItems().Count == 2, "Invalid anchor rolls back entire batch");

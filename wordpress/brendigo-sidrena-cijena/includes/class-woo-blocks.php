@@ -43,7 +43,7 @@ final class Brendigo_Sidrena_Cijena_Woo_Blocks {
 		$meta = Brendigo_Sidrena_Cijena_Product_Meta::instance();
 		$id = $meta->display_id( $product->get_id() );
 		$price = $meta->get_price( $id );
-		if ( '' === $price ) {
+		if ( '' === $price || ! $meta->is_historical_verified( $id ) ) {
 			return array( 'text' => '' );
 		}
 		$amount = $meta->get_price_to_display( $product, $price );

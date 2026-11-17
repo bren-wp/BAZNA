@@ -33,6 +33,26 @@ class Brendigo_Sidrena_Cijena_Fields {
 				'kind'   => 'text',
 			),
 			array(
+				'post'   => 'bazna_historical_source',
+				'setter' => 'set_historical_source',
+				'kind'   => 'text',
+			),
+			array(
+				'post'   => 'bazna_reference_scope',
+				'setter' => 'set_reference_scope',
+				'kind'   => 'text',
+			),
+			array(
+				'post'   => 'bazna_historical_method',
+				'setter' => 'set_historical_method',
+				'kind'   => 'text',
+			),
+			array(
+				'post'   => 'bazna_historical_verified',
+				'setter' => 'set_historical_verified',
+				'kind'   => 'checkbox',
+			),
+			array(
 				'post'   => 'sidrena_naziv_posebnog_oblika',
 				'setter' => 'set_oblik',
 				'kind'   => 'text',

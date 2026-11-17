@@ -48,12 +48,12 @@ final class CatalogForm extends FormBase {
       'products' => ['label' => 'Proizvodi', 'fields' => [
         'id', 'naziv', 'sku', 'marka', 'neto_kolicina', 'jedinica_mjere',
         'ean_barkod', 'barkod', 'maloprodajna_cijena', 'sidrena_cijena',
-        'sidrena_datum', 'cijena_jedinice_mjere', 'naziv_posebnog_oblika',
+        'sidrena_datum', 'historical_source', 'reference_scope', 'historical_method', 'cijena_jedinice_mjere', 'naziv_posebnog_oblika',
         'dostupnost', 'slika_url', 'outlet',
       ]],
       'services' => ['label' => 'Usluge', 'fields' => [
         'id', 'naziv', 'maloprodajna_cijena', 'sidrena_cijena',
-        'sidrena_datum', 'naziv_posebnog_oblika', 'outlet',
+        'sidrena_datum', 'historical_source', 'reference_scope', 'historical_method', 'naziv_posebnog_oblika', 'outlet',
       ]],
       'on_request' => ['label' => 'Usluge s cijenom na upit', 'fields' => [
         'id', 'naziv', 'kriteriji', 'outlet',
@@ -78,10 +78,19 @@ final class CatalogForm extends FormBase {
         ];
         foreach ($group['fields'] as $field) {
           $form['catalog'][$key][$number][$field] = [
-            '#type' => $field === 'sidrena_datum' ? 'date' : 'textfield',
+            '#type' => $field === 'sidrena_datum' ? 'date' :
+              (in_array($field, ['reference_scope', 'historical_method'], TRUE) ? 'select' : 'textfield'),
             '#title' => str_replace('_', ' ', ucfirst($field)),
             '#default_value' => (string) ($row[$field] ?? ''),
             '#maxlength' => $field === 'naziv' ? 240 : 800,
+            '#options' => $field === 'reference_scope' ? [
+                '' => 'Odaberite skupinu', 'legacy_fmcg' => 'FMCG / 2.5.2025.',
+                'general_goods_services' => 'Ostalo / 10.9.2026.',
+              ] : ($field === 'historical_method' ? [
+                '' => 'Odaberite metodu', 'reference_day' => 'Referentni dan',
+                'first_offer' => 'Prva ponuda', 'discount_lowest_30d' => 'FMCG: najniža prije popusta',
+                'discount_previous_retail' => 'Ostalo: prethodna maloprodajna',
+              ] : []),
           ];
         }
         if ($key === 'products' || $key === 'services') {

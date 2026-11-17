@@ -724,6 +724,68 @@ class Brendigo_Sidrena_Cijena_Archive {
 	 * @param string $oznaka Object code, empty for every file.
 	 * @return string
 	 */
+	/**
+	 * Find public, timestamped NN 132/2026 official versions. Unlike the
+	 * legacy daily archive, these snapshots have separate unique sequence
+	 * filenames and are never replaced merely because another update occurred
+	 * on the same calendar day.
+	 *
+	 * @param string $oznaka Optional outlet code.
+	 * @return array<int,array<string,mixed>> Public files, newest first.
+	 */
+	public function get_official_archive_files( $oznaka = '' ) {
+		$settings = Brendigo_Sidrena_Cijena_Settings::instance();
+		$identity = (string) $settings->get( 'trader_identifier', '' );
+		$id_kind = (string) $settings->get( 'trader_identifier_kind', 'oib' );
+		if ( ! Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( $identity, $id_kind ) ) {
+			return array();
+		}
+		$oznaka = $settings->normalize_oznaka( $oznaka );
+		$uploads = wp_upload_dir( null, false );
+		$dir = Brendigo_Sidrena_Cijena_Feed_Files::instance()->get_public_dir();
+		if ( empty( $uploads['baseurl'] ) || ! empty( $uploads['error'] ) || '' === $dir ) {
+			return array();
+		}
+		$entries = Brendigo_Sidrena_Cijena_Filesystem::dirlist( $dir );
+		if ( ! is_array( $entries ) ) {
+			return array();
+		}
+		$files = array();
+		foreach ( $entries as $name => $details ) {
+			$name = (string) $name;
+			if ( ! is_array( $details ) || ( isset( $details['type'] ) && 'f' !== $details['type'] ) ) {
+				continue;
+			}
+			// Permit letters, digits, hyphens and underscores in the outlet part
+			// but do not expose arbitrary uploads or private compatibility files.
+			if ( ! preg_match( '/^([0-9]{8,11})_([\\p{L}\\p{N} ._-]+)_(ROBA|USLUGE)_([0-9]+)_([0-9]{8})_([0-9]{4})\\.(csv|xml)$/uD', $name, $parts ) ||
+				$parts[1] !== $identity ) {
+				continue;
+			}
+			$place = $parts[2];
+			if ( '' !== $oznaka && ! str_ends_with( $place, '_' . $oznaka ) &&
+				'ZA_SVA_PRODAJNA_MJESTA' !== $place ) {
+				continue;
+			}
+			$iso_stamp = $parts[5] . '_' . $parts[6];
+			$timestamp = DateTimeImmutable::createFromFormat( '!Ymd_Hi', $iso_stamp, wp_timezone() );
+			if ( ! $timestamp instanceof DateTimeImmutable || $timestamp->format( 'Ymd_Hi' ) !== $iso_stamp ) {
+				continue;
+			}
+			$files[] = array(
+				'name' => $name,
+				'kind' => 'ROBA' === $parts[3] ? 'proizvodi' : 'usluge',
+				'ext' => $parts[7],
+				'stamp' => $timestamp->getTimestamp(),
+				'url' => esc_url_raw( trailingslashit( $uploads['baseurl'] ) . 'sidrena-cijena/' . rawurlencode( $name ) ),
+			);
+		}
+		usort( $files, static function ( $a, $b ) {
+			return $b['stamp'] <=> $a['stamp'] ?: strcmp( $b['name'], $a['name'] );
+		} );
+		return $files;
+	}
+
 	public function get_archive_embed_html( $oznaka = '' ) {
 		$files  = $this->get_archive_files();
 		$oznaka = Brendigo_Sidrena_Cijena_Settings::instance()->normalize_oznaka( $oznaka );
@@ -738,11 +800,27 @@ class Brendigo_Sidrena_Cijena_Archive {
 			$files = $matched;
 		}
 
-		if ( array() === $files ) {
+		$official = $this->get_official_archive_files( $oznaka );
+		if ( array() === $files && array() === $official ) {
 			return '<p class="sidrena-arhiva-empty">' . esc_html__( 'Arhiva je prazna.', 'brendigo-sidrena-cijena' ) . '</p>';
 		}
 
-		$html = '<ol class="sidrena-arhiva">';
+		$html = '';
+		if ( array() !== $official ) {
+			$html .= '<h4 class="bazna-archive-heading">' . esc_html__( 'Službeni CSV/XML cjenici', 'brendigo-sidrena-cijena' ) . '</h4><ol class="sidrena-arhiva bazna-official-archive">';
+			foreach ( $official as $file ) {
+				$html .= '<li><a href="' . esc_url( $file['url'] ) . '">' . esc_html( $file['name'] ) . '</a>';
+				$html .= '<span>' . esc_html( wp_date( 'd.m.Y. H:i', $file['stamp'] ) ) . '</span></li>';
+			}
+			$html .= '</ol>';
+		}
+		if ( array() === $files ) {
+			return $html;
+		}
+		if ( array() !== $official ) {
+			$html .= '<h4 class="bazna-archive-heading">' . esc_html__( 'Starija kompatibilna arhiva', 'brendigo-sidrena-cijena' ) . '</h4>';
+		}
+		$html .= '<ol class="sidrena-arhiva">';
 		foreach ( $files as $file ) {
 			$stamp = isset( $file['stamp'] ) ? (int) $file['stamp'] : 0;
 			$label = $stamp ? wp_date( 'd.m.Y. H:i', $stamp ) : ( isset( $file['date'] ) ? (string) $file['date'] : '' );

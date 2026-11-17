@@ -43,6 +43,9 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 		// retained for compatibility with older third-party integrations.
 		add_action( 'added_post_meta', array( $this, 'maybe_clear_overview_cache' ), 10, 4 );
 		add_action( 'updated_post_meta', array( $this, 'maybe_clear_overview_cache' ), 10, 4 );
+		add_action( 'updated_post_meta', array( $this, 'invalidate_evidence_on_change' ), 20, 4 );
+		add_action( 'added_post_meta', array( $this, 'invalidate_evidence_on_change' ), 20, 4 );
+		add_action( 'deleted_post_meta', array( $this, 'invalidate_evidence_on_change' ), 20, 4 );
 		add_action( 'deleted_post_meta', array( $this, 'maybe_clear_overview_cache' ), 10, 4 );
 		add_action( 'transition_post_status', array( $this, 'maybe_clear_overview_cache_on_status' ), 10, 3 );
 	}
@@ -89,6 +92,14 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			},
 			'_bazna_neto_kolicina' => static function ( $value ) { return substr( sanitize_text_field( $value ), 0, 100 ); },
 			'_bazna_ean_barkod' => static function ( $value ) { return Brendigo_Sidrena_Cijena_Official_Feed::valid_ean( $value ) ? (string) $value : ''; },
+			'_bazna_historical_source' => static function ( $value ) { return substr( sanitize_text_field( $value ), 0, 500 ); },
+			'_bazna_reference_scope' => static function ( $value ) {
+				return in_array( $value, array( 'legacy_fmcg', 'general_goods_services' ), true ) ? $value : '';
+			},
+			'_bazna_historical_method' => static function ( $value ) {
+				return in_array( $value, array( 'reference_day', 'first_offer', 'discount_lowest_30d', 'discount_previous_retail' ), true ) ? $value : '';
+			},
+			'_bazna_historical_verified' => static function ( $value ) { return 'yes' === $value ? 'yes' : ''; },
 			BRENDIGO_SIDRENA_CIJENA_META_VISIBILITY => static function ( $value ) {
 				$value = sanitize_key( $value );
 				return in_array( $value, array( 'include', 'exclude' ), true ) ? $value : '';
@@ -99,6 +110,10 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			foreach ( $sanitizers as $meta_key => $sanitize_callback ) {
 				$args = $common;
 				$args['sanitize_callback'] = $sanitize_callback;
+				if ( 0 === strpos( $meta_key, '_bazna_historical_' ) || '_bazna_reference_scope' === $meta_key ) {
+					// Documentary references and attestations are private administrative metadata.
+					$args['show_in_rest'] = false;
+				}
 				register_post_meta( $type, $meta_key, $args );
 			}
 		}
@@ -421,6 +436,104 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 	}
 
 	/**
+	 * Documentary reference retained only in authenticated product metadata.
+	 * Saving a changed source invalidates the earlier verification marker.
+	 */
+	public function get_historical_source( $product_id ) {
+		return (string) get_post_meta( absint( $product_id ), '_bazna_historical_source', true );
+	}
+
+	public function set_historical_source( $product_id, $value ) {
+		$value = substr( sanitize_text_field( $value ), 0, 500 );
+		return '' === $value
+			? $this->delete_meta_if_present( $product_id, '_bazna_historical_source' )
+			: $this->update_meta_if_changed( $product_id, '_bazna_historical_source', $value );
+	}
+
+	public function get_reference_scope( $product_id ) {
+		return (string) get_post_meta( absint( $product_id ), '_bazna_reference_scope', true );
+	}
+
+	public function set_reference_scope( $product_id, $value ) {
+		$value = in_array( $value, array( 'legacy_fmcg', 'general_goods_services' ), true ) ? $value : '';
+		return '' === $value
+			? $this->delete_meta_if_present( $product_id, '_bazna_reference_scope' )
+			: $this->update_meta_if_changed( $product_id, '_bazna_reference_scope', $value );
+	}
+
+	public function get_historical_method( $product_id ) {
+		return (string) get_post_meta( absint( $product_id ), '_bazna_historical_method', true );
+	}
+
+	public function set_historical_method( $product_id, $value ) {
+		$value = in_array( $value, array( 'reference_day', 'first_offer', 'discount_lowest_30d', 'discount_previous_retail' ), true ) ? $value : '';
+		return '' === $value
+			? $this->delete_meta_if_present( $product_id, '_bazna_historical_method' )
+			: $this->update_meta_if_changed( $product_id, '_bazna_historical_method', $value );
+	}
+
+	/**
+	 * Structural evidence check, not a legal certification of source truth.
+	 * A legacy populated base price has NO verified marker until reviewed.
+	 */
+	public function is_historical_verified( $product_id ) {
+		$product_id = absint( $product_id );
+		if ( 'yes' !== get_post_meta( $product_id, '_bazna_historical_verified', true ) ||
+			'' === $this->get_price( $product_id ) ||
+			strlen( trim( $this->get_historical_source( $product_id ) ) ) < 4 ) {
+			return false;
+		}
+		return '' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue(
+			array(
+				'historical_verified' => 'yes',
+				'reference_scope' => $this->get_reference_scope( $product_id ),
+				'historical_method' => $this->get_historical_method( $product_id ),
+				'sidrena_datum' => $this->get_date( $product_id ),
+			),
+			'proizvodi'
+		);
+	}
+
+	public function set_historical_verified( $product_id, $enabled ) {
+		if ( ! $enabled || ! $this->is_historical_evidence_ready( $product_id ) ) {
+			return $this->delete_meta_if_present( $product_id, '_bazna_historical_verified' );
+		}
+		return $this->update_meta_if_changed( $product_id, '_bazna_historical_verified', 'yes' );
+	}
+
+	private function is_historical_evidence_ready( $product_id ) {
+		if ( '' === $this->get_price( $product_id ) ||
+			strlen( trim( $this->get_historical_source( $product_id ) ) ) < 4 ) {
+			return false;
+		}
+		return '' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue(
+			array(
+				'historical_verified' => 'yes',
+				'reference_scope' => $this->get_reference_scope( $product_id ),
+				'historical_method' => $this->get_historical_method( $product_id ),
+				'sidrena_datum' => $this->get_date( $product_id ),
+			),
+			'proizvodi'
+		);
+	}
+
+	/**
+	 * REST imports and third-party writes also revoke stale attestations.
+	 * Internal save methods write evidence last, after price/date/source.
+	 */
+	public function invalidate_evidence_on_change( $meta_id, $product_id, $meta_key, $value ) {
+		if ( in_array( $meta_key, array(
+			BRENDIGO_SIDRENA_CIJENA_META_PRICE,
+			BRENDIGO_SIDRENA_CIJENA_META_DATE,
+			'_bazna_historical_source',
+			'_bazna_reference_scope',
+			'_bazna_historical_method',
+		), true ) ) {
+			$this->delete_meta_if_present( $product_id, '_bazna_historical_verified' );
+		}
+	}
+
+	/**
 	 * Whether the product has the CJM unit suffix enabled.
 	 *
 	 * @param int $product_id Product or variation ID.
@@ -711,6 +824,10 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			BRENDIGO_SIDRENA_CIJENA_META_BARCODE => 'barkod',
 			'_bazna_neto_kolicina' => 'neto_kolicina',
 			'_bazna_ean_barkod' => 'ean_barkod',
+			'_bazna_historical_source' => 'historical_source',
+			'_bazna_reference_scope' => 'reference_scope',
+			'_bazna_historical_method' => 'historical_method',
+			'_bazna_historical_verified' => 'historical_verified',
 			BRENDIGO_SIDRENA_CIJENA_META_VISIBILITY => 'visibility',
 		);
 		if ( isset( $fields[ $meta_key ] ) ) {

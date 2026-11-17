@@ -96,6 +96,14 @@ i ne pristupa korisničkim računima u WordPressu.
 
 [Detaljna matrica platformi](docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
 
+## Javni cjenici i arhiva na vlastitoj stranici
+
+Postavite u WordPress blok **Kratki kod**: `[bazna_objava]` za pregledan cjenik s arhivom i poveznicama na stvarno objavljene službene CSV/XML datoteke. Odvojeni prikazi: `[bazna_cjenik]`, `[bazna_arhiva]` i `[bazna_datoteke]`. Za pojedinu poslovnicu koristite atribut `oznaka`; za robu/usluge `vrsta`.
+
+**BAZNA → Postavke** nudi tamnu/svijetlu temu, četiri naglasne boje i razmake. Obvezni strojno čitljivi CSV/XML ostaje neovisan o izgledu HTML stranice. Ugrađivanje ne zamjenjuje poslužiteljski cron, obvezu objave do 11:00, javnu 15-dnevnu arhivu ni provjeru izvora bazne cijene.
+
+[Upute za ugradnju, boje, CSV/XML i arhivu](docs/BAZNA-PUBLIC-EMBEDS.md)
+
 ## Jedan BAZNA ekosustav
 
 | Platforma | Namjena | Verzija | Status |

@@ -560,7 +560,14 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 			wp_register_style( $style_handle, $style_url, array(), BRENDIGO_SIDRENA_CIJENA_VERSION );
 			wp_print_styles( $style_handle );
 		}
-		echo '</head><body><main>';
+		// The same validated theme and accent apply to standalone public routes
+		// and shortcode embeds. The legal CSV/XML payload is unchanged.
+		$appearance_handle = 'bazna-public-appearance';
+		if ( ! wp_style_is( $appearance_handle, 'registered' ) ) {
+			wp_register_style( $appearance_handle, BRENDIGO_SIDRENA_CIJENA_URL . 'assets/css/public-appearance.css', array(), BRENDIGO_SIDRENA_CIJENA_VERSION );
+		}
+		wp_print_styles( $appearance_handle );
+		echo '</head><body class="' . esc_attr( Brendigo_Sidrena_Cijena_Settings::instance()->public_appearance_classes() ) . '"><main>';
 	}
 
 	/**
@@ -600,6 +607,7 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 	 */
 	public function serve_archive_page() {
 		$files = Brendigo_Sidrena_Cijena_Archive::instance()->get_archive_files();
+		$official_files = Brendigo_Sidrena_Cijena_Archive::instance()->get_official_archive_files();
 		$shop  = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
 		$title = __( 'Arhiva baznih cijena', 'brendigo-sidrena-cijena' );
 
@@ -614,18 +622,29 @@ class Brendigo_Sidrena_Cijena_Feed_Routes {
 		echo '<h1>' . esc_html( $title ) . '</h1>';
 		echo '<p>' . esc_html( $shop ) . ' - ' . esc_html(
 			Brendigo_Sidrena_Cijena_Settings::instance()->is_multi_poslovnica()
-				? __( 'Dnevni cjenici (XML ili CSV), najviše 30 datoteka po poslovnici.', 'brendigo-sidrena-cijena' )
-				: __( 'Dnevni cjenici (XML ili CSV), najviše 30 zadnjih datoteka.', 'brendigo-sidrena-cijena' )
+				? __( 'Objavljene verzije po poslovnicama u CSV/XML formatu, uključujući službene datoteke i stariju arhivu.', 'brendigo-sidrena-cijena' )
+				: __( 'Objavljene verzije cjenika u CSV/XML formatu, uključujući službene datoteke i stariju arhivu.', 'brendigo-sidrena-cijena' )
 		) . '</p>';
 
-		if ( empty( $files ) ) {
-			echo '<p class="empty">' . esc_html__( 'Arhiva je prazna. Datoteke se dodaju nakon uspješnih dnevnih generiranja prema rasporedu postavljenom u administraciji.', 'brendigo-sidrena-cijena' ) . '</p>';
-		} elseif ( Brendigo_Sidrena_Cijena_Settings::instance()->is_multi_poslovnica() ) {
-			$this->render_archive_groups( $files );
-		} else {
-			echo '<ol>';
-			$this->render_archive_file_items( $files );
+		if ( empty( $files ) && empty( $official_files ) ) {
+			echo '<p class="empty">' . esc_html__( 'Arhiva je prazna. Datoteke se dodaju nakon uspješne objave.', 'brendigo-sidrena-cijena' ) . '</p>';
+		}
+		if ( ! empty( $official_files ) ) {
+			echo '<h2>' . esc_html__( 'Službeni CSV/XML cjenici', 'brendigo-sidrena-cijena' ) . '</h2><ol>';
+			$this->render_archive_file_items( $official_files );
 			echo '</ol>';
+		}
+		if ( ! empty( $files ) ) {
+			if ( ! empty( $official_files ) ) {
+				echo '<h2>' . esc_html__( 'Starija kompatibilna arhiva', 'brendigo-sidrena-cijena' ) . '</h2>';
+			}
+			if ( Brendigo_Sidrena_Cijena_Settings::instance()->is_multi_poslovnica() ) {
+				$this->render_archive_groups( $files );
+			} else {
+				echo '<ol>';
+				$this->render_archive_file_items( $files );
+				echo '</ol>';
+			}
 		}
 
 		$this->render_back_to_home( $shop );

@@ -18,6 +18,21 @@ final class Core
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
         'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
+        'historical_source', 'reference_scope', 'historical_method',
+        'barkod', 'dostupnost', 'slika_url',
+    ];
+    /**
+     * Immutable v1 client feed schema. PRIVATE documentary evidence is held
+     * in draft/published JSON outside DocumentRoot but NEVER sent in public
+     * CSV/XML or returned to Android/Windows clients.
+     *
+     * Do not derive this from FIELDS: administrative fields can be added
+     * without silently expanding the public API or exposing invoice IDs.
+     */
+    public const PUBLIC_FIELDS = [
+        'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
+        'cijena_jedinice_mjere', 'maloprodajna_cijena',
+        'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
         'barkod', 'dostupnost', 'slika_url',
     ];
     public const KINDS = ['proizvodi', 'usluge'];
@@ -61,7 +76,7 @@ final class Core
         }
     }
 
-    public static function validateItem(array $input): array
+    public static function validateItem(array $input, string $kind = 'proizvodi'): array
     {
         $row = [];
         foreach (self::FIELDS as $field) {
@@ -83,13 +98,25 @@ final class Core
                 throw new InvalidArgumentException('Neispravan iznos: ' . $money);
             }
         }
-        if ($row['sidrena_cijena'] !== '') {
-            $date = $row['sidrena_datum'];
-            $validDate = preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $date, $m) &&
-                checkdate((int) $m[2], (int) $m[3], (int) $m[1]);
-            if (!$validDate || ($input['historical_verified'] ?? false) !== true) {
-                throw new InvalidArgumentException('Bazna cijena zahtijeva stvarno potvrđen povijesni iznos i datum.');
-            }
+        if (strlen($row['historical_source']) > 500 ||
+            ($row['reference_scope'] !== '' && !isset(self::REFERENCE_DATES[$row['reference_scope']])) ||
+            ($row['historical_method'] !== '' && !in_array($row['historical_method'], [
+                'reference_day', 'first_offer', 'discount_lowest_30d', 'discount_previous_retail',
+            ], true))) {
+            throw new InvalidArgumentException('Neispravan izvor, referentna skupina ili metoda bazne cijene.');
+        }
+        // Incomplete evidence is permitted in PRIVATE drafts. Only a complete
+        // and explicitly attested record can be marked verified; publish()
+        // makes incomplete drafts inaccessible through public CSV/XML/HTML.
+        $verified = ($input['historical_verified'] ?? false) === true;
+        $date = $row['sidrena_datum'];
+        if ($date !== '' && (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $date, $m) ||
+            !checkdate((int) $m[2], (int) $m[3], (int) $m[1]))) {
+            throw new InvalidArgumentException('Datum bazne cijene mora biti valjan YYYY-MM-DD.');
+        }
+        if ($verified && ($row['sidrena_cijena'] === '' ||
+            self::legalEvidenceIssue(array_merge($row, ['historical_verified' => true]), $kind) !== '')) {
+            throw new InvalidArgumentException('Potvrda povijesne cijene zahtijeva dokaz, referentnu skupinu, metodu i datum.');
         }
         if ($row['ean_barkod'] !== '' && !self::validEan($row['ean_barkod'])) {
             throw new InvalidArgumentException('EAN-8/EAN-13 kontrolna znamenka nije valjana.');
@@ -173,7 +200,7 @@ final class Core
         foreach (['products', 'services'] as $collection) {
             foreach ($document[$collection] ?? [] as $input) {
                 if (!is_array($input)) throw new InvalidArgumentException('Neispravna stavka.');
-                $row = self::validateItem($input);
+                $row = self::validateItem($input, $collection === 'products' ? 'proizvodi' : 'usluge');
                 if ($row['outlet'] !== '' && !isset($seen[strtolower($row['outlet'])])) {
                     throw new InvalidArgumentException('Stavka je pridružena nepostojećoj poslovnici.');
                 }
@@ -256,11 +283,45 @@ final class Core
         }
     }
 
+    /**
+     * An existing attestation is revoked when any of its underlying historic
+     * inputs change. This also applies to entire JSON/Shopify catalog imports:
+     * a copied "verified=true" flag may not survive a changed reference price.
+     */
+    private static function revokeStaleEvidence(array $before, array $after): array
+    {
+        $inputs = ['sidrena_cijena', 'sidrena_datum', 'historical_source',
+            'reference_scope', 'historical_method'];
+        foreach (['products', 'services'] as $kind) {
+            $oldRows = [];
+            foreach ($before[$kind] ?? [] as $row) {
+                if (is_array($row) && is_scalar($row['id'] ?? null)) {
+                    $oldRows[(string) $row['id']] = $row;
+                }
+            }
+            foreach ($after[$kind] ?? [] as $index => $row) {
+                if (!is_array($row) || !is_scalar($row['id'] ?? null)) continue;
+                $old = $oldRows[(string) $row['id']] ?? null;
+                // A first documented attestation is permitted while editing
+                // an earlier unverified draft. Only an ALREADY attested
+                // historic value can carry a stale checked flag forward.
+                if (!is_array($old) || ($old['historical_verified'] ?? false) !== true) continue;
+                foreach ($inputs as $field) {
+                    if ((string) ($old[$field] ?? '') !== (string) ($row[$field] ?? '')) {
+                        $after[$kind][$index]['historical_verified'] = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return $after;
+    }
+
     public function saveDraft(array $document): void
     {
-        $validated = self::validateCatalog($document);
-        $this->catalogTransaction(function () use ($validated): void {
-            $this->write('draft.json', $validated);
+        $this->catalogTransaction(function () use ($document): void {
+            $prepared = self::revokeStaleEvidence($this->read('draft.json'), $document);
+            $this->write('draft.json', self::validateCatalog($prepared));
         });
     }
 
@@ -277,6 +338,7 @@ final class Core
         }
         $this->catalogTransaction(function () use ($collection, $index, $row, $expectedHash): void {
             $draft = $this->read('draft.json');
+            $before = $draft;
             $rows = $draft[$collection] ?? [];
             if (!is_array($rows) || !array_is_list($rows)) {
                 throw new RuntimeException('Neispravan zapis kataloga.');
@@ -313,6 +375,7 @@ final class Core
                 }
             }
             $draft[$collection] = $rows;
+            $draft = self::revokeStaleEvidence($before, $draft);
             $validated = self::validateCatalog($draft);
             if ($collection !== 'outlets') {
                 $seen = [];
@@ -338,6 +401,21 @@ final class Core
     {
         return $this->catalogTransaction(function () use ($onlyWhenChanged, $requireOfficial): array {
             $catalog = self::validateCatalog($this->read('draft.json'));
+            // Public compatibility feeds and official feeds MUST agree:
+            // manual publication cannot bypass the documentary check.
+            // Preserve drafts and the last published snapshot on failure.
+            foreach (['products' => 'proizvodi', 'services' => 'usluge'] as $collection => $kind) {
+                foreach ($catalog[$collection] as $index => $row) {
+                    if ($row['sidrena_cijena'] === '') continue;
+                    $issue = self::legalEvidenceIssue($row, $kind);
+                    if ($issue !== '') {
+                        throw new RuntimeException(
+                            'Javna objava blokirana: ' . $kind . ', redak ' . ($index + 1) .
+                            ', provjerite ' . $issue . '.'
+                        );
+                    }
+                }
+            }
             $existing = $this->read('published.json');
             $identity = $this->officialIdentity();
             if ($requireOfficial) {
@@ -435,6 +513,22 @@ final class Core
      * Never read draft.json, never infer an unpublished historical price.
      * Search covers both numeric services and price-on-request criteria.
      */
+    /**
+     * Upgrade-safe public projection for snapshots created before explicit
+     * evidence fields existed. Preserve the CURRENT price, while refusing to
+     * advertise an unverified historical amount or date as a legal baseline.
+     * The private immutable JSON snapshot is not modified.
+     */
+    private static function safePublicPriceRow(array $row, string $kind): array
+    {
+        if (trim((string) ($row['sidrena_cijena'] ?? '')) !== '' &&
+            self::legalEvidenceIssue($row, $kind) !== '') {
+            $row['sidrena_cijena'] = '';
+            $row['sidrena_datum'] = '';
+        }
+        return $row;
+    }
+
     public function publicCatalogHtml(string $kind, string $outlet = '', string $query = ''): string
     {
         if (!in_array($kind, self::KINDS, true) ||
@@ -460,7 +554,7 @@ final class Core
         };
         $rows = $published[$kind === 'proizvodi' ? 'products' : 'services'] ?? [];
         $html = '<section class="bazna-panel bazna-table-scroll"><table><thead><tr>' .
-            '<th>Naziv</th><th>SKU</th><th>Redovna cijena</th><th>Bazna cijena</th>' .
+            '<th>Naziv</th><th>SKU</th><th>Maloprodajna cijena</th><th>Bazna cijena</th>' .
             '<th>Referentni datum</th><th>Jedinica mjere</th><th>Dostupnost</th>' .
             '</tr></thead><tbody>';
         $count = 0;
@@ -472,6 +566,7 @@ final class Core
                 ]))) {
                 continue;
             }
+            $row = self::safePublicPriceRow($row, $kind);
             $fields = ['naziv', 'sku', 'maloprodajna_cijena', 'sidrena_cijena',
                 'sidrena_datum', 'jedinica_mjere', 'dostupnost'];
             $html .= '<tr>';
@@ -482,7 +577,7 @@ final class Core
                     $value .= ' €';
                 }
                 $html .= '<td data-label="' . self::esc([
-                    'naziv' => 'Naziv', 'sku' => 'SKU', 'maloprodajna_cijena' => 'Redovna cijena',
+                    'naziv' => 'Naziv', 'sku' => 'SKU', 'maloprodajna_cijena' => 'Maloprodajna cijena',
                     'sidrena_cijena' => 'Bazna cijena', 'sidrena_datum' => 'Referentni datum',
                     'jedinica_mjere' => 'Jedinica mjere', 'dostupnost' => 'Dostupnost',
                 ][$field]) . '">' . self::esc($value) . '</td>';
@@ -561,6 +656,34 @@ final class Core
         return preg_match('/^\d{8}$/D', $mb) ? $mb : '';
     }
 
+    /**
+     * Structurally validate one documented NN132 reference; never infer a
+     * historic retail price from the current price or a Shopify compareAt.
+     * This contract intentionally matches WP Official_Feed::evidence_issue.
+     */
+    public static function legalEvidenceIssue(array $row, string $kind): string
+    {
+        if (($row['historical_verified'] ?? false) !== true) return 'historical_verified';
+        if (strlen(trim((string) ($row['historical_source'] ?? ''))) < 4) return 'historical_source';
+        $scope = (string) ($row['reference_scope'] ?? '');
+        $method = (string) ($row['historical_method'] ?? '');
+        if (!isset(self::REFERENCE_DATES[$scope]) ||
+            ($kind === 'usluge' && $scope === 'legacy_fmcg')) return 'reference_scope';
+        $reference = self::REFERENCE_DATES[$scope];
+        $date = (string) ($row['sidrena_datum'] ?? '');
+        if (!preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $date, $m) ||
+            !checkdate((int) $m[2], (int) $m[3], (int) $m[1]) ||
+            $date < $reference ||
+            $date > (new \DateTimeImmutable('now', new \DateTimeZone('Europe/Zagreb')))->format('Y-m-d')) {
+            return 'sidrena_datum';
+        }
+        if ($method === 'reference_day') return $date === $reference ? '' : 'historical_method';
+        if ($method === 'first_offer') return $date > $reference ? '' : 'historical_method';
+        if ($method === 'discount_lowest_30d' && $scope === 'legacy_fmcg') return '';
+        if ($method === 'discount_previous_retail' && $scope === 'general_goods_services') return '';
+        return 'historical_method';
+    }
+
     /** Preview missing historical data, never silently certify a catalog. */
     public function officialMissing(string $kind, string $outlet = '', ?array $snapshot = null): array
     {
@@ -576,6 +699,12 @@ final class Core
             foreach (['naziv', 'maloprodajna_cijena', 'sidrena_cijena'] as $field) {
                 if (trim((string) ($row[$field] ?? '')) === '') {
                     $issues[] = ['row' => $index + 1, 'field' => $field];
+                }
+            }
+            if (trim((string) ($row['sidrena_cijena'] ?? '')) !== '') {
+                $evidenceIssue = self::legalEvidenceIssue($row, $kind);
+                if ($evidenceIssue !== '') {
+                    $issues[] = ['row' => $index + 1, 'field' => $evidenceIssue];
                 }
             }
             if (!empty($row['cijena_jedinice_mjere']) && $kind === 'proizvodi') {
@@ -679,12 +808,8 @@ final class Core
         fwrite($f, "\xEF\xBB\xBF");
         fputcsv($f, self::OFFICIAL_FIELDS[$kind], ';', '"', '');
         foreach ($rows as $row) {
-            $values = array_values($row);
-            foreach ($values as &$value) {
-                if (preg_match('/^[\s]*[=+\-@]/u', (string) $value)) $value = "'" . $value;
-            }
-            unset($value);
-            fputcsv($f, $values, ';', '"', '');
+            fputcsv($f, array_map(static fn($value): string =>
+                self::safeCsvCell((string) $value), array_values($row)), ';', '"', '');
         }
         rewind($f);
         $content = (string) stream_get_contents($f);
@@ -711,6 +836,20 @@ final class Core
         return (string) $dom->saveXML();
     }
 
+    /**
+     * CSV is consumed by spreadsheet applications as well as mobile clients.
+     * Preserve ordinary values but prevent a merchant-controlled product
+     * name, SKU or other text from becoming executable spreadsheet formula.
+     */
+    private static function safeCsvCell(string $value): string
+    {
+        if ($value !== '' && (preg_match('/^[\\x00-\\x1F\\x7F]/', $value) ||
+            preg_match('/^\\s*[=+\\-@]/u', $value))) {
+            return "'" . $value;
+        }
+        return $value;
+    }
+
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
     {
         if (!in_array($kind, self::KINDS, true) || ($outlet !== '' &&
@@ -722,10 +861,12 @@ final class Core
         $handle = fopen('php://temp', 'w+');
         if (!$handle) throw new RuntimeException('CSV nije moguće pripremiti.');
         fwrite($handle, "\xEF\xBB\xBF");
-        fputcsv($handle, self::FIELDS, ';', '"', '');
+        fputcsv($handle, self::PUBLIC_FIELDS, ';', '"', '');
         foreach ($rows as $row) {
             if (($row['outlet'] ?? '') !== $outlet) continue;
-            fputcsv($handle, array_map(static fn($field) => $row[$field] ?? '', self::FIELDS), ';', '"', '');
+            $row = self::safePublicPriceRow($row, $kind);
+            fputcsv($handle, array_map(static fn($field): string =>
+                self::safeCsvCell((string) ($row[$field] ?? '')), self::PUBLIC_FIELDS), ';', '"', '');
         }
         rewind($handle);
         $csv = stream_get_contents($handle);

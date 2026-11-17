@@ -26,8 +26,8 @@ public static class CatalogViewFilter
                 item.Barcode.Contains(term,StringComparison.OrdinalIgnoreCase)) &&
             (anchorMode switch
             {
-                1 => item.AnchorCents.HasValue,
-                2 => !item.AnchorCents.HasValue,
+                1 => item.AnchorVerified,
+                2 => !item.AnchorVerified,
                 _ => true
             })).ToList();
     }
