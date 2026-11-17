@@ -237,7 +237,7 @@ public partial class MainWindow : Window
         foreach(var file in newest)
             exports.Children.Add(U.Muted($"{file.CreatedUtc.ToLocalTime():dd. MM. yyyy. HH:mm}  · {file.Format}  · {Path.GetFileName(file.FilePath)}"));
         exports.Children.Add(U.Action("Otvori arhivu →",()=>Navigate("Arhiva")));
-        exports.Children.Add(U.Notice("Bazna cijena predstavlja dokumentirani povijesni podatak, a ne automatski izračunati popust."));
+        exports.Children.Add(U.Muted("Bazna cijena zahtijeva povijesni dokaz."));
         outer.Children.Add(U.Split(history,U.Card("Status izvoza",exports)));
         return outer;
     }
@@ -329,7 +329,7 @@ public partial class MainWindow : Window
         rightFields.Children.Add(money);
         rightFields.Children.Add(U.Field("Datum povijesne cijene (YYYY-MM-DD)",date));
         rightFields.Children.Add(U.Field("Izvor povijesne cijene",source));
-        rightFields.Children.Add(U.Notice("Unos je neprovjereni nacrt. Unesite točan dan, a nakon spremanja u detaljima odaberite skupinu i metodu te zasebno potvrdite dokumentirani izvor."));
+        rightFields.Children.Add(U.Notice("Za potvrdu bazne cijene priložite povijesni dokaz. Zapis ostaje nacrt do potvrde dokumentirani izvor."));
         rightFields.Children.Add(U.Action("Spremi novu stavku",()=>{
             try{
                 var historical=string.IsNullOrWhiteSpace(anchor.Text)?(decimal?)null:MoneyParser.Parse(anchor.Text);
@@ -366,7 +366,7 @@ public partial class MainWindow : Window
         editor.Children.Add(evidenceStatus);
         editor.Children.Add(U.Field("Referentna skupina",evidenceScope));
         editor.Children.Add(U.Field("Zakonska metoda bazne cijene",evidenceMethod));
-        editor.Children.Add(U.Notice("Potvrda je dopuštena samo za provjeren izvor i odgovarajući datum. Sama potvrda nije pravni certifikat."));
+        editor.Children.Add(U.Muted("Provjerite izvor i datum prije potvrde."));
         editor.Children.Add(U.Action("Potvrdi dokumentirani povijesni dokaz",()=>{
             if(grid.SelectedItem is not ItemRow selected){Status("Odaberite stavku.");return;}
             try
@@ -521,7 +521,7 @@ public partial class MainWindow : Window
                 chartHost.Content=U.PriceChart(values);
             }
         };
-        detail.Children.Add(U.Notice("Povijest prikazuje zabilježene promjene cijena; za referentnu cijenu sačuvajte i izvorni dokaz."));
+        detail.Children.Add(U.Muted("Povijesne dokaze sačuvajte u evidenciji."));
         outer.Children.Add(U.Split(U.Card("Povijest cijena",table),U.Card("Detalji promjene cijene",detail)));
         return outer;
     }
@@ -569,7 +569,7 @@ public partial class MainWindow : Window
         var exports=_workspace.ListDraftExports().Take(7).ToList();
         if(exports.Count==0)state.Children.Add(U.Muted("Još nema izrađenih cjenika."));
         foreach(var p in exports)state.Children.Add(U.Muted($"{p.Format}  · {Path.GetFileName(p.FilePath)}"));
-        state.Children.Add(U.Notice("Ovdje možete ispisati cjenik ili spremiti PDF. Za javnu objavu provjerite sve primjenjive zahtjeve."));
+        state.Children.Add(U.Muted("Prije javne objave provjerite podatke."));
         outer.Children.Add(U.Split(U.Card("Pregled cijena",preview),U.Card("Izlazne datoteke",state)));
         return outer;
     }
@@ -633,7 +633,7 @@ public partial class MainWindow : Window
             try{_workspace.SetLocationActive(x.Id,x.Status!="Aktivna");Reload();Status("Status poslovnice je promijenjen.");}
             catch(Exception ex)when(ex is KeyNotFoundException or Microsoft.Data.Sqlite.SqliteException){Error(ex);}
         }));
-        form.Children.Add(U.Notice("Upravljajte poslovnicama i pregledajte njihove javne cjenike kroz povezanu WordPress stranicu."));
+        form.Children.Add(U.Muted("Poslovnice i javni cjenici."));
         outer.Children.Add(U.Split(U.Card("Lokacije i poslovnice",table),U.Card("Detalji lokacije",form)));
         return outer;
     }
@@ -753,7 +753,7 @@ public partial class MainWindow : Window
             OpenUrl(verifiedArchive.AbsoluteUri);
         }));
         outer.Children.Add(U.Card("Povezivanje sa službenim WordPress dodatkom",
-            U.Notice("Sigurno provjerite javno objavljene cjenike, arhivu i poslovnice svojeg WordPress dodatka. Za provjeru nije potrebna lozinka."),
+            U.Muted("Javni pregled ne zahtijeva prijavu."),
             U.Field("Adresa web-stranice sa službenim dodatkom",site),
             controls,connectionStatus,published,
             U.Muted("Dostupni cjenici:"),feeds));
@@ -850,14 +850,14 @@ public partial class MainWindow : Window
             }
         }));
         outer.Children.Add(U.Card("Sigurna razmjena radnog nacrta",
-            U.Notice("Korisničko ime i WordPress aplikacijska lozinka koriste se samo za ovaj poziv i ne spremaju se u SQLite. Za radni nacrt vrijedi zaštita od sukoba verzija. Javna objava ostaje odvojena."),
+            U.Muted("Pristupni podaci nisu trajno pohranjeni. Zastarjelo uređivanje se odbija verzija. Javna objava ostaje odvojena."),
             U.Field("WordPress korisničko ime",syncUsername),
             U.Field("Aplikacijska lozinka (WordPress → Profil)",syncPassword),
             U.Field("Stavka iz WordPress nacrta",remoteRows),
             U.Field("Nova maloprodajna cijena",remotePrice),
             syncActions,syncStatus));
         outer.Children.Add(U.Card("Automatska objava i sinkronizacija",
-            U.Notice("Razmjena privatnog nacrta nije objava službenih cjenika. U WordPressu zasebno pregledajte dokaze i potvrdite objavu; WooCommerce i višestruki izdavači još trebaju transakcijski adapter."),
+            U.Muted("Sinkronizacija nacrta ne objavljuje cjenik. Objavu potvrdite u WordPressuavači još trebaju transakcijski adapter."),
             U.Action("Službeni WordPress dodatak",()=>
                 OpenUrl("https://wordpress.org/plugins/brendigo-sidrena-cijena/"))));
         return outer;
@@ -896,7 +896,7 @@ public partial class MainWindow : Window
             catch(Exception ex)when(ex is IOException or UnauthorizedAccessException or KeyNotFoundException)
             {Error(ex);}
         },true));
-        detail.Children.Add(U.Notice("Datoteke možete otvoriti u odgovarajućem programu. Prije objave provjerite njihov sadržaj."));
+        detail.Children.Add(U.Muted("Provjerite datoteku prije objave."));
         outer.Children.Add(U.Split(U.Card("Arhiva cjenika",grid),U.Card("Pregled datoteke",detail)));
         return outer;
     }
@@ -958,11 +958,11 @@ public partial class MainWindow : Window
         data.Children.Add(actions);
         outer.Children.Add(U.Card("Sigurnost i zaštitne kopije",data));
         outer.Children.Add(U.Card("Opće postavke",U.Muted("Jezik: Hrvatski · Izgled: Tamni · Jednostavno upravljanje"),
-            U.Notice("Vaše poslovne podatke možete dodatno zaštititi izradom redovitih sigurnosnih kopija.")));
+            U.Muted("Redovito izrađujte sigurnosne kopije.")));
         outer.Children.Add(U.Card("Informacije o izdanju",
             U.Text("BAZNA Desktop "+GetDesktopVersion(),18,true),
             U.Muted("Windows 10/11 · Brendigo · Bez aktivacijskog ključa"),
-            U.Notice("WordPress BAZNA 1.5.23 podržava pravni profil NN 132/2026; bazne cijene zahtijevaju provjeru izvora."),
+            U.Muted("Bazne cijene zahtijevaju dokaz o povijesnom iznosu."),
             U.Action("Preuzmi najnoviju Windows aplikaciju",()=>
                 OpenUrl("https://github.com/bren-wp/BAZNA/releases"),true),
             U.Action("Informacije o programu",()=>OpenUrl("https://brendigo.com/"))));
