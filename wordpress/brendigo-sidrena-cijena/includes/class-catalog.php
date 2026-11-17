@@ -241,6 +241,8 @@ class Brendigo_Sidrena_Cijena_Catalog {
 				'naziv'           => $row['naziv'],
 				'sku'             => $row['sku'],
 				'barkod'          => isset( $row['barkod'] ) ? $row['barkod'] : '',
+				'neto_kolicina' => isset( $row['neto_kolicina'] ) ? $row['neto_kolicina'] : '',
+				'ean_barkod' => isset( $row['ean_barkod'] ) ? $row['ean_barkod'] : '',
 				'cijena_redovna'  => $row['cijena_redovna'],
 				'cijena_akcijska' => $row['cijena_akcijska'],
 				'sidrena_cijena'  => $row['sidrena_cijena'],
@@ -299,6 +301,8 @@ class Brendigo_Sidrena_Cijena_Catalog {
 				'naziv'           => isset( $data['naziv'] ) ? $data['naziv'] : '',
 				'sku'             => isset( $data['sku'] ) ? $data['sku'] : '',
 				'barkod'          => isset( $data['barkod'] ) ? $data['barkod'] : '',
+				'neto_kolicina' => isset( $data['neto_kolicina'] ) ? $data['neto_kolicina'] : '',
+				'ean_barkod' => isset( $data['ean_barkod'] ) ? $data['ean_barkod'] : '',
 				'marka'           => isset( $data['marka'] ) ? $data['marka'] : '',
 				'url'             => isset( $data['url'] ) ? $data['url'] : '',
 				'cijena_redovna'        => isset( $data['cijena_redovna'] ) ? $data['cijena_redovna'] : '',
@@ -403,7 +407,7 @@ class Brendigo_Sidrena_Cijena_Catalog {
 			$row['dostupnost'] = isset( $existing['dostupnost'] ) ? $existing['dostupnost'] : 'dostupno';
 		}
 
-		$key_if_absent = array( 'cjm', 'cjm_suffix', 'naziv_posebnog_oblika', 'jedinica_mjere', 'cijena_jedinice_mjere', 'poslovnica' );
+		$key_if_absent = array( 'cjm', 'cjm_suffix', 'naziv_posebnog_oblika', 'jedinica_mjere', 'cijena_jedinice_mjere', 'poslovnica', 'neto_kolicina', 'ean_barkod' );
 		foreach ( $key_if_absent as $key ) {
 			if ( ! array_key_exists( $key, $data ) ) {
 				$row[ $key ] = isset( $existing[ $key ] ) ? $existing[ $key ] : '';
@@ -545,6 +549,8 @@ class Brendigo_Sidrena_Cijena_Catalog {
 		$marka  = isset( $row['marka'] ) ? sanitize_text_field( (string) $row['marka'] ) : '';
 		// Never interpret barcode as a number: leading zeroes are significant.
 		$barkod = isset( $row['barkod'] ) ? substr( preg_replace( '/[^0-9A-Za-z._-]/', '', (string) $row['barkod'] ), 0, 64 ) : '';
+		$neto = isset( $row['neto_kolicina'] ) ? substr( sanitize_text_field( (string) $row['neto_kolicina'] ), 0, 100 ) : '';
+		$ean = isset( $row['ean_barkod'] ) && preg_match( '/^\d{8}(?:\d{5})?$/D', (string) $row['ean_barkod'] ) ? (string) $row['ean_barkod'] : '';
 		$url    = isset( $row['url'] ) ? esc_url_raw( trim( (string) $row['url'] ), array( 'http', 'https' ) ) : '';
 		$reg         = isset( $row['cijena_redovna'] ) ? $this->normalize_price( $row['cijena_redovna'] ) : '';
 		$sale        = isset( $row['cijena_akcijska'] ) ? $this->normalize_price( $row['cijena_akcijska'] ) : '';
@@ -586,6 +592,8 @@ class Brendigo_Sidrena_Cijena_Catalog {
 			'naziv'           => $naziv,
 			'sku'             => $sku,
 			'barkod'          => $barkod,
+			'neto_kolicina' => $neto,
+			'ean_barkod' => $ean,
 			'marka'           => $marka,
 			'url'             => $url,
 			'cijena_redovna'  => $reg,
