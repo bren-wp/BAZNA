@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 define( 'ABSPATH', __DIR__ . '/' );
-define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.23' );
+define( 'BRENDIGO_SIDRENA_CIJENA_VERSION', '1.5.24' );
 define( 'BRENDIGO_SIDRENA_CIJENA_URL', 'https://example.test/wp-content/plugins/brendigo-sidrena-cijena/' );
 $GLOBALS['bazna_shortcodes'] = array();
 $GLOBALS['bazna_prefs'] = array( 'default_date' => '10.09.2026.', 'public_theme' => 'light', 'public_accent' => 'blue', 'public_density' => 'compact' );
