@@ -157,7 +157,18 @@ final class CatalogForm extends FormBase {
         $this->messenger()->addStatus('BAZNA: provjereni nacrt je javno objavljen.');
       }
       else {
-        $this->messenger()->addStatus('BAZNA: nacrt je spremljen, nije javno objavljen.');
+        if (getenv('BAZNA_AUTO_PUBLISH_VERIFIED') === '1') {
+          try {
+            $core->publish(true, true);
+            $this->messenger()->addStatus('BAZNA: potvrđeni podaci automatski su objavljeni.');
+          }
+          catch (\RuntimeException $error) {
+            $this->messenger()->addWarning('BAZNA: nacrt je spremljen, no automatska objava blokirana je zbog nepotpunih podataka.');
+          }
+        }
+        else {
+          $this->messenger()->addStatus('BAZNA: nacrt je spremljen, nije javno objavljen.');
+        }
       }
     }
     catch (\Throwable $error) {
