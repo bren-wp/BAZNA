@@ -5,6 +5,7 @@ on:
     paths:
       - 'web/**'
       - 'joomla/**'
+      - 'drupal/**'
       - 'shopify/**'
       - 'tools/package_platforms.py'
       - 'tools/test_platform_responsive.mjs'
@@ -33,7 +34,7 @@ jobs:
       - name: PHP lint on all public platforms
         run: |
           set -euo pipefail
-          find web joomla shopify -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
+          find web joomla drupal shopify -type f -name '*.php' -print0 | xargs -0 -n 1 php -l
       - name: Offline public contract, historical price and archive tests
         run: php web/tests/test.php
       - name: Shared PHP and Joomla catalog UI, CRUD and stale-write protection
@@ -68,9 +69,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/package_platforms.py --output-dir artifacts/multiplatform
-          (cd artifacts/multiplatform && sha256sum -c BAZNA-Web-1.1.4.zip.sha256)
-          (cd artifacts/multiplatform && sha256sum -c BAZNA-Joomla-Plugin-1.1.4.zip.sha256)
-          (cd artifacts/multiplatform && sha256sum -c BAZNA-Shopify-Adapter-1.1.4.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Web-1.1.5.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Joomla-Plugin-1.1.5.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Drupal-Module-1.1.5.zip.sha256)
+          (cd artifacts/multiplatform && sha256sum -c BAZNA-Shopify-Adapter-1.1.5.zip.sha256)
           python3 tools/package_platforms.py --output-dir /tmp/bazna-repeat
           for file in artifacts/multiplatform/*.zip; do
             cmp "$file" "/tmp/bazna-repeat/$(basename "$file")"
@@ -80,7 +82,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/bazna-joomla
-          unzip -q artifacts/multiplatform/BAZNA-Joomla-Plugin-1.1.4.zip -d /tmp/bazna-joomla
+          unzip -q artifacts/multiplatform/BAZNA-Joomla-Plugin-1.1.5.zip -d /tmp/bazna-joomla
           test -s /tmp/bazna-joomla/bazna.xml
           test -s /tmp/bazna-joomla/vendor/Core.php
           test ! -e /tmp/bazna-joomla/vendor/LicenseClient.php
@@ -95,12 +97,31 @@ jobs:
           assert root.find("files/folder[@plugin='bazna']") is not None
           print("PASS: valid Joomla plugin manifest and DI namespace")
           PY
+      - name: Drupal native module package and routing validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/bazna-drupal
+          unzip -q artifacts/multiplatform/BAZNA-Drupal-Module-1.1.5.zip -d /tmp/bazna-drupal
+          test -s /tmp/bazna-drupal/bazna/bazna.info.yml
+          test -s /tmp/bazna-drupal/bazna/bazna.routing.yml
+          test -s /tmp/bazna-drupal/bazna/src/Controller/BaznaController.php
+          test -s /tmp/bazna-drupal/bazna/src/Form/CatalogForm.php
+          test -s /tmp/bazna-drupal/bazna/vendor/Core.php
+          find /tmp/bazna-drupal -name '*.php' -print0 | xargs -0 -n 1 php -l
+          grep -q 'bazna.official_feeds:' /tmp/bazna-drupal/bazna/bazna.routing.yml
+          grep -q "'administer site configuration'" /tmp/bazna-drupal/bazna/bazna.routing.yml
+          if grep -R 'BAZNA_TRADER_OIB=' /tmp/bazna-drupal/bazna/src; then
+            echo "ERROR: Credential-like identity was hardcoded"
+            exit 1
+          fi
+          echo "PASS: Drupal module structure, ACL and published NN132 route"
       - name: Confirm Shopify bundle has no real credentials
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/bazna-shopify
-          unzip -q artifacts/multiplatform/BAZNA-Shopify-Adapter-1.1.4.zip -d /tmp/bazna-shopify
+          unzip -q artifacts/multiplatform/BAZNA-Shopify-Adapter-1.1.5.zip -d /tmp/bazna-shopify
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/index.php
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/webhooks.php
           test -s /tmp/bazna-shopify/bazna-shopify/shopify/server/WebhookHandler.php
