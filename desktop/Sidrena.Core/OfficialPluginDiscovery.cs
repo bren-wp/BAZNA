@@ -88,7 +88,7 @@ public static class OfficialPluginDiscovery
         var root=document.RootElement;
         if(root.ValueKind!=JsonValueKind.Object ||
            !root.TryGetProperty("feeds",out var feeds) || feeds.ValueKind!=JsonValueKind.Object)
-            throw new InvalidDataException("Ovo nije odgovor službenog Brendigo Sidrena Cijena REST API-ja.");
+            throw new InvalidDataException("Ovo nije podržani odgovor javnog BAZNA API-ja.");
 
         Uri Url(string field)
         {
@@ -108,7 +108,7 @@ public static class OfficialPluginDiscovery
         if(!root.TryGetProperty("api_version",out var apiVersion) ||
            apiVersion.ValueKind!=JsonValueKind.Number || !apiVersion.TryGetInt32(out var version) ||
            version!=1)
-            throw new InvalidDataException("Nepodržana verzija SIDRENA javnog API-ja.");
+            throw new InvalidDataException("Nepodržana verzija BAZNA javnog API-ja.");
         var cjenik=Url("cjenik");
         var archive=Url("archive");
         var archiveApi=OptionalUrl("type_archive");
