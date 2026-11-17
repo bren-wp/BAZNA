@@ -94,6 +94,8 @@ final class AdminCatalog
             self::input('sku', 'SKU / interna oznaka', $row) .
             self::input('marka', 'Marka / pružatelj', $row) .
             self::input('barkod', 'Barkod', $row) .
+            self::input('ean_barkod', 'EAN-8 ili EAN-13', $row) .
+            self::input('neto_kolicina', 'Neto količina (ako je primjenjivo)', $row) .
             self::input('jedinica_mjere', 'Jedinica mjere', $row) .
             self::input('cijena_jedinice_mjere', 'Cijena po jedinici mjere (€)', $row) .
             self::input('dostupnost', 'Dostupnost', $row) .
