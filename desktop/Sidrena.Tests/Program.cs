@@ -241,7 +241,7 @@ try
         Expect(destination.ListItems().Count == 2, "Batch collision rolls back all");
         var invalid = new List<CatalogImportRow>{
             new("Proizvod","Nova", "TEST-1", "", "kom",2m,null,null,null),
-            new("Proizvod","Lažni povijesni datum", "TEST-2", "", "kom",2m,1m,"2025-10-15","Nepoznato")
+            new("Proizvod","Lažni povijesni datum", "TEST-2", "", "kom",2m,1m,"2024-10-15","Nepoznato")
         };
         MustThrow(() => destination.ImportNewRows(invalid));
         Expect(destination.ListItems().Count == 2, "Invalid anchor rolls back entire batch");
