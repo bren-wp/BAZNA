@@ -15,7 +15,7 @@ final class Core
 {
     public const VERSION = '1.1.4';
     public const FIELDS = [
-        'id', 'naziv', 'vrsta', 'sku', 'marka', 'jedinica_mjere',
+        'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
         'naziv_posebnog_oblika', 'sidrena_cijena', 'sidrena_datum',
         'barkod', 'dostupnost', 'slika_url',
@@ -90,6 +90,13 @@ final class Core
             if (!$validDate || ($input['historical_verified'] ?? false) !== true) {
                 throw new InvalidArgumentException('Bazna cijena zahtijeva stvarno potvrđen povijesni iznos i datum.');
             }
+        }
+        if ($row['ean_barkod'] !== '' && !self::validEan($row['ean_barkod'])) {
+            throw new InvalidArgumentException('EAN-8/EAN-13 kontrolna znamenka nije valjana.');
+        }
+        if ($row['neto_kolicina'] !== '' &&
+            !preg_match('/^\\d{1,9}(?:[,.]\\d{1,5})?$/D', $row['neto_kolicina'])) {
+            throw new InvalidArgumentException('Neto količina nije valjana.');
         }
         if ($row['slika_url'] !== '') {
             $urlHost = parse_url($row['slika_url'], PHP_URL_HOST);
@@ -467,6 +474,161 @@ final class Core
         return $html;
     }
 
+    /** NN 132/2026 article 3: exact public ordering, separate from legacy Android v1 CSV. */
+    public const OFFICIAL_FIELDS = [
+        'proizvodi' => [
+            'naziv', 'sku', 'marka', 'neto_kolicina', 'jedinica_mjere',
+            'maloprodajna_cijena', 'poseban_oblik_prodaje',
+            'cijena_jedinice_mjere', 'barkod', 'ean_barkod', 'bazna_cijena',
+        ],
+        'usluge' => ['naziv', 'maloprodajna_cijena', 'poseban_oblik_prodaje', 'bazna_cijena'],
+    ];
+
+    public static function validOib(string $oib): bool
+    {
+        if (!preg_match('/^\d{11}$/D', $oib)) return false;
+        $state = 10;
+        for ($i = 0; $i < 10; $i++) {
+            $state = ($state + (int) $oib[$i]) % 10;
+            if ($state === 0) $state = 10;
+            $state = ($state * 2) % 11;
+        }
+        $check = 11 - $state;
+        return ($check === 10 ? 0 : $check) === (int) $oib[10];
+    }
+
+    public static function validEan(string $value): bool
+    {
+        if (!preg_match('/^(?:\d{8}|\d{13})$/D', $value)) return false;
+        $n = strlen($value) - 1;
+        $sum = 0;
+        for ($i = 0; $i < $n; $i++) $sum += (int) $value[$i] * (($n - $i) % 2 ? 3 : 1);
+        return (10 - $sum % 10) % 10 === (int) $value[$n];
+    }
+
+    /** Must be explicitly configured. An unknown identity cannot be invented. */
+    public function officialIdentity(): string
+    {
+        $oib = (string) (getenv('BAZNA_TRADER_OIB') ?: '');
+        $mb = (string) (getenv('BAZNA_TRADER_MB') ?: '');
+        if ($oib !== '' && $mb !== '') return '';
+        if ($oib !== '') return self::validOib($oib) ? $oib : '';
+        return preg_match('/^\d{8}$/D', $mb) ? $mb : '';
+    }
+
+    /** Preview missing historical data, never silently certify a catalog. */
+    public function officialMissing(string $kind, string $outlet = '', ?array $snapshot = null): array
+    {
+        if (!isset(self::OFFICIAL_FIELDS[$kind]) || ($outlet !== '' &&
+            !preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $outlet))) {
+            throw new InvalidArgumentException('Nepodržana vrsta ili poslovnica.');
+        }
+        $snapshot ??= $this->read('published.json');
+        $rows = $snapshot[$kind === 'proizvodi' ? 'products' : 'services'] ?? [];
+        $issues = [];
+        foreach ($rows as $index => $row) {
+            if (($row['outlet'] ?? '') !== $outlet) continue;
+            foreach (['naziv', 'maloprodajna_cijena', 'sidrena_cijena'] as $field) {
+                if (trim((string) ($row[$field] ?? '')) === '') {
+                    $issues[] = ['row' => $index + 1, 'field' => $field];
+                }
+            }
+            if (!empty($row['cijena_jedinice_mjere']) && $kind === 'proizvodi') {
+                foreach (['jedinica_mjere', 'neto_kolicina'] as $field) {
+                    if (trim((string) ($row[$field] ?? '')) === '') {
+                        $issues[] = ['row' => $index + 1, 'field' => $field];
+                    }
+                }
+            }
+        }
+        return $issues;
+    }
+
+    /** Strict official projection; never publishes a draft, failed evidence or fake history. */
+    public function officialRows(string $kind, string $outlet = '', ?array $snapshot = null): array
+    {
+        $snapshot ??= $this->read('published.json');
+        if (!isset($snapshot['published_at']) || $this->officialIdentity() === '') {
+            throw new \RuntimeException('Službeni cjenik zahtijeva objavljene podatke i valjan OIB/MB trgovca.');
+        }
+        if ($this->officialMissing($kind, $outlet, $snapshot) !== []) {
+            throw new \RuntimeException('Službeni cjenik ima neprovjerene ili nepotpune obvezne podatke.');
+        }
+        $rows = [];
+        foreach ($snapshot[$kind === 'proizvodi' ? 'products' : 'services'] ?? [] as $row) {
+            if (($row['outlet'] ?? '') !== $outlet) continue;
+            $values = [];
+            foreach (self::OFFICIAL_FIELDS[$kind] as $field) {
+                $values[$field] = match ($field) {
+                    'bazna_cijena' => (string) ($row['sidrena_cijena'] ?? ''),
+                    'poseban_oblik_prodaje' => !empty($row['naziv_posebnog_oblika']) ? 'da' : 'ne',
+                    default => (string) ($row[$field] ?? ''),
+                };
+            }
+            $rows[] = $values;
+        }
+        return $rows;
+    }
+
+    /** Stable URL; Content-Disposition name includes identity, outlet, type and local timestamp. */
+    public function officialFilename(string $kind, string $format, string $outlet = ''): string
+    {
+        if (!isset(self::OFFICIAL_FIELDS[$kind]) || !in_array($format, ['csv','xml'], true)) {
+            throw new InvalidArgumentException('Neispravna vrsta cjenika.');
+        }
+        $id = $this->officialIdentity();
+        if ($id === '') throw new \RuntimeException('Konfigurirajte OIB ili matični broj.');
+        $published = $this->read('published.json');
+        $date = (new \DateTimeImmutable((string) ($published['published_at'] ?? 'now')))
+            ->setTimezone(new \DateTimeZone('Europe/Zagreb'))->format('Ymd_Hi');
+        $place = $outlet === '' ? 'ZA_SVA_PRODAJNA_MJESTA' : $outlet;
+        if ($outlet !== '' && !preg_match('/^[A-Za-z0-9][A-Za-z0-9-]{0,63}$/D', $outlet)) {
+            throw new InvalidArgumentException('Nevaljana oznaka poslovnice.');
+        }
+        $type = $kind === 'proizvodi' ? 'ROBA' : 'USLUGE';
+        return $id . '_' . $place . '_' . $type . '_1_' . $date . '.' . $format;
+    }
+
+    public function officialCsv(string $kind, string $outlet = ''): string
+    {
+        $rows = $this->officialRows($kind, $outlet);
+        $f = fopen('php://temp', 'w+');
+        if (!$f) throw new \RuntimeException('CSV nije dostupan.');
+        fwrite($f, "\xEF\xBB\xBF");
+        fputcsv($f, self::OFFICIAL_FIELDS[$kind], ';', '"', '');
+        foreach ($rows as $row) {
+            $values = array_values($row);
+            foreach ($values as &$value) {
+                if (preg_match('/^[\s]*[=+\-@]/u', (string) $value)) $value = "'" . $value;
+            }
+            unset($value);
+            fputcsv($f, $values, ';', '"', '');
+        }
+        rewind($f);
+        $content = (string) stream_get_contents($f);
+        fclose($f);
+        return $content;
+    }
+
+    public function officialXml(string $kind, string $outlet = ''): string
+    {
+        $rows = $this->officialRows($kind, $outlet);
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->formatOutput = true;
+        $root = $dom->createElement('cjenik');
+        $dom->appendChild($root);
+        foreach ($rows as $row) {
+            $entry = $dom->createElement($kind === 'proizvodi' ? 'roba' : 'usluga');
+            foreach ($row as $key => $value) {
+                $element = $dom->createElement($key);
+                $element->appendChild($dom->createTextNode($value));
+                $entry->appendChild($element);
+            }
+            $root->appendChild($entry);
+        }
+        return (string) $dom->saveXML();
+    }
+
     public function csv(string $kind, string $outlet = '', ?array $snapshot = null): string
     {
         if (!in_array($kind, self::KINDS, true) || ($outlet !== '' &&
@@ -615,7 +777,16 @@ final class Core
         $draft = $this->read('draft.json');
         $endpoint = $base . '/bazna/v1/cjenici';
         $feeds = [];
+        $officialFeeds = [];
         foreach (self::KINDS as $kind) {
+            $ready = isset($published['published_at']) && $this->officialIdentity() !== '' &&
+                $this->officialMissing($kind, '', $published) === [];
+            $officialFeeds[$kind] = [
+                'csv' => $ready ? $base . '/bazna/v1/sluzbeni/' . $kind . '/csv' : '',
+                'xml' => $ready ? $base . '/bazna/v1/sluzbeni/' . $kind . '/xml' : '',
+                'available_csv' => $ready,
+                'available_xml' => $ready,
+            ];
             $feeds[$kind] = [
                 'csv' => $endpoint . '/' . $kind . '/csv',
                 'available_csv' => isset($published['published_at']),
@@ -629,6 +800,20 @@ final class Core
                     'csv' => $feeds[$kind]['csv'] . '?oznaka=' . rawurlencode($outlet['code']),
                     'available_csv' => true,
                 ];
+            }
+            $o['official_feeds'] = [];
+            foreach (self::KINDS as $kind) {
+                $ready = isset($published['published_at']) && $this->officialIdentity() !== '' &&
+                    $this->officialMissing($kind, $outlet['code'], $published) === [];
+                $o['official_feeds'][$kind] = [
+                    'csv' => $ready ? $officialFeeds[$kind]['csv'] ?: $base . '/bazna/v1/sluzbeni/' . $kind . '/csv' : '',
+                    'xml' => $ready ? $officialFeeds[$kind]['xml'] ?: $base . '/bazna/v1/sluzbeni/' . $kind . '/xml' : '',
+                    'available_csv' => $ready, 'available_xml' => $ready,
+                ];
+                if ($ready) {
+                    $o['official_feeds'][$kind]['csv'] = $base . '/bazna/v1/sluzbeni/' . $kind . '/csv?oznaka=' . rawurlencode($outlet['code']);
+                    $o['official_feeds'][$kind]['xml'] = $base . '/bazna/v1/sluzbeni/' . $kind . '/xml?oznaka=' . rawurlencode($outlet['code']);
+                }
             }
             $outlets[] = $o;
         }
@@ -646,7 +831,7 @@ final class Core
             'archive' => $base . '/bazna/arhiva',
             'type_archive' => $base . '/bazna/v1/arhiva',
             'on_request' => $base . '/bazna/v1/usluge-na-upit',
-            'feeds' => $feeds, 'outlets' => $outlets,
+            'feeds' => $feeds, 'official_feeds' => $officialFeeds, 'outlets' => $outlets,
             'publication' => [
                 'csv_ready' => isset($published['published_at']),
                 'generated_at' => $published['published_at'] ?? null,
