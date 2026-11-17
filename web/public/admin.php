@@ -63,16 +63,16 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 ) ?>
 <?php elseif ($tab === 'uvoz-izvoz'): ?>
 <section class="bazna-panel"><h2>Uvoz i izvoz cjelokupnog kataloga</h2>
-<p>Uvoz i izvoz kompletnog kataloga (JSON). Pojedinačne stavke uređuju se na karticama Proizvodi, Usluge, Cijena na upit i Poslovnice. Polje <code>historical_verified: true</code> smije se postaviti samo uz izvornu evidenciju za baznu cijenu. Pohrana je lokalna i ne šalje katalog vanjskim aktivacijskim servisima.</p>
+<p>Za uobičajeno uređivanje koristite kartice Proizvodi, Usluge i Poslovnice. Uvoz zahtijeva provjerene bazne cijene.</p>
 <form method="post" action="<?= bazna_html($core->link('bazna/admin?tab=' . $tab)) ?>">
 <input type="hidden" name="action" value="save"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
-<label>JSON nacrt kataloga
+<label>Nacrt kataloga (JSON)
 <textarea class="bazna-editor" name="catalog" spellcheck="false" required><?= bazna_html((string) $pretty) ?></textarea></label>
 <button type="submit">Spremi nacrt</button></form>
-<p class="bazna-small">Nepoznata poslovnica, nepravilna cijena, datum ili nepotvrđena povijesna cijena odbijaju se prilikom spremanja.</p></section>
+</section>
 <?php elseif ($tab === 'javni-cjenici'): ?>
-<section class="bazna-panel"><h2>Javni cjenici i BAZNA Android</h2>
-<p>Veza za Android i sve ostale platforme: <code><?= bazna_html($endpoint) ?></code></p>
+<section class="bazna-panel"><h2>Javni cjenici</h2>
+<p>Adresa za povezivanje aplikacija: <code><?= bazna_html($endpoint) ?></code></p>
 <p>Posljednja javna objava: <strong><?= bazna_html((string) ($published['published_at'] ?? 'nije objavljeno')) ?></strong></p>
 <form method="post" action="<?= bazna_html($core->link('bazna/admin?tab=javni-cjenici')) ?>">
 <input type="hidden" name="action" value="publish"><input type="hidden" name="_csrf" value="<?= bazna_html($csrf) ?>">
@@ -86,7 +86,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; form-acti
 <?php elseif ($tab === 'postavke'): ?>
 <section class="bazna-panel"><h2>Postavke platforme</h2>
 <p>Javna domena: <code><?= bazna_html($core->base()) ?></code></p>
-<p>Podatkovni API v1: <code><?= bazna_html($endpoint) ?></code></p>
+<p>Adresa za povezivanje: <code><?= bazna_html($endpoint) ?></code></p>
 </section>
 <?php endif; ?>
 </main></div><?php endif; ?>
