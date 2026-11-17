@@ -601,7 +601,10 @@ final class Core
         $date = (string) ($row['sidrena_datum'] ?? '');
         if (!preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $date, $m) ||
             !checkdate((int) $m[2], (int) $m[3], (int) $m[1]) ||
-            $date < $reference) return 'sidrena_datum';
+            $date < $reference ||
+            $date > (new \DateTimeImmutable('now', new \DateTimeZone('Europe/Zagreb')))->format('Y-m-d')) {
+            return 'sidrena_datum';
+        }
         if ($method === 'reference_day') return $date === $reference ? '' : 'historical_method';
         if ($method === 'first_offer') return $date > $reference ? '' : 'historical_method';
         if ($method === 'discount_lowest_30d' && $scope === 'legacy_fmcg') return '';

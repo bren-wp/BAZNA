@@ -125,6 +125,20 @@ try {
     throw new RuntimeException('Unregistered outlet was accepted.');
 } catch (InvalidArgumentException $ignored) {}
 $core->saveDraft($catalog);
+// Legacy manual publishing may not bypass official documentary evidence.
+$unverifiedMethod = $catalog;
+$unverifiedMethod['products'][0]['historical_method'] = '';
+$core->saveDraft($unverifiedMethod);
+try {
+    $core->publish();
+    throw new RuntimeException('Manual publication accepted an undocumented legal method.');
+} catch (RuntimeException $e) {
+    check(str_contains($e->getMessage(), 'historical_method'),
+        'Manual public feed rejects missing documentary method');
+}
+check(!isset($core->read('published.json')['published_at']),
+    'Manual publication failure preserves the last published state');
+$core->saveDraft($catalog);
 $before = $core->discovery('web');
 check(str_contains($core->publicCatalogHtml('proizvodi'), 'još nije objavljen'),
     'unpublished data cannot be rendered on public HTML');

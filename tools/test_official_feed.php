@@ -122,6 +122,7 @@ $cases = array(
 	array( 'usluge', 'general_goods_services', 'discount_previous_retail', '2026-09-10', true, 'Prethodna cijena 2026', '' ),
 	array( 'proizvodi', 'general_goods_services', 'first_offer', '2026-10-01', true, 'Prva ponuda 2026', '' ),
 	array( 'proizvodi', 'general_goods_services', 'first_offer', '2026-09-10', true, 'Krivi dan', 'historical_method' ),
+	array( 'proizvodi', 'general_goods_services', 'first_offer', '2099-01-01', true, 'Izmišljeni budući datum', 'sidrena_datum' ),
 	array( 'proizvodi', 'general_goods_services', 'reference_day', '2025-05-02', true, 'Krivi dan', 'sidrena_datum' ),
 	array( 'usluge', 'legacy_fmcg', 'reference_day', '2025-05-02', true, 'Pogrešna grupa', 'reference_scope' ),
 	array( 'proizvodi', 'legacy_fmcg', 'discount_previous_retail', '2025-05-02', true, 'Krivo pravilo', 'historical_method' ),

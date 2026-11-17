@@ -73,7 +73,8 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 		}
 		if ( ! preg_match( '/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $date, $parts ) ||
 			! checkdate( (int) $parts[2], (int) $parts[3], (int) $parts[1] ) ||
-			$date < $reference ) {
+			$date < $reference ||
+			$date > ( new DateTimeImmutable( 'now', new DateTimeZone( 'Europe/Zagreb' ) ) )->format( 'Y-m-d' ) ) {
 			return 'sidrena_datum';
 		}
 		if ( 'reference_day' === $method ) {
