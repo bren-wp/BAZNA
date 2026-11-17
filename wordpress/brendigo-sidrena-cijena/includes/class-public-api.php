@@ -87,12 +87,27 @@ final class Brendigo_Sidrena_Cijena_Public_API {
 			'archive'      => esc_url_raw( $export->get_archive_url() ),
 			'type_archive' => esc_url_raw( rest_url( 'brendigo-bazna/v1/arhiva' ) ),
 			'combined'     => esc_url_raw( $export->get_public_url() ),
+			// Official NN 132/2026 exports are additive: old Android/Windows
+			// consumers keep the unchanged compatibility feed above.
+			'official_feeds' => array(),
+
 			'feeds'        => array(),
 			// Optional additive REST v1 endpoint (MJDD-compatible HTML-only services).
 			'on_request'  => esc_url_raw( rest_url( 'brendigo-bazna/v1/usluge-na-upit' ) ),
 			'outlets'      => array(),
 		);
+		$official = Brendigo_Sidrena_Cijena_Feed_Files::instance();
+		$uploads = wp_upload_dir( null, false );
 		foreach ( array( 'proizvodi', 'usluge' ) as $kind ) {
+			$out['official_feeds'][ $kind ] = array();
+			foreach ( array( 'csv', 'xml' ) as $format ) {
+				$path = $official->official_live_path( $kind, $format );
+				$available = '' !== $path && is_file( $path ) && is_readable( $path );
+				$out['official_feeds'][ $kind ][ $format ] = $available && empty( $uploads['error'] )
+					? esc_url_raw( trailingslashit( $uploads['baseurl'] ) . 'sidrena-cijena/' . rawurlencode( basename( $path ) ) )
+					: '';
+				$out['official_feeds'][ $kind ]['available_' . $format ] = $available;
+			}
 			$out['feeds'][ $kind ] = array( 'available_csv' => $this->feed_available( $kind ) );
 			foreach ( array( 'xml', 'csv' ) as $ext ) {
 				$out['feeds'][ $kind ][ $ext ] = esc_url_raw( rest_url( 'brendigo-bazna/v1/cjenici/' . $kind . '/' . $ext ) );
