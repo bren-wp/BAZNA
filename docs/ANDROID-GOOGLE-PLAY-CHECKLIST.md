@@ -12,7 +12,7 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 - CI-produced `BAZNA-Android-unsigned.aab` is **not uploadable until signed** with the authorized upload key.
 
 ## Signing and store delivery
-1. Use `applicationId=com.brendigo.bazna` and `versionCode=24`. The applicationId migration introduced in 1.5.17 is **a new app**, not an update to `com.brendigo.sidrena`. The former app stays installed separately and its local preferences do not automatically transfer.
+1. Use `applicationId=com.brendigo.bazna` and `versionCode=28`. The applicationId migration introduced in 1.5.17 is **a new app**, not an update to `com.brendigo.sidrena`. The former app stays installed separately and its local preferences do not automatically transfer.
 2. In Android Studio choose **Build → Generate Signed Bundle / APK → Android App Bundle**.
 3. Sign using a controlled upload key for the **new** BAZNA Play listing; do not assume the former app's Play App Signing configuration transfers. Never commit a keystore or passwords.
 4. Confirm the resulting AAB is signed with the intended upload certificate.
@@ -26,7 +26,7 @@ This checklist covers the Android app only. **Passing CI does not imply Play app
 - **Before release**, publish BAZNA-specific disclosures on the live HTML privacy policy (the current website-wide policy is not sufficient evidence of Android-specific disclosures). See `docs/BAZNA-ANDROID-PRIVACY-DRAFT.md`.
 - Complete Play Console **Data safety** accurately based on an SDK, network and server-side data flow review. Do not claim "no data collected" without auditing the remote publisher and SDKs.
 - Provide store description, icon, feature graphic, real phone screenshots, contact details, content rating, app-access information, ads declaration, country availability and applicable declarations.
-- The app is public-catalog **read-only**; do not advertise mobile price editing or automatic bidirectional sync.
+- The app is public-catalog **read-only**; do not advertise mobile price editing or automatic bidirectional sync. Returning to the foreground may refresh public data after a two-minute staleness threshold; no periodic background sync or login is used.
 - For future native SDK additions, verify 16 KB page compatibility (if native `.so` files are present).
 - Validate high font scale, TalkBack, keyboard navigation, gesture insets and foldable/tablet layouts with real screenshots; 1:1 pixel parity needs original per-screen PNG references and measured pixel differences.
 

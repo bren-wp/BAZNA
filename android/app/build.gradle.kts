@@ -11,8 +11,8 @@ android {
         applicationId = "com.brendigo.bazna"
         minSdk = 26
         targetSdk = 36
-        versionCode = 27
-        versionName = "1.5.24"
+        versionCode = 28
+        versionName = "1.5.25"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

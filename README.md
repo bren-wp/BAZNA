@@ -30,7 +30,7 @@ Upravljajte proizvodima i uslugama, dokumentirajte povijesne bazne cijene i obja
 
 **Važno za povezivanje:** BAZNA koristi kompatibilne javne formate. Android čita već objavljene podatke putem HTTPS-a, a Windows ima lokalnu evidenciju. Automatska dvosmjerna sinkronizacija uređivanja između svih platformi nije uključena; službena objava provodi se u izvornom sustavu.
 
-**Izdanje 1.5.24** donosi javne WordPress shortcode prikaze, izbor izgleda, strože provjere povijesnih dokaza, sigurniji pristup arhivi te dodatno testiranje čuvanja zakonskih CSV/XML objava. Izdanja uključuju Android probni APK i nepotpisani AAB, Windows Portable/Setup te ZIP pakete platformi, ovisno o uspješnom CI-ju.
+**Izdanje 1.5.25** osvježava javne WordPress podatke u Android aplikaciji nakon povratka u prvi plan, bez pozadinskog praćenja, zadržava siguran privatni Windows/WordPress nacrt te pojačava kontrole za WordPress.org i Google Play. Izdanja uključuju Android probni APK i nepotpisani AAB, Windows Portable/Setup te ZIP pakete platformi, ovisno o uspješnom CI-ju.
 
 ### Pravni temelj — 17. studenoga 2026.
 
@@ -44,7 +44,7 @@ Upravljajte proizvodima i uslugama, dokumentirajte povijesne bazne cijene i obja
 
 ## Sve funkcije bez aktivacijskog ključa
 
-**BAZNA 1.5.24** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
+**BAZNA 1.5.25** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
 
 ## Sve cijene na jednom mjestu
 
@@ -104,13 +104,13 @@ Postavite u WordPress blok **Kratki kod**: `[bazna_objava]` za pregledan cjenik 
 
 | Platforma | Namjena | Verzija | Status |
 |---|---|---|---|
-| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.24** | CI provjeren; kandidat WordPress.org paketa |
+| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.25** | CI provjeren; kandidat WordPress.org paketa |
 | **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.6** | Funkcionalni paket; potreban test na stvarnom hostingu |
 | **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i sigurnom administracijom | **1.1.6** | Kandidat; potreban instalacijski test u Joomli |
 | **Drupal** | Nativni Drupal 10/11 modul na zajedničkoj PHP jezgri, javni REST i službeni CSV/XML | **1.1.6** | Razvojni kandidat; stvarni Drupal integracijski test potreban |
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.6** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.24** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
-| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.10** | Windows CI i stvarne provjere sučelja |
+| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.25** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
+| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.11** | Windows CI i stvarne provjere sučelja |
 
 ## Automatizirana objava i praćenje rokova
 

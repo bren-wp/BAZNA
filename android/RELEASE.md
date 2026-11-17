@@ -1,54 +1,24 @@
-# BAZNA 1.5.23 — službeni izvorni paketi i Google Play provjere
+# BAZNA 1.5.25 — Android i zajedničko izdanje
 
-| Komponenta | Verzija | Napomena |
+| Komponenta | Inačica | Ograničenja i status |
 |---|---|---|
-| Android | **1.5.23**, code **26** | `com.brendigo.bazna` · targetSdk 36 · minSdk 26 |
-| WordPress / WooCommerce | **1.5.23** | Zadržani svi postojeći podaci i REST v1 |
-| Web PHP, Joomla, Drupal, Shopify | **1.1.6** | Zajednički Core, javni HTML i filtrirani REST |
-| Windows | **0.10.9** | Isporučuje se u istom releaseu nakon smoke testova |
+| Android | **1.5.25**, versionCode **28** | `com.brendigo.bazna`, minSdk 26, targetSdk 36 |
+| WordPress | **1.5.25** | Postojeći identitet `brendigo-sidrena-cijena`, GPLv2+ |
+| Windows | **0.10.11** | Windows Setup i Portable |
+| Web, Joomla, Drupal, Shopify | **1.1.6** | Postojeća kompatibilna javna v1 sučelja |
 
-## Novo: ažuriranja postojećeg WordPress.org dodatka
+## Sinkronizacija
 
-GitHub izdanje priprema provjereni BAZNA WordPress ZIP s nepromijenjenim identitetom `brendigo-sidrena-cijena`. WordPress.org SVN nadogradnja zahtijeva valjane committer vjerodajnice i GitHub Actions objavu, zasebno od GitHub Release paketa. Postojeće postavke, cjenici, arhiva i REST v1 ostaju netaknuti.
+Android čita isključivo **posljednje javno objavljene** WordPress/CMS cijene, datoteke, poslovnice i arhivu preko HTTPS-a. Nakon povratka u prvi plan osvježava povezane podatke ako su stariji od dvije minute. Nema pozadinskog intervalnog dohvaćanja, oglasa ili administratorskih vjerodajnica u aplikaciji. Uvijek je moguće ručno osvježiti.
 
-[Upute za objavu na WordPress.org](../docs/WORDPRESS-ORG-AZURIRANJE.md)
+WordPress administracija i Windows imaju odvojenu autentificiranu razmjenu **samostalnog nacrta** sa zaštitom od sukoba verzija. Ta razmjena ne objavljuje službene CSV/XML cijene. Automatsko dvosmjerno uređivanje s Androida i kompletna transakcijska sinkronizacija WooCommerce/ostalih CMS-ova **nisu implementirani**.
 
-## Novo: isti javni prikaz na svim platformama
+## Google Play
 
-WordPress zadržava javni HTML cjenik i proširuje REST v1 pregled
-usluga „Cijena na upit” filtrima `outlet` i `q`.
-Web, Joomla i Shopify koriste istu PHP funkciju za HTML prikaz
-**posljednje objavljenih** proizvoda, numeričkih usluga i usluga
-s cijenom na upit. PHP/Web omogućuje odabir poslovnice i pretragu
-po nazivu, šifri, marki i barkodu, uz kriterije za dogovorne cijene.
-Shopify i dalje zahtijeva valjani potpisani proxy zahtjev.
+Isporuka uključuje debug APK i nepotpisani release AAB. Za Play Console treba aplikacijski ključ, Google Play App Signing, točnu Data safety prijavu, objavljenu Android-specifičnu politiku privatnosti, pre-launch test i odobrenje. Prolazak GitHub CI testova **nije** Google Play odobrenje.
 
-Androidova opća pretraga sada prikazuje i usluge na upit kao
-zasebne kartice s kriterijima. Nikad im ne dodaje lažnu cijenu.
-Filtri „Sve / Proizvodi / Usluge” i poslovnica primjenjuju se na
-stvarno objavljene podatke.
+## WordPress.org
 
-## Stabilnost i kompatibilnost
+Izvorni slug, direktorij, text domain i postojeći podaci ostaju nepromijenjeni. Distribucija WordPress.org zaseban je SVN korak i nije automatski dokazana objavom na GitHub Releases. Potrebne su ovlaštene SVN vjerodajnice i uspješna sigurnosna revizija WordPress.org.
 
-Ostaju netaknuti administratorski računi i hashovi, WooCommerce
-podaci, povijesni iznosi, arhive i sve prethodne REST v1 rute.
-Ova verzija ne tvrdi da Joomla ili Shopify izvode WP/WooCommerce
-funkcije: usklađena je javna semantika, a administracija ostaje
-autentificirana i platformno specifična.
-
-## Android potpisivanje i Google Play
-
-GitHub izdanje isporučuje **nepotpisani release AAB** i **debug APK**.
-Potrebno je potpisati AAB privatnim upload ključem, popuniti stvarnu
-Data safety izjavu, objaviti aplikaciji specifičnu politiku
-privatnosti i proći Play Console reviziju. CI testovi nisu
-zamjena za Googleovo odobrenje, pravno mišljenje ili pixel-perfect
-certifikat.
-
-[Podudarnost s MJDD 1.26.0](../docs/BAZNA-FEATURE-PARITY-MJDD-1.26.0.md)
- · [Play Checklist](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md)
- · [Sva izdanja](https://github.com/bren-wp/BAZNA/releases)
-
-## Bez licenciranja i bez pozivanja aktivacijskog servera
-
-BAZNA WordPress, Web PHP, Joomla i Shopify sada ne zahtijevaju BAZNA licencni ključ. Android ne učitava ni prikazuje status licence; stare REST v1 objave s poljem `licensing` sigurno ignorira. Windows Setup/Portable 0.10.9 ne traže aktivaciju. Ovlasti administratora, CSRF, Shopify HMAC i Android HTTPS ostaju sigurnosne kontrole. Distribucijska GPL licenca izvornog koda ostaje valjana.
+[Google Play priprema](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md) · [WordPress.org ažuriranja](../docs/WORDPRESS-ORG-AZURIRANJE.md) · [Sva GitHub izdanja](https://github.com/bren-wp/BAZNA/releases)

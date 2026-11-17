@@ -1,6 +1,7 @@
 package com.brendigo.bazna
 
 import android.app.Application
+import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.brendigo.bazna.data.CatalogRepository
 import com.brendigo.bazna.data.CatalogSnapshot
+import com.brendigo.bazna.data.ForegroundRefreshPolicy
 import com.brendigo.bazna.data.SiteUrl
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -27,6 +29,7 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
     var state by mutableStateOf(SidrenaState())
         private set
     private var requestId = 0L
+    private var lastSuccessfulLoadElapsedMs = 0L
 
     init {
         val saved = preferences.getString("site", "").orEmpty()
@@ -54,6 +57,7 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
 
     fun disconnect() {
         requestId++
+        lastSuccessfulLoadElapsedMs = 0L
         preferences.edit().remove("site").remove("outlet").apply()
         state = SidrenaState()
     }
@@ -75,6 +79,19 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
     fun refresh() {
         val site = state.snapshot?.site ?: return
         load(site, state.outlet, false)
+    }
+
+    /** Refresh published WordPress/CMS feeds only after returning to foreground. */
+    fun refreshIfStale() {
+        if (ForegroundRefreshPolicy.shouldRefresh(
+                nowElapsedMs = SystemClock.elapsedRealtime(),
+                lastSuccessfulLoadElapsedMs = lastSuccessfulLoadElapsedMs,
+                hasSnapshot = state.snapshot != null,
+                loading = state.isLoading,
+                editingSite = state.isEditingSite,
+            )) {
+            refresh()
+        }
     }
 
     private fun load(
@@ -106,6 +123,7 @@ class SidrenaViewModel(application: Application) : AndroidViewModel(application)
                     .putString("site", loaded.site)
                     .putString("outlet", effectiveOutlet)
                     .apply()
+                lastSuccessfulLoadElapsedMs = SystemClock.elapsedRealtime()
                 state = state.copy(siteInput = loaded.site, snapshot = loaded,
                     outlet = effectiveOutlet, isEditingSite = false, isLoading = false, error = null)
             } catch (cancel: CancellationException) {

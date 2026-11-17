@@ -1,6 +1,6 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.23**
+**BAZNA by Brendigo** · **1.5.25**
 
 WordPress.org nadogradnje istog dodatka koristi postojeći slug `brendigo-sidrena-cijena` i službeni SVN, ne odvojenu instalaciju `bazna-cjenici`. Upute su u [WordPress.org vodiču](../docs/WORDPRESS-ORG-AZURIRANJE.md).
 
@@ -36,7 +36,7 @@ Aplikacija koristi javno dostupne rute postojećeg WordPress dodatka:
 
 Pojedinačni CSV može se preusmjeriti na objavljenu datoteku na istoj HTTPS domeni. WordPress 1.5.16 dodaje opcionalni status `feeds.proizvodi.available_csv` i `feeds.usluge.available_csv` za webshop i svaku poslovnicu: `false` znači da datoteka još nije objavljena. Stari dodaci bez statusnih polja ostaju podržani. Proizvodi mogu neobavezno sadržavati stvarni `slika_url` s iste HTTPS domene, uz lokalnu ikonu kada ga nema. Prije povezivanja na WordPressu generirajte javni CSV cjenik, zatim u aplikaciji po potrebi odaberite Osvježi. Sadržaj poslovnica i arhive ovisi o stvarno objavljenim podacima na stranici. Aplikacija ne prikazuje izmišljene podatke kada javno sučelje ne nudi povijest promjena ili druge informacije.
 
-**Uređivanje cijena ostaje u WordPressu ili Windows aplikaciji** dok ne postoji autorizirani REST API za mobilno uređivanje.
+**Android čita samo javno objavljene podatke.** WordPress i Windows mogu upravljati privatnim nacrtima uz zasebnu autorizaciju. Android nema administratorsku prijavu niti može mijenjati cijene. Po povratku u aplikaciju već spojeni javni katalog osvježava se kada je posljednje uspješno učitavanje starije od dvije minute; ručno osvježavanje ostaje dostupno.
 
 ## Google Play brending i grafike
 
@@ -48,7 +48,7 @@ Gotovi ZIP nalazi se u GitHub Actions artefaktu `BAZNA-Google-Play-Branded-Asset
 
 ## Google Play — novi identifikator
 
-Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.23 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
+Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.25 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
 
 ## Instalacija
 
