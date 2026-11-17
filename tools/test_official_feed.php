@@ -31,6 +31,7 @@ $row = array(
 	'dostupnost' => 'dostupno', 'url' => 'https://example.com/',
 	'historical_verified' => 'yes', 'reference_scope' => 'legacy_fmcg',
 	'historical_method' => 'reference_day', 'sidrena_datum' => '02.05.2025.',
+	'historical_source' => 'Povijesni POS cjenik 02.05.2025.',
 );
 $projected = Brendigo_Sidrena_Cijena_Official_Feed::project( $row, 'proizvodi' );
 expect_official( array_keys( $projected ) === $goods, 'No extra compatibility fields in official export' );
