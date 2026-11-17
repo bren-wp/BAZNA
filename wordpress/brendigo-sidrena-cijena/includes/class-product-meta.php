@@ -87,6 +87,8 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 				$barcode = preg_replace( '/\s+/', '', sanitize_text_field( $value ) );
 				return is_string( $barcode ) ? $barcode : '';
 			},
+			'_bazna_neto_kolicina' => static function ( $value ) { return substr( sanitize_text_field( $value ), 0, 100 ); },
+			'_bazna_ean_barkod' => static function ( $value ) { return preg_match( '/^\d{8}(?:\d{5})?$/D', (string) $value ) ? (string) $value : ''; },
 			BRENDIGO_SIDRENA_CIJENA_META_VISIBILITY => static function ( $value ) {
 				$value = sanitize_key( $value );
 				return in_array( $value, array( 'include', 'exclude' ), true ) ? $value : '';
@@ -604,6 +606,29 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 		return $this->update_meta_if_changed( $product_id, BRENDIGO_SIDRENA_CIJENA_META_BARCODE, $barcode );
 	}
 
+
+	/** Net quantity and EAN are explicit, never guessed from shipping weight. */
+	public function get_neto_kolicina( $product_id ) {
+		return (string) get_post_meta( absint( $product_id ), '_bazna_neto_kolicina', true );
+	}
+	public function set_neto_kolicina( $product_id, $value ) {
+		$value = sanitize_text_field( is_scalar( $value ) ? (string) $value : '' );
+		$value = substr( trim( $value ), 0, 100 );
+		return '' === $value ? $this->delete_meta_if_present( $product_id, '_bazna_neto_kolicina' )
+			: $this->update_meta_if_changed( $product_id, '_bazna_neto_kolicina', $value );
+	}
+	public function get_ean_barkod( $product_id ) {
+		return (string) get_post_meta( absint( $product_id ), '_bazna_ean_barkod', true );
+	}
+	public function set_ean_barkod( $product_id, $value ) {
+		$value = is_scalar( $value ) ? trim( (string) $value ) : '';
+		if ( '' !== $value && ! preg_match( '/^\d{8}(?:\d{5})?$/D', $value ) ) {
+			return false;
+		}
+		return '' === $value ? $this->delete_meta_if_present( $product_id, '_bazna_ean_barkod' )
+			: $this->update_meta_if_changed( $product_id, '_bazna_ean_barkod', $value );
+	}
+
 	/**
 	 * Public pricelist visibility override: auto, include or exclude.
 	 *
@@ -684,6 +709,8 @@ class Brendigo_Sidrena_Cijena_Product_Meta {
 			BRENDIGO_SIDRENA_CIJENA_META_PRICE => 'sidrena_cijena',
 			BRENDIGO_SIDRENA_CIJENA_META_DATE => 'sidrena_datum',
 			BRENDIGO_SIDRENA_CIJENA_META_BARCODE => 'barkod',
+			'_bazna_neto_kolicina' => 'neto_kolicina',
+			'_bazna_ean_barkod' => 'ean_barkod',
 			BRENDIGO_SIDRENA_CIJENA_META_VISIBILITY => 'visibility',
 		);
 		if ( isset( $fields[ $meta_key ] ) ) {
