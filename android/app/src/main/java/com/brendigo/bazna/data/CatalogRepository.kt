@@ -38,7 +38,13 @@ class CatalogRepository {
         if (selectedOutlet.isBlank() && index.allOutletsCsvReady == false) {
             warnings.add("Neki CSV cjenici poslovnica nisu javno objavljeni. Provjerite svaku poslovnicu u WordPressu.")
         }
-        if (index.legal == null) warnings.add("Povezana BAZNA platforma ne objavljuje pravni profil.")
+        if (index.legal == null) {
+            warnings.add("Povezana BAZNA platforma ne objavljuje pravni profil.")
+        } else if (index.legal.rulesRevision != LegalContract.REVISION ||
+            index.legal.finalRulebooksVerified != true
+        ) {
+            warnings.add("WordPress objavljuje zastarjeli pravni profil. Provjerite usklađenje s NN 132/2026 i službene CSV/XML cjenike.")
+        }
         fun safeItems(url: String, label: String, ready: Boolean?): List<PriceItem> {
             if (ready == false) {
                 warnings.add("Cjenik za " + label + " još nije javno objavljen. Objavite ga u administraciji BAZNA.")
