@@ -1,7 +1,8 @@
+# BAZNA
+
 <div align="center">
   <img src="branding/bazna-icon.png" alt="BAZNA logotip" width="104" />
 
-# BAZNA
 ### Bazne cijene · Javni cjenici · Arhiva
 
 **Jasne cijene. Jednostavna objava. Pouzdana evidencija.**
