@@ -128,6 +128,36 @@ final class Brendigo_Sidrena_Cijena_Legal {
         return $date < self::EFFECTIVE_DATE ? 'preparation' : 'rules_effective';
     }
 
+    /**
+     * NN 132/2026 (1583), article 3: choose the documentary method, never
+     * create or certify a historical price. A first-offer date is permissible
+     * only AFTER the scope-specific reference date.
+     *
+     * @return array{status:string,reference_date:string,method:string}
+     */
+    public static function reference_requirement( $scope, $first_offered_on = '', $discounted_on_reference = false ) {
+        $date = self::reference_date( $scope );
+        if ( '' === $date ) {
+            return array( 'status' => 'requires_review', 'reference_date' => '', 'method' => '' );
+        }
+        if ( '' !== $first_offered_on ) {
+            if ( ! is_string( $first_offered_on ) ||
+                ! preg_match( '/^(\\d{4})-(\\d{2})-(\\d{2})$/D', $first_offered_on, $parts ) ||
+                ! checkdate( (int) $parts[2], (int) $parts[3], (int) $parts[1] ) ||
+                $first_offered_on <= $date ) {
+                return array( 'status' => 'requires_review', 'reference_date' => '', 'method' => '' );
+            }
+            $date = $first_offered_on;
+        }
+        $method = 'retail_price_on_reference_day';
+        if ( true === $discounted_on_reference ) {
+            $method = 'legacy_fmcg' === $scope
+                ? 'lowest_price_in_30_days_before_discount_start'
+                : 'previous_retail_price_before_discount';
+        }
+        return array( 'status' => 'evidence_required', 'reference_date' => $date, 'method' => $method );
+    }
+
     public static function reference_date( $scope ) {
         if ( 'legacy_fmcg' === $scope ) {
             return self::REFERENCE_FMCG;

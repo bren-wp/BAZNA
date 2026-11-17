@@ -39,6 +39,10 @@ try
         Expect(product.AnchorCents == 210 && product.AnchorDate == "2026-09-10", "Anchor unchanged");
         MustThrow(() => store.AddItem("Bez izvora", "Proizvod", "", "", "", 1m, 1m, "2026-09-10", null));
         MustThrow(() => store.AddItem("Pogrešan datum", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Izvor"));
+        MustThrow(() => store.AddItem("Usluga 2025", "Usluga", "", "", "", 1m, 1m, "2025-05-02", "Povijest"));
+        MustThrow(() => store.AddItem("Usluga prije opceg datuma", "Usluga", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: racun"));
+        MustThrow(() => store.AddItem("Roba bez klasifikacije", "Proizvod", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: racun"));
+
         MustThrow(() => store.AddItem("Preciznost", "Usluga", "", "", "", 1.123m, null, null, null));
         Expect(MoneyParser.Parse("12,50") == 12.50m, "Croatian decimal comma");
         Expect(MoneyParser.Parse("12.50") == 12.50m, "Invariant decimal dot");
@@ -62,6 +66,12 @@ try
 
         Expect(File.ReadAllText(csv).Contains("\"Mlijeko; \"\"punomasno\"\"\""), "CSV quoting");
         Expect(File.ReadAllText(xml).Contains("SidrenaRadniIzvoz"), "XML draft marker");
+    }
+    using (var firstOfferStore = new PriceStore(Path.Combine(folder,"first-offer.db")))
+    {
+        var newGoods = firstOfferStore.AddItem("Prvi put ponuđeno", "Proizvod", "NEW-1", "", "kom", 2m, 2m, "2026-09-11", "Prva ponuda: račun od 11. 9. 2026.");
+        Expect(firstOfferStore.ListItems().Any(p => p.Id == newGoods && p.AnchorDate == "2026-09-11"), "Verified first-offer date accepted");
+        MustThrow(() => firstOfferStore.AddItem("Bez dokaza", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Račun"));
     }
     using (var workspace = new WorkspaceStore(file))
     {

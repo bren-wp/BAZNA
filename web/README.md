@@ -3,11 +3,11 @@
 **Autor:** Brendigo · https://brendigo.com/  
 **Status:** prva funkcionalna inačica; nije objavljena niti testirana na stvarnom produkcijskom hostingu.
 
-BAZNA Web 1.1.5 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
+BAZNA Web 1.1.6 pruža administratorsku prijavu i **grafičko uređivanje proizvoda, usluga i poslovnica**, pojedinačno spremanje i uklanjanje s provjerom konkurentnih izmjena, javne HTML/CSV/XML cjenike i nepromjenjivu arhivu. Devet administratorskih kartica koristi stvarne obrasce; JSON je zadržan samo za napredni uvoz/izvoz. Android čita isti **BAZNA public v1** oblik kao kod WordPressa.
 
 ## Instalacija (Apache / PHP 8.1+)
 
-1. Raspakirajte \`BAZNA-Web-1.1.5.zip\` tako da imate \`src/\` i \`public/\`.
+1. Raspakirajte \`BAZNA-Web-1.1.6.zip\` tako da imate \`src/\` i \`public/\`.
 2. Postavite virtualni host DocumentRoot na **samo** \`/your-path/bazna-web/public\` (nikada na korijen paketa). Potrebni su PHP \`openssl\`, \`curl\`, \`dom\`, \`json\` i \`mbstring\` po potrebi.
 3. Postavite server-side environment variables (nginx fastcgi_param / PHP-FPM environment / Apache SetEnv, ne klijentski JavaScript):
 
@@ -46,7 +46,7 @@ Objave su eksplicitne, stare objave ostaju u arhivi bez automatskog brisanja. Za
 
 \`php web/tests/test.php\` iz korijena repozitorija. Pokrenite i \`php web/tests/test_editor.php\`. Testovi koriste lokalnu privremenu mapu i nemaju mrežne pozive. Chrome CI snima 14 Web/Joomla prikaza na 13 veličina (182 snimke), a to nije dokaz podudaranja piksela s izvornim dizajnom.
 
-## Usluge s cijenom na upit (v1.1.5)
+## Usluge s cijenom na upit (v1.1.6)
 
 Nova javna REST v1 ruta `/bazna/v1/usluge-na-upit` vraća samo
 objavljene `id`, `name`, `criteria` i `outlet`, bez iznosa i
@@ -56,7 +56,7 @@ cjenika. Na javnoj HTML stranici prikazuju se naziv, kriteriji
 i oznaka „Cijena na upit”. Shopify koristi isključivo potpisani
 app-proxy: zahtjev upućen izvan valjanog proxy potpisa nije podržan.
 
-## Javna funkcionalna podudarnost — Web PHP 1.1.5
+## Javna funkcionalna podudarnost — Web PHP 1.1.6
 
 Prikaz sada uključuje stvarno objavljene proizvode i usluge u
 responzivnoj tablici sa SKU-om, trenutnom cijenom, baznom cijenom,
@@ -78,3 +78,20 @@ Svi lokalni alati za uvoz, uređivanje i javnu objavu rade bez BAZNA licencnog k
 ## NN 132/2026 — službeni izvozi
 
 Osim kompatibilnih javnih v1 CSV/XML izvora, BAZNA objavljuje odvojene službene rute `/bazna/v1/sluzbeni/proizvodi/csv` i `/bazna/v1/sluzbeni/usluge/xml` (obje vrste i formata). Za službeni izvoz postavite stvarni `BAZNA_TRADER_OIB` ili `BAZNA_TRADER_MB`. Bez potvrđene povijesne cijene izvoz ne prikazuje lažnu usklađenost. Rok objave nakon izmjene je 11:00 na datum promjene; treba postaviti pouzdan scheduler na poslužitelju.
+
+
+## Automatizacija objave — shared hosting
+
+BAZNA PHP podržava **dva sigurna načina automatizacije**, bez potrebe za bazom podataka i bez ovisnosti o posjetiteljima web-stranice.
+
+**Na administratorsko spremanje:** postavite okolišnu varijablu `BAZNA_AUTO_PUBLISH_VERIFIED=1`. Kada administrator spremi novu stavku ili katalog, BAZNA pokušava objaviti samo **potpune i potvrđene** cijene, s konfiguriranim valjanim OIB-om/MB-om i podacima prodajnog mjesta. Nepotpuni podaci ostaju u privatnom nacrtu, uz poruku o razlogu blokade. Opcija je isključena dok se izričito ne konfigurira.
+
+**Raspored neovisan o prometu:** cron zadatak za PHP CLI, primjer (prilagodite vlastitim putanjama):
+
+```cron
+* * * * /usr/bin/php /absolute/path/to/bazna-web/bin/publish.php >> /private/logs/bazna-publish.log 2>&1
+```
+
+CLI koristi `BAZNA_PRIVATE_DIR`, `BAZNA_PUBLIC_URL` i točno jednu od `BAZNA_TRADER_OIB`/`BAZNA_TRADER_MB`. Za trgovine s više poslovnica obvezno upišite stvarne vrste, adrese i oznake prodajnih mjesta; za webshop koji nije zajednički svim prodajnim mjestima postavite `BAZNA_MAIN_STORE_TYPE`, `BAZNA_MAIN_STORE_ADDRESS` i `BAZNA_MAIN_STORE_CODE`. Testirajte izvršavanje kao hosting korisnik, vrijeme u `Europe/Zagreb` i vanjski HTTP dohvat prije 11:00 na dan izmjene.
+
+Ponovni poziv bez novih podataka neće promijeniti arhivu niti broj pohrane. Ako je postojeći cjenik nepotpun, automatizacija javlja grešku i ne mijenja zadnji objavljeni snapshot. Nije dopušteno tumačiti ovu zaštitu kao pravnu ovjeru sadržaja. **Običan WP-Cron ili pokretanje samo pri posjetama ne jamče zakonski rok.** Prije automatskog objavljivanja provjerite pravilnu kategorizaciju proizvoda i uvjete iznimaka.

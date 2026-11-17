@@ -1,6 +1,6 @@
 # BAZNA — Bazne cijene za Android
 
-**BAZNA by Brendigo** · **1.5.22**
+**BAZNA by Brendigo** · **1.5.23**
 
 WordPress.org nadogradnje istog dodatka koristi postojeći slug `brendigo-sidrena-cijena` i službeni SVN, ne odvojenu instalaciju `bazna-cjenici`. Upute su u [WordPress.org vodiču](../docs/WORDPRESS-ORG-AZURIRANJE.md).
 
@@ -14,7 +14,7 @@ Pregledajte objavljene cjenike, proizvode, usluge i poslovnice sa svoje WordPres
 |---|---|
 | Povezivanje | HTTPS adresa WordPress stranice |
 | Početna | Povezana stranica, pregled podataka, zadnja objava i brzi pristup |
-| Proizvodi | Popis, pretraga, filtri sidrenih cijena i dostupnost |
+| Proizvodi | Popis, pretraga, filtri baznih cijena i dostupnost |
 | Usluge | Objavljene usluge i pripadajuće cijene |
 | Detalj stavke | SKU, trenutačna i bazna cijena, datum i jedinica mjere |
 | Arhiva | CSV/XML zapisi, filtriranje i otvaranje datoteka |
@@ -48,7 +48,7 @@ Gotovi ZIP nalazi se u GitHub Actions artefaktu `BAZNA-Google-Play-Branded-Asset
 
 ## Google Play — novi identifikator
 
-Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.22 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
+Android koristi `com.brendigo.bazna` od verzije 1.5.17; verzija 1.5.23 nastavlja taj isti identifikator bez ponovne migracije. Ako je prethodna aplikacija s identifikatorom `com.brendigo.sidrena` bila objavljena u Google Playu, ova verzija zahtijeva **novu Play aplikaciju**. Android je neće instalirati kao nadogradnju stare aplikacije niti automatski prenijeti lokalnu adresu povezane stranice. Korisnik može ponovno unijeti istu HTTPS adresu i poslovnicu; javni cjenici ostaju na izvornom poslužitelju. Nepotpisani AAB potpišite ključem za novu Play aplikaciju.
 
 ## Instalacija
 
@@ -60,20 +60,20 @@ Izvorni kod koristi Kotlin, Jetpack Compose i Material 3. Za izgradnju otvorite 
 
 [Google Play kontrolni popis](../docs/ANDROID-GOOGLE-PLAY-CHECKLIST.md) · [Izdanja](RELEASE.md) · [Audit](../docs/CODE-AUDIT-2026-10-21.md) · [Podrška](mailto:info@brendigo.com)
 
-## Pravni profil (NN 132/2026 i NN 132/2026)
+## Pravni profil (NN 132/2026, pravilnici 1583 i 1584)
 
-Aplikacija čita isti javni pravni profil kao Windows aplikacija iz WordPress dodatka 1.5.16. Prikazuje datum početka proširenih obveza **17. 11. 2026.**, oba referentna datuma **2. 5. 2025.** i **10. 9. 2026.**, minimalnu arhivu 30 dana te vrijeme dnevne objave do 8:00. Ne mijenja i ne izmišlja povijesne cijene.
+Aplikacija čita isti javni pravni profil kao Windows aplikacija iz WordPress dodatka BAZNA. Prikazuje početak primjene **17. 11. 2026.**, oba referentna datuma **2. 5. 2025.** i **10. 9. 2026.**, minimalnu javnu dostupnost zamijenjenog cjenika **15 dana od zamjene** te rok objave izmjene **do 11:00 na dan promjene**. Ne mijenja i ne izmišlja povijesne cijene.
 
 [Pravni izvori i kontrolni popis](../docs/LEGAL-2026-INTEROPERABILITY.md) · [Sigurnosni audit](../docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 
-Pravni profil dopunjen je informativnim identifikatorima NN 59/2026 i NN 105/2026; pravne obveze ne dokazuju se samim postojanjem profila.
+Uz NN 132/2026 API sadrži informativne oznake NN 59/2026 i NN 105/2026; aplikacija upozorava na zastarjeli profil. Nijedno API polje samo po sebi ne potvrđuje usklađenost trgovčevih cijena.
 
 
-### Pravna dopuna 29. 10. 2026.
+### Razlika između bazne cijene i najniže cijene prije sniženja
 
 Javni profil razlikuje baznu cijenu od najniže prethodne cijene za sniženja u pravilu 30 dana, bilježi pravila NN 105/2026 od 26. 9. 2026. i ostaje kompatibilan sa starijim WordPress profilima. Aplikacija je read-only i ne potvrđuje pravnu usklađenost trgovca.
 
-## Usluge s cijenom na upit (1.5.22)
+## Usluge s cijenom na upit (1.5.23)
 
 Na zaslonu **Usluge** prikazuju se i odvojeno objavljene usluge
 bez unaprijed određene cijene. Svaka prikazuje naziv i kriterije,
@@ -82,7 +82,7 @@ numerički CSV/XML i nisu automatski sniženja ili bazne cijene.
 Ako poslužitelj ne podržava opcionalnu rutu, osnovni cjenici
 i arhiva nastavljaju normalno raditi.
 
-## Pretraživanje svih javno objavljenih usluga — 1.5.22
+## Pretraživanje svih javno objavljenih usluga — 1.5.23
 
 Zaslon **Pretraživanje** prikazuje proizvode, usluge s numeričkim
 iznosom i javne usluge s cijenom na upit. Usluge na upit pokazuju

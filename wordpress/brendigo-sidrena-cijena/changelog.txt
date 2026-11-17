@@ -1,3 +1,8 @@
+== BAZNA 1.5.23 ==
+- Pravilnici NN 132/2026: dodatni pravni i sigurnosni audit, očuvani podaci i ujednačen brending.
+- Automatizirana objava kroz zajedničku PHP jezgru i Drupal/Joomla administratorske kontrole.
+- Zadržani WordPress/WooCommerce API i arhiva, bez zaključavanja funkcija.
+
 == BAZNA 1.5.22 ==
 - Pravni profil NN 132/2026: pravilnici 1583 i 1584, rok 11:00 i arhiva 15 dana od zamjene.
 - Dodani službeni CSV/XML, zasebni od javnih kompatibilnih datoteka za Android i Windows.

@@ -26,6 +26,13 @@ sidrena_expect( true === $contract['final_rulebooks_verified'], 'Both final rule
 sidrena_expect( '' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'unknown' ), 'No inferred category' );
 sidrena_expect( '2025-05-02' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'legacy_fmcg' ), 'Verified legacy date' );
 sidrena_expect( '2026-09-10' === Brendigo_Sidrena_Cijena_Legal::reference_date( 'general_goods_services' ), 'Verified new date' );
+sidrena_expect( 'lowest_price_in_30_days_before_discount_start' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'legacy_fmcg', '', true )['method'], 'NN132 art 3(2): FMCG discounted reference uses the 30-day low before that discount' );
+sidrena_expect( 'previous_retail_price_before_discount' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'general_goods_services', '', true )['method'], 'NN132 art 3(4): other goods/services discounted reference use prior retail price' );
+sidrena_expect( '2025-06-03' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'legacy_fmcg', '2025-06-03' )['reference_date'], 'NN132 art 3(1): first-offer FMCG date after 2025-05-02' );
+sidrena_expect( '2026-09-11' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'general_goods_services', '2026-09-11' )['reference_date'], 'NN132 art 3(1): first-offer general date after 2026-09-10' );
+sidrena_expect( 'requires_review' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'general_goods_services', '2025-07-03' )['status'], 'Disallow a general-goods first-offer date before the reference date' );
+sidrena_expect( 'requires_review' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'unknown', '', true )['status'], 'No legal inference without explicit classification' );
+sidrena_expect( 'evidence_required' === Brendigo_Sidrena_Cijena_Legal::reference_requirement( 'legacy_fmcg', '', true )['status'], 'Method alone never certifies historical price' );
 sidrena_expect( 'NN-59-2026' === $contract['consumer_law_revision'], 'Consumer law revision' );
 sidrena_expect( '2026-11-17' === $contract['reviewed_on'], 'Legal profile reviewed on 14 Nov 2026' );
 sidrena_expect( 'enacted' === $contract['base_price_regulation_status'], 'NN 132/2026 enacted' );

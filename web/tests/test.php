@@ -14,6 +14,54 @@ $webroot = $root . '/public';
 mkdir($root, 0700);
 mkdir($webroot, 0700);
 $_SERVER['DOCUMENT_ROOT'] = $webroot;
+// Automated publication must be strictly idempotent, with fully documented data.
+// The separate test tenant protects existing archive/regression fixture counts.
+$automated = new Core($root . '/automatic', 'https://primjer.hr');
+$automated->ensurePrivate();
+$autoProduct = [
+    'id' => 'AUTO-P1', 'naziv' => 'Novo verificirano dobro',
+    'maloprodajna_cijena' => '5,00', 'sidrena_cijena' => '4,00',
+    'sidrena_datum' => '2026-09-10', 'historical_verified' => true,
+];
+$autoService = [
+    'id' => 'AUTO-S1', 'naziv' => 'Usluga',
+    'maloprodajna_cijena' => '15,00',
+];
+$automated->saveDraft([
+    'products' => [$autoProduct], 'services' => [$autoService],
+    'outlets' => [], 'on_request' => [],
+]);
+putenv('BAZNA_TRADER_OIB=12345678903');
+try {
+    $automated->publish(true, true);
+    throw new RuntimeException('Incomplete automatic official publication was accepted.');
+} catch (RuntimeException $e) {
+    check(str_contains($e->getMessage(), 'nedostaje'), 'Missing base price blocks automatic publication');
+}
+check(!isset($automated->read('published.json')['published_at']), 'Rejected automatic publish does not leak drafts');
+$autoService['sidrena_cijena'] = '14,00';
+$autoService['sidrena_datum'] = '2026-09-10';
+$autoService['historical_verified'] = true;
+$automated->saveDraft([
+    'products' => [$autoProduct], 'services' => [$autoService],
+    'outlets' => [], 'on_request' => [],
+]);
+$autoFirst = $automated->publish(true, true);
+$autoAgain = $automated->publish(true, true);
+check($autoFirst['publication_sequence'] === 1 &&
+    $autoAgain['publication_sequence'] === 1 &&
+    $automated->archives() === [],
+    'Repeated scheduled publication is a no-op without new archive');
+$autoService['maloprodajna_cijena'] = '16,00';
+$automated->saveDraft([
+    'products' => [$autoProduct], 'services' => [$autoService],
+    'outlets' => [], 'on_request' => [],
+]);
+$autoSecond = $automated->publish(true, true);
+check($autoSecond['publication_sequence'] === 2 &&
+    count($automated->archives()) > 0,
+    'Real verified change automatically publishes and archives replaced version');
+putenv('BAZNA_TRADER_OIB');
 $core = new Core($storage, 'https://primjer.hr');
 $core->ensurePrivate();
 check(is_dir($storage), 'private folder created');

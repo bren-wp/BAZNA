@@ -6,7 +6,7 @@ U \`joomla/plg_system_bazna\` je moderni Joomla **system plugin** s instalacijsk
 
 ## Instalacija
 
-1. U GitHub Actions preuzmite \`BAZNA-Joomla-Plugin-1.1.5.zip\`; ZIP sadrži \`vendor/Core.php\`, **\`vendor/AdminCatalog.php\`**, zajednički responzivni CSS i manifest.
+1. U GitHub Actions preuzmite \`BAZNA-Joomla-Plugin-1.1.6.zip\`; ZIP sadrži \`vendor/Core.php\`, **\`vendor/AdminCatalog.php\`**, zajednički responzivni CSS i manifest.
 2. Joomla: System → Install → Extensions → Upload Package; zatim Plugins → **System – BAZNA** → Enable.
 3. Konfigurirajte u PHP-FPM/Apache okolini (ne unositi u javni sadržaj):
    - \`BAZNA_JOOMLA_PRIVATE_DIR=/srv/bazna-private/joomla-shop\` (izvan Joomla document root);
@@ -18,9 +18,9 @@ U \`joomla/plg_system_bazna\` je moderni Joomla **system plugin** s instalacijsk
 
 Pruža 9 administratorskih kartica, čitanje HTML/CSV/XML, katalog usluga, poslovnica i arhive. Android koristi javne HTTPS putanje i zajednički API. BAZNA ne traži licencni ključ niti proof endpoint; ostaju Joomla `core.admin` i CSRF.
 
-**Granica izdanja 1.1.5:** Web i Joomla sada koriste isti grafički editor s pojedinačnim formama i provjerama spremanja, ali **još nije izrađena zasebna nativna Joomla MVC komponenta** ni nativni uvoz iz VirtueMart/HikaShop i nije potvrđeno testiranje instalacije na stvarnoj Joomla 5/6 instanci. Za produkciju su potrebni integracijski testovi, CSRF/ACL provjere u stvarnom CMS-u, migracijski scenariji i provjera proširenja.
+**Granica izdanja 1.1.6:** Web i Joomla sada koriste isti grafički editor s pojedinačnim formama i provjerama spremanja, ali **još nije izrađena zasebna nativna Joomla MVC komponenta** ni nativni uvoz iz VirtueMart/HikaShop i nije potvrđeno testiranje instalacije na stvarnoj Joomla 5/6 instanci. Za produkciju su potrebni integracijski testovi, CSRF/ACL provjere u stvarnom CMS-u, migracijski scenariji i provjera proširenja.
 
-## Usluge s cijenom na upit (v1.1.5)
+## Usluge s cijenom na upit (v1.1.6)
 
 Nova javna REST v1 ruta `/bazna/v1/usluge-na-upit` vraća samo
 objavljene `id`, `name`, `criteria` i `outlet`, bez iznosa i
@@ -30,7 +30,7 @@ cjenika. Na javnoj HTML stranici prikazuju se naziv, kriteriji
 i oznaka „Cijena na upit”. Shopify koristi isključivo potpisani
 app-proxy: zahtjev upućen izvan valjanog proxy potpisa nije podržan.
 
-## Javna funkcionalna podudarnost — Joomla 1.1.5
+## Javna funkcionalna podudarnost — Joomla 1.1.6
 
 Prikaz sada uključuje stvarno objavljene proizvode i usluge u
 responzivnoj tablici sa SKU-om, trenutnom cijenom, baznom cijenom,
@@ -52,3 +52,8 @@ Nema BAZNA licencnog ključa, aktivacijskog zaslona ni `vendor/LicenseClient.php
 ## NN 132/2026 — službeni podaci
 
 Zajednička BAZNA PHP jezgra uključuje pravni profil NN 132/2026 br. 1583/1584, službeni CSV/XML na putanjama `/bazna/v1/sluzbeni/{proizvodi|usluge}/{csv|xml}`, neto količinu i EAN. Za izvozne datoteke konfigurirajte `BAZNA_TRADER_OIB` ili `BAZNA_TRADER_MB` te provjerite primjenjivost iznimaka i dokazni iznos. Joomla UI zahtijeva stvarni instalacijski test prije tvrdnje o potpunoj 1:1 podudarnosti s WordPressom.
+
+
+## Automatizirana objava Joomla kataloga
+
+Postavite `BAZNA_AUTO_PUBLISH_VERIFIED=1` na PHP poslužitelju za objavu nakon valjano autoriziranog administratorskog spremanja. Zajednička jezgra provjerava povijesni dokaz, OIB/MB, relevantne redove te vrstu/adresu/oznaku svake poslovnice prije objave. Nacrt ostaje privatan kada podaci nisu potpuni. Za promjene iz drugih sustava može se koristiti isti `web/bin/publish.php` CLI uz isti `BAZNA_JOOMLA_PRIVATE_DIR` kao `BAZNA_PRIVATE_DIR` u kontekstu procesa, kroz poslužiteljski cron. Time PHP servis ne ovisi o javnom prometu, no stvarni Joomla integracijski i pravni test i dalje je nužan.

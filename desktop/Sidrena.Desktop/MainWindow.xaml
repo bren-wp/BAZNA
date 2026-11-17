@@ -24,7 +24,7 @@
                         </Viewbox>
                         <StackPanel x:Name="BrandText" Margin="12,12,0,0">
                             <TextBlock Text="BAZNA" FontWeight="Bold" FontSize="24"/>
-                            <TextBlock Text="Sidrene cijene i digitalni cjenici" FontSize="9.5"
+                            <TextBlock Text="Bazne cijene i digitalni cjenici" FontSize="9.5"
                                        Foreground="{StaticResource MutedBrush}"/>
                         </StackPanel>
                     </StackPanel>

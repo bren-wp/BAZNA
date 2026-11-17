@@ -13,7 +13,7 @@ use RuntimeException;
 
 final class Core
 {
-    public const VERSION = '1.1.5';
+    public const VERSION = '1.1.6';
     public const FIELDS = [
         'id', 'naziv', 'vrsta', 'sku', 'marka', 'neto_kolicina', 'ean_barkod', 'jedinica_mjere',
         'cijena_jedinice_mjere', 'maloprodajna_cijena',
@@ -328,11 +328,49 @@ final class Core
         });
     }
 
-    public function publish(): array
+    /**
+     * Atomic publication. Auto mode is idempotent and refuses an incomplete
+     * official catalog; manual publication stays available for legacy clients.
+     * No website traffic or WP-Cron is needed when a server scheduler invokes
+     * bin/publish.php periodically.
+     */
+    public function publish(bool $onlyWhenChanged = false, bool $requireOfficial = false): array
     {
-        return $this->catalogTransaction(function (): array {
+        return $this->catalogTransaction(function () use ($onlyWhenChanged, $requireOfficial): array {
             $catalog = self::validateCatalog($this->read('draft.json'));
             $existing = $this->read('published.json');
+            $identity = $this->officialIdentity();
+            if ($requireOfficial) {
+                if ($identity === '') {
+                    throw new RuntimeException('Automatska objava nije moguća bez valjanog OIB-a ili matičnog broja.');
+                }
+                foreach (array_merge([''], array_column($catalog['outlets'], 'code')) as $outlet) {
+                    foreach (self::KINDS as $kind) {
+                        $missing = $this->officialMissing($kind, $outlet, $catalog);
+                        if ($missing !== []) {
+                            $first = $missing[0];
+                            throw new RuntimeException(
+                                'Automatska objava za ' . $kind . ' / ' .
+                                ($outlet !== '' ? $outlet : 'webshop') .
+                                ': nedostaje ' . $first['field'] . ' u retku ' . $first['row'] . '.'
+                            );
+                        }
+                        // The filename also needs the exact shop/outlet type,
+                        // registered address and code; never invent them.
+                        $candidate = $catalog;
+                        $candidate['published_at'] = gmdate('c');
+                        $candidate['official_identity'] = $identity;
+                        $this->officialFilename($kind, 'csv', $outlet, $candidate);
+                    }
+                }
+            }
+            // Never publish duplicates or modify the archive on an unchanged
+            // scheduled run, including when verified identity remains stable.
+            if ($onlyWhenChanged && isset($existing['published_at']) &&
+                array_intersect_key($existing, $catalog) === $catalog &&
+                ($existing['official_identity'] ?? '') === $identity) {
+                return $existing;
+            }
             $timestamp = gmdate('c');
             // Retain archives indefinitely until merchant-supervised legal
             // retention review. Prevent two concurrent publishes from losing
@@ -353,7 +391,7 @@ final class Core
             $catalog['published_at'] = $timestamp;
             // Monotonic per-store publication sequence, retained with each snapshot.
             $catalog['publication_sequence'] = max(1, (int) ($existing['publication_sequence'] ?? 0) + 1);
-            $catalog['official_identity'] = $this->officialIdentity();
+            $catalog['official_identity'] = $identity;
             $this->write('published.json', $catalog);
             return $catalog;
         });

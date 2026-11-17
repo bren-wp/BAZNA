@@ -4,7 +4,7 @@
 
 **Vaše cijene. Vaša evidencija. Vaša kontrola.**
 
-BAZNA Desktop **0.10.8** je Windows aplikacija Brendigo za upravljanje proizvodima, uslugama, trenutačnim i baznim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
+BAZNA Desktop **0.10.9** je Windows aplikacija Brendigo za upravljanje proizvodima, uslugama, trenutačnim i baznim cijenama. Tamnoplavi izgled s narančastim detaljima prilagođava se većim i manjim prozorima.
 
 ## Funkcionalnosti
 
@@ -38,7 +38,7 @@ Windows pregled koristi **javne objave** WordPress dodatka **Brendigo Sidrena Ci
 
 ## Sinkronizacija javnih pravnih pravila
 
-Windows 0.10.8 prepoznaje `plugin_version` i javni `legal` profil WordPress dodatka 1.5.22. Datumi primjene i arhiviranja preuzimaju se iz istog ugovora kao u Android aplikaciji. Lokalni katalog ostaje odvojena baza i ne mijenja WordPress bez izričite autorizirane integracije.
+Windows 0.10.9 prepoznaje `plugin_version` i javni `legal` profil WordPress dodatka 1.5.23. Datumi primjene i arhiviranja preuzimaju se iz istog ugovora kao u Android aplikaciji. Lokalni katalog ostaje odvojena baza i ne mijenja WordPress bez izričite autorizirane integracije.
 
 [Pravni okvir i interoperabilnost](../docs/LEGAL-2026-INTEROPERABILITY.md) · [Security i dead-code audit](../docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
 

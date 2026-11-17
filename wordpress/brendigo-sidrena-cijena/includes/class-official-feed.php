@@ -118,11 +118,25 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 			$place = 'ZA_SVA_PRODAJNA_MJESTA';
 		} else {
 			$outlet = '' !== $oznaka ? Brendigo_Sidrena_Cijena_Poslovnice::instance()->get_by_oznaka( $oznaka ) : null;
-			$oblik = is_array( $outlet ) ? $outlet['oblik'] : $settings->get( 'file_oblik', 'webshop' );
-			$adresa = is_array( $outlet ) ? $outlet['adresa'] : $settings->get( 'file_adresa', '' );
-			$place = $settings->sanitize_file_part( $oblik, 'webshop' )
-				. '_' . $settings->sanitize_file_part( $adresa, 'adresa' )
-				. '_' . ( '' === $oznaka ? $settings->normalize_oznaka( $settings->get( 'file_oznaka', '001' ) ) : $oznaka );
+			if ( '' !== $oznaka && ! is_array( $outlet ) ) {
+				// Never silently replace an unknown outlet with the webshop.
+				return '';
+			}
+			$oblik  = is_array( $outlet ) && isset( $outlet['oblik'] ) ? $outlet['oblik'] : $settings->get( 'file_oblik', '' );
+			$adresa = is_array( $outlet ) && isset( $outlet['adresa'] ) ? $outlet['adresa'] : $settings->get( 'file_adresa', '' );
+			$code   = '' === $oznaka ? $settings->normalize_oznaka( $settings->get( 'file_oznaka', '' ) ) : $oznaka;
+			// NN 132/2026, 1584 article 6(3): exact outlet form,
+			// address and code are part of the official filename.
+			// "adresa" / "webshop" fallback placeholders are not evidence.
+			if ( ! is_scalar( $oblik ) || ! is_scalar( $adresa ) ||
+				'' === trim( (string) $oblik ) ||
+				'' === trim( (string) $adresa ) ||
+				'' === trim( (string) $code ) ) {
+				return '';
+			}
+			$place = $settings->sanitize_file_part( $oblik, '' )
+				. '_' . $settings->sanitize_file_part( $adresa, '' )
+				. '_' . $code;
 		}
 		$ts = null === $timestamp ? time() : (int) $timestamp;
 		$date = wp_date( 'Ymd_Hi', $ts, new DateTimeZone( 'Europe/Zagreb' ) );

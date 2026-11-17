@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="BAZNA logotip">
+<defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#13C8E9"/><stop offset="1" stop-color="#2772DA"/></linearGradient></defs>
+<rect width="256" height="256" rx="54" fill="#091A30"/><path d="M62 50h90c63 0 70 69 25 86 48 18 42 73-20 73H62Z" fill="none" stroke="url(#g)" stroke-width="27" stroke-linejoin="round"/>
+<path d="M85 88h69M85 169h71" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round"/>
+</svg>

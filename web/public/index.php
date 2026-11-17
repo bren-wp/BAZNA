@@ -140,6 +140,15 @@ try {
                     if (!is_array($payload)) bazna_fail(400, 'Neispravan JSON katalog.');
                     $core->saveDraft($payload);
                     $message = 'Nacrt kataloga je spremljen.';
+                    if (getenv('BAZNA_AUTO_PUBLISH_VERIFIED') === '1') {
+                        try {
+                            $core->publish(true, true);
+                            $message .= ' Automatska objava provjerenog cjenika izvršena.';
+                        } catch (RuntimeException $e) {
+                            // Draft stays safely private until required evidence is complete.
+                            $message .= ' Objava nije izvršena: ' . $e->getMessage();
+                        }
+                    }
                 } elseif ($action === 'publish') {
                     $core->publish();
                     $message = 'Javni cjenici i arhiva su ažurirani.';
@@ -155,6 +164,14 @@ try {
                     $core->modifyRow($collection, $index, $row, $expected);
                     $message = $action === 'save_item' ? 'Stavka je spremljena u nacrt.' :
                         'Stavka je uklonjena iz nacrta.';
+                    if (getenv('BAZNA_AUTO_PUBLISH_VERIFIED') === '1') {
+                        try {
+                            $core->publish(true, true);
+                            $message .= ' Provjereni katalog automatski je objavljen.';
+                        } catch (RuntimeException $e) {
+                            $message .= ' Objava je blokirana: ' . $e->getMessage();
+                        }
+                    }
                 }
             }
         }
