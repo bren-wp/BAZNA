@@ -129,3 +129,24 @@ jobs:
             artifacts/BAZNA-WordPress-org-1.5.24.zip.sha256
           retention-days: 7
           if-no-files-found: error
+
+  php74-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install declared minimum WordPress PHP runtime
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: none
+      - name: Lint entire installable WordPress plugin on PHP 7.4
+        shell: bash
+        run: |
+          set -euo pipefail
+          php -r 'if (PHP_MAJOR_VERSION !== 7 || PHP_MINOR_VERSION !== 4) { exit(1); }'
+          find wordpress/brendigo-sidrena-cijena -type f -name '*.php' -print0 |
+            xargs -0 -n 1 php -l > /tmp/bazna-min-php.log
+          php tools/test_official_retention.php
+          php tools/test_official_feed.php
+          echo 'PASS: WordPress minimum PHP version and official publication tests'
