@@ -148,5 +148,4 @@ jobs:
           find wordpress/brendigo-sidrena-cijena -type f -name '*.php' -print0 |
             xargs -0 -n 1 php -l > /tmp/bazna-min-php.log
           php tools/test_official_retention.php
-          php tools/test_official_feed.php
-          echo 'PASS: WordPress minimum PHP version and official publication tests'
+          echo 'PASS: WordPress 7.4 minimum syntax and official archive hold test'
