@@ -146,6 +146,9 @@ class Brendigo_Sidrena_Cijena_Admin_Save {
 			'enable_tooltip' => isset( $_POST['sidrena_cijena_enable_tooltip'] ) ? 'yes' : 'no',
 			'date_style'     => isset( $_POST['sidrena_cijena_date_style'] ) ? sanitize_text_field( wp_unslash( $_POST['sidrena_cijena_date_style'] ) ) : 'parens',
 			'enable_cjm'     => isset( $_POST['sidrena_cijena_enable_cjm'] ) ? 'yes' : 'no',
+			'public_theme'   => isset( $_POST['sidrena_cijena_public_theme'] ) ? sanitize_key( wp_unslash( $_POST['sidrena_cijena_public_theme'] ) ) : $settings->get( 'public_theme', 'dark' ),
+			'public_accent'  => isset( $_POST['sidrena_cijena_public_accent'] ) ? sanitize_key( wp_unslash( $_POST['sidrena_cijena_public_accent'] ) ) : $settings->get( 'public_accent', 'orange' ),
+			'public_density' => isset( $_POST['sidrena_cijena_public_density'] ) ? sanitize_key( wp_unslash( $_POST['sidrena_cijena_public_density'] ) ) : $settings->get( 'public_density', 'comfortable' ),
 			'brand_manual'   => isset( $_POST['sidrena_cijena_brand_manual'] ) ? sanitize_text_field( wp_unslash( $_POST['sidrena_cijena_brand_manual'] ) ) : '',
 		);
 
