@@ -21,9 +21,6 @@ public sealed class PriceStore : IDisposable
 {
     private readonly SqliteConnection _connection;
     private bool _disposed;
-    private static readonly HashSet<string> PermittedAnchorDates =
-        new(SidrenaLegalContract.KnownReferenceDates,StringComparer.Ordinal);
-
     public PriceStore(string databasePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(databasePath);
@@ -272,31 +269,19 @@ public sealed class PriceStore : IDisposable
         if(kind is not ("Proizvod" or "Usluga"))throw new ArgumentException("Nepoznata vrsta stavke.");
         if(price.HasValue)
         {
-            // NN 132/2026: an item first offered AFTER its applicable
-            // reference date uses the documented first-offer price.
-            // Require an explicit source marker instead of silently
-            // treating every later historical date as a reference date.
-            // Services have only the 2026-09-10 general-goods reference date;
-            // the legacy 2025-05-02 date is reserved for FMCG goods.
-            var known = date is not null && PermittedAnchorDates.Contains(date) &&
-                (kind == "Proizvod" || date == SidrenaLegalContract.GeneralReferenceDate);
-            // Validate the evidence marker before accessing its content;
-            // missing evidence is a controlled validation error, not a crash.
-            var hasSource = !string.IsNullOrWhiteSpace(source);
-            var documentedFmcg = hasSource &&
-                source!.Contains("FMCG",StringComparison.OrdinalIgnoreCase);
-            var offeredLater = date is not null && hasSource &&
-                DateOnly.TryParseExact(date,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None,out var firstOffer) &&
-                firstOffer > (kind == "Proizvod" && documentedFmcg
-                    ? new DateOnly(2025,5,2) : new DateOnly(2026,9,10)) &&
-                firstOffer <= DateOnly.FromDateTime(DateTime.UtcNow) &&
-                (source!.Contains("Prva ponuda:",StringComparison.OrdinalIgnoreCase) ||
-                 source.Contains("Prvo stavljanje u ponudu:",StringComparison.OrdinalIgnoreCase));
-            if(!known && !offeredLater)
-                throw new ArgumentException("Bazna cijena zahtijeva pravilan referentni datum; kasniji datum dopušten je uz dokaz Prva ponuda:.");
-
-            if(string.IsNullOrWhiteSpace(source))
+            // Store historical candidates without falsely certifying them.
+            // Scope and discounted-day method are confirmed separately with
+            // structured LegalEvidenceRules and item_evidence. Never infer from
+            // a free-text token such as "FMCG" or "Prva ponuda:".
+            if(!DateOnly.TryParseExact(date,"yyyy-MM-dd",CultureInfo.InvariantCulture,
+                DateTimeStyles.None,out var candidate))
+                throw new ArgumentException("Povijesni datum mora biti YYYY-MM-DD.");
+            var firstLegalDay=kind=="Usluga"?new DateOnly(2026,9,10):new DateOnly(2025,5,2);
+            var today=DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("Europe/Zagreb")).DateTime);
+            if(candidate<firstLegalDay || candidate>today)
+                throw new ArgumentException("Povijesni datum zahtijeva provjeru zakonske skupine i razdoblja.");
+            if(string.IsNullOrWhiteSpace(source) || source.Trim().Length<4)
                 throw new ArgumentException("Za baznu cijenu potreban je dokumentirani izvor.");
             if(source.Trim().Length>500||source.Any(c=>char.IsControl(c)&&c!='\t'))
                 throw new ArgumentException("Izvor bazne cijene sadrži nedopuštene znakove ili je predug.");

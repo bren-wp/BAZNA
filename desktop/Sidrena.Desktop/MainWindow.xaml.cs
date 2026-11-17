@@ -317,27 +317,28 @@ public partial class MainWindow : Window
         var actual=U.Box("Aktualna cijena",125);
         var anchor=U.Box("Bazna cijena (iz provjerene evidencije)",125);
         var source=U.Box("Povijesni izvor",240);
-        var date=U.Choice("10. 9. 2026.","2. 5. 2025.");
+        var date=U.Box("YYYY-MM-DD",145);
+        date.Text=kind=="Usluga"?"2026-09-10":"";
         var rightFields=U.Vertical();
         rightFields.Children.Add(U.Field("Naziv "+(kind=="Proizvod"?"artikla":"usluge")+" *",name));
         var line=U.Horizontal();line.Children.Add(U.Field("Šifra",sku));line.Children.Add(U.Field("Barkod",barcode));
         rightFields.Children.Add(line);
         rightFields.Children.Add(U.Field("Jedinica mjere",unit));
         var money=U.Horizontal();money.Children.Add(U.Field("Aktualna cijena (€) *",actual));
-        money.Children.Add(U.Field("Potvrđena bazna (€)",anchor));
+        money.Children.Add(U.Field("Unesena povijesna bazna (€)",anchor));
         rightFields.Children.Add(money);
-        rightFields.Children.Add(U.Field("Referentni datum bazne cijene",date));
+        rightFields.Children.Add(U.Field("Datum povijesne cijene (YYYY-MM-DD)",date));
         rightFields.Children.Add(U.Field("Izvor povijesne cijene",source));
-        rightFields.Children.Add(U.Notice("Bazna cijena ne izračunava se iz današnje. Datum i izvor unose se samo uz dokaziv povijesni iznos."));
+        rightFields.Children.Add(U.Notice("Unos je neprovjereni nacrt. Unesite točan dan, a nakon spremanja u detaljima odaberite skupinu i metodu te zasebno potvrdite dokumentirani izvor."));
         rightFields.Children.Add(U.Action("Spremi novu stavku",()=>{
             try{
                 var historical=string.IsNullOrWhiteSpace(anchor.Text)?(decimal?)null:MoneyParser.Parse(anchor.Text);
                 var created=_prices.AddItem(name.Text,kind,sku.Text,barcode.Text,unit.Text,MoneyParser.Parse(actual.Text),
-                    historical,historical.HasValue?(date.SelectedIndex==0?"2026-09-10":"2025-05-02"):null,
+                    historical,historical.HasValue?date.Text.Trim():null,
                     historical.HasValue?source.Text:null);
                 name.Clear();sku.Clear();barcode.Clear();actual.Clear();anchor.Clear();source.Clear();
                 Reload(refresh:true,selectId:created);
-                Status("Stavka je uspješno spremljena.");
+                Status("Stavka je spremljena; povijesna cijena nije potvrđena dok ne provjerite izvor, skupinu i metodu.");
             }catch(Exception ex)when(ex is ArgumentException or InvalidOperationException or Microsoft.Data.Sqlite.SqliteException){Error(ex);}
         },true));
         // Reference detail drawer: edit only descriptive fields. Current/anchor prices use their own audited workflows.

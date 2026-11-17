@@ -45,10 +45,8 @@ try
         Expect(product.CurrentCents == 249, "Current price updated");
         Expect(product.AnchorCents == 210 && product.AnchorDate == "2025-05-02", "Anchor unchanged");
         MustThrow(() => store.AddItem("Bez izvora", "Proizvod", "", "", "", 1m, 1m, "2026-09-10", null));
-        MustThrow(() => store.AddItem("Pogrešan datum", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Izvor"));
         MustThrow(() => store.AddItem("Usluga 2025", "Usluga", "", "", "", 1m, 1m, "2025-05-02", "Povijest"));
         MustThrow(() => store.AddItem("Usluga prije opceg datuma", "Usluga", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: racun"));
-        MustThrow(() => store.AddItem("Roba bez klasifikacije", "Proizvod", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: racun"));
 
         MustThrow(() => store.AddItem("Preciznost", "Usluga", "", "", "", 1.123m, null, null, null));
         Expect(MoneyParser.Parse("12,50") == 12.50m, "Croatian decimal comma");
@@ -77,8 +75,17 @@ try
     using (var firstOfferStore = new PriceStore(Path.Combine(folder,"first-offer.db")))
     {
         var newGoods = firstOfferStore.AddItem("Prvi put ponuđeno", "Proizvod", "NEW-1", "", "kom", 2m, 2m, "2026-09-11", "Prva ponuda: račun od 11. 9. 2026.");
-        Expect(firstOfferStore.ListItems().Any(p => p.Id == newGoods && p.AnchorDate == "2026-09-11"), "Verified first-offer date accepted");
-        MustThrow(() => firstOfferStore.AddItem("Bez dokaza", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Račun"));
+        Expect(firstOfferStore.ListItems().Any(p => p.Id == newGoods && p.AnchorDate == "2026-09-11" && !p.AnchorVerified),
+            "First-offer date stored without automatic certification");
+        MustThrow(()=>firstOfferStore.ConfirmEvidence(newGoods,LegalEvidenceRules.General,"reference_day"));
+        firstOfferStore.ConfirmEvidence(newGoods,LegalEvidenceRules.General,"first_offer");
+        Expect(firstOfferStore.ListItems().Single(p=>p.Id==newGoods).AnchorVerified,
+            "Documented first-offer method confirmed after explicit classification");
+        var unclassified=firstOfferStore.AddItem("Roba bez klasifikacije", "Proizvod", "", "", "", 1m, 1m, "2026-06-01", "Prva ponuda: račun");
+        MustThrow(()=>firstOfferStore.ConfirmEvidence(unclassified,LegalEvidenceRules.General,"first_offer"));
+        Expect(!firstOfferStore.ListItems().Single(p=>p.Id==unclassified).AnchorVerified,
+            "Unclassified historical date cannot be declared confirmed for general goods");
+        MustThrow(() => firstOfferStore.AddItem("Bez dokaza", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "X"));
     }
     using (var workspace = new WorkspaceStore(file))
     {
