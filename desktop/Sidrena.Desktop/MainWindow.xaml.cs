@@ -243,7 +243,7 @@ public partial class MainWindow : Window
     }
 
     private static ItemRow AsItemRow(PriceItem item)=>new(item.Id,item.Name,item.Kind,item.Sku,item.Barcode,item.Unit,
-        Euro(item.CurrentCents),item.AnchorCents.HasValue?Euro(item.AnchorCents.Value):"Nije potvrđena",DateText(item.AnchorDate));
+        Euro(item.CurrentCents),item.AnchorVerified&&item.AnchorCents.HasValue?Euro(item.AnchorCents.Value):"Zahtijeva dokaz",item.AnchorVerified?DateText(item.AnchorDate):"—");
     private static AuditRow AsAuditRow(PriceAuditView x)=>new(x.Id,x.ItemId,x.ItemName,x.ItemKind,
         Euro(x.PreviousCents),Euro(x.CurrentCents),ValueChange(x.PreviousCents,x.CurrentCents),x.Reason,
         x.ChangedUtc.ToLocalTime().ToString("dd. MM. yyyy. HH:mm",Hr));
@@ -256,7 +256,7 @@ public partial class MainWindow : Window
         Expander? newItemExpander=null;
         var filter=U.Horizontal();
         var search=U.Box("Pretražite naziv, šifru ili barkod",325);
-        var anchorFilter=U.Choice("Sve stavke","Potvrđena bazna","Bazna nije potvrđena");
+        var anchorFilter=U.Choice("Sve stavke","Dokaz potvrđen","Dokaz nije potvrđen");
         filter.Children.Add(U.Field("Referentna cijena",anchorFilter));
         filter.Children.Add(U.Field("Pretraživanje",search));
         filter.Children.Add(U.Action("+  "+(kind=="Proizvod"?"Novi artikl":"Nova usluga"),
@@ -348,6 +348,11 @@ public partial class MainWindow : Window
         var eUnit=U.Box("Jedinica",115);
         var eReason=U.Box("Razlog izmjene podataka",260);
         var locked=U.Muted("Bazna cijena i aktualna cijena mogu se mijenjati samo kroz odgovarajuće postupke.");
+        var evidenceScope=U.Choice("Odaberite skupinu","FMCG · 2. 5. 2025.","Ostala roba i usluge · 10. 9. 2026.");
+        var evidenceMethod=U.Choice("Odaberite metodu","Cijena na referentni dan",
+            "Prva ponuda nakon referentnog dana","FMCG · najniža 30 dana prije početka popusta",
+            "Ostala roba/usluge · prethodna maloprodajna");
+        var evidenceStatus=U.Muted("Status dokaza: odaberite stavku.");
         var editor=U.Vertical();
         editor.Children.Add(chosen);
         editor.Children.Add(U.Field("Naziv",eName));
@@ -357,6 +362,22 @@ public partial class MainWindow : Window
         editor.Children.Add(editLine);
         editor.Children.Add(U.Field("Jedinica mjere",eUnit));
         editor.Children.Add(locked);
+        editor.Children.Add(evidenceStatus);
+        editor.Children.Add(U.Field("Referentna skupina",evidenceScope));
+        editor.Children.Add(U.Field("Zakonska metoda bazne cijene",evidenceMethod));
+        editor.Children.Add(U.Notice("Potvrda je dopuštena samo za provjeren izvor i odgovarajući datum. Sama potvrda nije pravni certifikat."));
+        editor.Children.Add(U.Action("Potvrdi dokumentirani povijesni dokaz",()=>{
+            if(grid.SelectedItem is not ItemRow selected){Status("Odaberite stavku.");return;}
+            try
+            {
+                var scopes=new[]{string.Empty,LegalEvidenceRules.LegacyFmcg,LegalEvidenceRules.General};
+                var methods=new[]{string.Empty,"reference_day","first_offer","discount_lowest_30d","discount_previous_retail"};
+                _prices.ConfirmEvidence(selected.Id,scopes[evidenceScope.SelectedIndex],methods[evidenceMethod.SelectedIndex]);
+                Reload(refresh:true,selectId:selected.Id);
+                Status("Metoda i referentna skupina dokumentirano su potvrđene. Povijesni iznos nije izveden iz današnje cijene.");
+            }
+            catch(Exception ex)when(ex is ArgumentException or InvalidOperationException or KeyNotFoundException or Microsoft.Data.Sqlite.SqliteException){Error(ex);}
+        }));
         editor.Children.Add(U.Field("Razlog izmjene *",eReason));
         editor.Children.Add(U.Action("Spremi podatke odabrane stavke",()=>{
             if(grid.SelectedItem is not ItemRow selected){Status("Odaberite stavku u tablici.");return;}
@@ -375,9 +396,18 @@ public partial class MainWindow : Window
             chosen.Text=item.Name+"  ·  "+item.Kind;
             eName.Text=item.Name;eSku.Text=item.Sku;eBarcode.Text=item.Barcode;eUnit.Text=item.Unit;
             eReason.Clear();
-            locked.Text=$"Aktualna: {Euro(item.CurrentCents)} · Bazna: "+
-                (item.AnchorCents.HasValue?Euro(item.AnchorCents.Value):"nije potvrđena")+
+            locked.Text=$"Aktualna: {Euro(item.CurrentCents)} · Unesena povijesna: "+
+                (item.AnchorCents.HasValue?Euro(item.AnchorCents.Value):"nije unesena")+
                 $" · Datum: {DateText(item.AnchorDate)}\nPovijesni iznos i datum nisu uređivi u ovom obrascu.";
+            evidenceStatus.Text=item.AnchorVerified
+                ? "Dokaz evidentiran: skupina i metoda provjerene na temelju pohranjenog izvora."
+                : "Zahtijeva pregled: povijesna cijena nije potvrđena.";
+            evidenceScope.SelectedIndex=item.AnchorScope==LegalEvidenceRules.LegacyFmcg?1:
+                item.AnchorScope==LegalEvidenceRules.General?2:0;
+            evidenceMethod.SelectedIndex=item.AnchorMethod switch {
+                "reference_day"=>1,"first_offer"=>2,"discount_lowest_30d"=>3,
+                "discount_previous_retail"=>4,_=>0
+            };
         };
         var right=U.Vertical();
         right.Children.Add(U.Card("Odabrana stavka — detalji",editor));

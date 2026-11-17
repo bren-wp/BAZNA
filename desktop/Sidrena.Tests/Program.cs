@@ -10,10 +10,17 @@ try
     using (var store = new PriceStore(file))
     {
         id = store.AddItem("Mlijeko; \"punomasno\"", "Proizvod", "SKU-1", "3851234567890", "L",
-            2.35m, 2.10m, "2026-09-10", "Račun iz arhive");
+            2.35m, 2.10m, "2025-05-02", "Arhiva dokumentacija za mlijeko");
         var pending = store.AddItem("Usluga šišanja", "Usluga", "", "", "kom", 15m, null, null, null);
         Expect(store.ListItems().Count == 2, "Insert item");
         Expect(store.ListItems().First(p => p.Id == pending).AnchorCents is null, "No fabricated reference");
+        Expect(!store.ListItems().Single(p=>p.Id==id).AnchorVerified,
+            "Legacy historical amount is not automatically certified");
+        MustThrow(()=>store.ConfirmEvidence(id,LegalEvidenceRules.General,"reference_day"));
+        store.ConfirmEvidence(id,LegalEvidenceRules.LegacyFmcg,"reference_day");
+        Expect(store.ListItems().Single(p=>p.Id==id).AnchorVerified,
+            "Confirmed legacy FMCG evidence is explicitly classified");
+        MustThrow(()=>store.ConfirmEvidence(id,LegalEvidenceRules.LegacyFmcg,"discount_previous_retail"));
         store.UpdateCurrentPrice(id, 2.49m, "Novi cjenik");
         store.UpdateCurrentPrice(id, 2.49m, "Bez promjene");
         Expect(store.ListChanges(id).Count == 1, "Idempotent price log");
@@ -36,7 +43,7 @@ try
         MustThrow(()=>CatalogViewFilter.Apply(searchable,"Proizvod",new string('X',257),0));
         var product = store.ListItems().Single(p => p.Id == id);
         Expect(product.CurrentCents == 249, "Current price updated");
-        Expect(product.AnchorCents == 210 && product.AnchorDate == "2026-09-10", "Anchor unchanged");
+        Expect(product.AnchorCents == 210 && product.AnchorDate == "2025-05-02", "Anchor unchanged");
         MustThrow(() => store.AddItem("Bez izvora", "Proizvod", "", "", "", 1m, 1m, "2026-09-10", null));
         MustThrow(() => store.AddItem("Pogrešan datum", "Proizvod", "", "", "", 1m, 1m, "2026-09-11", "Izvor"));
         MustThrow(() => store.AddItem("Usluga 2025", "Usluga", "", "", "", 1m, 1m, "2025-05-02", "Povijest"));
@@ -59,7 +66,7 @@ try
             "Official SIDRENA WordPress import header exactly matches canonical template");
         Expect(csvText.Contains("proizvod") && csvText.Contains("usluga"),
             "Windows goods and services map to WordPress expected kind values");
-        Expect(csvText.Contains("2026-09-10") && !csvText.Contains("SIDRENA_NACRT"),
+        Expect(csvText.Contains("2025-05-02") && !csvText.Contains("SIDRENA_NACRT"),
             "Verified historical reference date preserved in transfer");
         Expect(csvText.Contains("Mlijeko; \"\"punomasno\"\""),
             "WordPress compatible CSV escapes semicolons and quotations");
@@ -112,10 +119,13 @@ try
     {
         var empty=counts.GetCatalogueTotals();
         Expect(empty.Total==0&&empty.ConfirmedAnchors==0,"Empty catalogue counts");
-        counts.AddItem("A","Proizvod","A1","","kom",2m,1.50m,"2026-09-10","Račun A");
+        var oldItem=counts.AddItem("A","Proizvod","A1","","kom",2m,1.50m,"2026-09-10","Račun A");
         counts.AddItem("B","Usluga","B1","","kom",5m,null,null,null);
+        Expect(counts.GetCatalogueTotals().ConfirmedAnchors==0,
+            "Legacy amounts are unverified after additive SQLite migration");
+        counts.ConfirmEvidence(oldItem,LegalEvidenceRules.General,"reference_day");
         var totals=counts.GetCatalogueTotals();
-        Expect(totals.Total==2&&totals.ConfirmedAnchors==1,"SQL reference totals");
+        Expect(totals.Total==2&&totals.ConfirmedAnchors==1,"Verified SQL reference totals");
         using var countedWorkspace=new WorkspaceStore(Path.Combine(folder,"counter.db"));
         Expect(countedWorkspace.CountPriceChanges()==0&&countedWorkspace.CountDraftExports()==0,
             "Empty audits and draft counters");
