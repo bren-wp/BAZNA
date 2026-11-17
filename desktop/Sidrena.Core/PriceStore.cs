@@ -262,15 +262,29 @@ public sealed class PriceStore : IDisposable
         if(kind is not ("Proizvod" or "Usluga"))throw new ArgumentException("Nepoznata vrsta stavke.");
         if(price.HasValue)
         {
-            if(date is null || !PermittedAnchorDates.Contains(date))
-                throw new ArgumentException("Sidrena cijena zahtijeva dopušten referentni datum.");
+            // NN 132/2026: an item first offered AFTER its applicable
+            // reference date uses the documented first-offer price.
+            // Require an explicit source marker instead of silently
+            // treating every later historical date as a reference date.
+            var known = date is not null && PermittedAnchorDates.Contains(date);
+            var offeredLater = date is not null &&
+                DateOnly.TryParseExact(date,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,out var firstOffer) &&
+                firstOffer > new DateOnly(2025,5,2) &&
+                firstOffer <= DateOnly.FromDateTime(DateTime.UtcNow) &&
+                !string.IsNullOrWhiteSpace(source) &&
+                (source.Contains("Prva ponuda:",StringComparison.OrdinalIgnoreCase) ||
+                 source.Contains("Prvo stavljanje u ponudu:",StringComparison.OrdinalIgnoreCase));
+            if(!known && !offeredLater)
+                throw new ArgumentException("Bazna cijena zahtijeva pravilan referentni datum; kasniji datum dopušten je uz dokaz Prva ponuda:.");
+
             if(string.IsNullOrWhiteSpace(source))
-                throw new ArgumentException("Za sidrenu cijenu potreban je dokumentirani izvor.");
+                throw new ArgumentException("Za baznu cijenu potreban je dokumentirani izvor.");
             if(source.Trim().Length>500||source.Any(c=>char.IsControl(c)&&c!='\t'))
-                throw new ArgumentException("Izvor sidrene cijene sadrži nedopuštene znakove ili je predug.");
+                throw new ArgumentException("Izvor bazne cijene sadrži nedopuštene znakove ili je predug.");
         }
         else if(date is not null || !string.IsNullOrWhiteSpace(source))
-            throw new ArgumentException("Datum i izvor bez sidrene cijene nisu dopušteni.");
+            throw new ArgumentException("Datum i izvor bez bazne cijene nisu dopušteni.");
     }
 
     public void UpdateCurrentPrice(long id, decimal newPrice, string reason)
