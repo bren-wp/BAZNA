@@ -28,8 +28,8 @@ def number(name: str) -> int:
 check(number("targetSdk") >= 36, "Google Play targetSdk must be at least 36")
 check(number("minSdk") >= 24, "Play-protected package must use minSdk >= 24")
 check(number("compileSdk") >= number("targetSdk"), "compileSdk must not be below targetSdk")
-check(number("versionCode") == 25, "BAZNA 1.5.22 must use Android versionCode 25")
-check('versionName = "1.5.22"' in gradle, "Android release must have versionName 1.5.22")
+check(number("versionCode") == 26, "BAZNA 1.5.23 must use Android versionCode 26")
+check('versionName = "1.5.23"' in gradle, "Android release must have versionName 1.5.23")
 check(number("versionCode") > 0, "A positive versionCode is required")
 check('applicationId = "com.brendigo.bazna"' in gradle, "BAZNA application ID must be com.brendigo.bazna (new Play listing)")
 check("isMinifyEnabled = true" in gradle and "isShrinkResources = true" in gradle,

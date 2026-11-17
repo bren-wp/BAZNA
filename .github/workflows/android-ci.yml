@@ -61,7 +61,7 @@ jobs:
           echo "$package_line"
           [[ "$package_line" == *"name='com.brendigo.bazna'"* ]]
           [[ "$package_line" == *"versionCode='25'"* ]]
-          [[ "$package_line" == *"versionName='1.5.22'"* ]]
+          [[ "$package_line" == *"versionName='1.5.23'"* ]]
       - name: Verify built artifacts and hash
         run: |
           set -euo pipefail
