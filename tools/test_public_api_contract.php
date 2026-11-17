@@ -106,6 +106,7 @@ class Brendigo_Sidrena_Cijena_Settings {
 	public function is_multi_poslovnica() {
 		return true;
 	}
+	public function get( $key, $default = '' ) { return $default; }
     public function normalize_oznaka( $code ) { return trim( (string) $code ); }
 }
 class Brendigo_Sidrena_Cijena_Archive {
