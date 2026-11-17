@@ -58,6 +58,14 @@ final class Brendigo_Sidrena_Cijena_Official_Feed {
 		if ( 'yes' !== ( isset( $row['historical_verified'] ) ? $row['historical_verified'] : '' ) ) {
 			return 'historical_verified';
 		}
+		// A stored confirmation flag is not proof of a documentary source.
+		// Validate the source again at the publication boundary, including legacy
+		// records and programmatic imports that bypass the admin field handler.
+		$source = isset( $row['historical_source'] ) && is_scalar( $row['historical_source'] )
+			? trim( (string) $row['historical_source'] ) : '';
+		if ( strlen( $source ) < 4 ) {
+			return 'historical_source';
+		}
 		$scope = isset( $row['reference_scope'] ) ? $row['reference_scope'] : '';
 		$method = isset( $row['historical_method'] ) ? $row['historical_method'] : '';
 		if ( ! in_array( $scope, array( 'legacy_fmcg', 'general_goods_services' ), true ) ||
