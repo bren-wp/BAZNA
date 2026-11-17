@@ -41,6 +41,10 @@ class Brendigo_Sidrena_Cijena_Plugin {
     public static function current_user_can_manage() { return $GLOBALS['sync_manager']; }
     public static function woocommerce_active() { return $GLOBALS['sync_woo']; }
 }
+class Brendigo_Sidrena_Cijena_Automation {
+    public static function instance() { return new self(); }
+    public function mark_pending( $reason ) { $GLOBALS['sync_pending'] = $reason; }
+}
 class Brendigo_Sidrena_Cijena_Catalog {
     const OPTION_KEY = 'sidrena_cijena_catalog';
     public static function instance() { return new self(); }
@@ -130,6 +134,7 @@ sync_check( $created instanceof SyncResponse && $created->data['published'] === 
     count( $GLOBALS['sync_rows'] ) === 1 && $GLOBALS['sync_rows'][0]['historical_verified'] === '',
     'Creates private draft without documentary attestation or publication' );
 sync_check( '' === $GLOBALS['sync_lock'], 'Atomic write releases lock after success' );
+sync_check( ( $GLOBALS['sync_pending'] ?? '' ) === 'sync-draft', 'Draft write marks publication pending but never publishes' );
 
 $conflict = $sync::write( new SyncRequest( $create ) );
 sync_check( $conflict instanceof WP_Error && $conflict->code === 'bazna_sync_conflict' &&
