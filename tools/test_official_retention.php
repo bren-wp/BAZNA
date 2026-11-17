@@ -70,6 +70,7 @@ retention_check( Brendigo_Sidrena_Cijena_Feed_Files::official_snapshot_name_is_v
 retention_check( ! Brendigo_Sidrena_Cijena_Feed_Files::official_snapshot_name_is_valid( '../' . $old ), 'Traversal cannot be treated as official filename' );
 retention_check( ! Brendigo_Sidrena_Cijena_Feed_Files::official_snapshot_name_is_valid( $bad ), 'Unrelated uploads are never official snapshots' );
 $method = new ReflectionMethod( Brendigo_Sidrena_Cijena_Feed_Files::class, 'prune_official_snapshots' );
+$method->setAccessible( true ); // PHP 7.4 requires explicit access to a private method.
 $method->invoke( $feed );
 retention_check( file_exists( $dir . '/' . $old ), 'Held 45-day-old snapshot remains public for 15 days after replacement' );
 retention_check( ! file_exists( $dir . '/' . $expired ), 'Expired old official file can be pruned' );
