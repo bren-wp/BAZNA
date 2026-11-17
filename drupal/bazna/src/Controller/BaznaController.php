@@ -87,6 +87,16 @@ final class BaznaController extends ControllerBase {
     });
   }
 
+  public function officialArchive(string $id, string $kind, string $format, Request $request): Response {
+    return $this->safe(function(Core $core) use ($id, $kind, $format, $request): Response {
+      $snapshot = $core->officialArchive($id, $kind, $format,
+        (string) $request->query->get('oznaka', ''));
+      return $this->result($format === 'csv' ? 'text/csv; charset=utf-8' : 'application/xml; charset=utf-8',
+        $snapshot['body'], 200,
+        ['Content-Disposition' => 'inline; filename="' . $snapshot['filename'] . '"']);
+    });
+  }
+
   public function catalog(): Response {
     return $this->safe(function(Core $c): Response {
       $name = Core::esc('BAZNA — Bazne cijene');
