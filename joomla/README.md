@@ -52,3 +52,8 @@ Nema BAZNA licencnog ključa, aktivacijskog zaslona ni `vendor/LicenseClient.php
 ## NN 132/2026 — službeni podaci
 
 Zajednička BAZNA PHP jezgra uključuje pravni profil NN 132/2026 br. 1583/1584, službeni CSV/XML na putanjama `/bazna/v1/sluzbeni/{proizvodi|usluge}/{csv|xml}`, neto količinu i EAN. Za izvozne datoteke konfigurirajte `BAZNA_TRADER_OIB` ili `BAZNA_TRADER_MB` te provjerite primjenjivost iznimaka i dokazni iznos. Joomla UI zahtijeva stvarni instalacijski test prije tvrdnje o potpunoj 1:1 podudarnosti s WordPressom.
+
+
+## Automatizirana objava Joomla kataloga
+
+Postavite `BAZNA_AUTO_PUBLISH_VERIFIED=1` na PHP poslužitelju za objavu nakon valjano autoriziranog administratorskog spremanja. Zajednička jezgra provjerava povijesni dokaz, OIB/MB, relevantne redove te vrstu/adresu/oznaku svake poslovnice prije objave. Nacrt ostaje privatan kada podaci nisu potpuni. Za promjene iz drugih sustava može se koristiti isti `web/bin/publish.php` CLI uz isti `BAZNA_JOOMLA_PRIVATE_DIR` kao `BAZNA_PRIVATE_DIR` u kontekstu procesa, kroz poslužiteljski cron. Time PHP servis ne ovisi o javnom prometu, no stvarni Joomla integracijski i pravni test i dalje je nužan.
