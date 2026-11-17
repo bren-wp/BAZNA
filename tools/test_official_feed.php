@@ -41,6 +41,15 @@ expect_official( array() === Brendigo_Sidrena_Cijena_Official_Feed::missing_requ
 $not_verified = $row;
 $not_verified['historical_verified'] = '';
 expect_official( 'historical_verified' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $not_verified, 'proizvodi' ), 'No historic evidence: block official publication' );
+// Regression: a manually/imported yes flag must not bypass missing proof.
+$unproved = $row;
+$unproved['historical_source'] = '   ';
+expect_official( 'historical_source' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $unproved, 'proizvodi' ), 'Yes flag without historical source is rejected at publication boundary' );
+$proof_errors = Brendigo_Sidrena_Cijena_Official_Feed::missing_required_data( array( $unproved ), 'proizvodi' );
+expect_official( count( $proof_errors ) === 1 && 'historical_source' === $proof_errors[0]['field'], 'Official feed refuses unproved imported historical price' );
+$short_source = $row;
+$short_source['historical_source'] = ' abc ';
+expect_official( 'historical_source' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $short_source, 'proizvodi' ), 'Short historical source cannot validate a confirmed price' );
 $bad_scope = $row;
 $bad_scope['reference_scope'] = 'general_goods_services';
 expect_official( 'sidrena_datum' === Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $bad_scope, 'proizvodi' ), 'A later general-goods reference cannot use 2025 date' );
@@ -141,13 +150,10 @@ foreach ( $cases as $case ) {
 	);
 	$core_issue = \Brendigo\Bazna\Core::legalEvidenceIssue( $input, $kind );
 	$wp_input = $input;
-	$wp_input['historical_verified'] = $verified && strlen( trim( $source ) ) >= 4 ? 'yes' : '';
+	$wp_input['historical_verified'] = $verified ? 'yes' : '';
+	// Both engines must independently validate the source: do not massage the
+	// verified flag or rewrite the returned issue to hide a parity failure.
 	$wp_issue = Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue( $wp_input, $kind );
-	// The WordPress stored flag is already a derived source-evidence marker:
-	// core preserves the more specific missing historical_source reason.
-	if ( 'historical_source' === $expected ) {
-		$wp_issue = '' === $wp_input['historical_verified'] ? 'historical_source' : $wp_issue;
-	}
 	expect_official( $core_issue === $expected && $wp_issue === $expected,
 		'WP and Core NN132 evidence parity: ' . implode( '/', array( $kind, $scope, $method, $date, $expected ) ) );
 }
