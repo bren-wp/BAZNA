@@ -49,4 +49,45 @@ expect_official( ! Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( '123
 expect_official( Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( '12345678', 'maticni_broj' ), '8-digit MB identifier shape' );
 expect_official( ! Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( '12345678', 'oib' ), 'Wrong identity kind rejected' );
 expect_official( ! Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( '12345678901/../', 'oib' ), 'Filename traversal rejected' );
+
+// Minimal WP stubs: legal filename tests must run standalone in CI.
+class Brendigo_Sidrena_Cijena_Settings {
+	public static $values = array(
+		'trader_identifier' => '12345678903',
+		'trader_identifier_kind' => 'oib',
+		'file_oblik' => 'webshop',
+		'file_adresa' => '',
+		'file_oznaka' => '001',
+	);
+	public static $multi = true;
+	public static function instance() { return new self(); }
+	public function get( $key, $fallback = '' ) { return self::$values[ $key ] ?? $fallback; }
+	public function normalize_oznaka( $text ) { return preg_replace( '/[^A-Za-z0-9-]/', '', (string) $text ); }
+	public function is_multi_poslovnica() { return self::$multi; }
+	public function sanitize_file_part( $value, $fallback = '' ) {
+		$value = trim( preg_replace( '/[^A-Za-z0-9]+/', '_', (string) $value ), '_' );
+		return '' === $value ? $fallback : $value;
+	}
+}
+class Brendigo_Sidrena_Cijena_Poslovnice {
+	public static function instance() { return new self(); }
+	public function get_by_oznaka( $oznaka ) { return 'EXISTING' === $oznaka ?
+		array( 'oblik' => 'trgovina', 'adresa' => 'Zagreb 1' ) : null; }
+}
+function wp_date( $format, $time, $timezone ) {
+	return ( new DateTimeImmutable( '@' . $time ) )->setTimezone( $timezone )->format( $format );
+}
+$official = 'Brendigo_Sidrena_Cijena_Official_Feed';
+expect_official( '' === $official::filename( 'proizvodi', 'csv', '', 1, 1794913200 ),
+	'Missing webshop address cannot be silently replaced by a placeholder' );
+expect_official( '' === $official::filename( 'proizvodi', 'csv', 'UNKNOWN', 1, 1794913200 ),
+	'Unknown outlet cannot be substituted with webshop data' );
+expect_official( str_contains( $official::filename( 'proizvodi', 'csv', 'EXISTING', 1, 1794913200 ),
+	'trgovina_Zagreb_1_EXISTING_ROBA_1_' ), 'Known outlet requires exact address and identifier' );
+Brendigo_Sidrena_Cijena_Settings::$values['file_adresa'] = 'Ulica 1';
+expect_official( str_contains( $official::filename( 'usluge', 'xml', '', 3, 1794913200 ),
+	'webshop_Ulica_1_001_USLUGE_3_' ), 'Configured webshop legal filename accepted' );
+Brendigo_Sidrena_Cijena_Settings::$multi = false;
+expect_official( str_contains( $official::filename( 'proizvodi', 'csv', '', 4, 1794913200 ),
+	'ZA_SVA_PRODAJNA_MJESTA_ROBA_4_' ), 'All-outlets exception does not need fake outlet data' );
 echo "PASS: NN 132/2026 official feed projection\n";
