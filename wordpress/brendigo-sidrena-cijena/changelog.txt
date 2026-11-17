@@ -1,3 +1,10 @@
+== BAZNA 1.5.22 ==
+- Pravni profil NN 132/2026: pravilnici 1583 i 1584, rok 11:00 i arhiva 15 dana od zamjene.
+- Dodani službeni CSV/XML, zasebni od javnih kompatibilnih datoteka za Android i Windows.
+- Neto količina i validacija EAN-a te OIB-a; poslovnice imaju odvojene statusne objave.
+- Novi vizualni identitet BAZNA u WordPress, README i marketing bannerima.
+- Napomena: službene cijene i kategorije iznimki moraju biti dokazno provjerene.
+
 == BAZNA 1.5.21 ==
 - Usklađen sustav objave postojećeg WordPress.org dodatka brendigo-sidrena-cijena sa GitHub izdanjima i SVN tags.
 - Dodan CI gate za isti slug, ime glavne PHP datoteke, tekstualnu domenu i neizmijenjen, deterministički ZIP.
