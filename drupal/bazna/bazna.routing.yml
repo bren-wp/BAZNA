@@ -1,0 +1,53 @@
+bazna.index:
+  path: '/bazna/v1/cjenici'
+  defaults:
+    _controller: '\Drupal\bazna\Controller\BaznaController::discovery'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+bazna.request_services:
+  path: '/bazna/v1/usluge-na-upit'
+  defaults:
+    _controller: '\Drupal\bazna\Controller\BaznaController::inquiries'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+bazna.archive:
+  path: '/bazna/v1/arhiva'
+  defaults:
+    _controller: '\Drupal\bazna\Controller\BaznaController::archives'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+bazna.feeds:
+  path: '/bazna/v1/cjenici/{kind}/{format}'
+  defaults:
+    _controller: '\Drupal\bazna\Controller\BaznaController::feed'
+  requirements:
+    _permission: 'access content'
+    kind: 'proizvodi|usluge'
+    format: 'csv|xml'
+  methods: [GET]
+bazna.official_feeds:
+  path: '/bazna/v1/sluzbeni/{kind}/{format}'
+  defaults:
+    _controller: '\Drupal\bazna\Controller\BaznaController::officialFeed'
+  requirements:
+    _permission: 'access content'
+    kind: 'proizvodi|usluge'
+    format: 'csv|xml'
+  methods: [GET]
+bazna.catalog:
+  path: '/bazna/cjenik'
+  defaults:
+    _controller: '\Drupal\bazna\Controller\BaznaController::catalog'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+bazna.admin:
+  path: '/admin/config/services/bazna'
+  defaults:
+    _form: '\Drupal\bazna\Form\CatalogForm'
+    _title: 'BAZNA — Bazne cijene'
+  requirements:
+    _permission: 'administer site configuration'
