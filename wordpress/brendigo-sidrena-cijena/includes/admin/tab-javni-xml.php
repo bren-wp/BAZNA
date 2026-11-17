@@ -77,7 +77,11 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 		// Use the SAME confirmed-publication discovery as Android.
 		// A stale file or missing OIB/MB must not become a clickable
 		// official link just because it remains in uploads.
-		$sidrena_discovery = Brendigo_Sidrena_Cijena_Public_API::instance()->index();
+		// REST index() returns WP_REST_Response, not a PHP array.
+		// Extract the published data explicitly before accessing official_feeds.
+		$sidrena_discovery_response = Brendigo_Sidrena_Cijena_Public_API::instance()->index();
+		$sidrena_discovery = is_object( $sidrena_discovery_response ) && method_exists( $sidrena_discovery_response, 'get_data' )
+			? $sidrena_discovery_response->get_data() : array();
 		$sidrena_official_count = 0;
 		$sidrena_official = isset( $sidrena_discovery['official_feeds'] ) && is_array( $sidrena_discovery['official_feeds'] )
 			? $sidrena_discovery['official_feeds'] : array();
