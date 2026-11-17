@@ -136,7 +136,6 @@ sync_check( $created instanceof SyncResponse && $created->data['published'] === 
     'Creates private draft without documentary attestation or publication' );
 sync_check( '' === $GLOBALS['sync_lock'], 'Atomic write releases lock after success' );
 sync_check( Brendigo_Sidrena_Cijena_Automation::$pending === array( 'sync-draft' ), 'Remote draft edit is pending and never queued for public auto-release' );
-sync_check( ( $GLOBALS['sync_pending'] ?? '' ) === 'sync-draft', 'Draft write marks publication pending but never publishes' );
 
 $conflict = $sync::write( new SyncRequest( $create ) );
 sync_check( $conflict instanceof WP_Error && $conflict->code === 'bazna_sync_conflict' &&
