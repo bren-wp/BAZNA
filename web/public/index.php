@@ -83,6 +83,12 @@ try {
         header('Content-Type: application/xml; charset=utf-8');
         echo $core->xml($parts[1], $outlet); exit;
     }
+    if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/sluzbeni/(proizvodi|usluge)/(csv|xml)$#D', $path, $parts)) {
+        $archive = $core->officialArchive($parts[1], $parts[2], $parts[3], (string) ($_GET['oznaka'] ?? ''));
+        header('Content-Type: ' . ($parts[3] === 'csv' ? 'text/csv' : 'application/xml') . '; charset=utf-8');
+        header('Content-Disposition: inline; filename="' . $archive['filename'] . '"');
+        echo $archive['body']; exit;
+    }
     if ($method === 'GET' && preg_match('#^/bazna/v1/arhiva/([0-9]{14}-[a-f0-9]{12})/(proizvodi|usluge)/csv$#D', $path, $parts)) {
         header('Content-Type: text/csv; charset=utf-8');
         echo $core->archiveCsv($parts[1], $parts[2], (string) ($_GET['oznaka'] ?? '')); exit;
