@@ -4,7 +4,7 @@ Tags: reference-prices, price-list, csv, croatia, woocommerce
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.5.23
+Stable tag: 1.5.24
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ BAZNA by Brendigo: bazne cijene i datumi, javni HTML cjenici te CSV/XML arhiva z
 
 == Description ==
 
-**Svi alati bez aktivacije:** BAZNA 1.5.23 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
+**Svi alati bez aktivacije:** BAZNA 1.5.24 radi bez licencnog ključa, online provjere, probnog roka ili aktivacije. Administratorske mogućnosti dostupne su ovlaštenim WordPress korisnicima; postojeće cijene i povijest nisu resetirani.
 
 
 **BAZNA brings reference prices, transparent public pricelists and dated archives together in one WordPress dashboard.** Built for WooCommerce stores and independent WordPress catalogs, without adding an external account or mandatory hosted service.
@@ -179,6 +179,12 @@ Adds observed price history, publication alerts, separate product/service feeds,
 Fixes WordPress.org i18n translator-comment errors and malformed admin sprintf placeholders that could append internal text to publication, pending-change, and pagination labels.
 
 == Changelog ==
+
+= 1.5.24 =
+* Legal publication hardening: 15-day archive holds for official filenames containing spaces or Croatian characters; secure archive lookup rejects encoded path separators.
+* PHP 7.4 compatibility restored for the public archive, with independent retention and routing regression tests.
+* Published-catalog shortcodes, public appearance presets and confirmed CSV/XML links from the merged release candidate.
+
 
 = 1.5.23 =
 * NN 132/2026: audit, zajednička kompatibilnost platformi i dodatne sigurnosne provjere.

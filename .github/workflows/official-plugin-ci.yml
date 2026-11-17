@@ -14,6 +14,7 @@ on:
       - 'tools/test_public_catalog_markup.php'
       - 'tools/test_public_embed.php'
       - 'tools/test_public_archive.php'
+      - 'tools/test_official_retention.php'
       - 'tools/test_legal_price_safety.php'
       - 'tools/test_responsive_browser.mjs'
       - 'tools/audit_public_bazna.py'
@@ -35,7 +36,7 @@ jobs:
         run: |
           test -f wordpress/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test -f wordpress/brendigo-sidrena-cijena/includes/class-legal.php
-          grep -q 'Stable tag: 1.5.23' wordpress/brendigo-sidrena-cijena/readme.txt
+          grep -q 'Stable tag: 1.5.24' wordpress/brendigo-sidrena-cijena/readme.txt
       - name: Lint PHP
         shell: bash
         run: |
@@ -62,6 +63,7 @@ jobs:
         run: |
           php tools/test_public_embed.php
           php tools/test_public_archive.php
+          php tools/test_official_retention.php
       - name: Test legally verified reference dates and no historical price inference
         run: php tools/test_legal_price_safety.php
       - uses: actions/setup-node@v7
@@ -97,19 +99,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_plugin.py --version 1.5.23 --output artifacts/brendigo-sidrena-cijena-1.5.23.zip
-          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.23.zip.sha256)
-          python3 tools/package_plugin.py --version 1.5.23 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.23.zip
-          cmp artifacts/brendigo-sidrena-cijena-1.5.23.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.23.zip
+          python3 tools/package_plugin.py --version 1.5.24 --output artifacts/brendigo-sidrena-cijena-1.5.24.zip
+          (cd artifacts && sha256sum -c brendigo-sidrena-cijena-1.5.24.zip.sha256)
+          python3 tools/package_plugin.py --version 1.5.24 --output /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.24.zip
+          cmp artifacts/brendigo-sidrena-cijena-1.5.24.zip /tmp/sidrena-check/brendigo-sidrena-cijena-1.5.24.zip
       - name: Verify WordPress.org package is a direct in-place update
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/package_wporg.py --version 1.5.23 --output artifacts/BAZNA-WordPress-org-1.5.23.zip
-          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.23.zip.sha256)
-          cmp artifacts/brendigo-sidrena-cijena-1.5.23.zip artifacts/BAZNA-WordPress-org-1.5.23.zip
+          python3 tools/package_wporg.py --version 1.5.24 --output artifacts/BAZNA-WordPress-org-1.5.24.zip
+          (cd artifacts && sha256sum -c BAZNA-WordPress-org-1.5.24.zip.sha256)
+          cmp artifacts/brendigo-sidrena-cijena-1.5.24.zip artifacts/BAZNA-WordPress-org-1.5.24.zip
           mkdir -p /tmp/bazna-wporg/extracted
-          unzip -q artifacts/BAZNA-WordPress-org-1.5.23.zip -d /tmp/bazna-wporg/extracted
+          unzip -q artifacts/BAZNA-WordPress-org-1.5.24.zip -d /tmp/bazna-wporg/extracted
           find /tmp/bazna-wporg/extracted/brendigo-sidrena-cijena -name '*.php' -type f -print0 | xargs -0 -n 1 php -l >/tmp/bazna-wporg-lint.log
           grep -q 'Text Domain: brendigo-sidrena-cijena' /tmp/bazna-wporg/extracted/brendigo-sidrena-cijena/brendigo-sidrena-cijena.php
           test ! -e /tmp/bazna-wporg/extracted/brendigo-sidrena-cijena/includes/class-license.php
@@ -123,7 +125,27 @@ jobs:
         with:
           name: BAZNA-WordPress-org-candidate
           path: |
-            artifacts/BAZNA-WordPress-org-1.5.23.zip
-            artifacts/BAZNA-WordPress-org-1.5.23.zip.sha256
+            artifacts/BAZNA-WordPress-org-1.5.24.zip
+            artifacts/BAZNA-WordPress-org-1.5.24.zip.sha256
           retention-days: 7
           if-no-files-found: error
+
+  php74-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install declared minimum WordPress PHP runtime
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: none
+      - name: Lint entire installable WordPress plugin on PHP 7.4
+        shell: bash
+        run: |
+          set -euo pipefail
+          php -r 'if (PHP_MAJOR_VERSION !== 7 || PHP_MINOR_VERSION !== 4) { exit(1); }'
+          find wordpress/brendigo-sidrena-cijena -type f -name '*.php' -print0 |
+            xargs -0 -n 1 php -l > /tmp/bazna-min-php.log
+          php tools/test_official_retention.php
+          echo 'PASS: WordPress 7.4 minimum syntax and official archive hold test'

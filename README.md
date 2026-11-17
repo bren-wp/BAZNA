@@ -1,40 +1,36 @@
 # BAZNA
 
-### Bazne cijene
+<p align="center"><img src="branding/bazna-icon.png" alt="BAZNA logotip" width="104" /></p>
 
-![BAZNA — Bazne cijene, jedna evidencija za više platformi](branding/bazna-readme-hero.svg)
+### Bazne cijene · Javni cjenici · Arhiva
 
-<div align="center">
+**Jasne cijene. Jednostavna objava. Pouzdana evidencija.**
 
-**Jedna evidencija cijena. Više prodajnih kanala. Javna objava pod kontrolom.**
+Upravljajte proizvodima i uslugama, dokumentirajte povijesne bazne cijene i objavite pregledne cjenike u svojem digitalnom poslovanju — bez dodatnog korisničkog računa za BAZNA sustav.
 
-BAZNA povezuje proizvode, usluge, poslovnice, provjerene bazne cijene, javne cjenike i arhivu — kroz WordPress, Android, Windows, Web, Joomlu, Drupal i Shopify.
+<p align="center"><img src="branding/bazna-banner.png" alt="BAZNA — vizualni identitet za upravljanje cijenama" width="920" /></p>
 
-[**Izdanja i paketi**](https://github.com/bren-wp/BAZNA/releases) · [**Instalacija**](#instalacija-po-platformama) · [**Povezivanje s Androidom**](#jedinstveni-podaci-na-svim-platformama) · [**Dokumentacija**](#dokumentacija)
-
-![Android CI](https://github.com/bren-wp/BAZNA/actions/workflows/android-ci.yml/badge.svg)
-![WordPress CI](https://github.com/bren-wp/BAZNA/actions/workflows/official-plugin-ci.yml/badge.svg)
-![Multiplatform CI](https://github.com/bren-wp/BAZNA/actions/workflows/multiplatform-ci.yml/badge.svg)
-
-</div>
+[**Preuzmite BAZNA**](https://github.com/bren-wp/BAZNA/releases) · [**WordPress dodatak**](wordpress/brendigo-sidrena-cijena) · [**Vodič za instalaciju**](#instalacija-po-platformama) · [**Javni cjenici**](#javni-cjenici-i-arhiva-na-vlastitoj-stranici)
 
 ---
 
-## Platforme i vizualni identitet
+## Jedan standard cjenika, za više platformi
+
+| <img src="branding/bazna-mark.svg" alt="BAZNA ikona" width="56" /> **BAZNA za vaš katalog** | **Što dobivate** |
+| :--- | :--- |
+| **Proizvodi i usluge** | Aktualna cijena, bazna cijena, povijesni izvor i podaci o poslovnici na preglednome mjestu |
+| **Javna objava** | Ljudima čitljiv HTML cjenik i službene CSV/XML datoteke za automatizirani dohvat |
+| **Arhiva objava** | Kronološki dostupne verzije objavljenih cjenika, uz evidenciju zamjene |
+| **Ugradnja na stranicu** | WordPress kratki kodovi, tamni ili svijetli izgled te prilagodljiva boja i gustoća |
+| **Rad na više uređaja** | WordPress/WooCommerce, Windows, Android i prilagodnici za PHP, Joomlu, Drupal i Shopify |
 
 <p align="center">
-  <img src="branding/bazna-mark.svg" alt="BAZNA — vektorska ikona" width="104">
-  <img src="desktop/branding/bazna-banner.svg" alt="BAZNA Desktop — vektorski banner" width="340">
+  <img src="branding/bazna-readme-hero.svg" alt="Prikaz BAZNA ekosustava — promotivna ilustracija, ne snimka aplikacije" width="820" />
 </p>
 
-**BAZNA za svaku platformu** — WordPress administracija, Android javni pregled, Windows lokalna obrada te integracijski sloj za CMS i web trgovine. Vektorski logotip i nova promocijska grafika koriste identitet BAZNA bez starih marketinških natpisa. Ilustrirani zaslon i primjerne cijene nisu snimke stvarne aplikacije; stvarni emulator/desktop screenshotovi dostupni su u GitHub Actions artefaktima.
+**Važno za povezivanje:** BAZNA koristi kompatibilne javne formate. Android čita već objavljene podatke putem HTTPS-a, a Windows ima lokalnu evidenciju. Automatska dvosmjerna sinkronizacija uređivanja između svih platformi nije uključena; službena objava provodi se u izvornom sustavu.
 
-[<img src="https://img.shields.io/badge/WordPress-WooCommerce-21759B?logo=wordpress&logoColor=white" alt="WordPress">](wordpress/brendigo-sidrena-cijena)
-[<img src="https://img.shields.io/badge/Android-Kotlin-2E7D32?logo=android&logoColor=white" alt="Android">](android)
-[<img src="https://img.shields.io/badge/Windows-WPF-0078D4?logo=windows&logoColor=white" alt="Windows">](desktop)
-[<img src="https://img.shields.io/badge/Joomla-PHP-EE5628?logo=joomla&logoColor=white" alt="Joomla">](joomla)
-[<img src="https://img.shields.io/badge/Drupal-Module-0678BE?logo=drupal&logoColor=white" alt="Drupal">](drupal/bazna)
-[<img src="https://img.shields.io/badge/Shopify-Adapter-7AB55C?logo=shopify&logoColor=white" alt="Shopify">](shopify)
+**Izdanje 1.5.24** donosi javne WordPress shortcode prikaze, izbor izgleda, strože provjere povijesnih dokaza, sigurniji pristup arhivi te dodatno testiranje čuvanja zakonskih CSV/XML objava. Izdanja uključuju Android probni APK i nepotpisani AAB, Windows Portable/Setup te ZIP pakete platformi, ovisno o uspješnom CI-ju.
 
 ### Pravni temelj — 17. studenoga 2026.
 
@@ -48,7 +44,7 @@ BAZNA povezuje proizvode, usluge, poslovnice, provjerene bazne cijene, javne cje
 
 ## Sve funkcije bez aktivacijskog ključa
 
-**BAZNA 1.5.23** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
+**BAZNA 1.5.24** ne provjerava aktivaciju, pretplatu, probni rok ili licencni poslužitelj. WordPress, Web, Joomla, Shopify adapter, Android i Windows rade bez BAZNA ključa. Sigurnosne kontrole za administratore i Shopify HMAC ostaju. GPL i obveze drugih licenci izvornog koda nisu uklonjene.
 
 ## Sve cijene na jednom mjestu
 
@@ -81,7 +77,7 @@ i služi za pregled, a ne upravljanje WordPressom.
 
 ## Jedna javna logika cjenika, uz punu kontrolu objave
 
-**Novo u 1.5.23:** WordPress, samostalni Web PHP, Joomla i Shopify
+**Funkcionalnosti uvedene od 1.5.23:** WordPress, samostalni Web PHP, Joomla i Shopify
 prikazuju objavljene proizvode, usluge i usluge s cijenom na upit
 uz jedinstvene nazive, iznose, povijesne datume i poslovnice.
 Web omogućuje pretraživanje i odabir poslovnice, Joomla i Shopify
@@ -108,13 +104,13 @@ Postavite u WordPress blok **Kratki kod**: `[bazna_objava]` za pregledan cjenik 
 
 | Platforma | Namjena | Verzija | Status |
 |---|---|---|---|
-| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.23** | CI provjeren; kandidat WordPress.org paketa |
+| **WordPress + WooCommerce** | Upravljanje cjenicima, postojećim WordPress podacima, javnim objavama i arhivom | **1.5.24** | CI provjeren; kandidat WordPress.org paketa |
 | **Web PHP** | Samostalni sustav bez WordPressa, grafički editor, lokalni JSON katalog, objava i arhiva | **1.1.6** | Funkcionalni paket; potreban test na stvarnom hostingu |
 | **Joomla** | System plugin sa zajedničkim editorom, ACL/CSRF kontrolama, cjenicima i sigurnom administracijom | **1.1.6** | Kandidat; potreban instalacijski test u Joomli |
 | **Drupal** | Nativni Drupal 10/11 modul na zajedničkoj PHP jezgri, javni REST i službeni CSV/XML | **1.1.6** | Razvojni kandidat; stvarni Drupal integracijski test potreban |
 | **Shopify** | Zaseban PHP adapter s potpisanim app-proxyjem, uvozom EUR varijanti, theme blokom i privacy webhookovima | **1.1.6** | Custom-store kandidat; javni OAuth/App Store postupak nije dovršen |
-| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.23** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
-| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.9** | Windows CI i stvarne provjere sučelja |
+| **Android** | Nativni javni pregled cijena, poslovnica i arhive s podržanih BAZNA stranica | **1.5.24** | Novi Play identifikator `com.brendigo.bazna`; debug APK i nepotpisani AAB |
+| **Windows** | Lokalna obrada kataloga, povijesti cijena i izvoz s Portable/Setup paketima | **0.10.10** | Windows CI i stvarne provjere sučelja |
 
 ## Automatizirana objava i praćenje rokova
 
@@ -195,7 +191,7 @@ Android se povezuje sa stvarnim javnim katalogom preko HTTPS-a. APK služi za in
 
 [Android upute](android/README.md) · [Google Play i migracija](docs/BAZNA-ANDROID-PACKAGE-MIGRATION.md) · [Windows upute](desktop/README.md)
 
-## Google Play slike i BRENDIGO Android identitet
+## Vizualni identitet i slike za Google Play
 
 BAZNA Play Store paket proizvodi se isključivo iz uspješno provjerenih **stvarnih Android emulator snimki**: ikona 512 × 512, feature graphic 1024 × 500, osam telefonskih slika 1080 × 1920, svih 12 zaslona i dvije kolekcije tablet prikaza. Korišten je postojeći narančasti znak B i tamnoplava paleta; aplikacijski zasloni nisu izmišljene makete.
 
@@ -224,7 +220,7 @@ Zaštite uključuju HTTPS javno čitanje, administratorske CSRF/ACL kontrole, at
 
 ## Dokumentacija
 
-[Arhitektura i kompatibilnost](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Android i WordPress](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md) · [Vizualni standard](docs/PIXEL-PERFECT-QA.md) · [Sigurnosni audit](docs/SECURITY-DEADCODE-AUDIT-2026-10-24.md)
+[Arhitektura i kompatibilnost](docs/BAZNA-MULTIPLATFORM-ARCHITECTURE.md) · [Pravni okvir](docs/LEGAL-2026-INTEROPERABILITY.md) · [Android i WordPress](docs/ANDROID-WORDPRESS-INTEGRATION-AUDIT-159.md) · [Vizualni standard](docs/PIXEL-PERFECT-QA.md) · [Sigurnosna i dead-code revizija 1.5.24](docs/BAZNA-SECURITY-DEADCODE-1.5.24.md)
 
 ---
 

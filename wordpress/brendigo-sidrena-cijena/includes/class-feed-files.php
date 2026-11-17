@@ -591,6 +591,21 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 		return trailingslashit( $dir ) . 'bazna-sluzbeni-' . $kind . ( '' === $code ? '' : '-' . $code ) . '.' . $format;
 	}
 
+	/**
+	 * Recognize only legally named public snapshots. All supported characters
+	 * in a place/address (including spaces and Croatian letters) must remain
+	 * eligible for the mandatory hold after replacement.
+	 *
+	 * @param mixed $name Candidate filesystem basename.
+	 * @return bool
+	 */
+	public static function official_snapshot_name_is_valid( $name ) {
+		return is_string( $name )
+			&& strlen( $name ) <= 240
+			&& false === strpos( $name, '..' )
+			&& (bool) preg_match( '/^[0-9]{8,11}_[\\p{L}\\p{N} ._-]+_(?:ROBA|USLUGE)_[0-9]+_[0-9]{8}_[0-9]{4}\\.(?:csv|xml)$/uD', $name );
+	}
+
 	/** Public snapshots older than 31 days are pruned after a successful new publication. */
 	private function prune_official_snapshots() {
 		$dir = $this->get_public_dir();
@@ -608,8 +623,8 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			}
 		}
 		foreach ( $files as $name => $info ) {
-			if ( ! preg_match( '/_(\\d{8})_(\\d{4})\\.(?:csv|xml)$/D', (string) $name, $m ) ||
-				! preg_match( '/^\\d{8,11}_/', (string) $name ) ) {
+			if ( ! self::official_snapshot_name_is_valid( $name ) ||
+				! preg_match( '/_(\\d{8})_(\\d{4})\\.(?:csv|xml)$/D', (string) $name, $m ) ) {
 				continue;
 			}
 			$date = DateTimeImmutable::createFromFormat( '!Ymd_Hi', $m[1] . '_' . $m[2], new DateTimeZone( 'Europe/Zagreb' ) );
@@ -740,8 +755,7 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 				$holds = get_option( 'bazna_official_retention_holds', array() );
 				$holds = is_array( $holds ) ? $holds : array();
 				foreach ( $prior['snapshot_files'] as $old_name ) {
-					if ( is_string( $old_name ) &&
-						preg_match( '/^\\d{8,11}_[A-Za-z0-9_-]+_(?:ROBA|USLUGE)_\\d+_\\d{8}_\\d{4}\\.(?:csv|xml)$/D', $old_name ) ) {
+					if ( self::official_snapshot_name_is_valid( $old_name ) ) {
 						$holds[ $old_name ] = max( isset( $holds[ $old_name ] ) ? (int) $holds[ $old_name ] : 0, time() + 15 * DAY_IN_SECONDS );
 					}
 				}
