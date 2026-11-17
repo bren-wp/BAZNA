@@ -550,7 +550,7 @@ class Brendigo_Sidrena_Cijena_Catalog {
 		// Never interpret barcode as a number: leading zeroes are significant.
 		$barkod = isset( $row['barkod'] ) ? substr( preg_replace( '/[^0-9A-Za-z._-]/', '', (string) $row['barkod'] ), 0, 64 ) : '';
 		$neto = isset( $row['neto_kolicina'] ) ? substr( sanitize_text_field( (string) $row['neto_kolicina'] ), 0, 100 ) : '';
-		$ean = isset( $row['ean_barkod'] ) && preg_match( '/^\d{8}(?:\d{5})?$/D', (string) $row['ean_barkod'] ) ? (string) $row['ean_barkod'] : '';
+		$ean = isset( $row['ean_barkod'] ) && Brendigo_Sidrena_Cijena_Official_Feed::valid_ean( $row['ean_barkod'] ) ? (string) $row['ean_barkod'] : '';
 		$url    = isset( $row['url'] ) ? esc_url_raw( trim( (string) $row['url'] ), array( 'http', 'https' ) ) : '';
 		$reg         = isset( $row['cijena_redovna'] ) ? $this->normalize_price( $row['cijena_redovna'] ) : '';
 		$sale        = isset( $row['cijena_akcijska'] ) ? $this->normalize_price( $row['cijena_akcijska'] ) : '';
