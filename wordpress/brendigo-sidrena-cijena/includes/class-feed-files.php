@@ -576,6 +576,40 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 		return $xml;
 	}
 
+
+	/** Stable, publicly downloadable official format separate from the client feed. */
+	public function official_live_path( $kind, $format = 'csv', $oznaka = '' ) {
+		if ( ! in_array( $kind, array( 'proizvodi', 'usluge' ), true ) ||
+			! in_array( $format, array( 'csv', 'xml' ), true ) ) {
+			return '';
+		}
+		$dir = $this->get_public_dir();
+		if ( '' === $dir ) {
+			return '';
+		}
+		$code = Brendigo_Sidrena_Cijena_Settings::instance()->normalize_oznaka( $oznaka );
+		return trailingslashit( $dir ) . 'bazna-sluzbeni-' . $kind . ( '' === $code ? '' : '-' . $code ) . '.' . $format;
+	}
+
+	/** Public snapshots older than 31 days are pruned after a successful new publication. */
+	private function prune_official_snapshots() {
+		$dir = $this->get_public_dir();
+		$files = Brendigo_Sidrena_Cijena_Filesystem::dirlist( $dir );
+		if ( ! is_array( $files ) ) {
+			return;
+		}
+		foreach ( $files as $name => $info ) {
+			if ( ! preg_match( '/_(\\d{8})_(\\d{4})\\.(?:csv|xml)$/D', (string) $name, $m ) ||
+				! preg_match( '/^\\d{8,11}_/', (string) $name ) ) {
+				continue;
+			}
+			$date = DateTimeImmutable::createFromFormat( '!Ymd_Hi', $m[1] . '_' . $m[2], new DateTimeZone( 'Europe/Zagreb' ) );
+			if ( $date && $date->getTimestamp() < time() - 31 * DAY_IN_SECONDS ) {
+				Brendigo_Sidrena_Cijena_Filesystem::delete( trailingslashit( $dir ) . $name );
+			}
+		}
+	}
+
 	/**
 	 * Write one live feed file.
 	 *
@@ -615,6 +649,47 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			}
 			$bundle[ $this->get_type_html_path( $kind, $oznaka ) ] = '<!-- sidrena-count:' . count( $type_rows ) . " -->\n" . $this->build_cjenik_embed_html( $type_rows, Brendigo_Sidrena_Cijena_Export::CJENIK_DOM_TOKEN, $oznaka );
 		}
+
+		// Keep existing Android/Windows compatible files unchanged. The law
+		// requires a different column order and filenames; publish separately.
+		$settings = Brendigo_Sidrena_Cijena_Settings::instance();
+		$id = (string) $settings->get( 'trader_identifier', '' );
+		$id_kind = (string) $settings->get( 'trader_identifier_kind', 'oib' );
+		$official_ready = Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( $id, $id_kind );
+		if ( '' !== $id && ! $official_ready ) {
+			return new WP_Error( 'bazna_official_identifier', __( 'Neispravan OIB ili matični broj za službeni cjenik.', 'brendigo-sidrena-cijena' ) );
+		}
+		$official_paths = array();
+		if ( $official_ready ) {
+			$sequence = max( 1, (int) get_option( 'bazna_official_publication_sequence', 1 ) );
+			foreach ( $types as $kind => $type_rows ) {
+				$missing = Brendigo_Sidrena_Cijena_Official_Feed::missing_required_data( $type_rows, $kind );
+				if ( $missing ) {
+					return new WP_Error(
+						'bazna_official_incomplete',
+						sprintf(
+							/* translators: 1: number of missing required values, 2: product or service catalog */
+							__( 'Službeni cjenik nije objavljen: %1$d obveznih podataka nedostaje u skupini %2$s.', 'brendigo-sidrena-cijena' ),
+							count( $missing ), $kind
+						)
+					);
+				}
+				foreach ( array( 'csv', 'xml' ) as $extension ) {
+					$name = Brendigo_Sidrena_Cijena_Official_Feed::filename( $kind, $extension, $oznaka, $sequence );
+					if ( '' === $name ) {
+						return new WP_Error( 'bazna_official_filename', __( 'Službeni naziv datoteke nije ispravan.', 'brendigo-sidrena-cijena' ) );
+					}
+					$body = 'csv' === $extension
+						? Brendigo_Sidrena_Cijena_Official_Feed::csv( $type_rows, $kind )
+						: Brendigo_Sidrena_Cijena_Official_Feed::xml( $type_rows, $kind );
+					$bundle[ trailingslashit( $dir ) . $name ] = $body;
+					$stable = $this->official_live_path( $kind, $extension, $oznaka );
+					$bundle[ $stable ] = $body;
+					$official_paths[ $kind ][ $extension ] = $stable;
+				}
+			}
+		}
+
 		$published = $this->atomic_write_bundle(
 			$bundle,
 			'sidrena_public_write',
@@ -625,6 +700,10 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			return $published;
 		}
 
+		if ( $official_ready ) {
+			update_option( 'bazna_official_publication_sequence', $sequence + 1, false );
+			$this->prune_official_snapshots();
+		}
 		$feed_path = $this->get_public_path( $format, $oznaka );
 		$html_path = $this->get_cjenik_html_path( $oznaka );
 
@@ -636,6 +715,8 @@ class Brendigo_Sidrena_Cijena_Feed_Files {
 			'sha256'      => hash( 'sha256', $feed_body ),
 			'html_sha256' => hash( 'sha256', $html_body ),
 			'format'      => $format,
+			'official_ready' => $official_ready,
+			'official_paths' => $official_paths,
 		);
 	}
 
