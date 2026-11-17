@@ -44,7 +44,7 @@ final class CatalogForm extends FormBase {
         . '<p>Posljednja javna objava: ' . htmlspecialchars((string) ($published['published_at'] ?? 'nije objavljeno'), ENT_QUOTES, 'UTF-8') . '</p>',
     ];
     $groups = [
-      'outlets' => ['label' => 'Poslovnice', 'fields' => ['code', 'name', 'address']],
+      'outlets' => ['label' => 'Poslovnice', 'fields' => ['code', 'name', 'address', 'type']],
       'products' => ['label' => 'Proizvodi', 'fields' => [
         'id', 'naziv', 'sku', 'marka', 'neto_kolicina', 'jedinica_mjere',
         'ean_barkod', 'barkod', 'maloprodajna_cijena', 'sidrena_cijena',
