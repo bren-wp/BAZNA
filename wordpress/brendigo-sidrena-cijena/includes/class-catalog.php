@@ -159,6 +159,24 @@ class Brendigo_Sidrena_Cijena_Catalog {
 		}
 
 		$current = $this->all();
+		// A changed historical amount/date/method invalidates earlier attestation
+		// even if an old browser submitted an unchanged checked checkbox.
+		$previous_by_id = array();
+		foreach ( $current as $old_row ) {
+			$previous_by_id[ $old_row['id'] ] = $old_row;
+		}
+		foreach ( $clean as $index => $item ) {
+			$previous = isset( $previous_by_id[ $item['id'] ] ) ? $previous_by_id[ $item['id'] ] : null;
+			if ( ! is_array( $previous ) ) {
+				continue;
+			}
+			foreach ( array( 'sidrena_cijena', 'sidrena_datum', 'historical_source', 'reference_scope', 'historical_method' ) as $key ) {
+				if ( (string) ( $previous[ $key ] ?? '' ) !== (string) ( $item[ $key ] ?? '' ) ) {
+					$clean[ $index ]['historical_verified'] = '';
+					break;
+				}
+			}
+		}
 		$next = max(
 			$this->next_id( $clean ),
 			$this->next_id( $current ),
@@ -248,6 +266,13 @@ class Brendigo_Sidrena_Cijena_Catalog {
 				'sidrena_cijena'  => $row['sidrena_cijena'],
 				'vrsta'           => $this->row_vrsta( $row ),
 				'sidrena_datum'   => $this->display_date( $row ),
+				'reference_scope' => isset( $row['reference_scope'] ) ? $row['reference_scope'] : '',
+				'historical_method' => isset( $row['historical_method'] ) ? $row['historical_method'] : '',
+				'historical_verified' => (
+					isset( $row['historical_verified'], $row['historical_source'] ) &&
+					'yes' === $row['historical_verified'] &&
+					strlen( trim( (string) $row['historical_source'] ) ) >= 4
+				) ? 'yes' : '',
 				'poslovnica'      => $this->row_poslovnica( $row ),
 			);
 
@@ -316,6 +341,10 @@ class Brendigo_Sidrena_Cijena_Catalog {
 				'cijena_jedinice_mjere' => isset( $data['cijena_jedinice_mjere'] ) ? $data['cijena_jedinice_mjere'] : '',
 				'vrsta'                 => isset( $data['vrsta'] ) ? $data['vrsta'] : '',
 				'sidrena_datum'         => isset( $data['sidrena_datum'] ) ? $data['sidrena_datum'] : '',
+				'historical_source' => isset( $data['historical_source'] ) ? $data['historical_source'] : '',
+				'reference_scope' => isset( $data['reference_scope'] ) ? $data['reference_scope'] : '',
+				'historical_method' => isset( $data['historical_method'] ) ? $data['historical_method'] : '',
+				'historical_verified' => isset( $data['historical_verified'] ) ? $data['historical_verified'] : '',
 				'poslovnica'            => isset( $data['poslovnica'] ) ? $data['poslovnica'] : '',
 			),
 			false
@@ -407,7 +436,7 @@ class Brendigo_Sidrena_Cijena_Catalog {
 			$row['dostupnost'] = isset( $existing['dostupnost'] ) ? $existing['dostupnost'] : 'dostupno';
 		}
 
-		$key_if_absent = array( 'cjm', 'cjm_suffix', 'naziv_posebnog_oblika', 'jedinica_mjere', 'cijena_jedinice_mjere', 'poslovnica', 'neto_kolicina', 'ean_barkod' );
+		$key_if_absent = array( 'cjm', 'cjm_suffix', 'naziv_posebnog_oblika', 'jedinica_mjere', 'cijena_jedinice_mjere', 'poslovnica', 'neto_kolicina', 'ean_barkod', 'historical_source', 'reference_scope', 'historical_method', 'historical_verified' );
 		foreach ( $key_if_absent as $key ) {
 			if ( ! array_key_exists( $key, $data ) ) {
 				$row[ $key ] = isset( $existing[ $key ] ) ? $existing[ $key ] : '';
@@ -424,6 +453,12 @@ class Brendigo_Sidrena_Cijena_Catalog {
 			$row['sidrena_datum'] = $existing['sidrena_datum'];
 		}
 
+		foreach ( array( 'sidrena_cijena', 'sidrena_datum', 'historical_source', 'reference_scope', 'historical_method' ) as $key ) {
+			if ( (string) ( $row[ $key ] ?? '' ) !== (string) ( $existing[ $key ] ?? '' ) ) {
+				$row['historical_verified'] = '';
+				break;
+			}
+		}
 		return $row;
 	}
 
@@ -566,6 +601,27 @@ class Brendigo_Sidrena_Cijena_Catalog {
 		$vrsta       = $this->normalize_vrsta( isset( $row['vrsta'] ) ? $row['vrsta'] : '' );
 		$datum       = $this->normalize_date( isset( $row['sidrena_datum'] ) ? $row['sidrena_datum'] : '' );
 		$poslovnica  = $this->row_poslovnica( $row );
+		$source = isset( $row['historical_source'] ) ? substr( sanitize_text_field( (string) $row['historical_source'] ), 0, 500 ) : '';
+		$scope = isset( $row['reference_scope'] ) && in_array( $row['reference_scope'], array( 'legacy_fmcg', 'general_goods_services' ), true )
+			? $row['reference_scope'] : '';
+		$method = isset( $row['historical_method'] ) && in_array( $row['historical_method'], array(
+			'reference_day', 'first_offer', 'discount_lowest_30d', 'discount_previous_retail',
+		), true ) ? $row['historical_method'] : '';
+		$verified = isset( $row['historical_verified'] ) && in_array( $row['historical_verified'], array( 'yes', '1', 'true' ), true ) ? 'yes' : '';
+		if ( '' !== $verified && (
+			strlen( trim( $source ) ) < 4 ||
+			'' === $sidrena ||
+			'' !== Brendigo_Sidrena_Cijena_Official_Feed::evidence_issue(
+				array(
+					'historical_verified' => $verified,
+					'reference_scope' => $scope,
+					'historical_method' => $method,
+					'sidrena_datum' => $datum,
+				), 'usluga' === $vrsta ? 'usluge' : 'proizvodi'
+			)
+		) ) {
+			$verified = '';
+		}
 		$oblik       = is_string( $oblik ) ? $oblik : '';
 		$jedinica    = is_string( $jedinica ) ? $jedinica : '';
 
@@ -607,6 +663,10 @@ class Brendigo_Sidrena_Cijena_Catalog {
 			'cijena_jedinice_mjere' => $jed_cijena,
 			'vrsta'                 => $vrsta,
 			'sidrena_datum'         => $datum,
+			'historical_source' => $source,
+			'reference_scope' => $scope,
+			'historical_method' => $method,
+			'historical_verified' => $verified,
 			'poslovnica'            => $poslovnica,
 		);
 	}
