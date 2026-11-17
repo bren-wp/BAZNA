@@ -757,8 +757,107 @@ public partial class MainWindow : Window
             U.Field("Adresa web-stranice sa službenim dodatkom",site),
             controls,connectionStatus,published,
             U.Muted("Dostupni cjenici:"),feeds));
+        // Private, explicit draft sync uses an application-specific password.
+        // It never stores credentials or silently changes the public price list.
+        var syncUsername=U.Box("WordPress korisničko ime",280);
+        var syncPassword=new PasswordBox { MaxLength=128, Width=280 };
+        var remoteRows=new ComboBox { MinWidth=220,MaxWidth=480 };
+        var remotePrice=U.Box("Nova aktualna cijena, npr. 12,50",180);
+        var syncStatus=U.Muted("Za uređivanje odaberite samostalni BAZNA katalog (bez WooCommercea).");
+        DraftSyncSnapshot? remoteDraft=null;
+        remoteRows.SelectionChanged+=(_,_)=>{
+            if(remoteRows.SelectedItem is DraftSyncRow row)
+                remotePrice.Text=row.CurrentPrice;
+        };
+        var syncActions=U.Horizontal();
+        syncActions.Children.Add(U.Action("Preuzmi radni nacrt",async ()=>{
+            _pendingWordPressRequest?.Cancel();
+            using var lifetime=new CancellationTokenSource();
+            _pendingWordPressRequest=lifetime;
+            syncStatus.Text="Provjeravam prava i preuzimam privatni nacrt…";
+            try
+            {
+                var snapshot=await AuthenticatedDraftSync.PullAsync(site.Text,syncUsername.Text,
+                    syncPassword.Password,cancellationToken:lifetime.Token);
+                if(lifetime.IsCancellationRequested || _activePage!="Sinkronizacija")return;
+                remoteDraft=snapshot;
+                remoteRows.Items.Clear();
+                foreach(var row in snapshot.Rows)remoteRows.Items.Add(row);
+                remoteRows.DisplayMemberPath="Name";
+                if(remoteRows.Items.Count>0)remoteRows.SelectedIndex=0;
+                syncStatus.Text=$"Učitano {snapshot.Rows.Count} stavki. Nije izmijenjen ni objavljen cjenik.";
+            }
+            catch(Exception ex) when(ex is ArgumentException or HttpRequestException or
+                InvalidDataException or UnauthorizedAccessException or DraftSyncConflictException or
+                System.Text.Json.JsonException or OperationCanceledException)
+            {
+                if(!lifetime.IsCancellationRequested)
+                    syncStatus.Text=UserFacingError.Describe(ex);
+            }
+            finally
+            {
+                if(ReferenceEquals(_pendingWordPressRequest,lifetime))_pendingWordPressRequest=null;
+            }
+        },true));
+        syncActions.Children.Add(U.Action("Spremi aktualnu cijenu u nacrt",async ()=>{
+            if(remoteDraft is null || remoteRows.SelectedItem is not DraftSyncRow row)
+            {
+                syncStatus.Text="Prvo preuzmite nacrt i odaberite stavku.";
+                return;
+            }
+            decimal newValue;
+            try{newValue=MoneyParser.Parse(remotePrice.Text);}
+            catch(Exception ex) when(ex is FormatException or ArgumentException)
+            {
+                syncStatus.Text="Unesite ispravnu cijenu u EUR.";
+                return;
+            }
+            if(newValue<0m || newValue>999999999m || decimal.Round(newValue,2)!=newValue)
+            {
+                syncStatus.Text="Iznos mora biti pozitivan ili nula, s najviše dvije decimale.";
+                return;
+            }
+            _pendingWordPressRequest?.Cancel();
+            using var lifetime=new CancellationTokenSource();
+            _pendingWordPressRequest=lifetime;
+            syncStatus.Text="Spremam samo radni nacrt…";
+            try
+            {
+                await AuthenticatedDraftSync.PushCurrentPriceAsync(site.Text,syncUsername.Text,
+                    syncPassword.Password,remoteDraft.Revision,row,newValue,
+                    cancellationToken:lifetime.Token);
+                if(lifetime.IsCancellationRequested || _activePage!="Sinkronizacija")return;
+                remoteDraft=null;
+                remoteRows.Items.Clear();
+                syncStatus.Text="Aktualna cijena spremljena u WordPress nacrt. Preuzmite novu verziju prije sljedeće promjene; javni cjenik nije objavljen.";
+            }
+            catch(DraftSyncConflictException)
+            {
+                remoteDraft=null;
+                remoteRows.Items.Clear();
+                syncStatus.Text="Druga sesija je već izmijenila nacrt. Ponovno ga preuzmite; ništa nije prepisano.";
+            }
+            catch(Exception ex) when(ex is ArgumentException or HttpRequestException or
+                InvalidDataException or UnauthorizedAccessException or
+                System.Text.Json.JsonException or OperationCanceledException)
+            {
+                if(!lifetime.IsCancellationRequested)
+                    syncStatus.Text=UserFacingError.Describe(ex);
+            }
+            finally
+            {
+                if(ReferenceEquals(_pendingWordPressRequest,lifetime))_pendingWordPressRequest=null;
+            }
+        }));
+        outer.Children.Add(U.Card("Sigurna razmjena radnog nacrta",
+            U.Notice("Korisničko ime i WordPress aplikacijska lozinka koriste se samo za ovaj poziv i ne spremaju se u SQLite. Za radni nacrt vrijedi zaštita od sukoba verzija. Javna objava ostaje odvojena."),
+            U.Field("WordPress korisničko ime",syncUsername),
+            U.Field("Aplikacijska lozinka (WordPress → Profil)",syncPassword),
+            U.Field("Stavka iz WordPress nacrta",remoteRows),
+            U.Field("Nova maloprodajna cijena",remotePrice),
+            syncActions,syncStatus));
         outer.Children.Add(U.Card("Automatska objava i sinkronizacija",
-            U.Notice("Pregled javnih sadržaja ne mijenja podatke na vašoj web-stranici. Automatsko objavljivanje nije dostupno u ovoj verziji."),
+            U.Notice("Razmjena privatnog nacrta nije objava službenih cjenika. U WordPressu zasebno pregledajte dokaze i potvrdite objavu; WooCommerce i višestruki izdavači još trebaju transakcijski adapter."),
             U.Action("Službeni WordPress dodatak",()=>
                 OpenUrl("https://wordpress.org/plugins/brendigo-sidrena-cijena/"))));
         return outer;
