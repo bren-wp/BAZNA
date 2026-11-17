@@ -217,7 +217,7 @@ defined( 'ABSPATH' ) || exit;
 								<th><?php echo esc_html__( 'Neto količina', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Cijena za jedinicu', 'brendigo-sidrena-cijena' ); ?></th>
 								<th><?php echo esc_html__( 'Bazna cijena', 'brendigo-sidrena-cijena' ); ?></th>
-								<th><?php echo esc_html__( 'Datum sidrene', 'brendigo-sidrena-cijena' ); ?></th>
+								<th><?php echo esc_html__( 'Datum bazne cijene', 'brendigo-sidrena-cijena' ); ?></th>
 								<?php if ( Brendigo_Sidrena_Cijena_Settings::instance()->is_cjm_enabled() ) : ?>
 								<th><?php echo esc_html__( 'Mjerna jedinica', 'brendigo-sidrena-cijena' ); ?></th>
 								<?php endif; ?>

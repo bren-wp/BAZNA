@@ -266,11 +266,16 @@ public sealed class PriceStore : IDisposable
             // reference date uses the documented first-offer price.
             // Require an explicit source marker instead of silently
             // treating every later historical date as a reference date.
-            var known = date is not null && PermittedAnchorDates.Contains(date);
+            // Services have only the 2026-09-10 general-goods reference date;
+            // the legacy 2025-05-02 date is reserved for FMCG goods.
+            var known = date is not null && PermittedAnchorDates.Contains(date) &&
+                (kind == "Proizvod" || date == SidrenaLegalContract.GeneralReferenceDate);
             var offeredLater = date is not null &&
                 DateOnly.TryParseExact(date,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,
                     System.Globalization.DateTimeStyles.None,out var firstOffer) &&
-                firstOffer > new DateOnly(2025,5,2) &&
+                firstOffer > (kind == "Usluga" ||
+                    !source.Contains("FMCG",StringComparison.OrdinalIgnoreCase)
+                    ? new DateOnly(2026,9,10) : new DateOnly(2025,5,2)) &&
                 firstOffer <= DateOnly.FromDateTime(DateTime.UtcNow) &&
                 !string.IsNullOrWhiteSpace(source) &&
                 (source.Contains("Prva ponuda:",StringComparison.OrdinalIgnoreCase) ||

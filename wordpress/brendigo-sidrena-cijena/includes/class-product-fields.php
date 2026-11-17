@@ -50,7 +50,7 @@ class Brendigo_Sidrena_Cijena_Product_Fields {
 		</div>
 		<div class="sidrena-cijena-admin-fields__note">
 			<span class="dashicons dashicons-info-outline" aria-hidden="true"></span>
-			<span><?php echo esc_html__( 'Upišite referentnu cijenu i datum na koji je ta cijena vrijedila.', 'brendigo-sidrena-cijena' ); ?></span>
+			<span><?php echo esc_html__( 'Unesite dokazanu baznu cijenu, izvor i datum. Za skupine iz 2. 5. 2025. vrijedi posebno pravilo najniže cijene prije početka popusta, a za ostalu robu i usluge prethodno primijenjena maloprodajna cijena; ne koristite automatski današnju cijenu.', 'brendigo-sidrena-cijena' ); ?></span>
 		</div>
 		<?php
 
