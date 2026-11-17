@@ -161,7 +161,7 @@ public partial class MainWindow : Window
     {
         if(page!="Sinkronizacija") _pendingWordPressRequest?.Cancel();
         _activePage=page;
-        PageTitle.Text=page=="Pregled"?"Sidrene cijene i digitalni cjenici":page;
+        PageTitle.Text=page=="Pregled"?"Bazne cijene i digitalni cjenici":page;
         PageSubtitle.Text=page switch{
             "Pregled"=>"Sve vaše cijene, artikli i cjenici na jednom mjestu.",
             "Artikli"=>"Upravljanje proizvodima, cijenama i osnovnim podacima.",
@@ -215,7 +215,7 @@ public partial class MainWindow : Window
         var changes=_workspace.ListRecentChanges(6);
         outer.Children.Add(U.Metrics(
             U.Stat("Artikala i usluga",totals.Total.ToString(Hr),"Ukupno u evidenciji","⬡"),
-            U.Stat("Potvrđenih sidrenih",totals.ConfirmedAnchors.ToString(Hr),
+            U.Stat("Potvrđenih baznih cijena",totals.ConfirmedAnchors.ToString(Hr),
                 "Nepotvrđene vrijednosti ostaju prazne","⚓"),
             U.Stat("Promjena cijena",_workspace.CountPriceChanges().ToString(Hr),
                 "Evidencija promjena","↗"),
@@ -315,7 +315,7 @@ public partial class MainWindow : Window
         var barcode=U.Box("Barkod",160);
         var unit=U.Box("Jedinica mjere",105);unit.Text="kom";
         var actual=U.Box("Aktualna cijena",125);
-        var anchor=U.Box("Opcionalna sidrena cijena",125);
+        var anchor=U.Box("Bazna cijena (iz provjerene evidencije)",125);
         var source=U.Box("Povijesni izvor",240);
         var date=U.Choice("10. 9. 2026.","2. 5. 2025.");
         var rightFields=U.Vertical();
@@ -326,7 +326,7 @@ public partial class MainWindow : Window
         var money=U.Horizontal();money.Children.Add(U.Field("Aktualna cijena (€) *",actual));
         money.Children.Add(U.Field("Potvrđena bazna (€)",anchor));
         rightFields.Children.Add(money);
-        rightFields.Children.Add(U.Field("Referentni datum (samo uz sidrenu)",date));
+        rightFields.Children.Add(U.Field("Referentni datum bazne cijene",date));
         rightFields.Children.Add(U.Field("Izvor povijesne cijene",source));
         rightFields.Children.Add(U.Notice("Bazna cijena ne izračunava se iz današnje. Datum i izvor unose se samo uz dokaziv povijesni iznos."));
         rightFields.Children.Add(U.Action("Spremi novu stavku",()=>{
@@ -364,7 +364,7 @@ public partial class MainWindow : Window
             {
                 _prices.UpdateItemDetails(selected.Id,eName.Text,eSku.Text,eBarcode.Text,eUnit.Text,eReason.Text);
                 Reload(refresh:true,selectId:selected.Id);eReason.Clear();
-                Status("Podaci su spremljeni, a audit izmjene ostaje zabilježen. Cijene i sidrene reference nisu promijenjene.");
+                Status("Podaci su spremljeni, a audit izmjene ostaje zabilježen. Cijene i bazne reference nisu promijenjene.");
             }
             catch(Exception ex)when(ex is ArgumentException or KeyNotFoundException or Microsoft.Data.Sqlite.SqliteException){Error(ex);}
         },true));
@@ -413,7 +413,7 @@ public partial class MainWindow : Window
             if(answer!=MessageBoxResult.Yes)return;
             int imported=_prices.ImportNewRows(rows);
             refresh();
-            Status($"Uvezeno {imported} novih stavki. Postojeće cijene i sidrene reference nisu izmijenjene.");
+            Status($"Uvezeno {imported} novih stavki. Postojeće cijene i bazne reference nisu izmijenjene.");
         }
         catch(Exception ex)when(ex is ArgumentException or IOException or UnauthorizedAccessException or
             DecoderFallbackException or Microsoft.Data.Sqlite.SqliteException)
@@ -844,7 +844,7 @@ public partial class MainWindow : Window
         return U.Card("Pomoć i podrška",
             U.Text("Brzi početak",20,true),
             U.Muted("1. Otvorite Artikli ili Usluge i unesite aktualnu cijenu."),
-            U.Muted("2. Sidrenu cijenu unesite samo kad imate provjerljiv povijesni izvor."),
+            U.Muted("2. Baznu cijenu unesite samo kad imate provjerljiv povijesni izvor."),
             U.Muted("3. Promjenu cijene zabilježite razlogom; povijest je trajno dostupna."),
             U.Muted("4. Izradite cjenik u odabranom formatu i otvorite ga u Arhivi."),
             U.Notice("Prije objave cjenika provjerite točnost podataka i ispunjavanje propisanih uvjeta."),
@@ -856,7 +856,7 @@ public partial class MainWindow : Window
             U.Text("Pravne informacije",18,true),
             U.Muted("Nositelj prava na Windows aplikaciju: Brendigo LTD."),
             U.Text("Podrška",18,true),
-            U.Action("Pošalji e-poštu podršci",()=>OpenUrl("mailto:sidrena@brendigo.com")));
+            U.Action("Pošalji e-poštu podršci",()=>OpenUrl("mailto:info@brendigo.com")));
     }
 
     private void OpenLocal(string path)
