@@ -270,15 +270,18 @@ public sealed class PriceStore : IDisposable
             // the legacy 2025-05-02 date is reserved for FMCG goods.
             var known = date is not null && PermittedAnchorDates.Contains(date) &&
                 (kind == "Proizvod" || date == SidrenaLegalContract.GeneralReferenceDate);
-            var offeredLater = date is not null &&
+            // Validate the evidence marker before accessing its content;
+            // missing evidence is a controlled validation error, not a crash.
+            var hasSource = !string.IsNullOrWhiteSpace(source);
+            var documentedFmcg = hasSource &&
+                source!.Contains("FMCG",StringComparison.OrdinalIgnoreCase);
+            var offeredLater = date is not null && hasSource &&
                 DateOnly.TryParseExact(date,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,
                     System.Globalization.DateTimeStyles.None,out var firstOffer) &&
-                firstOffer > (kind == "Usluga" ||
-                    !source.Contains("FMCG",StringComparison.OrdinalIgnoreCase)
-                    ? new DateOnly(2026,9,10) : new DateOnly(2025,5,2)) &&
+                firstOffer > (kind == "Proizvod" && documentedFmcg
+                    ? new DateOnly(2025,5,2) : new DateOnly(2026,9,10)) &&
                 firstOffer <= DateOnly.FromDateTime(DateTime.UtcNow) &&
-                !string.IsNullOrWhiteSpace(source) &&
-                (source.Contains("Prva ponuda:",StringComparison.OrdinalIgnoreCase) ||
+                (source!.Contains("Prva ponuda:",StringComparison.OrdinalIgnoreCase) ||
                  source.Contains("Prvo stavljanje u ponudu:",StringComparison.OrdinalIgnoreCase));
             if(!known && !offeredLater)
                 throw new ArgumentException("Bazna cijena zahtijeva pravilan referentni datum; kasniji datum dopušten je uz dokaz Prva ponuda:.");
