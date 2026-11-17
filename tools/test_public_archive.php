@@ -55,6 +55,11 @@ $names = array(
 );
 foreach ( $names as $name ) { file_put_contents( $GLOBALS['bazna_archive_test_dir'] . '/' . $name, 'public immutable fixture' ); }
 $archive = Brendigo_Sidrena_Cijena_Archive::instance();
+bazna_archive_assert( '' === $archive->sanitize_archive_name( '../private.csv' ), 'Raw traversal rejected before filesystem lookup' );
+bazna_archive_assert( '' === $archive->sanitize_archive_name( '%2e%2e%2fprivate.csv' ), 'Encoded traversal rejected before filesystem lookup' );
+bazna_archive_assert( '' === $archive->sanitize_archive_name( 'nested%2Fpublic.csv' ), 'Nested archive paths rejected rather than reduced to a basename' );
+bazna_archive_assert( '' === $archive->sanitize_archive_name( 'nested%5Cpublic.csv' ), 'Windows separators rejected before filesystem lookup' );
+bazna_archive_assert( '12345678903_webshop_Ulica 1_001_ROBA_1_20261117_0930.csv' === $archive->sanitize_archive_name( '12345678903_webshop_Ulica 1_001_ROBA_1_20261117_0930.csv' ), 'Legal filename with spaces remains accessible' );
 $all = $archive->get_official_archive_files();
 bazna_archive_assert( 4 === count( $all ), 'Only current merchant, valid named public CSV/XML snapshots listed' );
 bazna_archive_assert( str_contains( $all[0]['name'], 'RI-01' ) && 'csv' === $all[0]['ext'], 'Latest official snapshot sorts first' );
