@@ -306,6 +306,21 @@ $sidrena_history        = $sidrena_export->get_publication_history();
 			<p class="description"><?php echo esc_html__( 'Ponavljajuća upozorenja istog uzroka ograničena su na najviše jedno u 12 sati. Dostava zahtijeva ispravan WordPress sustav slanja pošte.', 'brendigo-sidrena-cijena' ); ?></p>
 		</section>
 
+
+		<section class="sidrena-cijena-automation">
+			<h3><?php echo esc_html__( 'Identifikacija trgovca u službenom cjeniku (NN 132/2026)', 'brendigo-sidrena-cijena' ); ?></h3>
+			<label for="sidrena_cijena_trader_identifier_kind"><?php echo esc_html__( 'Vrsta identifikatora', 'brendigo-sidrena-cijena' ); ?></label>
+			<select name="sidrena_cijena_trader_identifier_kind" id="sidrena_cijena_trader_identifier_kind">
+				<option value="oib" <?php selected( $sidrena_settings->get( 'trader_identifier_kind', 'oib' ), 'oib' ); ?>><?php echo esc_html__( 'OIB pravne osobe (11 znamenaka)', 'brendigo-sidrena-cijena' ); ?></option>
+				<option value="maticni_broj" <?php selected( $sidrena_settings->get( 'trader_identifier_kind', 'oib' ), 'maticni_broj' ); ?>><?php echo esc_html__( 'Matični broj fizičke osobe (8 znamenaka)', 'brendigo-sidrena-cijena' ); ?></option>
+			</select>
+			<label for="sidrena_cijena_trader_identifier"><?php echo esc_html__( 'Identifikator trgovca', 'brendigo-sidrena-cijena' ); ?></label>
+			<input class="regular-text" type="text" inputmode="numeric" maxlength="11" autocomplete="off" name="sidrena_cijena_trader_identifier" id="sidrena_cijena_trader_identifier" value="<?php echo esc_attr( (string) $sidrena_settings->get( 'trader_identifier', '' ) ); ?>" />
+			<?php if ( ! Brendigo_Sidrena_Cijena_Official_Feed::valid_identifier( $sidrena_settings->get( 'trader_identifier', '' ), $sidrena_settings->get( 'trader_identifier_kind', 'oib' ) ) ) : ?>
+				<p class="notice notice-warning inline"><?php echo esc_html__( 'Identifikator nije postavljen ili nema propisani oblik. Odvojene službene CSV/XML datoteke neće se generirati; postojeći kompatibilni cjenici ostaju dostupni.', 'brendigo-sidrena-cijena' ); ?></p>
+			<?php endif; ?>
+			<p class="description"><?php echo esc_html__( 'U službenom izvozu redoslijed stupaca slijedi čl. 3. novog Pravilnika. Datum i broj pohrane ulaze u naziv svake objave; stalna adresa služi za automatizirani dohvat. Prazne povijesne cijene ostaju prazne i zahtijevaju dokumentiranje.', 'brendigo-sidrena-cijena' ); ?></p>
+		</section>
 		<section class="sidrena-cijena-automation">
 			<h3><span class="dashicons dashicons-media-spreadsheet aria-hidden="true"></span><?php echo esc_html__( 'Format datoteke', 'brendigo-sidrena-cijena' ); ?></h3>
 			<fieldset class="sidrena-cijena-choices">
