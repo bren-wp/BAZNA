@@ -428,8 +428,10 @@ class Brendigo_Sidrena_Cijena_Archive {
 	public function sanitize_archive_name( $name ) {
 		$name = is_string( $name ) ? $name : '';
 		$name = rawurldecode( $name );
-		$name = str_replace( '\\', '/', $name );
-		$name = basename( $name );
+		// Archive names are basenames, never paths. Reject encoded separators before lookup.
+		if ( false !== strpos( $name, '/' ) || false !== strpos( $name, '\\' ) ) {
+			return '';
+		}
 
 		if ( '' === $name || false !== strpos( $name, '..' ) ) {
 			return '';
@@ -716,15 +718,6 @@ class Brendigo_Sidrena_Cijena_Archive {
 	}
 
 	/**
-	 * File list for the [sidrena-arhiva] shortcode. Name and date only.
-	 *
-	 * An oznaka keeps files for that object code. Names the parser does not
-	 * recognize stay in the unfiltered list only.
-	 *
-	 * @param string $oznaka Object code, empty for every file.
-	 * @return string
-	 */
-	/**
 	 * Find public, timestamped NN 132/2026 official versions. Unlike the
 	 * legacy daily archive, these snapshots have separate unique sequence
 	 * filenames and are never replaced merely because another update occurred
@@ -763,7 +756,7 @@ class Brendigo_Sidrena_Cijena_Archive {
 				continue;
 			}
 			$place = $parts[2];
-			if ( '' !== $oznaka && ! str_ends_with( $place, '_' . $oznaka ) &&
+			if ( '' !== $oznaka && substr( $place, -strlen( '_' . $oznaka ) ) !== '_' . $oznaka &&
 				'ZA_SVA_PRODAJNA_MJESTA' !== $place ) {
 				continue;
 			}
